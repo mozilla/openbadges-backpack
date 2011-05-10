@@ -34,6 +34,7 @@
     }
   }
   
+  badgeAPI.backpack = ORIGIN;
   badgeAPI.add = queue("add");
   badgeAPI.update = queue("update");
   badgeAPI.revoke = queue("revoke");
@@ -45,14 +46,15 @@
       origin: ORIGIN,
       scope: "badges"
     })
-    badgeAPI.add = function(location){
+    badgeAPI.add = function(location, callback){
       badgeChannel.call({
         method: "add",
         params: location,
-        success: function(response){ console.log('success', response); },
+        success: callback,
         error: function(err){ console.dir(err); }
       })
     }
+    
     queue.flush(badgeAPI, "add");
     queue.flush(badgeAPI, "update");
     queue.flush(badgeAPI, "revoke");

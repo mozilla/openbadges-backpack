@@ -12,8 +12,12 @@
     Hello.
     <script type="text/javascript" src="http://backpack.local/include/badge.js"></script>
     <script>
-      navigator.badges.add("first call");
-      navigator.badges.add("second call");
+      navigator.badges.add("/brian_js.badge", function(resp) {
+        console.dir(resp);
+      });
+      navigator.badges.add("/brian_audio.badge", function(resp) {
+        console.dir(resp);
+      });
     </script>
   </body>
 </html>
