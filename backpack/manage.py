@@ -1,5 +1,14 @@
 #!/usr/bin/env python
+import os
+import site
+
 from django.core.management import execute_manager
+
+ROOT = os.path.dirname(os.path.abspath(__file__))
+path = lambda *a: os.path.join(ROOT, *a)
+
+site.addsitedir(path('apps'))
+
 import imp
 try:
     imp.find_module('settings') # Assumed to be in the same directory.
