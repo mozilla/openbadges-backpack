@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block title %} | Login{% endblock %}
 {% block content %}
-  <h1>Log the fuck in</h1>
-  <form action="login" method="post">
+  <h1>Log in</h1>
+  <form action="" method="post">
     {% csrf_token %}
     <p><label>E-mail: <input type="text" name="email"></label></p>
     <p><label>Password: <input type="password" name="password"></label></p>
