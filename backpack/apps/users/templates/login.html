@@ -2,6 +2,10 @@
 {% block title %} | Login{% endblock %}
 {% block content %}
   <h1>Log in</h1>
+  {% if error %}
+    <p><strong>Invalid credentials</strong></p>
+  {% endif %}
+
   <form action="" method="post">
     {% csrf_token %}
     <p><label>E-mail: <input type="text" name="email"></label></p>
