@@ -19,8 +19,9 @@ def badge_manifest(request, badge_id=None):
 def issue_badge(request, badge_id=None):
     path = get_external_path(request, badge_id)
     params = urllib.urlencode({'badge': path})
+    
+    # TODO: handle errors with opening backpack
     remote = urllib2.urlopen(ISSUE_URL, params)
-    dir(remote)
-    return HttpResponse(params)
+    return HttpResponse(remote)
     
         
