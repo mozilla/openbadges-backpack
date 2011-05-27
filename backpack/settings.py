@@ -119,11 +119,13 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
+    'django_nose',
     'south',
     'users',
     'manager',
 )
 
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 LOGIN_URL = '/login'
 
 # A sample logging configuration. The only tangible logging
