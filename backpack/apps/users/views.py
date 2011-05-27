@@ -6,7 +6,8 @@ from django.contrib import auth
 from users.forms import UserCreationForm
 
 def register(request):
-    if request.user is not None and request.user.is_active:
+    user = getattr(request, 'user', None)
+    if user is not None and user.is_active:
         return HttpResponseRedirect('/')
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
