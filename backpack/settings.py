@@ -120,10 +120,14 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django_nose',
+    'django_sha2',
     'south',
     'users',
     'manager',
 )
+
+PWD_ALGORITHM = 'bcrypt'
+BCRYPT_ROUNDS = '12'
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 LOGIN_URL = '/login'
