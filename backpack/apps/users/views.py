@@ -3,6 +3,20 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.contrib import auth
+from users.forms import UserCreationForm
+
+def register(request):
+    if request.user is not None and request.user.is_active:
+        return HttpResponseRedirect('/')
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            new_user = form.save()
+            return HttpResponseRedirect('/')
+    else:
+        form = UserCreationForm()
+    return render_to_response('register.html', {'form': form },
+                              context_instance=RequestContext(request))
 
 def logout(request):
     auth.logout(request)
@@ -25,4 +39,3 @@ def login(request):
     else:
         return render_to_response('login.html', {'error': True},
                                   context_instance=RequestContext(request))
-    
