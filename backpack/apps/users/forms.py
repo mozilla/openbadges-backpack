@@ -6,8 +6,7 @@ class UserCreationForm(forms.ModelForm):
     """
     A form that creates a user, with no privileges, from the given username and password.
     """
-    email = forms.RegexField(label=_("E-mail"), max_length=255, regex=r'^.+@.+\..+$',
-        help_text = _("Required."),
+    email = forms.EmailField(label=_("E-mail"), max_length=255, help_text = _("Required."),
         error_messages = {'invalid': _("This doesn't look like a valid email address")})
     password1 = forms.CharField(label=_("Password"), widget=forms.PasswordInput)
     password2 = forms.CharField(label=_("Password confirmation"), widget=forms.PasswordInput,
