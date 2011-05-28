@@ -1,6 +1,7 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
+from models import UserProfile
 
 class UserCreationForm(forms.ModelForm):
     """
@@ -38,4 +39,5 @@ class UserCreationForm(forms.ModelForm):
         user.is_active = False
         if commit:
             user.save()
+            UserProfile(user=user).save()
         return user

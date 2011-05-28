@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.test.client import RequestFactory, Client
 from django.contrib.auth.models import User
+from models import UserProfile
 from forms import UserCreationForm
 import views
 
@@ -10,6 +11,19 @@ class UserTests(TestCase):
         self.factory = RequestFactory()
         self.client = Client()
     
+    def tearDown(self):
+        try:    User.objects.get(username=self.u['email']).delete()
+        except: pass
+    
+    def create_user(self):
+        UserCreationForm({
+            'email': self.u['email'],
+            'password1': self.u['pass'],
+            'password2': self.u['pass'],
+        }).save()
+        return User.objects.get(username=self.u['email'])
+        
+        
     def test_create_valid_user(self):
         request = self.factory.post('/register', {
             'email': self.u['email'],
@@ -47,9 +61,9 @@ class UserTests(TestCase):
         logged_in = self.client.login(username=self.u['email'], password=self.u['pass'])
         self.assertFalse(logged_in, "Should not be able to login without activating")
         
-    def tearDown(self):
-        try:
-            User.objects.get(username=self.u['email']).delete()
-        except:
-            pass
-        
+    def test_getting_users_profile(self):
+        user = self.create_user()
+        profile = user.get_profile()
+        self.assertIsInstance(profile, UserProfile, "Could not get user profile")
+        code = profile.get_confirmation_code()
+        self.assertEqual(len(code), 60, "Didn't generate a proper confirmation code")
