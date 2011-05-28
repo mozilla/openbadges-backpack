@@ -30,11 +30,11 @@ def login(request):
     if request.user.is_authenticated():
         # TODO: print some sort of message?
         return HttpResponseRedirect('/')
-    
+
     if request.method == 'GET':
         return render_to_response('login.html', {},
                                   context_instance=RequestContext(request))
-        
+
     email = request.POST.get('email', '')
     password = request.POST.get('password', '')
     user = auth.authenticate(username=email, password=password)

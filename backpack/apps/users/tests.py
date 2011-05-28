@@ -11,11 +11,11 @@ class UserTests(TestCase):
         self.u = {'email':'test@example.com', 'pass':'password'}
         self.factory = RequestFactory()
         self.client = Client()
-    
+
     def tearDown(self):
         try:    User.objects.get(username=self.u['email']).delete()
         except: pass
-    
+
     def create_user(self):
         UserCreationForm({
             'email': self.u['email'],
@@ -23,8 +23,8 @@ class UserTests(TestCase):
             'password2': self.u['pass'],
         }).save()
         return User.objects.get(username=self.u['email'])
-        
-        
+
+
     def test_create_valid_user(self):
         request = self.factory.post('/register', {
             'email': self.u['email'],
@@ -38,7 +38,7 @@ class UserTests(TestCase):
             user = None
         self.assertIsInstance(user, User, "User creation failed")
         self.assertEqual(response.status_code, 302, "Failed to redirect on successful creation")
-    
+
     def test_non_matching_password(self):
         request = self.factory.post('/register', {
             'email': self.u['email'],
@@ -61,7 +61,7 @@ class UserTests(TestCase):
         }).save()
         logged_in = self.client.login(username=self.u['email'], password=self.u['pass'])
         self.assertFalse(logged_in, "Should not be able to login without activating")
-        
+
     def test_getting_users_profile(self):
         user = self.create_user()
         profile = user.get_profile()
@@ -80,14 +80,11 @@ class UserTests(TestCase):
         self.assertRaises(Http404,
                           lambda *a: views.confirm(request, token='', username='bogus user'),
                           "Bogus user should result in 404")
-        
+
         views.confirm(request, token='bogus token', username=user.username)
         self.assertFalse(user.is_active, "User should not be active if confirming with bogus token.")
-        
+
         views.confirm(request, token=profile.confirmation_code, username=user.username)
         # must get user again or is_active will be read from memory
         user = User.objects.get(username=self.u['email'])
         self.assertTrue(user.is_active, "User should be activated after confirming.")
-             
-        
-
