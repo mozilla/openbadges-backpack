@@ -39,5 +39,7 @@ class UserCreationForm(forms.ModelForm):
         user.is_active = False
         if commit:
             user.save()
-            UserProfile(user=user).save()
+            profile = UserProfile(user=user)
+            profile.generate_confirmation_code()
+            profile.save()
         return user

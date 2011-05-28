@@ -65,5 +65,9 @@ class UserTests(TestCase):
         user = self.create_user()
         profile = user.get_profile()
         self.assertIsInstance(profile, UserProfile, "Could not get user profile")
-        code = profile.get_confirmation_code()
-        self.assertEqual(len(code), 60, "Didn't generate a proper confirmation code")
+        code = profile.confirmation_code
+        code_again = profile.generate_confirmation_code()
+        new_code = profile.generate_confirmation_code(True)
+        self.assertEqual(len(code), 60, "Didn't generate a proper confirmation code (expecting 60 characters)")
+        self.assertEqual(code, code_again, "Should cache confirmation code.")
+        self.assertNotEqual(code, new_code, "Should generate new confirmation code when regen == True")
