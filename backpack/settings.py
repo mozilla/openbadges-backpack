@@ -22,8 +22,14 @@ DATABASES = {
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
-    }
+    },
 }
+MONGO_DB = {
+    'NAME': 'openbadgehub',   # Name of database to use
+    'HOST': '',               # Set to empty string for localhost
+    'PORT': '',               # Set to empty string for default.
+}
+
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -124,6 +130,7 @@ INSTALLED_APPS = (
     'south',
     'users',
     'manager',
+    'badges',
 )
 
 PWD_ALGORITHM = 'bcrypt'
@@ -131,7 +138,7 @@ BCRYPT_ROUNDS = 12
 
 AUTH_PROFILE_MODULE = 'users.UserProfile'
 
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+# TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 LOGIN_URL = '/login'
 
 # A sample logging configuration. The only tangible logging
