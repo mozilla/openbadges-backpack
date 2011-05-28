@@ -129,6 +129,8 @@ INSTALLED_APPS = (
 PWD_ALGORITHM = 'bcrypt'
 BCRYPT_ROUNDS = 12
 
+AUTH_PROFILE_MODULE = 'users.UserProfile'
+
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 LOGIN_URL = '/login'
 
