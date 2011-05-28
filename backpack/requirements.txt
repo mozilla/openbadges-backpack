@@ -1,6 +1,7 @@
 Django==1.3
 South==0.7.3
 django-nose==0.1.3
+py-bcrypt==0.2
 -e git://github.com/fwenzel/django-sha2.git@89ba3c15bb672249a340f777061264241280c26c#egg=django_sha2-0.3-py2.7-dev
 nose==1.0.0
-py-bcrypt==0.2
+pymongo==1.11
