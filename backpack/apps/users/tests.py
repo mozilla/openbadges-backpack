@@ -81,10 +81,13 @@ class UserTests(TestCase):
                           lambda *a: views.confirm(request, token='', username='bogus user'),
                           "Bogus user should result in 404")
         
+        views.confirm(request, token='bogus token', username=user.username)
+        self.assertFalse(user.is_active, "User should not be active if confirming with bogus token.")
+        
         views.confirm(request, token=profile.confirmation_code, username=user.username)
         # must get user again or is_active will be read from memory
         user = User.objects.get(username=self.u['email'])
-        self.assertTrue(user.is_active, "User should be actived after confirming.")
+        self.assertTrue(user.is_active, "User should be activated after confirming.")
              
         
 
