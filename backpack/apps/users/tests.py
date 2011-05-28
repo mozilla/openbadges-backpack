@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.test.client import RequestFactory, Client
+from django.http import Http404
 from django.contrib.auth.models import User
 from models import UserProfile
 from forms import UserCreationForm
@@ -71,3 +72,19 @@ class UserTests(TestCase):
         self.assertEqual(len(code), 60, "Didn't generate a proper confirmation code (expecting 60 characters)")
         self.assertEqual(code, code_again, "Should cache confirmation code.")
         self.assertNotEqual(code, new_code, "Should generate new confirmation code when regen == True")
+
+    def test_user_activation(self):
+        user = self.create_user()
+        profile = user.get_profile()
+        request = self.factory.get('/confirm')
+        self.assertRaises(Http404,
+                          lambda *a: views.confirm(request, token='', username='bogus user'),
+                          "Bogus user should result in 404")
+        
+        views.confirm(request, token=profile.confirmation_code, username=user.username)
+        # must get user again or is_active will be read from memory
+        user = User.objects.get(username=self.u['email'])
+        self.assertTrue(user.is_active, "User should be actived after confirming.")
+             
+        
+
