@@ -4,6 +4,9 @@ from django.conf import settings
 from models import Badge
 
 def setup_test_database():
+    """
+    Take the defined name of the database, append _test.
+    """
     name = (settings.MONGO_DB['NAME'] + '_test')
     host = settings.MONGO_DB['HOST']
     port = settings.MONGO_DB['PORT']
@@ -14,9 +17,9 @@ class BasicTests(TestCase):
     def setUp(self):
         self.valid_badge = {
             'name': 'Audo Expert',
-            'description': 'For rockin\' those block destroyin\' beats',
-            'recipient': 'brian@nyhacker.org',
-            'evidence': '/badges/brian_audio.html',
+            'description': "For rockin' beats",
+            'recipient': 'test@example.com',
+            'evidence': '/badges/audio.html',
             'expires': '2020/1/1',
             'icons': {'128': '/images/audio_128.png',},
             'ttl': 60 * 60 * 24,
