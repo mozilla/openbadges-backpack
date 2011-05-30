@@ -20,7 +20,7 @@ class BasicTests(TestCase):
             'description': "For rockin' beats",
             'recipient': 'test@example.com',
             'evidence': '/badges/audio.html',
-            'expires': '2020/1/1',
+            'expires': '2020-1-1',
             'icons': {'128': '/images/audio_128.png',},
             'ttl': 60 * 60 * 24,
         }
