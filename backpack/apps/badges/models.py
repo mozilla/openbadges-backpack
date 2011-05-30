@@ -1,83 +1,79 @@
 import re
 from pymongo import Connection
 from django.conf import settings
-from django.core.validators import email_re
+from django.core.validators import RegexValidator, URLValidator, validate_email
+from validators import validate_integer, validate_iso_date, LengthValidator, RelativeURLValidator, MinSizeValidator, TypeValidator
 from django.core.exceptions import ValidationError
-
 
 class Badge(object):
     collection = None
-
+    validators = {
+        'url':         [URLValidator()],
+        'name':        [LengthValidator(min=4, max=80)],
+        'description': [LengthValidator(min=4, max=140)],
+        'recipient':   [validate_email],
+        'evidence':    [RelativeURLValidator()],
+        'expires':     [validate_iso_date],
+        'icons':       [TypeValidator(dict), MinSizeValidator(1)],
+        'ttl':         [validate_integer],
+    }
+    
     def __init__(self, data):
         if not self.collection: self.collection = connect_to_db()
+        
         # required fields
-        self.data = {
-            'name':'', 'description':'',
-            'recipient':'', 'evidence':'', 'icons':{},
+        self.fields = {
+            'uri':'',
+            'name':'',
+            'description':'',
+            'recipient':'',
+            'evidence':'',
+            'icons':{},
         }
-        self.data.update(data)
-        self.validator = self.Validator()
-        self.errors = []
+        
+        self.fields.update(data)
+        self._errors = {}
 
-    def clean(self):
-        data = self.data
-        for field in data:
-            data[field] = self.get_validator(field)(data[field])
+    def full_clean(self):
+        errors = {}
+        try:
+            self.clean_fields()
+        except ValidationError, e:
+            errors = e.update_error_dict(errors)
+        
+        # other validations go here
+        
+        if errors:
+            raise ValidationError(errors)
 
-    def get_validator(self, field):
+    def clean_fields(self):
         """
-        Get validator function for field.
-        If no validator exists, returns truth function.
+        Cleans all fields and raises a ValidationError containing message_dict
+        of all validation errors if any occur.
         """
-        return getattr(self.validator, field, lambda *a: True)
+        errors = {}
+        for f in self.fields:
+            raw_value = self.fields[f]
+            if f not in self.validators:
+                continue
+            try:
+                for validate in self.validators[f]:
+                    validate(raw_value)
+            except ValidationError, e:
+                errors[f] = e.messages
+        if errors:
+            raise ValidationError(errors)
+    
+    def errors(self):
+        self._errors = []
+        try:
+            self.full_clean()
+        except ValidationError, e: 
+            self._errors = e.message_dict
+        return self._errors
 
     def is_valid(self):
-        try:
-            self.clean()
-        except ValidationError:
-            return False
-        return True
-
-    class Validator(object):
-        invalid_uri_re = re.compile(r'^(\w*)://')
-        iso_date_re = re.compile(r'^\d{4}(-|/)?\d{1,2}(-|/)?\d{1,2}$')
-
-        def name(self, value): return self.__non_blank(value, 'name');
-        def description(self, value): return self.__non_blank(value, 'description');
-        def recipient(self, value):
-            value = self.__non_blank(value, 'recipient')
-            if not email_re.match(value):
-                raise ValidationError('recipient must be a valid email address')
-            return value
-        def evidence(self, value):
-            value = self.__non_blank(value, 'evidence')
-            if self.invalid_uri_re.match(value):
-                raise ValidationError('evidence must be a relative url')
-            return value
-        def expires(self, value):
-            value = self.__non_blank(value, 'expires')
-            if not self.iso_date_re.match(value):
-                raise ValidationError('expires must be in ISO date format (YYYY-MM-DD)')
-            return value
-        def ttl(self, value):
-            try: value = int(value)
-            except ValueError:
-                raise ValidationError('ttl must be a valid integer')
-            return value
-        def icons(self, value):
-            try:
-                if not len(value.keys()) > 0:
-                    raise ValidationError('icons must contain at least one value')
-            except AttributeError:
-                raise ValidationError('icons must be a dictionary-like object')
-            return value
-
-        def __non_blank(self, value, field):
-            value = value.strip()
-            if not re.match(r'.+', value):
-                raise ValidationError('%s cannot be blank' % field)
-            return value
-
+        return len(self.errors()) == 0
 
 def connect_to_db():
     host = settings.MONGO_DB['HOST']

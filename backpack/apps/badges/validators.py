@@ -30,7 +30,7 @@ class TypeValidator(BaseValidator):
     message = _(u'Ensure this value is %(limit_value)s (it is %(show_value)s.')
     code = 'type'
 
-def validate_integer(value, message):
+def validate_integer(value):
     try: value = int(value)
     except (ValueError, TypeError), e:
         raise ValidationError('must be valid integer')
