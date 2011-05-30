@@ -7,17 +7,20 @@ from django.core.exceptions import ValidationError
 
 class Badge(object):
     collection = None
+
     def __init__(self, data):
         if not self.collection: self.collection = connect_to_db()
+        # required fields
+        self.data = {
+            'name':'', 'description':'',
+            'recipient':'', 'evidence':'', 'icons':{},
+        }
+        self.data.update(data)
         self.validator = self.Validator()
-        self.data = data
         self.errors = []
 
     def clean(self):
-        # make sure all required fields exist
         data = self.data
-        self.validator.check_missing(data)
-
         for field in data:
             data[field] = self.get_validator(field)(data[field])
 
@@ -36,19 +39,8 @@ class Badge(object):
         return True
 
     class Validator(object):
-        required_fields = (
-            'name', 'description',
-            'recipient', 'evidence', 'icons',
-        )
-
         invalid_uri_re = re.compile(r'^(\w*)://')
         iso_date_re = re.compile(r'^\d{4}(-|/)?\d{1,2}(-|/)?\d{1,2}$')
-
-        def check_missing(self, data):
-            provided = set(data.keys())
-            required = set(self.required_fields)
-            missing = tuple(required.difference(provided))
-            if missing: raise ValidationError('missing fields: %s' % ''.join(missing))
 
         def name(self, value): return self.__non_blank(value, 'name');
         def description(self, value): return self.__non_blank(value, 'description');

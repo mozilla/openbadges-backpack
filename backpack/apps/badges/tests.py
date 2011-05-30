@@ -26,14 +26,14 @@ class BasicTests(TestCase):
         }
     
     def test_badge_validation(self):
-        invalid_badge = self.valid_badge.copy()
-        del invalid_badge['recipient']
+        missing_recipient_badge = self.valid_badge.copy()
+        del missing_recipient_badge['recipient']
 
         valid = Badge(self.valid_badge)
-        invalid = Badge(invalid_badge)
+        missing_recipient = Badge(missing_recipient_badge)
 
         self.assertTrue(valid.is_valid(), "Valid badge should be valid")
-        self.assertFalse(invalid.is_valid(), "Invalid badge should be invalid")
+        self.assertFalse(missing_recipient.is_valid(), "Invalid badge should be invalid")
 
 setup_test_database()
 
