@@ -12,6 +12,7 @@ def setup_test_database():
     port = settings.MONGO_DB['PORT']
     CONNECTION = Connection(host=(host if host else None), port=(port if port else None))
     CONNECTION.drop_database(name)
+    settings.MONGO_DB['NAME'] = name
 
 class BasicTests(TestCase):
     def setUp(self):
