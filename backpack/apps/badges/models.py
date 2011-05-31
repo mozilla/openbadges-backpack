@@ -20,10 +20,9 @@ class Badge(object):
     
     def __init__(self, data):
         if not self.collection: self.collection = connect_to_db()
-        
         # required fields
         self.fields = {
-            'uri':'',
+            'url':'',
             'name':'',
             'description':'',
             'recipient':'',
@@ -40,9 +39,6 @@ class Badge(object):
             self.clean_fields()
         except ValidationError, e:
             errors = e.update_error_dict(errors)
-        
-        # other validations go here
-        
         if errors:
             raise ValidationError(errors)
 

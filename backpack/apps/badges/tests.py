@@ -16,6 +16,7 @@ def setup_test_database():
 class BasicTests(TestCase):
     def setUp(self):
         self.valid_badge = {
+            'url': 'http://localhost/audio.badge',
             'name': 'Audo Expert',
             'description': "For rockin' beats",
             'recipient': 'test@example.com',
@@ -50,6 +51,14 @@ class BasicTests(TestCase):
         self.assertIn('expires', invalid_expires.errors().keys())
         self.assertIn('recipient', missing_recipient.errors().keys())
         self.assertIn('description', missing_description.errors().keys())
+        
+    def test_save_and_retrieve(self):
+        valid = Badge(self.valid_badge)
+        self.assertTrue(valid.save())
+        
+        all_items = Badge.objects.all()
+        self.assertEqual(len(all_items), 1)
+        self.assertIn(valid, all_items)
         
 setup_test_database()
 
