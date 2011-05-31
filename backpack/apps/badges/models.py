@@ -137,9 +137,9 @@ class Badge(object):
         self.collection().remove(self.fields['_id'], True)
         del self.fields['_id']
 
-    ##################
-    # Remote actions #
-    ##################
+    #################################
+    # Verification & remote methods #
+    #################################
     def refresh_from_remote(self):
         data = Badge.get_remote_data(self['url'])
         self.fields.update(data)
@@ -149,6 +149,11 @@ class Badge(object):
     ##################
     @staticmethod
     def get_remote_data(url, key=''):
+        try:
+            URLValidator()(url)
+        except ValidationError, e:
+            raise ValueError("URL must be valid and absolute.")
+        
         raw_re = re.compile('application/x-badge-manifest')
         signed_re = re.compile('application/x-badge-signed')
         response = urlopen(url)

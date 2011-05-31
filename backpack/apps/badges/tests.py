@@ -1,9 +1,12 @@
+import json
 from pymongo import Connection
 from django.test import TestCase
+from django.test.client import Client, RequestFactory
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from testserver.server import server
 from models import Badge
+import views
 
 def setup_test_database():
     """
@@ -158,6 +161,9 @@ class RemoteServerTests(TestCase):
     def test_malformed(self):
         self.assertRaises(ValueError, Badge.from_remote, self.malformed_url)
 
+    def test_invalid_url(self):
+        self.assertRaises(ValueError, Badge.from_remote, 'not-a-real-uri')
+    
     def test_refresh(self):
         badge = Badge.from_remote(self.badge_url)
         original_description = badge['description']
@@ -170,9 +176,26 @@ class RemoteServerTests(TestCase):
         self.assertEqual(badge['description'],  original_description)
         self.assertIn('facebook', badge.groups())
         
+class ViewTests(TestCase):
+    badge_url = "http://localhost:5000/audio.badge"
+    malformed_url = "http://localhost:5000/malformed.badge"
+    invalid_url = "http://localhost:5000/invalid_type.badge"
+    
+    def setUp(self):
+        self.client = Client()
+        self.factory = RequestFactory()
 
+    def __issue_view(self):
+        request = self.factory.post('/badge/issue',{'url': self.badge_url})
+        response = views.recieve_badge(request)
+        respobj = json.loads(response.content)
+        self.assertIs(response.status_code, 201, "Wrong HTTP status for creating badge (should be 201)")
+
+        # play it again, sam
+        response = views.recieve_badge(request)
+        self.assertIs(response.status_code, 403, "Wrong HTTP status for creating duplicated badge (should be 403)")
         
-
+        
 setup_test_database()
 server.start() # starts on port 5000 -- see testserver/server.py, line 24
 

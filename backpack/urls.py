@@ -1,12 +1,13 @@
 from django.conf import settings
 from django.conf.urls.defaults import patterns, include, url
-
 from django.contrib import admin
+
 admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'',            include('manager.urls')),
     url(r'',            include('users.urls')),
+    url(r'^badges/',    include('badges.urls')),
     url(r'^api/',       include('api.urls')),
     url(r'^include/',   include('browsershim.urls')),
     url(r'^admin/',     include(admin.site.urls)),
