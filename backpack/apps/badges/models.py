@@ -18,6 +18,9 @@ class Badge(object):
         'ttl':         [validate_integer],
     }
     
+    def __eq__(self, other):
+        return self.fields == other.fields
+    
     def __init__(self, data):
         # required fields
         self.fields = {
@@ -28,7 +31,6 @@ class Badge(object):
             'evidence':'',
             'icons':{},
         }
-        
         self.fields.update(data)
         self._errors = {}
 
@@ -73,4 +75,7 @@ class Badge(object):
     def save(self):
         self.full_clean()
         objectid = self.collection().insert(self.fields)
-        return bool(objectid)
+        if not objectid:
+            return False
+        self.fields['_id'] = objectid
+        return True

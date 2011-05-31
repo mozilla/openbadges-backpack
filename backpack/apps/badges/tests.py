@@ -58,8 +58,10 @@ class BasicTests(TestCase):
         self.assertTrue(valid.save())
         
         all_items = Badge.objects.all()
-        self.assertEqual(len(all_items), 1)
-        self.assertIn(valid, all_items)
+        self.assertEqual(all_items.count(), 1)
+        
+        badge_data = all_items.next()
+        self.assertEqual(valid, Badge(badge_data))
         
 setup_test_database()
 
