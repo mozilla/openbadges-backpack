@@ -1,12 +1,12 @@
 import re
-from pymongo import Connection
-from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, URLValidator, validate_email
 from validators import validate_integer, validate_iso_date, LengthValidator, RelativeURLValidator, MinSizeValidator, TypeValidator
-from django.core.exceptions import ValidationError
+from manager import BadgeManager
 
 class Badge(object):
-    collection = None
+    from connection import collection
+    objects = BadgeManager()
     validators = {
         'url':         [URLValidator()],
         'name':        [LengthValidator(min=4, max=80)],
@@ -19,7 +19,6 @@ class Badge(object):
     }
     
     def __init__(self, data):
-        if not self.collection: self.collection = connect_to_db()
         # required fields
         self.fields = {
             'url':'',
@@ -71,10 +70,7 @@ class Badge(object):
     def is_valid(self):
         return len(self.errors()) == 0
 
-def connect_to_db():
-    host = settings.MONGO_DB['HOST']
-    port = settings.MONGO_DB['PORT']
-    name = settings.MONGO_DB['NAME']
-
-    conn = Connection(host=(host if host else None), port=(port if port else None))
-    return conn[name].badges
+    def save(self):
+        self.full_clean()
+        objectid = self.collection.insert(self.fields)
+        return bool(objectid)
