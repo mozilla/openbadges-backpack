@@ -112,7 +112,7 @@ class Badge(object):
 
     def save(self):
         self.full_clean()
-        if self.fields.get('_id', None):
+        if self.id():
             return self.__update()
         else:
             return self.__insert()
@@ -129,6 +129,6 @@ class Badge(object):
         return True
     
     def delete(self):
-        assert self.fields.get('_id', None) is not None, "Badge object can't be deleted because its _id attribute is set to None"
+        assert self.id() is not None, "Badge object can't be deleted because its _id attribute is set to None"
         self.collection().remove(self.fields['_id'], True)
         del self.fields['_id']
