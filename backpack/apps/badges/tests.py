@@ -157,6 +157,10 @@ class RemoteServerTests(TestCase):
     malformed_url = "http://localhost:5000/malformed.badge"
     invalid_url = "http://localhost:5000/invalid_type.badge"
     
+    def tearDown(self):
+        # remove all created badges
+        map(lambda b: b.delete(), Badge.objects.all())
+    
     def test_badge_from_uri(self):
         badge = Badge.from_remote(self.badge_url)
         badge.save()
@@ -198,14 +202,15 @@ class ViewTests(TestCase):
         response = views.recieve_badge(request)
         respobj = json.loads(response.content)
         
-        self.assertIs(response.status_code, 201, "Wrong HTTP status for creating badge (should be 201)")
+        self.assertEqual(response.status_code, 201, "Wrong HTTP status for creating badge (should be 201, got %s)" % response.status_code)
         self.assertIs(respobj['ok'], True, "Response should contain an 'ok' element")
 
         # play it again, sam
-        # response = views.recieve_badge(request)
-        # self.assertIs(response.status_code, 403, "Wrong HTTP status for creating duplicated badge (should be 403)")
-        
-        
+        response = views.recieve_badge(request)
+        respobj = json.loads(response.content)
+        self.assertEqual(response.status_code, 403, "Wrong HTTP status for creating duplicated badge (should be 403, got %s)" % response.status_code)
+        self.assertEqual(respobj['error'], 'validation')
+
 setup_test_database()
 server.start() # starts on port 5000 -- see testserver/server.py, line 24
 
