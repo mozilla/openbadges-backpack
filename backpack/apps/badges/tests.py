@@ -126,5 +126,19 @@ class GroupingTests(TestCase):
         self.assertRaises(ValidationError, self.badge.save)
         self.assertIn('groups', self.badge.errors())
 
+    def test_filter_by_group(self):
+        badge2 = Badge(valid_badge.copy())
+        badge2['recipient'] = 'person@example.com'
+        badge2.add_to_group('do-not-find')
+        self.badge.add_to_group('find')
+        self.badge.add_to_group('linkedin')
+        self.badge.add_to_group('other-group')
+        self.badge.save()
+        badge2.save()
+
+        badges = Badge.objects.filter(groups='find')
+        self.assertEqual(badges.count(), 1)
+        self.assertIn(self.badge, badges)
+
 setup_test_database()
 
