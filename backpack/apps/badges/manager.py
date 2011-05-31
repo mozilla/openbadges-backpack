@@ -1,5 +1,7 @@
 class BadgeManager(object):
     from connection import collection
     def all(self):
-        return self.collection().find()
+        return self.filter()
 
+    def filter(self, **kwargs):
+        return self.collection().find(kwargs)
