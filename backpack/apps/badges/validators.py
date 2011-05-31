@@ -31,7 +31,8 @@ class TypeValidator(BaseValidator):
     code = 'type'
 
 def validate_integer(value):
-    try: value = int(value)
+    try:
+        value = int(value)
     except (ValueError, TypeError), e:
         raise ValidationError('must be valid integer')
     return value
