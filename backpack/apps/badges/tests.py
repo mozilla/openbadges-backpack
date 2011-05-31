@@ -27,6 +27,10 @@ class BasicTests(TestCase):
             'ttl': 60 * 60 * 24,
         }
     
+    def tearDown(self):
+        # remove all created badges
+        map(lambda b: Badge(b).delete(), Badge.objects.all())
+    
     def test_validation(self):
         missing_recipient_badge = self.valid_badge.copy()
         del missing_recipient_badge['recipient']
@@ -72,7 +76,7 @@ class BasicTests(TestCase):
         
         badge_data = all_items.next()
         self.assertEqual(valid, Badge(badge_data))
-        
+
 
 setup_test_database()
 
