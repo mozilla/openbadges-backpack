@@ -61,6 +61,7 @@ class BasicTests(TestCase):
         
         valid.delete()
         self.assertEqual(Badge.objects.all().count(), 0)
+        self.assertRaises(AssertionError, valid.delete)
     
     def test_save_and_retrieve(self):
         valid = Badge(self.valid_badge)
