@@ -9,4 +9,4 @@ class BadgeManager(object):
         if 'pk' in kwargs:
             kwargs['_id'] = kwargs['pk']
             del kwargs['pk']
-        return Badge(self.collection().find_one(kwargs))
+        return self.collection().find_one(kwargs)

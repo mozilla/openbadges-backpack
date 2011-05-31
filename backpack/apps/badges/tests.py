@@ -30,7 +30,7 @@ class BasicTests(TestCase):
     
     def tearDown(self):
         # remove all created badges
-        map(lambda b: Badge(b).delete(), Badge.objects.all())
+        map(lambda b: b.delete(), Badge.objects.all())
     
     def test_validation(self):
         missing_recipient_badge = self.valid_badge.copy()
@@ -71,8 +71,8 @@ class BasicTests(TestCase):
         all_items = Badge.objects.all()
         self.assertEqual(all_items.count(), 1)
         
-        badge_data = all_items.next()
-        self.assertEqual(self.valid, Badge(badge_data))
+        badge = all_items.next()
+        self.assertEqual(self.valid, badge)
 
     def test_filtering(self):
         other_badge = self.valid_badge.copy()
@@ -83,7 +83,7 @@ class BasicTests(TestCase):
         
         badges = Badge.objects.filter(recipient='test@example.com')
         self.assertEqual(badges.count(), 1)
-        self.assertEqual(Badge(badges.next()), self.valid)
+        self.assertEqual(badges.next(), self.valid)
 
     def test_find_one(self):
         self.valid.save()
