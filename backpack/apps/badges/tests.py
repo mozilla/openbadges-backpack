@@ -53,6 +53,15 @@ class BasicTests(TestCase):
         self.assertIn('recipient', missing_recipient.errors().keys())
         self.assertIn('description', missing_description.errors().keys())
         
+    def test_save_and_delete(self):
+        valid = Badge(self.valid_badge)
+        self.assertRaises(AssertionError, valid.delete)
+        self.assertTrue(valid.save())
+        self.assertEqual(Badge.objects.all().count(), 1)
+        
+        valid.delete()
+        self.assertEqual(Badge.objects.all().count(), 0)
+    
     def test_save_and_retrieve(self):
         valid = Badge(self.valid_badge)
         self.assertTrue(valid.save())
@@ -63,5 +72,6 @@ class BasicTests(TestCase):
         badge_data = all_items.next()
         self.assertEqual(valid, Badge(badge_data))
         
+
 setup_test_database()
 
