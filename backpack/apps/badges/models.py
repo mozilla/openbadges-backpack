@@ -24,7 +24,16 @@ class Badge(object):
 
     def __eq__(self, other):
         return self.fields == other.fields
+    
+    def __getitem__(self, key):
+        return self.fields.get(key, None)
+    
+    def __setitem__(self, key, value):
+        self.fields[key] = value
 
+    def __contains__(self, item):
+        return item in self.fields
+        
     ######################
     # Validation-related #
     ######################

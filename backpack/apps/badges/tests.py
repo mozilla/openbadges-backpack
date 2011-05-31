@@ -87,20 +87,20 @@ class BasicTests(TestCase):
 
     def test_find_one(self):
         self.valid.save()
-        self.assertEqual(self.valid, Badge.objects.get(pk=self.valid.fields['_id']))
+        self.assertEqual(self.valid, Badge.objects.get(pk=self.valid['_id']))
     
     def test_grouping(self):
         # add to group
         self.valid.add_to_group('linkedin')
         self.valid.save()
-        badge = Badge.objects.get(pk=self.valid.fields['_id'])
+        badge = Badge.objects.get(pk=self.valid['_id'])
         self.assertIn('linkedin', badge.groups())
         
         # remove from group
         badge.remove_from_group('linkedin')
         badge.save()
         
-        badge_again = Badge.objects.get(pk=badge.fields['_id'])
+        badge_again = Badge.objects.get(pk=badge['_id'])
         self.assertNotIn('linkedin', badge_again.groups())
         
         # find by group?
