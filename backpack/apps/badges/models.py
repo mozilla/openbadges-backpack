@@ -34,6 +34,9 @@ class Badge(object):
     def __contains__(self, item):
         return item in self.fields
         
+    def id(self):
+        return self['_id']
+    
     ######################
     # Validation-related #
     ######################
@@ -47,6 +50,7 @@ class Badge(object):
         'expires':     [validate_iso_date],
         'icons':       [TypeValidator(dict), MinSizeValidator(1)],
         'ttl':         [validate_integer],
+        
     }
 
     def full_clean(self):
