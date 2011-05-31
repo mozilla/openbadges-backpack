@@ -7,7 +7,7 @@ from manager import BadgeManager
 class Badge(object):
     from connection import collection
     objects = BadgeManager()
-    
+
     def __init__(self, data):
         # required fields
         self.fields = {
@@ -23,11 +23,11 @@ class Badge(object):
 
     def __eq__(self, other):
         return self.fields == other.fields
-    
+
     ######################
     # Validation-related #
     ######################
-    
+
     validators = {
         'url':         [URLValidator()],
         'name':        [LengthValidator(min=4, max=80)],
@@ -38,7 +38,7 @@ class Badge(object):
         'icons':       [TypeValidator(dict), MinSizeValidator(1)],
         'ttl':         [validate_integer],
     }
-    
+
     def full_clean(self):
         errors = {}
         try:
@@ -65,12 +65,12 @@ class Badge(object):
                 errors[f] = e.messages
         if errors:
             raise ValidationError(errors)
-    
+
     def errors(self):
         self._errors = []
         try:
             self.full_clean()
-        except ValidationError, e: 
+        except ValidationError, e:
             self._errors = e.message_dict
         return self._errors
 
@@ -80,7 +80,7 @@ class Badge(object):
     ############################
     # Database-hitting actions #
     ############################
-    
+
     def save(self):
         self.full_clean()
         objectid = self.collection().insert(self.fields)
@@ -88,14 +88,7 @@ class Badge(object):
             return False
         self.fields['_id'] = objectid
         return True
-    
+
     def delete(self):
         assert self.fields.get('_id', None) is not None, "Badge object can't be deleted because its _id attribute is set to None"
         self.collection().remove(self.fields['_id'])
-
-
-
-
-
-
-
