@@ -17,6 +17,7 @@ class Badge(object):
             'recipient':'',
             'evidence':'',
             'icons':{},
+            'groups': ['private']
         }
         self.fields.update(data)
         self._errors = {}
@@ -77,18 +78,43 @@ class Badge(object):
     def is_valid(self):
         return len(self.errors()) == 0
 
+    #########################
+    # Group-related actions #
+    #########################
+
+    def add_to_group(self, group):
+        existing = set(self.fields.get('groups', []))
+        existing.add(group)
+        self.fields['groups'] = list(existing)
+    
+    def groups(self):
+        return self.fields['groups']
+
+    def remove_from_group(self, group):
+        return self.fields['groups'].remove(group)
+    
     ############################
     # Database-hitting actions #
     ############################
 
     def save(self):
         self.full_clean()
-        objectid = self.collection().insert(self.fields)
+        if self.fields.get('_id', None):
+            return self.__update()
+        else:
+            return self.__insert()
+
+    def __insert(self):
+        objectid = self.collection().insert(self.fields, safe=True)
         if not objectid:
             return False
         self.fields['_id'] = objectid
         return True
-
+    
+    def __update(self):
+        self.collection().update({'_id':self.fields['_id']}, self.fields, safe=True)
+        return True
+    
     def delete(self):
         assert self.fields.get('_id', None) is not None, "Badge object can't be deleted because its _id attribute is set to None"
         self.collection().remove(self.fields['_id'], True)

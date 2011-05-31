@@ -89,16 +89,21 @@ class BasicTests(TestCase):
         self.valid.save()
         self.assertEqual(self.valid, Badge.objects.get(pk=self.valid.fields['_id']))
     
-    # def test_grouping(self):
-    #     # add to group
-    #     self.valid.add_to_group('linked-in')
-    #     self.assertIn('linked-in', self.valid.groups())
+    def test_grouping(self):
+        # add to group
+        self.valid.add_to_group('linkedin')
+        self.valid.save()
+        badge = Badge.objects.get(pk=self.valid.fields['_id'])
+        self.assertIn('linkedin', badge.groups())
         
-    #     # save and retrieve
-    #     self.valid.save()
-    #     badge = Badge.objects.filter(self.valid.fields['_id'])
-    #     # remove from group
-    #     # find by group?
+        # remove from group
+        badge.remove_from_group('linkedin')
+        badge.save()
+        
+        badge_again = Badge.objects.get(pk=badge.fields['_id'])
+        self.assertNotIn('linkedin', badge_again.groups())
+        
+        # find by group?
         
 setup_test_database()
 
