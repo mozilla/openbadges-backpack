@@ -3,7 +3,7 @@ import json
 from urllib import urlopen
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, URLValidator, validate_email
-from validators import validate_integer, validate_iso_date, LengthValidator, RelativeURLValidator, MinSizeValidator, TypeValidator
+from validators import validate_integer, validate_iso_date, LengthValidator, RelativeURLValidator, MinSizeValidator, TypeValidator, UniquenessValidator
 from manager import BadgeManager
 
 class Badge(object):
@@ -44,7 +44,7 @@ class Badge(object):
     # Validation-related #
     ######################
 
-    validators = {
+    field_validators = {
         'url':         [URLValidator()],
         'name':        [LengthValidator(min=4, max=80)],
         'description': [LengthValidator(min=4, max=140)],
@@ -57,12 +57,31 @@ class Badge(object):
         'private':     [TypeValidator(bool)],
     }
 
+    unique_validators = [UniquenessValidator('url'),]
+
     def full_clean(self):
         errors = {}
         try:
             self.clean_fields()
         except ValidationError, e:
             errors = e.update_error_dict(errors)
+        if errors:
+            raise ValidationError(errors)
+
+        try:
+            self.validate_unique()
+        except ValidationError, e:
+            errors = e.update_error_dict(errors)
+        if errors:
+            raise ValidationError(errors)
+
+    def validate_unique(self):
+        errors = {}
+        for validate in self.unique_validators:
+            try:
+                validate(self)
+            except ValidationError, e:
+                errors['unique'] = e.messages
         if errors:
             raise ValidationError(errors)
 
@@ -74,10 +93,10 @@ class Badge(object):
         errors = {}
         for f in self.fields:
             raw_value = self.fields[f]
-            if f not in self.validators:
+            if f not in self.field_validators:
                 continue
             try:
-                for validate in self.validators[f]:
+                for validate in self.field_validators[f]:
                     validate(raw_value)
             except ValidationError, e:
                 errors[f] = e.messages

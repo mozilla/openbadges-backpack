@@ -30,6 +30,17 @@ class TypeValidator(BaseValidator):
     message = _(u'Ensure this value is %(limit_value)s (it is %(show_value)s.')
     code = 'type'
 
+class UniquenessValidator(BaseValidator):
+    def compare(self, badge, field):
+        from models import Badge
+        other = Badge.objects.get(**{field: badge[field]})
+        if other:
+            return other.id() != badge.id()
+        return False
+    
+    message = _(u'%(limit_value)s field must be unique across database.')
+    code = 'uniquness'
+    
 def validate_integer(value):
     try:
         value = int(value)

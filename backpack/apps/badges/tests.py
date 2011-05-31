@@ -29,6 +29,7 @@ valid_badge = {
     'icons': {'128': '/images/audio_128.png',},
     'ttl': 60 * 60 * 24,
 }
+
 class BasicTests(TestCase):
     def setUp(self):
         self.valid = Badge(valid_badge)
@@ -83,8 +84,14 @@ class DatabaseTests(TestCase):
         badge = all_items.next()
         self.assertEqual(self.valid, badge)
 
+    def test_uniqueness_constraint(self):
+        self.valid.save()
+        dupe = Badge(valid_badge)
+        self.assertRaises(ValidationError, dupe.save)
+    
     def test_filtering(self):
         other_badge = valid_badge.copy()
+        other_badge['url'] = 'http://localhost/other_audio.badge'
         other_badge['recipient'] = 'blurgh@example.com'
         
         self.valid.save()
@@ -133,6 +140,7 @@ class GroupingTests(TestCase):
     def test_filter_by_group(self):
         badge2 = Badge(valid_badge.copy())
         badge2['recipient'] = 'person@example.com'
+        badge2['url'] = 'http://localhost/yet_another_audio.badge'
         badge2.add_to_group('do-not-find')
         self.badge.add_to_group('find')
         self.badge.add_to_group('linkedin')
@@ -185,15 +193,17 @@ class ViewTests(TestCase):
         self.client = Client()
         self.factory = RequestFactory()
 
-    def __issue_view(self):
+    def test_issue_view(self):
         request = self.factory.post('/badge/issue',{'url': self.badge_url})
         response = views.recieve_badge(request)
         respobj = json.loads(response.content)
+        
         self.assertIs(response.status_code, 201, "Wrong HTTP status for creating badge (should be 201)")
+        self.assertIs(respobj['ok'], True, "Response should contain an 'ok' element")
 
         # play it again, sam
-        response = views.recieve_badge(request)
-        self.assertIs(response.status_code, 403, "Wrong HTTP status for creating duplicated badge (should be 403)")
+        # response = views.recieve_badge(request)
+        # self.assertIs(response.status_code, 403, "Wrong HTTP status for creating duplicated badge (should be 403)")
         
         
 setup_test_database()
