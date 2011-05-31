@@ -156,7 +156,7 @@ class RemoteServerTests(TestCase):
         self.assertRaises(TypeError, Badge.from_remote, self.invalid_url)
     
     def test_malformed(self):
-        self.assertRaises(ValueError, Badge.from_remote, self.malformed)
+        self.assertRaises(ValueError, Badge.from_remote, self.malformed_url)
 
 setup_test_database()
 server.start() # starts on port 5000 -- see testserver/server.py, line 24
