@@ -26,6 +26,7 @@ class BasicTests(TestCase):
             'icons': {'128': '/images/audio_128.png',},
             'ttl': 60 * 60 * 24,
         }
+        self.valid = Badge(self.valid_badge)
     
     def tearDown(self):
         # remove all created badges
@@ -34,11 +35,9 @@ class BasicTests(TestCase):
     def test_validation(self):
         missing_recipient_badge = self.valid_badge.copy()
         del missing_recipient_badge['recipient']
-
-        valid = Badge(self.valid_badge)
         missing_recipient = Badge(missing_recipient_badge)
 
-        self.assertTrue(valid.is_valid(), "Valid badge should be valid")
+        self.assertTrue(self.valid.is_valid(), "Valid badge should be valid")
         self.assertFalse(missing_recipient.is_valid(), "Invalid badge should be invalid")
 
     def test_error_messaging(self):
@@ -58,25 +57,22 @@ class BasicTests(TestCase):
         self.assertIn('description', missing_description.errors().keys())
         
     def test_save_and_delete(self):
-        valid = Badge(self.valid_badge)
-        self.assertRaises(AssertionError, valid.delete)
-        self.assertTrue(valid.save())
+        self.assertRaises(AssertionError, self.valid.delete)
+        self.assertTrue(self.valid.save())
         self.assertEqual(Badge.objects.all().count(), 1)
         
-        valid.delete()
+        self.valid.delete()
         self.assertEqual(Badge.objects.all().count(), 0)
-        self.assertRaises(AssertionError, valid.delete)
+        self.assertRaises(AssertionError, self.valid.delete)
     
     def test_save_and_retrieve(self):
-        valid = Badge(self.valid_badge)
-        self.assertTrue(valid.save())
+        self.assertTrue(self.valid.save())
         
         all_items = Badge.objects.all()
         self.assertEqual(all_items.count(), 1)
         
         badge_data = all_items.next()
-        self.assertEqual(valid, Badge(badge_data))
-
+        self.assertEqual(self.valid, Badge(badge_data))
 
 setup_test_database()
 
