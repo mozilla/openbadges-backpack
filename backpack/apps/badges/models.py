@@ -1,5 +1,6 @@
 import re
 import json
+from urllib import urlopen
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, URLValidator, validate_email
 from validators import validate_integer, validate_iso_date, LengthValidator, RelativeURLValidator, MinSizeValidator, TypeValidator
@@ -137,24 +138,33 @@ class Badge(object):
         del self.fields['_id']
 
     ##################
+    # Remote actions #
+    ##################
+    def refresh_from_remote(self):
+        data = Badge.get_remote_data(self['url'])
+        self.fields.update(data)
+    
+    ##################
     # Static methods #
     ##################
     @staticmethod
-    def from_remote(url, key=''):
-        from urllib import urlopen
-        
+    def get_remote_data(url, key=''):
         raw_re = re.compile('application/x-badge-manifest')
         signed_re = re.compile('application/x-badge-signed')
-        
         response = urlopen(url)
         content_type = response.headers['Content-Type']
         if raw_re.match(content_type):
             data = json.loads(response.read())
             data['url'] = url
-            return Badge(data)
-        
         elif signed_re.match(content_type):
-            print "signed!"
-        
+            raise NotImplemented("signed badges not yet implemented")
         else:
             raise TypeError("Unrecognized Content-Type for badge (expecting application/x-badge-manifest or application/x-badge-signed, got %s" % content_type)
+        return data
+
+    @staticmethod
+    def from_remote(url, key=''):
+        data = Badge.get_remote_data(url, key)
+        return Badge(data)
+        
+    

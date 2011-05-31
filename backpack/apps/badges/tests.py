@@ -158,6 +158,21 @@ class RemoteServerTests(TestCase):
     def test_malformed(self):
         self.assertRaises(ValueError, Badge.from_remote, self.malformed_url)
 
+    def test_refresh(self):
+        badge = Badge.from_remote(self.badge_url)
+        original_description = badge['description']
+        
+        badge.add_to_group('facebook')
+        badge['description'] = 'something else'
+        badge.save()
+
+        badge.refresh_from_remote()
+        self.assertEqual(badge['description'],  original_description)
+        self.assertIn('facebook', badge.groups())
+        
+
+        
+
 setup_test_database()
 server.start() # starts on port 5000 -- see testserver/server.py, line 24
 
