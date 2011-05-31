@@ -1,0 +1,2 @@
+class BadgeManager(object):
+    pass
