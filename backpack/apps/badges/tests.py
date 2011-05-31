@@ -203,13 +203,13 @@ class ViewTests(TestCase):
         respobj = json.loads(response.content)
         
         self.assertEqual(response.status_code, 201, "Wrong HTTP status for creating badge (should be 201, got %s)" % response.status_code)
-        self.assertIs(respobj['ok'], True, "Response should contain an 'ok' element")
+        self.assertIs(respobj['ok'], True, "Response should contain an 'ok' element with value True")
 
         # play it again, sam
         response = views.recieve_badge(request)
         respobj = json.loads(response.content)
         self.assertEqual(response.status_code, 403, "Wrong HTTP status for creating duplicated badge (should be 403, got %s)" % response.status_code)
-        self.assertEqual(respobj['error'], 'validation')
+        self.assertEqual(respobj['error'], 'validation', "Response should include 'error' element with value 'validation'")
 
 setup_test_database()
 server.start() # starts on port 5000 -- see testserver/server.py, line 24
