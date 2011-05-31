@@ -91,5 +91,5 @@ class Badge(object):
 
     def delete(self):
         assert self.fields.get('_id', None) is not None, "Badge object can't be deleted because its _id attribute is set to None"
-        self.collection().remove(self.fields['_id'])
+        self.collection().remove(self.fields['_id'], True)
         del self.fields['_id']
