@@ -1,4 +1,5 @@
 import re
+import json
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, URLValidator, validate_email
 from validators import validate_integer, validate_iso_date, LengthValidator, RelativeURLValidator, MinSizeValidator, TypeValidator
@@ -134,3 +135,25 @@ class Badge(object):
         assert self.id() is not None, "Badge object can't be deleted because its _id attribute is set to None"
         self.collection().remove(self.fields['_id'], True)
         del self.fields['_id']
+
+    ##################
+    # Static methods #
+    ##################
+    @staticmethod
+    def from_remote(url, key=''):
+        from urllib import urlopen
+        
+        raw_re = re.compile('application/x-badge-manifest')
+        signed_re = re.compile('application/x-badge-signed')
+        
+        response = urlopen(url)
+        content_type = response.headers['Content-Type']
+        if raw_re.match(content_type):
+            data = json.loads(response.read())
+            return Badge(data)
+        
+        elif signed_re.match(content_type):
+            print "signed!"
+        
+        else:
+            raise TypeError("Unrecognized Content-Type for badge (expecting application/x-badge-manifest or application/x-badge-signed, got %s" % content_type)

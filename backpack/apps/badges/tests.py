@@ -2,6 +2,7 @@ from pymongo import Connection
 from django.test import TestCase
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from testserver.server import server
 from models import Badge
 
 def setup_test_database():
@@ -140,5 +141,14 @@ class GroupingTests(TestCase):
         self.assertEqual(badges.count(), 1)
         self.assertIn(self.badge, badges)
 
+class RemoteServerTests(TestCase):
+    badge_url = "http://localhost:5000/audio.badge"
+    
+    def test_badge_from_uri(self):
+        badge = Badge.from_remote(self.badge_url)
+        self.assertEqual(badge['recipient'], 'test@example.com')
+    
 setup_test_database()
+server.start() # starts on port 5000 -- see testserver/server.py, line 24
+
 
