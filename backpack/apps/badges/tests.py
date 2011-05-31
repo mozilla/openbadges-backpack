@@ -143,11 +143,21 @@ class GroupingTests(TestCase):
 
 class RemoteServerTests(TestCase):
     badge_url = "http://localhost:5000/audio.badge"
+    malformed_url = "http://localhost:5000/malformed.badge"
+    invalid_url = "http://localhost:5000/invalid_type.badge"
     
     def test_badge_from_uri(self):
         badge = Badge.from_remote(self.badge_url)
+        badge.save()
         self.assertEqual(badge['recipient'], 'test@example.com')
+        badge.delete()
     
+    def test_invalid_type(self):
+        self.assertRaises(TypeError, Badge.from_remote, self.invalid_url)
+    
+    def test_malformed(self):
+        self.assertRaises(ValueError, Badge.from_remote, self.malformed)
+
 setup_test_database()
 server.start() # starts on port 5000 -- see testserver/server.py, line 24
 

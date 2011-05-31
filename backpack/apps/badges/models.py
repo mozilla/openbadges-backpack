@@ -150,6 +150,7 @@ class Badge(object):
         content_type = response.headers['Content-Type']
         if raw_re.match(content_type):
             data = json.loads(response.read())
+            data['url'] = url
             return Badge(data)
         
         elif signed_re.match(content_type):
