@@ -17,7 +17,8 @@ class Badge(object):
             'recipient':'',
             'evidence':'',
             'icons':{},
-            'groups': ['private']
+            'groups': [],
+            'private': True,
         }
         self.fields.update(data)
         self._errors = {}
@@ -50,7 +51,8 @@ class Badge(object):
         'expires':     [validate_iso_date],
         'icons':       [TypeValidator(dict), MinSizeValidator(1)],
         'ttl':         [validate_integer],
-        
+        'groups':      [TypeValidator(list)],
+        'private':     [TypeValidator(bool)],
     }
 
     def full_clean(self):

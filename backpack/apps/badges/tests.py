@@ -1,6 +1,7 @@
 from pymongo import Connection
 from django.test import TestCase
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from models import Badge
 
 def setup_test_database():
@@ -27,10 +28,6 @@ valid_badge = {
 class BasicTests(TestCase):
     def setUp(self):
         self.valid = Badge(valid_badge)
-
-    def tearDown(self):
-        # remove all created badges
-        map(lambda b: b.delete(), Badge.objects.all())
     
     def test_validation(self):
         missing_recipient_badge = valid_badge.copy()
@@ -56,6 +53,14 @@ class BasicTests(TestCase):
         self.assertIn('recipient', missing_recipient.errors().keys())
         self.assertIn('description', missing_description.errors().keys())
         
+class DatabaseTests(TestCase):
+    def setUp(self):
+        self.valid = Badge(valid_badge)
+
+    def tearDown(self):
+        # remove all created badges
+        map(lambda b: b.delete(), Badge.objects.all())
+    
     def test_save_and_delete(self):
         self.assertRaises(AssertionError, self.valid.delete)
         self.assertTrue(self.valid.save())
@@ -88,22 +93,38 @@ class BasicTests(TestCase):
     def test_find_one(self):
         self.valid.save()
         self.assertEqual(self.valid, Badge.objects.get(pk=self.valid.id()))
+
+class GroupingTests(TestCase):
+    def setUp(self):
+        self.badge = Badge(valid_badge)
+        self.badge.save()
     
-    def test_grouping(self):
+    def tearDown(self):
+        # remove all created badges
+        map(lambda b: b.delete(), Badge.objects.all())
+    
+    def test_add_to_group(self):
         # add to group
-        self.valid.add_to_group('linkedin')
-        self.valid.save()
-        badge = Badge.objects.get(pk=self.valid.id())
-        self.assertIn('linkedin', badge.groups())
+        self.badge.add_to_group('linkedin')
+        self.badge.save()
+        badge_again = Badge.objects.get(pk=self.badge.id())
+        self.assertIn('linkedin', badge_again.groups())
         
+    def test_remove_from_group(self):
         # remove from group
-        badge.remove_from_group('linkedin')
-        badge.save()
+        map(self.badge.add_to_group, ['facebook', 'myspace'])
+        self.badge.save()
+        self.badge.remove_from_group('myspace')
+        self.badge.save()
         
-        badge_again = Badge.objects.get(pk=badge.id())
-        self.assertNotIn('linkedin', badge_again.groups())
-        
-        # find by group?
-        
+        badge_again = Badge.objects.get(pk=self.badge.id())
+        self.assertNotIn('myspace', badge_again.groups())
+        self.assertIn('facebook', badge_again.groups())
+    
+    def test_invalid_group(self):
+        self.badge['groups'] = 'not a list'
+        self.assertRaises(ValidationError, self.badge.save)
+        self.assertIn('groups', self.badge.errors())
+
 setup_test_database()
 
