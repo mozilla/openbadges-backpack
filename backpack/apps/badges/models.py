@@ -72,5 +72,5 @@ class Badge(object):
 
     def save(self):
         self.full_clean()
-        objectid = self.collection.insert(self.fields)
+        objectid = self.collection().insert(self.fields)
         return bool(objectid)
