@@ -75,7 +75,12 @@ class BasicTests(TestCase):
         self.assertEqual(self.valid, Badge(badge_data))
 
     def test_filtering(self):
+        other_badge = self.valid_badge.copy()
+        other_badge['recipient'] = 'blurgh@example.com'
+        
         self.valid.save()
+        Badge(other_badge).save()
+        
         badges = Badge.objects.filter(recipient='test@example.com')
         self.assertEqual(badges.count(), 1)
         self.assertEqual(Badge(badges.next()), self.valid)
