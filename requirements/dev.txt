@@ -1,0 +1,10 @@
+Django
+South
+py-bcrypt
+django-nose
+nose
+pymongo
+mongoengine
+ipython
+
+-e git://github.com/fwenzel/django-sha2.git#egg=django_sha2 
