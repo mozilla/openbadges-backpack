@@ -1,12 +1,18 @@
 # Create your views here.
 import urllib
+import logging
+import json
+import logging 
 
+from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 from django.shortcuts import render_to_response, get_object_or_404
 from django.contrib import auth
 from django.contrib.auth.models import User
 from users.forms import UserCreationForm
+
+logger = logging.getLogger(__name__)
 
 def register(request):
     user = getattr(request, 'user', None)
@@ -35,23 +41,32 @@ def login(request):
         return render_to_response('login.html', {},
                                   context_instance=RequestContext(request))
 
-    email = request.POST.get('email', '')
-    password = request.POST.get('password', '')
-    user = auth.authenticate(username=email, password=password)
-    if user is not None and user.is_active:
+    # get assertion
+    assertion_url = 'https://%s/verify?assertion=%s&audience=%s'% (
+        settings.IDENTITY_PROVIDER,
+        request.POST.get('assertion', ''),
+        settings.SITE_URL)
+    
+    assertion = json.loads(urllib.urlopen(assertion_url).read())
+    
+    # validate assertion
+    identity_provider = '%s:443' % settings.IDENTITY_PROVIDER
+    valid_response = (assertion['status'] == 'okay')
+    expected_provider = (assertion['issuer'] == identity_provider)
+    if valid_response and expected_provider:
+        email = assertion['email']
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist, e:
+            user = User(username=hash(email), email=email, password=email)
+            user.save()
+        
+        user.backend = 'django.contrib.auth.backends.ModelBackend'
         auth.login(request, user)
         return HttpResponseRedirect('/')
+    
     else:
-        return render_to_response('login.html', {'error': True},
-                                  context_instance=RequestContext(request))
-
-def confirm(request, token, username):
-    user = get_object_or_404(User, username=urllib.unquote(username))
-    code = user.get_profile().confirmation_code
-    if code == token:
-        user.is_active = True
-        user.save()
-        # TODO: print some sort of message?
-        return HttpResponseRedirect('/')
-    else:
-        return HttpResponse("Invalid token")
+        logger.error('invalid assertion')
+    
+    return render_to_response('login.html', {'error': True,},
+                              context_instance=RequestContext(request))
