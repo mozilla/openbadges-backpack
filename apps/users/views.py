@@ -1,4 +1,3 @@
-# Create your views here.
 import urllib
 import logging
 import json
@@ -13,20 +12,6 @@ from django.contrib.auth.models import User
 from users.forms import UserCreationForm
 
 logger = logging.getLogger(__name__)
-
-def register(request):
-    user = getattr(request, 'user', None)
-    if user is not None and user.is_active:
-        return HttpResponseRedirect('/')
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            new_user = form.save()
-            return HttpResponseRedirect('/')
-    else:
-        form = UserCreationForm()
-    return render_to_response('register.html', {'form': form },
-                              context_instance=RequestContext(request))
 
 def logout(request):
     auth.logout(request)
