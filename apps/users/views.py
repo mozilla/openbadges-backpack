@@ -58,7 +58,7 @@ def login(request):
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist, e:
-            user = User(username=hash(email), email=email, password=email)
+            user = User(username=hash(email), email=email)
             user.save()
         
         user.backend = 'django.contrib.auth.backends.ModelBackend'
