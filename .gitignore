@@ -1,3 +1,6 @@
 *.pyc
 *.db
 /backpack/settings_local.py
+/log.txt
+/pip-log.txt
+/settings_local.py

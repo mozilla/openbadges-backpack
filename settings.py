@@ -111,7 +111,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
 )
 
-ROOT_URLCONF = 'backpack.urls'
+ROOT_URLCONF = 'openbadges.urls'
 
 TEMPLATE_DIRS = (
     path('templates'),
