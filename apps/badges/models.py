@@ -49,7 +49,7 @@ class Badge(object):
         'name':        [LengthValidator(min=4, max=80)],
         'description': [LengthValidator(min=4, max=140)],
         'recipient':   [validate_email],
-        'evidence':    [RelativeURLValidator()],
+        'evidence':    [URLValidator()],
         'expires':     [validate_iso_date],
         'icons':       [TypeValidator(dict), MinSizeValidator(1)],
         'ttl':         [validate_integer],
