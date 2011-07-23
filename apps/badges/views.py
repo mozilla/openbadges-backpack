@@ -3,7 +3,7 @@ from django.http import HttpResponse, HttpResponseForbidden
 from models import Badge
 import json
 
-def recieve_badge(request):
+def receive_badge(request):
     url = request.POST['url']
     status = 201
     response = {'ok': True}
