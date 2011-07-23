@@ -2,7 +2,7 @@ import re
 import json
 from urllib import urlopen
 from django.core.exceptions import ValidationError
-from django.core.validators import RegexValidator, URLValidator, validate_email
+from django.core.validators import MinLengthValidator, RegexValidator, URLValidator, validate_email
 from validators import validate_integer, validate_iso_date, LengthValidator, RelativeURLValidator, MinSizeValidator, TypeValidator, UniquenessValidator
 from manager import BadgeManager
 
@@ -18,7 +18,7 @@ class Badge(object):
             'description':'',
             'recipient':'',
             'evidence':'',
-            'icons':{},
+            'image':'',
             'groups': [],
             'private': True,
         }
@@ -51,7 +51,7 @@ class Badge(object):
         'recipient':   [validate_email],
         'evidence':    [URLValidator()],
         'expires':     [validate_iso_date],
-        'icons':       [TypeValidator(dict), MinSizeValidator(1)],
+        'image':       [MinLengthValidator(4)],
         'ttl':         [validate_integer],
         'groups':      [TypeValidator(list)],
         'private':     [TypeValidator(bool)],
