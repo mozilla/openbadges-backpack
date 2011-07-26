@@ -27,23 +27,22 @@ class Badge(object):
 
     def __eq__(self, other):
         return self.fields == other.fields
-    
+
     def __getitem__(self, key):
         return self.fields.get(key, None)
-    
+
     def __setitem__(self, key, value):
         self.fields[key] = value
 
     def __contains__(self, item):
         return item in self.fields
-        
+
     def id(self):
         return self['_id']
-    
+
     ######################
     # Validation-related #
     ######################
-
     field_validators = {
         'url':         [URLValidator()],
         'name':        [LengthValidator(min=4, max=80)],
@@ -122,13 +121,13 @@ class Badge(object):
         existing = set(self.fields.get('groups', []))
         existing.add(group)
         self.fields['groups'] = list(existing)
-    
+
     def groups(self):
         return self.fields['groups']
 
     def remove_from_group(self, group):
         return self.fields['groups'].remove(group)
-    
+
     ############################
     # Database-hitting actions #
     ############################
@@ -146,11 +145,11 @@ class Badge(object):
             return False
         self.fields['_id'] = objectid
         return True
-    
+
     def __update(self):
         self.collection().update({'_id':self.fields['_id']}, self.fields, safe=True)
         return True
-    
+
     def delete(self):
         assert self.id() is not None, "Badge object can't be deleted because its _id attribute is set to None"
         self.collection().remove(self.fields['_id'], True)
@@ -162,7 +161,7 @@ class Badge(object):
     def refresh_from_remote(self):
         data = Badge.get_remote_data(self['url'])
         self.fields.update(data)
-    
+
     ##################
     # Static methods #
     ##################
@@ -172,7 +171,7 @@ class Badge(object):
             URLValidator()(url)
         except ValidationError, e:
             raise ValueError("URL must be valid and absolute.")
-        
+
         raw_re = re.compile('application/x-badge-manifest')
         signed_re = re.compile('application/x-badge-signed')
         response = urlopen(url)
@@ -190,5 +189,3 @@ class Badge(object):
     def from_remote(url, key=''):
         data = Badge.get_remote_data(url, key)
         return Badge(data)
-        
-    
