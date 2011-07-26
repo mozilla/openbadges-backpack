@@ -27,5 +27,6 @@ def receive_badge(request):
         except ValidationError, e:
             errors[url] = {'error': 'validation', 'message': e.message_dict}
     
-    print errors
-    return HttpResponse('wutlol')
+    if errors:
+        return HttpResponse(json.dumps(errors), mimetype=mime, status=500)
+    return HttpResponse(json.dumps({'status':'okay'}))
