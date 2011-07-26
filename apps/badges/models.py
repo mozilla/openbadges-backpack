@@ -56,8 +56,6 @@ class Badge(object):
         'private':     [TypeValidator(bool)],
     }
 
-    unique_validators = [UniquenessValidator('url'),]
-
     def full_clean(self):
         errors = {}
         try:
@@ -67,23 +65,17 @@ class Badge(object):
         if errors:
             raise ValidationError(errors)
 
-        try:
-            self.validate_unique()
-        except ValidationError, e:
-            errors = e.update_error_dict(errors)
-        if errors:
-            raise ValidationError(errors)
+        self.validate_unique()
 
     def validate_unique(self):
-        errors = {}
-        for validate in self.unique_validators:
-            try:
-                validate(self)
-            except ValidationError, e:
-                errors['unique'] = e.messages
-        if errors:
-            raise ValidationError(errors)
-
+        """
+        Figure out if this badge is already in the database and pull the ID if
+        it is so save() can perfom an update instead of insert.
+        """
+        other = Badge.objects.get(url=self['url'])
+        if other:
+            self['_id'] = other.id()
+    
     def clean_fields(self):
         """
         Cleans all fields and raises a ValidationError containing message_dict
