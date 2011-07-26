@@ -116,7 +116,6 @@ class Badge(object):
     #########################
     # Group-related actions #
     #########################
-
     def add_to_group(self, group):
         existing = set(self.fields.get('groups', []))
         existing.add(group)
@@ -131,7 +130,6 @@ class Badge(object):
     ############################
     # Database-hitting actions #
     ############################
-
     def save(self):
         self.full_clean()
         if self.id():
