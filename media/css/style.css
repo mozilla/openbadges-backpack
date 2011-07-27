@@ -4,20 +4,23 @@ body {
   background: #eee;
   margin: 0;
 }
+
 a {
   text-decoration: none;
 }
 
 h1, h2, h3, h4, h5, h6 {
   color: #555;
+  text-shadow: 1px 1px 0px #fff;
 }
 
 h1 {
-  border-bottom: 1px solid #000;
+  border-bottom: 3px solid #cdd;
   margin: 0;
   padding: 12px;
   color: #ddd;
-  background: #333;
+  background: #444;
+  text-shadow: 2px 2px 0px #000;
 }
 
 .main {
