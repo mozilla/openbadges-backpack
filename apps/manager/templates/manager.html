@@ -17,7 +17,7 @@
            <h1>{{ badge.name }}</h1>
            <img class='icon' src='{{ badge.image }}'>
            <ul>
-             <li>Issued by <strong>{{ badge.issuer }}</strong></li>
+             <li>Issued by <strong><a href="{{ badge.issuer }}">{{ badge.issuer }}</a></strong></li>
              <li>Described as <em>"{{ badge.description }}"</em></li>
              <li>Evidenced by <a href="{{ badge.evidence }}">{{ badge.evidence }}</a></li>
            </ul>
