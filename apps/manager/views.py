@@ -1,3 +1,4 @@
+import json
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.contrib import auth
@@ -9,3 +10,6 @@ def manage(request):
     badges = Badge.objects.filter(recipient=request.user.email)
     return render_to_response('manager.html', { 'user': request.user, 'badges': badges })
 
+def status(request):
+    return HttpResponse(json.dumps({'status':'okay', 'version':'0.1.0'}),
+                        mimetype="application/json")
