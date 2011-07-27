@@ -1,21 +1,27 @@
 {% extends "base.html" %}
 {% block title %} | Manager{% endblock %}
 {% block content %}
-  <h1>Welcome, {{ user.email }}</h1>
-  <h2>Overview</h2>
-  <h3>You have {{ badges.count }} badges.</h3>
-  <ul>
-    {% for badge in badges %}
-     <li>
-       <ul>
-         <li>{{ badge.url }}</li>
-         <li>{{ badge.name }}</li>
-         <li>{{ badge.description }}</li>
-         <li>{{ badge.image }}</li>
-         <li>{{ badge.evidence }}</li>
-       </ul>
-     </li>
-    {% endfor %}
-  </ul>
-  <p><a href="logout">Logout</a></p>
+  <header>
+    <h1>
+      <a id='logout' href="logout">Logout</a>    
+      {{ user.email }}
+    </h1>
+  </header>
+  
+  <div class="main">
+    <h2>You have {{ badges.count }} badges.</h2>
+    <ul>
+      {% for badge in badges %}
+       <li>
+         <ul>
+           <li>{{ badge.url }}</li>
+           <li>{{ badge.name }}</li>
+           <li>{{ badge.description }}</li>
+           <li>{{ badge.image }}</li>
+           <li>{{ badge.evidence }}</li>
+         </ul>
+       </li>
+      {% endfor %}
+    </ul>
+  </div>
 {% endblock %}

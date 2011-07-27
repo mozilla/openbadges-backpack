@@ -1,0 +1,33 @@
+body {
+  font-family: 'Helvetica', 'Arial', sans-serif;
+  color: #333;
+  background: #eee;
+  margin: 0;
+}
+a {
+  text-decoration: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #555;
+}
+
+h1 {
+  border-bottom: 1px solid #000;
+  margin: 0;
+  padding: 12px;
+  color: #ddd;
+  background: #333;
+}
+
+.main {
+  padding: 0 15px;
+}
+
+#logout {
+  float: right;
+  color: #f66;
+}
+#logout:active {
+  color: #f33;
+}
