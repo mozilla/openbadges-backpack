@@ -14,7 +14,7 @@ h1, h2, h3, h4, h5, h6 {
   text-shadow: 1px 1px 0px #fff;
 }
 
-h1 {
+h1.masthead {
   border-bottom: 3px solid #cdd;
   margin: 0;
   padding: 12px;
@@ -34,3 +34,34 @@ h1 {
 #logout:active {
   color: #f33;
 }
+
+#badges > li {
+  list-style: none;
+  margin: 0 0 50px;
+}
+
+section.badge {
+  clear: both;
+}
+
+section.badge li {
+  list-style: none;
+  margin: 5px 0;
+}
+
+section.badge h1 {
+  margin: 0;
+  padding: 0;
+  font-size: 20px;
+}
+ 
+section.badge .icon {
+  float: left;
+  height: 100px;
+  width: 100px;
+}
+
+section.badge ul {
+  padding-top: 15px;
+}
+

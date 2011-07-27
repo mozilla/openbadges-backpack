@@ -1,6 +1,6 @@
 import re
 import json
-from urllib import urlopen
+from urllib2 import urlopen, urlparse
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator, RegexValidator, URLValidator, validate_email
 from validators import validate_integer, validate_iso_date, LengthValidator, RelativeURLValidator, MinSizeValidator, TypeValidator, UniquenessValidator
@@ -13,6 +13,7 @@ class Badge(object):
     def __init__(self, data):
         # required fields
         self.fields = {
+            'issuer':'',
             'url':'',
             'name':'',
             'description':'',
@@ -22,7 +23,20 @@ class Badge(object):
             'groups': [],
             'private': True,
         }
+        
         self.fields.update(data)
+        
+        # TODO: move this stuff into its own method
+        if data['url']:
+            parts = urlparse.urlparse(data['url'])
+            self.fields['issuer'] = '://'.join([parts.scheme, parts.netloc])
+        
+        if data['image']:
+            parts = urlparse.urlparse(data['image'])
+            if not parts.netloc:
+                img = urlparse.urljoin(self.fields['issuer'], data['image'])
+                self.fields['image'] = img
+        
         self._errors = {}
 
     def __eq__(self, other):

@@ -2,7 +2,7 @@
 {% block title %} | Manager{% endblock %}
 {% block content %}
   <header>
-    <h1>
+    <h1 class="masthead">
       <a id='logout' href="logout">Logout</a>    
       {{ user.email }}
     </h1>
@@ -10,16 +10,18 @@
   
   <div class="main">
     <h2>You have {{ badges.count }} badges.</h2>
-    <ul>
+    <ul id='badges'>
       {% for badge in badges %}
        <li>
-         <ul>
-           <li>{{ badge.url }}</li>
-           <li>{{ badge.name }}</li>
-           <li>{{ badge.description }}</li>
-           <li>{{ badge.image }}</li>
-           <li>{{ badge.evidence }}</li>
-         </ul>
+         <section class='badge'>
+           <h1>{{ badge.name }}</h1>
+           <img class='icon' src='{{ badge.image }}'>
+           <ul>
+             <li>Issued by <strong>{{ badge.issuer }}</strong></li>
+             <li>Described as <em>"{{ badge.description }}"</em></li>
+             <li>Evidenced by <a href="{{ badge.evidence }}">{{ badge.evidence }}</a></li>
+           </ul>
+         </section>
        </li>
       {% endfor %}
     </ul>
