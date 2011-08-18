@@ -1,4 +1,0 @@
-# packages required for  running tests
-django-nose
-nose
-flask
