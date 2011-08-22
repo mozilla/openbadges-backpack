@@ -2,8 +2,9 @@ var express = require('express')
   , ejs = require('ejs')
   , logger = require('./lib/logging').logger
   , path = require('path')
-  , controller = require('./controller')
   , middleware = require('./middleware')
+  , controller = require('./controller')
+  , helper = require('./helper')
 
 var app = express.createServer();
 
@@ -20,9 +21,11 @@ app.configure(function(){
 })
 
 // routing
-app.post('/authenticate', controller.authenticate)
-app.get('/login',         controller.directToTemplate('login'))
-app.get('/',              controller.authRequired(controller.manage))
+(function (_) {
+  app.post('/authenticate', controller.authenticate)
+  app.get('/login',         _.directTemplate('login'))
+  app.get('/',              _.authRequired(controller.manage))
+}(helper))
 
 app.listen(80);
 logger.info('READY PLAYER ONE');

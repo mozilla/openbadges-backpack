@@ -78,22 +78,3 @@ exports.manage = function(req, res){
   return;
 }
 
-// helpers -- like per-route middleware
-// TODO: move helpers into their own file?
-exports.authRequired = function(controller){
-  return function(req, res){
-    if (!req.session) req.session = {}
-    if (!req.session.authenticated) {
-      res.redirect('login', 303);
-    }
-    logger.warn('will require authentication');
-    return controller(req, res);
-  }
-}
-
-exports.directToTemplate = function(template, opts) {
-  return function(req, res) {
-    opts = opts || {}
-    res.render(template, opts);
-  }
-}
