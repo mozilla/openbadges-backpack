@@ -4,11 +4,12 @@ var configuration = require('./lib/configuration')
   , path = require('path')
   , qs = require('querystring')
 
+// FIXME: CSRF
 exports.authenticate = function(req, res) {
   // throw out 403 if we can't find assertion
   if (!req.body['assertion']) {
     res.status(403)
-    res.send('forbidden');
+    res.end('forbidden');
     return;
   }
   var postbody = qs.stringify({
@@ -53,13 +54,11 @@ exports.authenticate = function(req, res) {
     }
     var hostname = configuration.get('hostname')
     if (assertion.audience !== hostname) {
-      logger.warn('unexpected audience for this assertion, expecting ' +
-                  hostname +'; got ' + assertion.audience);
+      logger.warn('unexpected audience for this assertion, expecting ' + hostname +'; got ' + assertion.audience);
       return problem();
     }
     if (assertion.issuer !== ident.server) {
-      logger.warn('unexpected issuer for this assertion, expecting ' +
-                  ident.server +'; got ' + assertion.issuer);
+      logger.warn('unexpected issuer for this assertion, expecting ' + ident.server +'; got ' + assertion.issuer);
       return problem();
     }
 
@@ -67,14 +66,35 @@ exports.authenticate = function(req, res) {
     if (!req.session) res.session = {}
     req.session.authenticated = [assertion.email]
 
-      // FIXME: redirect
-    return res.end('worked');
+    return res.redirect('/', 303);
   })
 }
 
-exports.manage = function(req, res){
-  logger.warn('gon party');
-  res.end('party timeeeeeeeeeeee');
-  return;
+// FIXME: CSRF
+exports.signout = function(req, res) {
+  var session = req.session;
+  if (session) {
+    Object.keys(session).forEach(function(k) {
+      if (k !== 'csrf') delete session[k];
+    });
+  }
+  res.redirect('/login', 303);
 }
 
+exports.manage = function(req, res) {
+  // TODO: support multiple users
+  var session = req.session
+    , user = session.authenticated[0]
+    , emailRe = /^.+?\@.+?\.*$/
+  
+  // very simple sanity check
+  if (!emailRe.test(user)) {
+    logger.warn('session.authenticate does not contain valid user: ' + user);
+    req.session = {};
+    return res.redirect('/login', 303);
+  }
+  res.render('manage', {
+    user: user,
+    badges: []
+  });
+}

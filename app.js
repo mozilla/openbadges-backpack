@@ -21,6 +21,7 @@ app.use(middleware.logRequests());
 // routing
 (function (_) {
   app.post('/authenticate', controller.authenticate)
+  app.get('/signout',       controller.signout)
   app.get('/login',         _.directTemplate('login'))
   app.get('/',              _.authRequired(controller.manage))
 }(helper))

@@ -3,11 +3,9 @@ var logger = require('./lib/logging').logger
 
 exports.authRequired = function(controller){
   return function(req, res){
-    if (!req.session) req.session = {}
-    if (!req.session.authenticated) {
-      res.redirect('login', 303);
+    if (!req.session || !req.session.authenticated) {
+      return res.redirect('/login', 303);
     }
-    logger.warn('will require authentication');
     return controller(req, res);
   }
 }
