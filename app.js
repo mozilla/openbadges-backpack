@@ -20,8 +20,9 @@ app.configure(function(){
 })
 
 // routing
-app.get('/',         controller.authRequired(controller.manage))
-app.post('/sign-in', controller.authenticate)
+app.post('/authenticate', controller.authenticate)
+app.get('/login',         controller.directToTemplate('login'))
+app.get('/',              controller.authRequired(controller.manage))
 
 app.listen(80);
 logger.info('READY PLAYER ONE');
