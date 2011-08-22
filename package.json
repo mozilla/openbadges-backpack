@@ -10,6 +10,7 @@
     , "winston": "0.3.x"
     , "mongoose": "1.8.x"
     , "ejs": "0.4.x"
+    , "connect-cookie-session" : "0.0.x"
   }
   , "devDependencies": {
       "vows": "0.5.x"
