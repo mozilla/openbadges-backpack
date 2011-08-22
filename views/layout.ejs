@@ -12,7 +12,34 @@
   </head>
   <body>
     <div class='container'>
+      <!-- make a partial? -->
+        <div class='topbar'>
+          <div class='fill'>
+            <div class='container'>
+              <h3>
+                <a href='#'>Badge Backpack</a>
+              </h3>
+              
+              <% if (user) { %>
+                <form action=''>
+                  <input type='text' placeholder='Filter'>
+                </form>
+                <ul class='nav secondary-nav'>
+                  <li class='menu'>
+                    <a id='user-dropdown-link' class='menu' href='#'><%= user %></a>
+                    <ul id='user-dropdown' class='menu-dropdown'>
+                      <li><a href='/signout'>Sign Out</a></li>
+                    </ul>
+                  </li>
+                </ul>
+              <% } %>
+            
+            </div>
+          </div>
+        </div>
+      
       <%- body %>
     </div>
+    <script type='text/javascript' src='/js/backpack.js'></script>
   </body>
 </html>

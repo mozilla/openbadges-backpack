@@ -11,6 +11,12 @@ var app = express.createServer();
 // misc settings
 app.set('view engine', 'ejs');
 
+// view helpers
+app.helpers({
+  user: null,
+  badges: {}
+})
+
 // middleware
 app.use(express.bodyParser());
 app.use(express.cookieParser());
