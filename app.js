@@ -12,13 +12,11 @@ var app = express.createServer();
 app.set('view engine', 'ejs');
 
 // middleware
-app.configure(function(){
-  app.use(express.bodyParser());
-  app.use(express.cookieParser());
-  app.use(express.static(path.join(__dirname, "static")));
-  app.use(middleware.cookieSessions());
-  app.use(middleware.logRequests());
-})
+app.use(express.bodyParser());
+app.use(express.cookieParser());
+app.use(express.static(path.join(__dirname, "static")));
+app.use(middleware.cookieSessions());
+app.use(middleware.logRequests());
 
 // routing
 (function (_) {
