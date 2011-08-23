@@ -123,9 +123,9 @@ var run_tests = function() {
         'will have all `missing` errors': function(topic){
           var errors = topic.errors();
           var errHash = {};
-          for (k in errors) {
+          Object.keys(errors).forEach(function(k){
             errHash[errors[k]] = true;
-          }
+          })
           assert.equal(Object.keys(errHash).length, 1);
           assert.include(Object.keys(errHash), 'missing');
         }
