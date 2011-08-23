@@ -1,21 +1,9 @@
 <h1>Sign in with BrowserID</h1>
-<a href='#' id='sign-in'><img src='https://browserid.org/i/sign_in_green.png'></a>
+<a href='#' id='js-browserid-link'><img src='https://browserid.org/i/sign_in_green.png'></a>
 
-<form class='sign-in' method='POST' action='/authenticate'>
-  <input id='browserid-assertion' name='assertion' type='hidden'>
+<form class='signin js-browserid-form' method='POST' action='/authenticate'>
+  <input class='js-browserid-input' name='assertion' type='hidden'>
 </form>
 
 <script type='text/javascript'>
-  var login = function(){
-    navigator.id.getVerifiedEmail(function(assertion) {
-      if (assertion) {
-        $('#browserid-assertion').val(assertion);
-        $('form.sign-in').trigger('submit');
-      } else {
-        // pass
-      }
-    })
-  }
-  
-  $('#sign-in').bind('click', login);
 </script>

@@ -26,14 +26,20 @@
                 </form>
                 <ul class='nav secondary-nav'>
                   <li class='menu'>
-                    <a id='user-dropdown-link' class='menu' href='#'><%= user %></a>
-                    <ul id='user-dropdown' class='menu-dropdown'>
+                    <a class='menu js-usermenu-link' href='#'><%= user %></a>
+                    <ul class='menu-dropdown js-usermenu-dropdown'>
                       <li><a href='/signout'>Sign Out</a></li>
                     </ul>
                   </li>
                 </ul>
-              <% } %>
-            
+              <% } else { %>
+              <form class='signin js-browserid-form' method='POST' action='/authenticate'>
+                <input class='js-browserid-input' name='assertion' type='hidden'>
+              </form>
+              <ul class='nav secondary-nav'>
+                <li><a href='#' class='js-browserid-link'><img src='https://browserid.org/i/sign_in_green.png'></a><li>
+              </ul>
+              <% } %> 
             </div>
           </div>
         </div>
