@@ -59,7 +59,7 @@ exports.authenticate = function(req, res) {
         throw 'could not request';
       }
       if (resp.statusCode != 200) {
-        logger.warn('identity server returned error: ');
+        logger.warn('identity server returned error');
         logger.debug('  status code: ' + resp.statusCode);
         logger.debug('  sent with these options: ' + JSON.stringify(options));
         throw 'invalid http status';
