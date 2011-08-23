@@ -1,12 +1,24 @@
 var model_factory = function(){
   var model = function(data){ this.data = data || {}; }
   model.prototype.fields = {}
-  model.prototype.validate = function(){
+  model.prototype.errors = function(){
     var errors = []
-    var expected = Object.keys(this.fields);
-    var provided = Object.keys(this.data);
-    console.dir(this.data);
-    console.dir(this.fields);
+    var fields = this.fields
+    var provided = this.data;
+    var expected = Object.keys(fields);
+    var self = this;
+    expected.forEach(function(k){
+      var err = {};
+      if (!provided[k] && fields[k].required) {
+        err[k] = 'missing';
+      } else {
+          fields[k].validators.forEach(function(validator){
+          try { validator(provided[k]); }
+          catch (e) { err[k] = e.message;  }
+        })
+      }
+      if (err[k]) { errors.push(err); }
+    })
     return errors;
   }
   return model;
@@ -23,7 +35,7 @@ var RegEx = function(regex){
 var ISODate = function(){
   return function(input){
     var parsed = new Date(Date.parse(input))
-    if (isNan(parsed.getDate())) throw new ValidationError('isodate');
+    if (isNaN(parsed.getDate())) throw new ValidationError('isodate');
   };
 };
 var Email = function(){
@@ -93,39 +105,101 @@ var run_tests = function() {
     },
     'A Badge instance': {
       topic: (new Badge({what: 'lol'})),
-      'has `data`, `fields` and `validate` method': function(topic){
+      'has `data`, `fields` and `errors` method': function(topic){
         assert.include(topic, 'data');
         // will be in prototype chain, not on object.
         assert.ok(topic.fields);
-        assert.ok(topic.validate);
+        assert.ok(topic.errors);
+      },
+      'missing all fields': {
+        topic: new Badge(),
+        'will have all errors': function(topic){
+          // currently 5 required fields.
+          var errors = topic.errors()
+          assert.equal(errors.length, 5);
+        }
       }
     },
-    'Maxlength validators': {
-      topic: function(){ return function(len){ return MaxLength(len);} },
-      'should trip if above length': function(topic) {
-        var str = 'wwwwwwwwwwwwwwwwwwwwwwwwwwwwwhat';
-        assert.throws(function(){
-          topic(str.length - 1)(str);
-        }, Error);
+    'A Validator': {
+      'of MaxLength': {
+        topic: function(){ return function(len){ return MaxLength(len);} },
+        'should trip if above length': function(topic) {
+          var str = 'wwwwwwwwwwwwwwwwwwwwwwwwwwwwwhat';
+          assert.throws(function(){
+            topic(str.length - 1)(str);
+          }, Error);
+        },
+        'should not trip if at length': function(topic) {
+          var str = 'www';
+          assert.doesNotThrow(function(){
+            topic(str.length)(str);
+          }, Error);
+        },
+        'should not trip if below length': function(topic) {
+          var str = '1';
+          assert.doesNotThrow(function(){
+            topic(str.length + 1)(str);
+          }, Error);
+        },
+        'should be able to co-exist': function(topic) {
+          var one = topic(1);
+          var two = topic(2);
+          assert.doesNotThrow(function(){ one('1'); }, Error);
+          assert.doesNotThrow(function(){ two('22'); }, Error);
+          assert.throws(function(){ one('22'); }, Error);
+        }
       },
-      'should not trip if at length': function(topic) {
-        var str = 'www';
-        assert.doesNotThrow(function(){
-          topic(str.length)(str);
-        }, Error);
+      'of URLs': {
+        topic: function(){ return function(){ return URL();} },
+        'should pass with fqdn': function(topic){
+          assert.doesNotThrow(function(){
+            topic()('http://google.com/');
+          }, Error);
+        },
+        'should pass with relative': function(topic){
+          assert.doesNotThrow(function(){
+            topic()('/google/bots');
+          }, Error);
+        },
+        'should fail with wrong scheme': function(topic){
+          assert.throws(function(){
+            topic()('ftp://google.com/bots');
+          }, Error);
+        },
+        'should pass with port': function(topic){
+          assert.doesNotThrow(function(){
+            topic()('https://google.com:443/');
+          }, Error);
+        }
       },
-      'should not trip if below length': function(topic) {
-        var str = '1';
-        assert.doesNotThrow(function(){
-          topic(str.length + 1)(str);
-        }, Error);
+      'of ISODates': {
+        topic: function(){ return function(){ return ISODate();} },
+        'should pass with good date': function(topic) {
+          assert.doesNotThrow(function(){ topic()('2010-09-10'); });
+        },
+        'should pass with good time': function(topic) {
+          assert.doesNotThrow(function(){ topic()('2010-09-10T21:00:00'); });
+        },
+        'should fail with bad dates': function(topic) {
+          assert.throws(function(){ topic()('2010-09-40'); });
+          assert.throws(function(){ topic()('10000-500-10'); })
+          assert.throws(function(){ topic()('2010-22-10'); })
+        }
       },
-      'should be able to co-exist': function(topic) {
-        var one = topic(1);
-        var two = topic(2);
-        assert.doesNotThrow(function(){ one('1'); }, Error);
-        assert.doesNotThrow(function(){ two('22'); }, Error);
-        assert.throws(function(){ one('22'); }, Error);
+      'of Emails': {
+        topic: function(){ return function(){ return Email();} },
+        'should pass with good email': function(topic) {
+          assert.doesNotThrow(function(){ topic()('b@example.com'); });
+          assert.doesNotThrow(function(){ topic()('b@e.com'); });
+          assert.doesNotThrow(function(){ topic()('yo@domain.local.com'); });
+          assert.doesNotThrow(function(){ topic()('first.last@domain.local.com'); });
+        },
+        'should fail with bad email': function(topic) {
+          assert.throws(function(){ topic()('b@ex'); });
+          assert.throws(function(){ topic()('@whatlolcom'); });
+          assert.throws(function(){ topic()('no-at-at-alll'); });
+          assert.throws(function(){ topic()('12902@@@.com'); });
+        }
       }
     }
   }).run()
