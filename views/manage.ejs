@@ -1,2 +1,8 @@
-<h1><%= user %></h1>
-Oh sup
+<% if (!badges || badges.length === 0) { %>
+  <h1>No badges. Get out there and start earning some!</h1>
+  <p>(By the way, <a href="http://p2pu.org">P2PU</a> would be a great place to start)</p>
+<% } else { %>
+<!-- let's show some badges -->
+
+<% } %>
+
