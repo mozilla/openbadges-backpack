@@ -35,7 +35,7 @@ exports.authenticate = function(req, res) {
   request.post(opts, function(err, resp, body){
     var assertion = {}
     function goBackWithError(msg) {
-      req.flash('error', (msg || 'Oh no! There was a problem, please try again.'));
+      req.flash('login_error', (msg || '<strong>Oh no!</strong> There was a problem, please try again.'));
       res.redirect('back', 303)
     }
     
@@ -115,8 +115,10 @@ exports.manage = function(req, res) {
 };
 
 exports.login = function(req, res) {
+  // req.flash returns an array. Pass on the whole thing to the view and
+  // decide there if we want to display all of them or just the first one.
   res.render('login', {
-    error: req.flash('error')
+    error: req.flash('login_error')
   });
 };
  

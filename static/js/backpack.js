@@ -3,6 +3,17 @@
   // below.
   var __CLASS_PREFIX = 'js';
   
+  $.fn.slideUpAndFadeOut = function(delay, fn) {
+    return $(this).animate({
+      opacity: 'hide',
+      height: 'hide',
+      marginTop: 'hide',
+      marginBottom: 'hide',
+      paddingTop: 'hide',
+      paddingBottom: 'hide'
+    }, delay, fn)
+  };
+  
   // Build a limited selector based on a prefix and classname. The suffix will
   // usually be named after the thing being selected. Doing this helps
   // slightly with separation of concerns -- classes that begin with the
@@ -35,6 +46,15 @@
     $$('link').bind('click', function(){ $$('dropdown').toggle(); });
   }
 
+  // Activate the close button on error boxes.
+  function bindAlertClose(className) {
+    var $$ = __scopeTo(className);
+    $$('close').bind('click', function() {
+      $$('container').slideUpAndFadeOut();
+    })
+  }
+  
   bindSignIn('browserid');
   bindUserMenu('usermenu');
+  bindAlertClose('alert');
 })(jQuery);

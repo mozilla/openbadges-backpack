@@ -18,6 +18,7 @@ app.set('view engine', 'ejs');
 // checks.
 app.helpers({
   user: null,
+  error: [],
   badges: {}
 });
 
