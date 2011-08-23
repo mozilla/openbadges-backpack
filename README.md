@@ -5,15 +5,15 @@ Brief: Push badges to a hub for your users and let them share badges everywhere 
 Long: https://wiki.mozilla.org/Badges
 
 # API Examples
-**NOTE**: Much of this describes a future that will exist come September 5th. I will use the present tense regardless.
+**NOTE**: Much of this describes a future that will exist come *September 5th*. I will use the present tense regardless.
 
 ## Pushing A Badge
 A badge assertion is sent to the hub by making a POST request with the path to the badge assertion. For example:
 
-    $ curl -X POST -d "assertion=https://example.org/bimmys-html5-badge.json" http://hub.example.org/badges
+    $ curl -d "assertion=https://example.org/6f81533e9978ae26a3d07b3888206c80.json" http://hub.example.org/badges
 
 This tells the badge hub to do a GET request to
-“https://example.org/bimmys-html5-badge.json” and process the assertion at
+“https://example.org/6f81533e9978ae26a3d07b3888206c80.json” and process the assertion at
 that URL.
 
 ## Example assertion (with optional fields)
@@ -22,7 +22,7 @@ that URL.
   "recipient": "bimmy@example.com",
   "evidence": "/badges/html5-basic/bimmy",
   "expires": "2013-06-01",
-  "issued_at": "2011-06-01"
+  "issued_at": "2011-06-01",
   "badge": {
     "version": "0.5.0",
     "name": "HTML5 Fundamental",
