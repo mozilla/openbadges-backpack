@@ -5,7 +5,7 @@ var request = require('request')
   , configuration = require('./lib/configuration')
 ;
 
-// FIXME: CSRF
+// #FIXME: CSRF
 exports.authenticate = function(req, res) {
   // If `assertion` wasn't posted in, the user has no business here.
   // We could return 403 or redirect to login page. It's more polite
@@ -13,20 +13,18 @@ exports.authenticate = function(req, res) {
   if (!req.body['assertion']) {
     return res.redirect('/login', 303);
   }
-  // The browserid server we are going to be using.
+  
+  // Setup the options and the post body for the verification request.
+  // nginx invariably 411s if it doesn't find a content-length header, and
+  // express, which is what the main browserid server runs, will refuse to
+  // populate req.body unless the proper content-type is set.
   var ident = configuration.get('identity');
   var opts = {}
-  
-  // Setup options for the verification request.
   opts.uri = ident.protocol + '://' +  ident.server + ident.path;
   opts.body = qs.stringify({
     assertion: req.body['assertion'],
     audience: configuration.get('hostname')
   });
-  
-  // nginx invariably 411s if it doesn't find a content-length header, and
-  // express, which is what the main browserid server runs, will refuse to
-  // populate req.body unless the proper content-type is set.
   opts.headers = {
     'content-length': opts.body.length,
     'content-type': 'application/x-www-form-urlencoded'
@@ -36,22 +34,22 @@ exports.authenticate = function(req, res) {
     var assertion = {}
     var hostname = configuration.get('hostname')
     
-    // Store an error and return to the previous page.
-    // Used in the testing battery below.
+    // We need to make sure:
+    //
+    //   * the request could make it out of the system,
+    //   * the other side responded with the A-OK,
+    //   * with a valid JSON structure,
+    //   * and a status of 'okay'
+    //   * with the right hostname, matching this server
+    //   * and coming from the issuer we expect.
+    //
+    // If any of these tests fail, throw an error, catch that error at the
+    // bottom, and call `goBackWithError` to redirect to the previous page
+    // with a human-friendly message telling the user to try again.
     function goBackWithError(msg) {
       req.flash('login_error', (msg || 'There was a problem authenticating, please try again.'));
       return res.redirect('back', 303)
     }
-    
-    // Make sure:
-    // * the request could make it out of the system,
-    // * the other side responded with the A-OK,
-    // * with a valid JSON structure,
-    // * and a status of 'okay'
-    // * with the right hostname, matching this server
-    // * and coming from the issuer we expect.
-    // If any of these tests fail, immediately store an error to display
-    // to the user and redirect to the previous page.
     try {
       if (err) {
         logger.error('could not make request to identity server')
@@ -95,7 +93,7 @@ exports.authenticate = function(req, res) {
   })
 };
 
-// FIXME: CSRF
+// #FIXME: CSRF
 exports.signout = function(req, res) {
   var session = req.session;
   if (session) {
@@ -111,7 +109,7 @@ exports.manage = function(req, res) {
     return res.redirect('/login', 303);
   }
   
-  // TODO: support multiple users
+  // #TODO: support multiple users
   var session = req.session
     , user = session.authenticated[0]
     , emailRe = /^.+?\@.+?\.*$/
