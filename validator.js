@@ -2,22 +2,24 @@ var model_factory = function(){
   var model = function(data){ this.data = data || {}; }
   model.prototype.fields = {}
   model.prototype.errors = function(){
-    var errors = []
-    var fields = this.fields
-    var provided = this.data;
-    var expected = Object.keys(fields);
-    var self = this;
-    expected.forEach(function(k){
-      var err = {};
+    var errors = {}
+      , fields = this.fields
+      , provided = this.data
+      , expectedFields = Object.keys(fields);
+    
+    expectedFields.forEach(function(k){
+      var errorType;
       if (!provided[k] && fields[k].required) {
-        err[k] = 'missing';
+        errorType = 'missing';
       } else {
           fields[k].validators.forEach(function(validator){
           try { validator(provided[k]); }
-          catch (e) { err[k] = e.message;  }
-        })
+          catch (e) { errorType = e.message;  }
+        });
       }
-      if (err[k]) { errors.push(err); }
+      if (errorType) {
+        errors[k] = errorType;
+      }
     })
     return errors;
   }
@@ -91,7 +93,7 @@ exports.validate = function(assertion){
   return { status: 'okay', error: [] };
 };
 
-// temporary testing: remove this once development is done, test as black-box
+// Internal testing.
 var run_tests = function() {
   var vows = require('vows')
     , assert = require('assert');
@@ -116,7 +118,16 @@ var run_tests = function() {
         'will have all errors': function(topic){
           // currently 5 required fields.
           var errors = topic.errors()
-          assert.equal(errors.length, 5);
+          assert.equal(Object.keys(errors).length, 5);
+        },
+        'will have all `missing` errors': function(topic){
+          var errors = topic.errors();
+          var errHash = {};
+          for (k in errors) {
+            errHash[errors[k]] = true;
+          }
+          assert.equal(Object.keys(errHash).length, 1);
+          assert.include(Object.keys(errHash), 'missing');
         }
       }
     },
