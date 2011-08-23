@@ -5,14 +5,14 @@ var express = require('express')
   , logger = require('./lib/logging').logger
 ;
 
-// COOKIE_SECRET is randomly generated on the first run of the server,
+// `COOKIE_SECRET` is randomly generated on the first run of the server,
 // then stored to a file and looked up on restart to maintain state.
 // See the `secrets.js` for more information.
 var COOKIE_SECRET = secrets.hydrateSecret('openbadges_cookie', configuration.get('var_path'));
 var COOKIE_KEY = 'openbadges_state';
 
-// Store sessions in cookies. The session structure is base64 encoded, then
-// hash+salted with COOKIE_SECRET to prevent clientside tampering.
+// Store sessions in cookies. The session structure is base64 encoded, a 
+// salty hash is created with `COOKIE_SECRET` to prevent clientside tampering.
 exports.cookieSessions = function(){
   return sessions({
     secret: COOKIE_SECRET,
