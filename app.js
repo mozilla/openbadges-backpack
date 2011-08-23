@@ -1,36 +1,40 @@
+// Configure & start express.
+
 var express = require('express')
   , ejs = require('ejs')
-  , logger = require('./lib/logging').logger
   , path = require('path')
   , middleware = require('./middleware')
   , controller = require('./controller')
-  , helper = require('./helper')
+  , logger = require('./lib/logging').logger
+;
 
+// Create the app and set it up to use `ejs` templates which are easier to
+// maintain than the default `jade` templates.
 var app = express.createServer();
-
-// misc settings
 app.set('view engine', 'ejs');
 
-// view helpers
+// View helpers. `user` and `badges` are set so we can use them in `if`
+// statements without getting undefined errors and without having to use typeof
+// checks.
 app.helpers({
   user: null,
   badges: {}
-})
+});
 
-// middleware
+// Middleware. See `middleware.js` for more information on the custom
+// middleware used.
 app.use(express.bodyParser());
 app.use(express.cookieParser());
 app.use(express.static(path.join(__dirname, "static")));
 app.use(middleware.cookieSessions());
 app.use(middleware.logRequests());
 
-// routing
-(function (_) {
-  app.post('/authenticate', controller.authenticate)
-  app.get('/signout',       controller.signout)
-  app.get('/login',         _.directTemplate('login'))
-  app.get('/',              _.authRequired(controller.manage))
-}(helper))
+// Routing for the application. See `controller.js` for more information.
+app.post('/authenticate', controller.authenticate);
+app.get('/signout',       controller.signout);
+app.get('/login',         controller.login);
+app.get('/',              controller.manage);
 
+// FIXME: make port a configuration rather than hardcoded.
 app.listen(80);
 logger.info('READY PLAYER ONE');

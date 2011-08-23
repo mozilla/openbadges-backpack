@@ -1,65 +1,76 @@
-var configuration = require('./lib/configuration')
-  , logger = require('./lib/logging').logger
-  , request = require('request')
+var request = require('request')
   , path = require('path')
   , qs = require('querystring')
+  , logger = require('./lib/logging').logger
+  , configuration = require('./lib/configuration')
+;
 
 // FIXME: CSRF
 exports.authenticate = function(req, res) {
-  // throw out 403 if we can't find assertion
+  // If `assertion` wasn't posted in, the user has no business here.
+  // We could return 403 or redirect to login page. It's more polite
+  // to just redirect to the login page.
   if (!req.body['assertion']) {
-    res.status(403)
-    res.end('forbidden');
-    return;
+    return res.redirect('/login', 303);
   }
-  var postbody = qs.stringify({
+  // The browserid server we are going to be using.
+  var ident = configuration.get('identity');
+  var opts = {}
+  
+  // Setup options for the verification request.
+  opts.uri = ident.protocol + '://' +  ident.server + ident.path;
+  opts.body = qs.stringify({
     assertion: req.body['assertion'],
     audience: configuration.get('hostname')
   });
-  var ident = configuration.get('identity');
-  var options = {
-    uri: ident.protocol + '://' +  ident.server + ident.path,
-    method: 'POST',
-    headers: {
-      // nginx invariably 411s without content-length
-      'Content-Length': postbody.length,
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body: postbody
+  
+  // nginx invariably 411s if it doesn't find a content-length header, and
+  // express, which is what the main browserid server runs, will refuse to
+  // populate req.body unless the proper content-type is set.
+  opts.headers = {
+    'content-length': opts.body.length,
+    'content-type': 'application/x-www-form-urlencoded'
   };
 
-  // FIXME: use proper respose statuses (httputil)
-  request(options, function(err, resp, body){
+  request.post(opts, function(err, resp, body){
     var assertion = {}
-    function problem() { res.end('there was a problem, try again'); }
+    function goBackWithError(msg) {
+      req.flash('error', (msg || 'Oh no! There was a problem, please try again.'));
+      res.redirect('back', 303)
+    }
+    
+    // testing -- just fail immediately
+    return goBackWithError()
+    
+    
     if (err || resp.statusCode != 200) {
       logger.warn('identity server returned error: ');
-      logger.warn('  status code: ' + resp.statusCode);
-      logger.warn('  err obj: ' + JSON.stringify(err));
-      logger.warn('  sent with these options: ' + JSON.stringify(options));
-      return problem();
+      logger.debug('  status code: ' + resp.statusCode);
+      logger.debug('  err obj: ' + JSON.stringify(err));
+      logger.debug('  sent with these options: ' + JSON.stringify(options));
+      return goBackWithError();
     }
     // try to parse response
     try {
       assertion = JSON.parse(body);
     } catch (syntaxError) {
       logger.warn('could not parse response from identity server: ' + body)
-      return problem();
+      return goBackWithError();
     }
 
     if (assertion.status !== 'okay') {
       logger.warn('did not get an affirmative response from identity server:');
       logger.warn(JSON.stringify(assertion));
-      return problem();
+      return goBackWithError();
     }
     var hostname = configuration.get('hostname')
     if (assertion.audience !== hostname) {
       logger.warn('unexpected audience for this assertion, expecting ' + hostname +'; got ' + assertion.audience);
-      return problem();
+      return goBackWithError();
     }
     if (assertion.issuer !== ident.server) {
       logger.warn('unexpected issuer for this assertion, expecting ' + ident.server +'; got ' + assertion.issuer);
-      return problem();
+      return goBackWithError();
     }
 
     // everything seems to be in order
@@ -68,7 +79,7 @@ exports.authenticate = function(req, res) {
 
     return res.redirect('/', 303);
   })
-}
+};
 
 // FIXME: CSRF
 exports.signout = function(req, res) {
@@ -79,9 +90,13 @@ exports.signout = function(req, res) {
     });
   }
   res.redirect('/login', 303);
-}
+};
 
 exports.manage = function(req, res) {
+  if (!req.session || !req.session.authenticated) {
+    return res.redirect('/login', 303);
+  }
+  
   // TODO: support multiple users
   var session = req.session
     , user = session.authenticated[0]
@@ -97,4 +112,11 @@ exports.manage = function(req, res) {
     user: user,
     badges: []
   });
-}
+};
+
+exports.login = function(req, res) {
+  res.render('login', {
+    error: req.flash('error')
+  });
+};
+ 
