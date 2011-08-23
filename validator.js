@@ -1,45 +1,76 @@
-var validator_factory = function(){
-  var validator = function(data){ this.data = data || {}; }
-  validator.prototype.validate = function(){
+var model_factory = function(){
+  var model = function(data){ this.data = data || {}; }
+  model.prototype.fields = {}
+  model.prototype.validate = function(){
     var errors = []
+    var expected = Object.keys(this.fields);
+    var provided = Object.keys(this.data);
+    
     console.dir(this.data);
     console.dir(this.fields);
     return errors;
   }
-  return validator;
+  return model;
+
 };
 
-var field = function(required, validators){}
+var field = function(required, validators){ return { required: required, validators: validators }; };
+var required = function() { return field(true, Array.prototype.slice.call(arguments)); };
+var optional = function() { return field(false, Array.prototype.slice.call(arguments)); };
 
-var Assertion = validator_factory()
-var Badge = validator_factory()
-var Issuer = validator_factory()
+var Assertion = model_factory()
+var Badge = model_factory()
+var Issuer = model_factory()
 
 Assertion.prototype.fields = {
-  recipient : field(true, []),
-  badge     : field(true, []),
-  evidence  : field(false, []),
-  expires   : field(false, []),
-  issued_at : field(false, [])
+  recipient : required(),
+  badge     : required(),
+  evidence  : optional(),
+  expires   : optional(),
+  issued_at : optional()
 }
 Badge.prototype.fields = {
-  version     : field(true, []),
-  name        : field(true, []),
-  image       : field(true, []),
-  description : field(true, []),
-  criteria    : field(true, []),
-  issuer      : field(true, [])
+  version     : required(),
+  name        : required(),
+  image       : required(),
+  description : required(),
+  criteria    : required(),
+  issuer      : required()
 }
 Issuer.prototype.fields = {
-  name    : field(true, []),
-  org     : field(false, []),
-  contact : field(false, []),
-  url     : field(false, [])
+  name    : required(),
+  org     : optional(),
+  contact : optional(),
+  url     : optional()
 }
 
 exports.validate = function(assertion){
   return {status: 'okay', error: []}
 }
-exports.Assertion = Assertion
-exports.Badge = Badge
-exports.Issuer = Issuer
+
+// temporary testing: remove this once development is done, test as black-box
+var run_tests = function() {
+  var vows = require('vows')
+    , assert = require('assert');
+  
+  vows.describe('internal').addBatch({
+    'A Badge prototype': {
+      topic: (Badge.prototype),
+      'has `fields`': function(topic) {
+        assert.include(topic, 'fields');
+      }
+    },
+    'A Badge instance': {
+      topic: (new Badge({what: 'lol'})),
+      'has `data`, `fields` and `validate` method': function(topic){
+        assert.include(topic, 'data');
+        // will be in prototype chain, not on object.
+        assert.ok(topic.fields);
+        assert.ok(topic.validate);
+      }
+    }
+  }).run()
+}
+run_tests()
+
+
