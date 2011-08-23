@@ -34,49 +34,63 @@ exports.authenticate = function(req, res) {
 
   request.post(opts, function(err, resp, body){
     var assertion = {}
+    var hostname = configuration.get('hostname')
+    
+    // Store an error and return to the previous page.
+    // Used in the testing battery below.
     function goBackWithError(msg) {
       req.flash('login_error', (msg || '<strong>Oh no!</strong> There was a problem, please try again.'));
-      res.redirect('back', 303)
+      return res.redirect('back', 303)
     }
     
-    // testing -- just fail immediately
-    return goBackWithError()
-    
-    
-    if (err || resp.statusCode != 200) {
-      logger.warn('identity server returned error: ');
-      logger.debug('  status code: ' + resp.statusCode);
-      logger.debug('  err obj: ' + JSON.stringify(err));
-      logger.debug('  sent with these options: ' + JSON.stringify(options));
-      return goBackWithError();
-    }
-    // try to parse response
+    // Make sure:
+    // * the request could make it out of the system,
+    // * the other side responded with the A-OK,
+    // * with a valid JSON structure,
+    // * and a status of 'okay'
+    // * with the right hostname, matching this server
+    // * and coming from the issuer we expect.
+    // If any of these tests fail, immediately store an error to display
+    // to the user and redirect to the previous page.
     try {
-      assertion = JSON.parse(body);
-    } catch (syntaxError) {
-      logger.warn('could not parse response from identity server: ' + body)
+      if (err) {
+        logger.error('could not make request to identity server')
+        logger.error('  err obj: ' + JSON.stringify(err));
+        throw 'could not request';
+      }
+      if (resp.statusCode != 200) {
+        logger.warn('identity server returned error: ');
+        logger.debug('  status code: ' + resp.statusCode);
+        logger.debug('  sent with these options: ' + JSON.stringify(options));
+        throw 'invalid http status';
+      }
+      try {
+        assertion = JSON.parse(body);
+      } catch (syntaxError) {
+        logger.warn('could not parse response from identity server: ' + body)
+        throw 'invalid response';
+      }
+      if (assertion.status !== 'okay') {
+        logger.warn('did not get an affirmative response from identity server:');
+        logger.warn(JSON.stringify(assertion));
+        throw 'unexpected status';
+      }
+      if (assertion.audience !== hostname) {
+        logger.warn('unexpected audience for this assertion, expecting ' + hostname +'; got ' + assertion.audience);
+        throw 'unexpected audience';
+      }
+      if (assertion.issuer !== ident.server) {
+        logger.warn('unexpected issuer for this assertion, expecting ' + ident.server +'; got ' + assertion.issuer);
+        throw 'unexpected issuer';
+      }
+    } catch (validationError) {
       return goBackWithError();
     }
 
-    if (assertion.status !== 'okay') {
-      logger.warn('did not get an affirmative response from identity server:');
-      logger.warn(JSON.stringify(assertion));
-      return goBackWithError();
-    }
-    var hostname = configuration.get('hostname')
-    if (assertion.audience !== hostname) {
-      logger.warn('unexpected audience for this assertion, expecting ' + hostname +'; got ' + assertion.audience);
-      return goBackWithError();
-    }
-    if (assertion.issuer !== ident.server) {
-      logger.warn('unexpected issuer for this assertion, expecting ' + ident.server +'; got ' + assertion.issuer);
-      return goBackWithError();
-    }
-
-    // everything seems to be in order
+    // Everything seems to be in order, store the user's email in the session
+    // and redirect to the front page.
     if (!req.session) res.session = {}
     req.session.authenticated = [assertion.email]
-
     return res.redirect('/', 303);
   })
 };
