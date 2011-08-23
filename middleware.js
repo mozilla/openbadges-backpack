@@ -25,7 +25,6 @@ exports.cookieSessions = function(){
   });
 };
 
-// Log all requests and the server response status as they come in.
 exports.logRequests = function(){
   return express.logger({
     format: 'dev',
