@@ -2,36 +2,38 @@ var field = function(required, validators){ return { required: required, validat
 var required = function() { return field(true, Array.prototype.slice.call(arguments)); };
 var optional = function() { return field(false, Array.prototype.slice.call(arguments)); };
 
-var modelFactory = function(){
-  var model = function(data){ this.data = data || {}; };
-  model.prototype.fields = {};
-  model.prototype.errors = function(){
-    var errors = {}
-      , fields = this.fields
-      , provided = this.data
-      , expectedFields = Object.keys(fields);
-    
-    expectedFields.forEach(function(k){
-      var errorType;
-      if (!provided[k]) {
-          if (fields[k].required) {
-            errorType = 'missing';
-          }
-      } else {
-          fields[k].validators.forEach(function(validator){
-          try { validator(provided[k]); }
-          catch (e) { errorType = e.message;  }
-        });
-      }
-      if (errorType) {
-        errors[k] = errorType;
-      }
-    });
-    return errors;
+var Model = function(fields){
+  var F = function(data) {
+    this.data = data || {};
+    this.fields = fields || {};
   };
-  return model;
-};
+  F.prototype = Model.prototype;
+  return F;
+}
+Model.prototype.errors = function() {
+  var errors = {}
+    , fields = this.fields
+    , provided = this.data
+    , expectedFields = Object.keys(fields);
 
+  expectedFields.forEach(function(k){
+    var errorType;
+    if (!provided[k]) {
+        if (fields[k].required) {
+          errorType = 'missing';
+        }
+    } else {
+        fields[k].validators.forEach(function(validator){
+        try { validator(provided[k]); }
+        catch (e) { errorType = e.message;  }
+      });
+    }
+    if (errorType) {
+      errors[k] = errorType;
+    }
+  });
+  return errors;
+};
 
 var RegEx = function(regex, type) { return (
   function(input){ if (!regex.test(input)) throw new Error(type || 'regex'); }
@@ -68,32 +70,27 @@ var URL = function(){
   };
 };
 
-
-var Assertion = modelFactory();
-var Badge = modelFactory();
-var Issuer = modelFactory();
-
-Assertion.prototype.fields = {
+var Assertion = Model({
   //badge     : required(),
   recipient : required(Email()),
   evidence  : optional(URL()),
   expires   : optional(ISODate()),
   issued_at : optional(ISODate())
-};
-Badge.prototype.fields = {
+});
+var Badge = Model({
   //issuer      : required(),
   version     : required(RegEx(/^v?\d+\.\d+\.\d+$/)),
   name        : required(MaxLength(128)),
   description : required(MaxLength(128)),
   image       : required(URL()),
   criteria    : required(URL())
-};
-Issuer.prototype.fields = {
+});
+var Issuer = Model({
   name    : required(MaxLength(128)),
   org     : optional(MaxLength(128)),
   contact : optional(Email()),
   url     : optional(URL())
-};
+});
 
 var validate = function(assertionData){
   var badgeData = assertionData.badge || {}
