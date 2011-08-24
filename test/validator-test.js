@@ -2,6 +2,17 @@ var vows = require('vows')
   , assert = require('assert')
   , validate = require('../validator').validate
 
+var genstring = function(length) {
+  var alphanum = 'abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+      str = [],
+      ind = 0;
+  for (var i = 0; i < length; i += 1) {
+    ind = Math.floor(Math.random() * (alphanum.length - 1))
+    str.push(alphanum[ind]);
+  }
+  return str.join('');
+}
+
 var fixture = function(changes){
   changes = changes || {}
   var f = {
@@ -23,20 +34,45 @@ var fixture = function(changes){
       }
     }
   }
-  function make_change(_base, _changes) {
+  function makeChange(_base, _changes) {
     Object.keys(_changes).forEach(function(k){
       if (typeof _changes[k] === 'object') {
-        make_change(_base[k], _changes[k]);
+        makeChange(_base[k], _changes[k]);
       } else {
         _base[k] = _changes[k];
       }
     })
   }
-  make_change(f, changes);
+  makeChange(f, changes);
   return f;
 };
 
+var generateErrorTests = function(field, errType, badData) {
+  var tests = {}, currentTest;
+  for (var i = 0; i < badData.length; i += 1) {
+    var hierarchy = field.split('.');
+    var changes = {}, struct, currentField;
+    changes[hierarchy.pop()] = badData[i];
+    for (var j = hierarchy.length - 1; j >= 0; j--) {
+      struct = {};
+      struct[hierarchy[j]] = changes;
+      changes = struct;
+    }
+    currentTest = tests['“' + badData[i] + '”'] = {}
+    currentTest['topic'] = fixture(changes);
+    currentTest['should fail with `' +  errType + '` error'] = function(topic) {
+      var result = validate(topic);
+      assert.include(result.error, field);
+      assert.equal(result.error[field], errType);
+    }
+  }
+  return tests;
+}
 
+var BAD_EMAILS = ['lkajd', 'skj@asdk', '@.com', '909090', '____!@']
+var BAD_URLS = ['-not-asdo', 'ftp://bad-scheme', '@.com:90/']
+var BAD_DATES = ['oiajsd09gjas;oj09', 'foreever ago', '111111', '1314145531', '@.com:90/']
+var BAD_VERSIONS = ['v100', '50', 'v10.1alpha']
 
 vows.describe('Badge Validator').addBatch({
   'When validating anything': {
@@ -57,102 +93,19 @@ vows.describe('Badge Validator').addBatch({
       assert.ok(Object.keys(topic.error).length > 0);
     }
   },
-  'Invalid assertions': {
-    'with bad assertion.recipient': {
-      topic: [
-        fixture({recipient: 'lkajd'}),
-        fixture({recipient: 'alskj@asdk'}),
-        fixture({recipient: '@.com'}),
-        fixture({recipient: '909090'}),
-        fixture({recipient: '____!@'})
-      ],
-      'should fail with `email` errors': function(topic){
-        topic.forEach(function(invalid){
-          var result = validate(invalid);
-          assert.include(result.error, 'assertion.recipient');
-          assert.equal(result.error['assertion.recipient'], 'email');
-        })
-      }
-    },
-    'with bad assertion.evidence': {
-      topic: [
-        fixture({evidence: '-not-asdo'}),
-        fixture({evidence: 'ftp://bad-scheme'}),
-        fixture({evidence: '@.com:90/'})
-      ],
-      'should fail with `url` errors': function(topic){
-        topic.forEach(function(invalid){
-          var result = validate(invalid);
-          assert.include(result.error, 'assertion.evidence');
-          assert.equal(result.error['assertion.evidence'], 'url');
-        })
-      }
-    },
-    'with bad assertion.expires': {
-      topic: [
-        fixture({expires: 'oiajsd09gjas;oj09'}),
-        fixture({expires: 'foreever ago'}),
-        fixture({expires: '111111'}),
-        fixture({expires: '1314145531'}),
-        fixture({expires: '@.com:90/'})
-      ],
-      'should fail with `isodate` errors': function(topic){
-        topic.forEach(function(invalid){
-          var result = validate(invalid);
-          assert.include(result.error, 'assertion.expires');
-          assert.equal(result.error['assertion.expires'], 'isodate');
-        })
-      }
-    },
-    'with bad assertion.issued_at': {
-      topic: [
-        fixture({issued_at: 'oiajsd09gjas;oj09'}),
-        fixture({issued_at: 'foreever ago'}),
-        fixture({issued_at: '111111'}),
-        fixture({issued_at: '1314145531'}),
-        fixture({issued_at: '@.com:90/'})
-      ],
-      'should fail with `isodate` errors': function(topic){
-        topic.forEach(function(invalid){
-          var result = validate(invalid);
-          assert.include(result.error, 'assertion.issued_at');
-          assert.equal(result.error['assertion.issued_at'], 'isodate');
-        })
-      }
-    },
-    'with bad badge.version': {
-      topic: [
-        fixture({badge: {version: 'v100'}}),
-        fixture({badge: {version: '50'}}),
-        fixture({badge: {version: 'v10.1alpha'}})
-      ],
-      'should fail with `regex` errors': function(topic){
-        topic.forEach(function(invalid){
-          var result = validate(invalid);
-          assert.include(result.error, 'badge.version');
-          assert.equal(result.error['badge.version'], 'regex');
-        })
-      }
-    },
-    'with bad badge.name': {
-    },
-    'with bad badge.description': {
-    },
-    'with bad badge.image': {
-    },
-    'with bad badge.criteria': {
-    },
-    'with bad issuer.name': {
-    },
-    'with bad issuer.org': {
-    },
-    'with bad issuer.contact': {
-    },
-    'with bad issuer.url': {
-    },
+  'Invalid badge assertion': {
+    'with bad recipient': generateErrorTests('recipient', 'email', BAD_EMAILS),
+    'with bad evidence': generateErrorTests('evidence', 'url', BAD_URLS),
+    'with bad expires': generateErrorTests('expires', 'isodate', BAD_DATES),
+    'with bad issued_at': generateErrorTests('expires', 'isodate', BAD_DATES),
+    'with bad badge.version': generateErrorTests('badge.version', 'regex', BAD_VERSIONS),
+    'with bad badge.name': generateErrorTests('badge.name', 'length', [genstring(500)]),
+    'with bad badge.description': generateErrorTests('badge.description', 'length', [genstring(500)]),
+    'with bad badge.image': generateErrorTests('badge.image', 'url', BAD_URLS),
+    'with bad badge.criteria': generateErrorTests('badge.criteria', 'url', BAD_URLS),
+    'with bad badge.issuer.name': generateErrorTests('badge.issuer.name', 'length', [genstring(500)]),
+    'with bad badge.issuer.org': generateErrorTests('badge.issuer.org', 'length', [genstring(500)]),
+    'with bad badge.issuer.contact': generateErrorTests('badge.issuer.contact', 'email', BAD_EMAILS),
+    'with bad badge.issuer.url': generateErrorTests('evidence', 'url', BAD_URLS)
   }
 }).export(module);
-
-console.dir(validate(fixture({version: 'v100'})));
-console.dir(validate(fixture({version: '50'})));
-console.dir(validate(fixture({version: 'v10.1alpha'})));

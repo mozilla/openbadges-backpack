@@ -102,14 +102,15 @@ var validate = function(assertionData){
     , issuer = new Issuer(issuerData)
     , errors = {}
   ;
-  function addToErrors(prefix, newErrors) {
-    Object.keys(newErrors).forEach(function(k){
-      errors[prefix + '.' + k] = newErrors[k];
+  function addToErrors(newErrors, prefix) {
+    Object.keys(newErrors).forEach(function(field) {
+      var key = prefix ? [prefix, '.', field].join('') : field;
+      errors[key] = newErrors[field];
     });
   }
-  addToErrors('assertion', assertion.errors());
-  addToErrors('badge', badge.errors());
-  addToErrors('issuer', issuer.errors());
+  addToErrors(assertion.errors());
+  addToErrors(badge.errors(), 'badge');
+  addToErrors(issuer.errors(), 'badge.issuer');
   return {
     status: Object.keys(errors).length ? 'failure' : 'success',
     error: errors
