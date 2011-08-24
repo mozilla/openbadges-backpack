@@ -68,7 +68,7 @@ var Validator = function(vdef) {
   }
   F.prototype.validate = function(input, code) {
     var sanitized = this.clean(input);
-    if (!vdef.test(sanitized)) {
+    if (!this.test(sanitized)) {
       this.throwError(code);
     }
   }
@@ -77,10 +77,8 @@ var Validator = function(vdef) {
 var regex = Validator({
   code: 'regex',
   opts: ['expression'],
-  test: function(input){}
+  test: function(input){ return this.expression.test(input); }
 });
-console.dir(regex(/whatlol/).expression );
-
 
 var RegEx = function(regex, type) { return (
   function(input){ if (!regex.test(input)) throw new Error(type || 'regex'); }
