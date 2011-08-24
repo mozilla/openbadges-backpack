@@ -1,3 +1,7 @@
+var field = function(required, validators){ return { required: required, validators: validators }; };
+var required = function() { return field(true, Array.prototype.slice.call(arguments)); };
+var optional = function() { return field(false, Array.prototype.slice.call(arguments)); };
+
 var model_factory = function(){
   var model = function(data){ this.data = data || {}; }
   model.prototype.fields = {}
@@ -9,8 +13,10 @@ var model_factory = function(){
     
     expectedFields.forEach(function(k){
       var errorType;
-      if (!provided[k] && fields[k].required) {
-        errorType = 'missing';
+      if (!provided[k]) {
+          if (fields[k].required) {
+            errorType = 'missing';
+          }
       } else {
           fields[k].validators.forEach(function(validator){
           try { validator(provided[k]); }
@@ -26,26 +32,31 @@ var model_factory = function(){
   return model;
 };
 
-var RegEx = function(regex, type){
-  return function(input){
-    if (!regex.test(input)) throw new Error(type || 'regexp');
-  };
-};
-var ISODate = function(){
-  return function(input){
-    var parsed = new Date(Date.parse(input))
-    if (isNaN(parsed.getDate())) throw new Error('isodate');
-  };
+
+var RegEx = function(regex, type) { return (
+  function(input){ if (!regex.test(input)) throw new Error(type || 'regex'); }
+)};
+var MaxLength = function(len) { return (
+  function(input) { if (input.length > len) throw new Error('length'); }
+)};
+var ISODate = function() {
+  function simpleISODate(input) {
+    var regex = /\d{4}-\d{2}-\d{2}/;
+    if (!regex.test(input)) return 0;
+        var pieces = input.split('-')
+    , year = parseInt(pieces[0], 10)
+    , month = parseInt(pieces[1], 10)
+    , day = parseInt(pieces[2], 10)
+    if (month > 12 || month < 1) return 0;
+    if (day > 31 || day < 1) return 0;
+    return (new Date(year, (month-1), day)).getTime();
+  }
+  return function(input){ if (!simpleISODate(input)) throw new Error('isodate');}
 };
 var Email = function(){
   // more or less RFC 2822
   var regex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
   return RegEx(regex, 'email');
-};
-var MaxLength = function(len){
-  return function(input) {
-    if (input.length > len) throw new Error('length');
-  };
 };
 var URL = function(){
   var fq_url = /^(https?):\/\/[^\s\/$.?#].[^\s]*$/;
@@ -56,28 +67,25 @@ var URL = function(){
   };
 };
 
-var field = function(required, validators){ return { required: required, validators: validators }; };
-var required = function() { return field(true, Array.prototype.slice.call(arguments)); };
-var optional = function() { return field(false, Array.prototype.slice.call(arguments)); };
 
 var Assertion = model_factory();
 var Badge = model_factory();
 var Issuer = model_factory();
 
 Assertion.prototype.fields = {
-  recipient : required(Email()),
   //badge     : required(),
+  recipient : required(Email()),
   evidence  : optional(URL()),
   expires   : optional(ISODate()),
   issued_at : optional(ISODate())
 };
 Badge.prototype.fields = {
+  //issuer      : required(),
   version     : required(RegEx(/^v?\d+\.\d+\.\d+$/)),
   name        : required(MaxLength(128)),
   description : required(MaxLength(128)),
   image       : required(URL()),
-  criteria    : required(URL()),
-  //issuer      : required()
+  criteria    : required(URL())
 };
 Issuer.prototype.fields = {
   name    : required(MaxLength(128)),
@@ -86,12 +94,30 @@ Issuer.prototype.fields = {
   url     : optional(URL())
 };
 
-exports.validate = function(assertion){
-  return { status: 'okay', error: [] };
+var validate = function(assertionData){
+  var badgeData = assertionData.badge || {}
+    , issuerData = badgeData.issuer || {}
+    , assertion = new Assertion(assertionData)
+    , badge = new Badge(badgeData)
+    , issuer = new Issuer(issuerData)
+    , errors = {}
+  ;
+  function addToErrors(prefix, newErrors) {
+    Object.keys(newErrors).forEach(function(k){
+      errors[prefix + '.' + k] = newErrors[k];
+    });
+  }
+  addToErrors('assertion', assertion.errors());
+  addToErrors('badge', badge.errors());
+  addToErrors('issuer', issuer.errors());
+  return {
+    status: Object.keys(errors).length ? 'failure' : 'success',
+    error: errors
+  };
 };
 
 // Internal testing.
-var run_tests = function() {
+var runtests = function() {
   var vows = require('vows')
     , assert = require('assert')
     , fixtures = {
@@ -126,24 +152,24 @@ var run_tests = function() {
     
     'A Badge instance': {
       topic: (new Badge(fixtures.badge())),
-      'has `data`, `fields` and `errors` method': function(topic){
+      'has `data`, `fields` and `errors` method': function(topic) {
         assert.include(topic, 'data');
         // will be in prototype chain, not on object.
         assert.ok(topic.fields);
         assert.ok(topic.errors);
       },
-      'has expected data': function(topic){
+      'has expected data': function(topic) {
         var supplied = fixtures.badge();
         assert.equal(topic.data.name, supplied.name);
       },
       'missing all fields': {
         topic: new Badge(),
-        'will have all errors': function(topic){
+        'will have all errors': function(topic) {
           // currently 5 required fields.
           var errors = topic.errors()
           assert.equal(Object.keys(errors).length, 5);
         },
-        'will have all `missing` errors': function(topic){
+        'will have all `missing` errors': function(topic) {
           var errors = topic.errors();
           Object.keys(errors).forEach(function(k){
             assert.equal(errors[k], 'missing');
@@ -157,9 +183,15 @@ var run_tests = function() {
           d.image = 'ftp://even-worse-url.com/';
           return new Badge(d);
         },
-        'will have two errors': function(topic){
+        'will have two errors': function(topic) {
           var errors = topic.errors();
           assert.equal(Object.keys(errors).length, 2);
+        },
+        'will have `url` errors only': function(topic) {
+          var errors = topic.errors();
+          Object.keys(errors).forEach(function(k){
+            assert.equal(errors[k], 'url');
+          });
         }
       }
     },
@@ -252,4 +284,11 @@ var run_tests = function() {
     }
   }).run()
 }
-run_tests()
+
+if (typeof module !== 'undefined') {
+  if (!module.parent) {
+    runtests();
+  } else {
+    exports.validate = validate;
+  }
+}
