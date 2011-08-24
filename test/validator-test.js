@@ -2,6 +2,30 @@ var vows = require('vows')
   , assert = require('assert')
   , validate = require('../validator').validate
 
+var BAD_EMAILS = ['lkajd', 'skj@asdk', '@.com', '909090', '____!@']
+var BAD_URLS = ['-not-asdo', 'ftp://bad-scheme', '@.com:90/']
+var BAD_DATES = ['oiajsd09gjas;oj09', 'foreever ago', '111111', '1314145531', '@.com:90/']
+var BAD_VERSIONS = ['v100', '50', 'v10.1alpha']
+var VALID_BADGE = function(){ return {
+  recipient: 'bimmy@example.com',
+  evidence: '/bimmy-badge.json',
+  expires: '2040-08-13',
+  issued_at: '2011-08-23',
+  badge: {
+    version: 'v0.5.0',
+    name: 'HTML5',
+    description: 'For rocking in the free world',
+    image: '/html5.png',
+    criteria: 'http://example.com/criteria.html',
+    issuer: {
+      name: 'p2pu',
+      org: 'school of webcraft',
+      contact: 'admin@p2pu.org',
+      url: 'http://p2pu.org/schools/sow'
+    }
+  }
+}}
+
 var genstring = function(length) {
   var alphanum = 'abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
       str = [],
@@ -15,25 +39,7 @@ var genstring = function(length) {
 
 var fixture = function(changes){
   changes = changes || {}
-  var f = {
-    recipient: 'bimmy@example.com',
-    evidence: '/bimmy-badge.json',
-    expires: '2040-08-13',
-    issued_at: '2011-08-23',
-    badge: {
-      version: 'v0.5.0',
-      name: 'HTML5',
-      description: 'For rocking in the free world',
-      image: '/html5.png',
-      criteria: 'http://example.com/criteria.html',
-      issuer: {
-        name: 'p2pu',
-        org: 'school of webcraft',
-        contact: 'admin@p2pu.org',
-        url: 'http://p2pu.org/schools/sow'
-      }
-    }
-  }
+  var _fixture = VALID_BADGE();
   function makeChange(_base, _changes) {
     Object.keys(_changes).forEach(function(k){
       if (typeof _changes[k] === 'object') {
@@ -43,8 +49,8 @@ var fixture = function(changes){
       }
     })
   }
-  makeChange(f, changes);
-  return f;
+  makeChange(_fixture, changes);
+  return _fixture;
 };
 
 var generateErrorTests = function(field, errType, badData) {
@@ -68,11 +74,6 @@ var generateErrorTests = function(field, errType, badData) {
   }
   return tests;
 }
-
-var BAD_EMAILS = ['lkajd', 'skj@asdk', '@.com', '909090', '____!@']
-var BAD_URLS = ['-not-asdo', 'ftp://bad-scheme', '@.com:90/']
-var BAD_DATES = ['oiajsd09gjas;oj09', 'foreever ago', '111111', '1314145531', '@.com:90/']
-var BAD_VERSIONS = ['v100', '50', 'v10.1alpha']
 
 vows.describe('Badge Validator').addBatch({
   'When validating anything': {
