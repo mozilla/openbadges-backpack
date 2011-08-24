@@ -4,11 +4,14 @@ var optional = function() { return field(false, Array.prototype.slice.call(argum
 
 var Model = function(fields){
   var F = function(data) {
+    if (!(this instanceof F)) return new F(data);
     this.data = data || {};
     this.fields = fields || {};
   };
   F.prototype = Model.prototype;
   return F;
+}
+Model.prototype.init = function(data) {
 }
 Model.prototype.errors = function() {
   var errors = {}
@@ -34,6 +37,50 @@ Model.prototype.errors = function() {
   });
   return errors;
 };
+
+
+// ValidatorFactory -> ValidatorGenerator -> Validator
+  
+// ValidatorGenerator(args):
+//   * throwError(type, msg): make a new error, throw it.
+//   returns Validator(input):
+//      * clean() - return a processed string, or null
+//      * validate() - throwError(msg) if invalid
+
+var Validator = function(vdef) {
+  var noop = function(input){ return input };
+  var fixer = function(F, arguments) {
+  }
+  var F = function(args) {
+    if (!(this instanceof F)) return new F(arguments);
+    this.init.apply(this, args.callee ? args : arguments);
+  }
+  F.prototype.init = function(args){
+    this.code = vdef.code || 'validation';
+    this.clean = vdef.clean || noop;
+    this.test = vdef.test;
+    for (var i = 0, opts = vdef.opts; i < opts.length; i +=1) {
+      this[opts[i]] = arguments[i];
+    }
+  }
+  F.prototype.throwError = function(code) {
+    throw new Error(code || this.code);
+  }
+  F.prototype.validate = function(input, code) {
+    var sanitized = this.clean(input);
+    if (!vdef.test(sanitized)) {
+      this.throwError(code);
+    }
+  }
+  return F;
+}
+var regex = Validator({
+  code: 'regex',
+  opts: ['expression'],
+  test: function(input){}
+});
+console.dir(regex(/whatlol/).expression );
+
 
 var RegEx = function(regex, type) { return (
   function(input){ if (!regex.test(input)) throw new Error(type || 'regex'); }
@@ -95,9 +142,9 @@ var Issuer = Model({
 var validate = function(assertionData){
   var badgeData = assertionData.badge || {}
     , issuerData = badgeData.issuer || {}
-    , assertion = new Assertion(assertionData)
-    , badge = new Badge(badgeData)
-    , issuer = new Issuer(issuerData)
+    , assertion = Assertion(assertionData)
+    , badge = Badge(badgeData)
+    , issuer = Issuer(issuerData)
     , errors = {}
   ;
   function addToErrors(newErrors, prefix) {
