@@ -121,9 +121,9 @@
         }
         var result = validate(data);
         var errors = [];
-        Object.keys(result.error).forEach(function(field){
+        Object.keys(result.errors).forEach(function(field){
           var emphfield = '<strong>' + field + '</strong>';
-          errors.push([ emphfield, messages[result.error[field]]].join(' '));
+          errors.push([ emphfield, messages[result.errors[field]]].join(' '));
         });
         report(errors);
       });
