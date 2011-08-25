@@ -42,7 +42,7 @@ var fixture = function(changes){
   var _fixture = VALID_BADGE();
   function makeChange(_base, _changes) {
     Object.keys(_changes).forEach(function(k){
-      if (typeof _changes[k] === 'object') {
+      if (typeof _changes[k] === 'object' && _changes[k]) {
         makeChange(_base[k], _changes[k]);
       } else {
         _base[k] = _changes[k];
@@ -68,8 +68,8 @@ var generateErrorTests = function(field, errType, badData) {
     currentTest['topic'] = fixture(changes);
     currentTest['should fail with `' +  errType + '` error'] = function(topic) {
       var result = validate(topic);
-      assert.include(result.error, field);
-      assert.equal(result.error[field], errType);
+      assert.include(result.errors, field);
+      assert.equal(result.errors[field], errType);
     }
   }
   return tests;
@@ -83,7 +83,7 @@ vows.describe('Badge Validator').addBatch({
         assert.include(topic, 'status')
       },
       'with a `errors` member': function(topic) {
-        assert.include(topic, 'error')
+        assert.include(topic, 'errors')
       }
     }
   },
@@ -91,7 +91,7 @@ vows.describe('Badge Validator').addBatch({
     topic: function() { return validate({}); },
     'we get a bad status and errors': function(topic) {
       assert.equal(topic.status, 'failure');
-      assert.ok(Object.keys(topic.error).length > 0);
+      assert.ok(Object.keys(topic.errors).length > 0);
     }
   },
   'Invalid badge assertion': {
@@ -108,5 +108,15 @@ vows.describe('Badge Validator').addBatch({
     'with bad badge.issuer.org': generateErrorTests('badge.issuer.org', 'length', [genstring(500)]),
     'with bad badge.issuer.contact': generateErrorTests('badge.issuer.contact', 'email', BAD_EMAILS),
     'with bad badge.issuer.url': generateErrorTests('evidence', 'url', BAD_URLS)
+  },
+  'Valid badge assertion' : {
+    'without issued_at': {
+      topic: fixture({issued_at: null}),
+      'should not have errors': function(topic){
+        var result = validate(topic);
+        assert.equal(result.status, 'success');
+        assert.equal(Object.keys(result.errors).length, 0);
+      }
+    }
   }
 }).export(module);
