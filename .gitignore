@@ -7,3 +7,4 @@ notes
 /bin/update-docs
 /bin/start-server
 /.project
+/lib/environments/local.js
