@@ -27,7 +27,7 @@ Model.prototype.errors = function() {
         }
     } else {
         fields[k].validators.forEach(function(validator){
-        try { validator(provided[k]); }
+        try { validator.validate(provided[k]); }
         catch (e) { errorType = e.message;  }
       });
     }
@@ -37,15 +37,6 @@ Model.prototype.errors = function() {
   });
   return errors;
 };
-
-
-// ValidatorFactory -> ValidatorGenerator -> Validator
-  
-// ValidatorGenerator(args):
-//   * throwError(type, msg): make a new error, throw it.
-//   returns Validator(input):
-//      * clean() - return a processed string, or null
-//      * validate() - throwError(msg) if invalid
 
 var Validator = function(vdef) {
   var noop = function(input){ return input };
@@ -59,7 +50,8 @@ var Validator = function(vdef) {
     this.code = vdef.code || 'validation';
     this.clean = vdef.clean || noop;
     this.test = vdef.test;
-    for (var i = 0, opts = vdef.opts; i < opts.length; i +=1) {
+    var opts = vdef.opts || [];
+    for (var i = 0; i < opts.length; i +=1) {
       this[opts[i]] = arguments[i];
     }
   }
@@ -74,67 +66,69 @@ var Validator = function(vdef) {
   }
   return F;
 }
+
 var regex = Validator({
   code: 'regex',
   opts: ['expression'],
   test: function(input){ return this.expression.test(input); }
 });
-
-var RegEx = function(regex, type) { return (
-  function(input){ if (!regex.test(input)) throw new Error(type || 'regex'); }
-)};
-var MaxLength = function(len) { return (
-  function(input) { if (input.length > len) throw new Error('length'); }
-)};
-var ISODate = function() {
-  function simpleISODate(input) {
+var maxlength = Validator({
+  code: 'length',
+  opts: ['maxlen'],
+  test: function(input){ return input.length < this.maxlen; }
+})
+var isodate = Validator({
+  code: 'isodate',
+  clean: function(input) {
     var regex = /\d{4}-\d{2}-\d{2}/;
-    if (!regex.test(input)) return 0;
+    if (!regex.test(input)) return false;
     var pieces = input.split('-')
       , year = parseInt(pieces[0], 10)
       , month = parseInt(pieces[1], 10)
       , day = parseInt(pieces[2], 10)
     ;
-    if (month > 12 || month < 1) return 0;
-    if (day > 31 || day < 1) return 0;
+    if (month > 12 || month < 1) return false;
+    if (day > 31 || day < 1) return false;
     return (new Date(year, (month-1), day)).getTime();
+  },
+  test: function(input) { return input !== false; }
+})
+var email = Validator({
+  code: 'email',
+  test: function(input) {
+    var EMAIL_RE = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+    return regex(EMAIL_RE).test(input);
   }
-  return function(input){ if (!simpleISODate(input)) throw new Error('isodate');}
-};
-var Email = function(){
-  // more or less RFC 2822
-  var regex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-  return RegEx(regex, 'email');
-};
-var URL = function(){
-  var fq_url = /^(https?):\/\/[^\s\/$.?#].[^\s]*$/;
-  var local_url = /^\/\S+$/;
-  return function(input) {
-    try { RegEx(fq_url, 'url')(input); }
-    catch(e) { RegEx(local_url, 'url')(input); }
-  };
-};
+})
+var url = Validator({
+  code: 'url',
+  test: function(input) {
+    var FQ_URL_RE = /^(https?):\/\/[^\s\/$.?#].[^\s]*$/;
+    var LOCAL_URL_RE = /^\/\S+$/;
+    return regex(FQ_URL_RE).test(input) || regex(LOCAL_URL_RE).test(input);
+  }
+});
 
 var Assertion = Model({
   //badge     : required(),
-  recipient : required(Email()),
-  evidence  : optional(URL()),
-  expires   : optional(ISODate()),
-  issued_at : optional(ISODate())
+  recipient : required( email() ),
+  evidence  : optional( url() ),
+  expires   : optional( isodate() ),
+  issued_at : optional( isodate() )
 });
 var Badge = Model({
   //issuer      : required(),
-  version     : required(RegEx(/^v?\d+\.\d+\.\d+$/)),
-  name        : required(MaxLength(128)),
-  description : required(MaxLength(128)),
-  image       : required(URL()),
-  criteria    : required(URL())
+  version     : required( regex(/^v?\d+\.\d+\.\d+$/) ),
+  name        : required( maxlength(128) ),
+  description : required( maxlength(128) ),
+  image       : required( url() ),
+  criteria    : required( url() )
 });
 var Issuer = Model({
-  name    : required(MaxLength(128)),
-  org     : optional(MaxLength(128)),
-  contact : optional(Email()),
-  url     : optional(URL())
+  name    : required( maxlength(128) ),
+  org     : optional( maxlength(128) ),
+  contact : optional( email() ),
+  url     : optional( url() )
 });
 
 var validate = function(assertionData){
