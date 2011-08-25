@@ -39,17 +39,11 @@ Model.prototype.errors = function() {
 };
 
 var Validator = function(vdef) {
-  var noop = function(input){ return input };
-  var fixer = function(F, arguments) {
-  }
   var F = function(args) {
     if (!(this instanceof F)) return new F(arguments);
     this.init.apply(this, args.callee ? args : arguments);
   }
   F.prototype.init = function(args){
-    this.code = vdef.code || 'validation';
-    this.clean = vdef.clean || noop;
-    this.test = vdef.test;
     var opts = vdef.opts || [];
     for (var i = 0; i < opts.length; i +=1) {
       this[opts[i]] = arguments[i];
@@ -64,6 +58,9 @@ var Validator = function(vdef) {
       this.throwError(code);
     }
   }
+  F.prototype.code = vdef.code || 'validation';
+  F.prototype.clean = vdef.clean || function(input){ return input };
+  F.prototype.test = vdef.test;
   return F;
 }
 
@@ -156,4 +153,5 @@ var validate = function(assertionData){
 
 if (typeof module !== 'undefined') {
   exports.validate = validate;
+  exports.isodate = isodate;
 }
