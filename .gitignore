@@ -1,7 +1,7 @@
+/docs/*
 /var/*
 !/var/.gitkeep
 /node_modules
 *log
 notes
-/docs/*html
-/docs/*css
+/bin/update-docs
