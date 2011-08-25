@@ -1,5 +1,4 @@
 // Configure & start express.
-
 var express = require('express')
   , ejs = require('ejs')
   , path = require('path')
@@ -36,6 +35,5 @@ app.get('/signout',       controller.signout);
 app.get('/login',         controller.login);
 app.get('/',              controller.manage);
 
-// FIXME: make port a configuration rather than hardcoded.
-app.listen(80);
-logger.info('READY PLAYER ONE');
+exports.server = app;
+exports.logger = logger;

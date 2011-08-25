@@ -1,7 +1,9 @@
-/docs/*
+/docs
 /var/*
 !/var/.gitkeep
 /node_modules
 *log
 notes
 /bin/update-docs
+/bin/start-server
+/.project
