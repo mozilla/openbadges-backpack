@@ -12,6 +12,15 @@ vows.describe('Issuing by remote assertion').addBatch({
         '`status == success`': function(err, result){ assert.equal(result.status, 'success'); },
         '`id == <something>`': function(err, result){ assert.equal(result.id, 42); }
       },
+      'but bad local reaction': {
+        topic: function(server) {
+          remote.process(server.url, this.callback, function(){
+            throw new Error('u mad?');
+          })
+        },
+        'should get `status == failure`': function(err, result){ assert.equal(result.status, 'failure'); },
+        'should get `error == database`': function(err, result){ assert.equal(result.error, 'unknown'); }
+      },
       teardown: function(server){ server.close(); }
     },
     'bad assertion': {

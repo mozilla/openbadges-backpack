@@ -23,11 +23,19 @@ exports.process = function(url, onprocess, onsuccess){
       }
       var validationResult = validator.validate(assertion);
       if (validationResult.status === 'success') {
-        var id = onsuccess(assertion);
-        return onprocess(null, {
-          status: 'success',
-          id: id
-        });
+        try { 
+          var badgeID = onsuccess(assertion);
+          return onprocess(null, {
+            status: 'success',
+            id: badgeID
+          });
+        } catch (e) {
+          return onprocess(null, {
+            status: 'failure',
+            error: 'unknown',
+            reason: 'there was a local error. it may be temporary, try again later?'
+          });
+        }
       } else {
         return onprocess(null, {
           status: 'failure',
