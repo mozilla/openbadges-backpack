@@ -22,7 +22,7 @@ that URL.
   "recipient": "bimmy@example.com",
   "evidence": "/badges/html5-basic/bimmy",
   "expires": "2013-06-01",
-  "issued_at": "2011-06-01",
+  "issued_on": "2011-06-01",
   "badge": {
     "version": "0.5.0",
     "name": "HTML5 Fundamental",
@@ -59,7 +59,7 @@ NOTE: If a URL is not fully-qualified it is assumed to be relative to the issuin
 ### Optional
 * **evidence**: User-specific URL with information about this specific badge instance. Should contain information about how the specific user earned the badge.
 * **expires**: Date when the badge expires. If omitted, the badge never expires. The badge is not removed from the user's backpack after the expires date – there will be some visual/technical indicator that the badge is expired and needs to be re-upped. *Must be formatted "YYYY-MM-DD"*
-* **issued_at**: Date when badge was issued. If omitted, the issue date will be set to whenever the hub recieved the badge.  *Must be formatted "YYYY-MM-DD"*
+* **issued_on**: Date when badge was issued. If omitted, the issue date will be set to whenever the hub recieved the badge.  *Must be formatted "YYYY-MM-DD"*
 
 NOTE: We've discussed having an additional field that is customizable by the
 user - so that the user could add a personal evidence URL, or could add

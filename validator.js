@@ -154,7 +154,7 @@ var Assertion = Model({
   recipient : required( email() ),
   evidence  : optional( url() ),
   expires   : optional( isodate() ),
-  issued_at : optional( isodate() )
+  issued_on : optional( isodate() )
 });
 var Badge = Model({
   version     : required( regex(/^v?\d+\.\d+\.\d+$/) ),

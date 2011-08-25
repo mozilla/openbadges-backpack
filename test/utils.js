@@ -2,7 +2,7 @@ var VALID_BADGE = function(){ return {
   recipient: 'bimmy@example.com',
   evidence: '/bimmy-badge.json',
   expires: '2040-08-13',
-  issued_at: '2011-08-23',
+  issued_on: '2011-08-23',
   badge: {
     version: 'v0.5.0',
     name: 'HTML5',

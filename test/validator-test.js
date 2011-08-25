@@ -54,7 +54,7 @@ vows.describe('Badge Validator').addBatch({
     'with bad recipient': generateErrorTests('recipient', 'email', BAD_EMAILS),
     'with bad evidence': generateErrorTests('evidence', 'url', BAD_URLS),
     'with bad expires': generateErrorTests('expires', 'isodate', BAD_DATES),
-    'with bad issued_at': generateErrorTests('expires', 'isodate', BAD_DATES),
+    'with bad issued_on': generateErrorTests('expires', 'isodate', BAD_DATES),
     'with bad badge.version': generateErrorTests('badge.version', 'regex', BAD_VERSIONS),
     'with bad badge.name': generateErrorTests('badge.name', 'length', [genstring(500)]),
     'with bad badge.description': generateErrorTests('badge.description', 'length', [genstring(500)]),
@@ -66,8 +66,8 @@ vows.describe('Badge Validator').addBatch({
     'with bad badge.issuer.url': generateErrorTests('evidence', 'url', BAD_URLS)
   },
   'Valid badge assertion' : {
-    'without issued_at': {
-      topic: fixture({issued_at: null}),
+    'without issued_on': {
+      topic: fixture({issued_on: null}),
       'should not have errors': function(topic){
         var result = validate(topic);
         assert.equal(result.status, 'success');
