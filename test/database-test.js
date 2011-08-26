@@ -1,13 +1,7 @@
 var vows = require('./setup').vows
   , assert = require('assert')
   , db = require('../database')
- 
-var documents = [{'what': 'lol'}, {'hey':'jude'}];
-db.collection('badges').insert(documents, function(err, docs) {
-  console.dir(docs);
-})
- 
- 
+
 vows.describe('Database storage & retrieval').addBatch({
   'A db interface': {
     topic: db.collection('badges'),
@@ -16,10 +10,10 @@ vows.describe('Database storage & retrieval').addBatch({
         collection.insert({test: 'sup'}, this.callback);
       },
       'returns its structure': function(err, result){
+        var doc = result[0];
         assert.ok(!err);
-        assert.equal(result[0].test, 'sup');
-        assert.ok(result[0]['_id']);
-        console.dir(result[0]['_id']);
+        assert.equal(doc.test, 'sup');
+        assert.ok(doc['_id']);
       },
       'read': function(){  },
       'update': function(){  },
@@ -28,5 +22,3 @@ vows.describe('Database storage & retrieval').addBatch({
     teardown: function(){ db.connection.close(); }
   }
 }).export(module)
-
-

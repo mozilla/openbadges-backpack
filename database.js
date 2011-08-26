@@ -6,6 +6,7 @@ var configuration = require('./lib/configuration')
 var server = new mongo.Server(conf.host, conf.port, {});
 var conn = new mongo.Db(conf.name, server, {})
 
+// action buffer -- used to buffer commands before we open the connection
 var actions = new EventEmitter();
 actions.setMaxListeners(1);
 actions.__buf = []
@@ -19,28 +20,31 @@ actions.flush = function(){
   return ret;
 }
 
+// open a connection to the database, flush all buffered commands
 conn.open(function(err, client) {
   if (err) throw err;
-  function perform(action) {
-    client.collection(action.collection, action);
-  }
+  function execAction(action) { client.collection(action.collection, action);}
   // first flush buffer.
-  actions.flush().forEach(function(action) {
-    perform(action);
-  })
+  actions.flush().forEach(execAction)
   // then listen on queues.
-  actions.on('queue', perform);
+  actions.on('queue', execAction);
 });
 
+// make a really thin wrapper around collection methods
 function Collection(name) { this.name = name; }
-Collection.prototype.insert = function(data, callback){
-  var collectionName = this.name;
+Collection.prototype.command = function() {
+  var args = Array.prototype.slice.call(arguments)
+    , command = args.shift();
   var act = function(err, col){
     if (err) throw err;
-    col.insert(data, callback);
-  };
+    col[command].apply(col, args);
+  }
   act.collection = this.name;
   actions.push(act);
 }
+Collection.prototype.insert = function(data, callback) {
+  this.command('insert', data, callback);
+}
+
 exports.collection = function(name) { return new Collection(name); }
 exports.connection = conn;
