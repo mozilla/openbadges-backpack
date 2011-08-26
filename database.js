@@ -20,16 +20,6 @@ actions.flush = function(){
   return ret;
 }
 
-// open a connection to the database, flush all buffered commands
-conn.open(function(err, client) {
-  if (err) throw err;
-  function execAction(action) { client.collection(action.collection, action);}
-  // first flush buffer.
-  actions.flush().forEach(execAction)
-  // then listen on queues.
-  actions.on('queue', execAction);
-});
-
 // make a really thin wrapper around collection methods
 function Collection(name) { this.name = name; }
 Collection.prototype.command = function() {
@@ -48,7 +38,10 @@ Collection.prototype.insert = function(data, opts, callback) {
 }
 Collection.prototype.update = function(selector, data, opts, callback) {
   if ('function' === typeof opts) callback = opts, opts = {};
-  this.command('update', selector, data, callback);
+  this.command('update', selector, data, opts, callback);
+}
+Collection.prototype.upsert = function(selector, data, callback) {
+  this.update(selector, data, {upsert: true}, callback);
 }
 Collection.prototype.remove = function(selector, opts, callback) {
   if ('function' === typeof opts) callback = opts, opts = {};
@@ -64,6 +57,17 @@ Collection.prototype.find = function(query, opts, callback) {
   act.collection = this.name;
   actions.push(act);
 }
+
+// *side effect of requiring*
+// open a connection to the database, flush all buffered commands
+conn.open(function(err, client) {
+  if (err) throw err;
+  function execAction(action) { client.collection(action.collection, action);}
+  // first flush buffer.
+  actions.flush().forEach(execAction)
+  // then listen on queues.
+  actions.on('queue', execAction);
+});
 
 exports.collection = function(name) { return new Collection(name); }
 exports.connection = conn;

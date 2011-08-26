@@ -5,7 +5,6 @@ var vows = require('./setup').vows
 var collection = db.collection('db_test');
 
 // clean slate before we begin
-// #TODO: make sure this is a the test environment
 collection.remove({}) 
 
 // poor man's fixture
@@ -14,7 +13,24 @@ collection.insert([
   {name: 'jeremy'},
   {name: 'miko'},
   {name: 'alex'},
-  {complicated:{document: {may: {cause: 'issues'}},other: {fields: {distraction: true}}}}
+  {recipient: 'bimmy@example.com',
+   evidence: '/bimmy-badge.json',
+   expires: '2040-08-13',
+   issued_on: '2011-08-23',
+   badge: {
+     version: 'v0.5.0',
+     name: 'HTML5',
+     description: 'For rocking in the free world',
+     image: '/html5.png',
+     criteria: 'http://example.com/criteria.html',
+     issuer: {
+       name: 'p2pu',
+       org: 'school of webcraft',
+       contact: 'admin@p2pu.org',
+       url: 'http://p2pu.org/schools/sow'
+     }
+   }
+  },
 ], function(err, docs){
   
   vows.describe('Database storage & retrieval').addBatch({
@@ -31,7 +47,6 @@ collection.insert([
           assert.ok(doc['_id']);
         },
       },
-      
       'when finding documents': {
         topic: function(collection){
           collection.find({name: {'$exists': true} }, this.callback);
@@ -51,7 +66,8 @@ collection.insert([
       },
       'when finding a complicated document': {
         topic: function(collection){
-          collection.find({'complicated.document.may.cause': 'issues' }, this.callback);
+          var query = {recipient: 'bimmy@example.com', 'badge.issuer.name': 'p2pu', 'badge.issuer.org': 'school of webcraft'}
+          collection.find(query, this.callback);
         },
         'gets the document': function(err, docs){
           assert.equal(docs.length, 1);
@@ -78,8 +94,28 @@ collection.insert([
             collection.find({name: 'alex'}, self.callback)
           })
         },
-        'the doc should not be found': function(err, docs) {
+        'the doc be removed': function(err, docs) {
           assert.equal(docs.length, 0);
+        }
+      },
+      'when upserting': {
+        topic: function(collection){
+          var self = this;
+          var selector = {plural: {crow: 'murder'}};
+          var newDoc = {plural: {crow: 'murder'}, is_this_awesome: 'totally'};
+          collection.upsert(selector, newDoc, function(err) {
+            if (err) throw err;
+            newDoc.is_this_awesome = 'yep';
+            collection.update(selector, newDoc, function(err) {
+              collection.find(selector, self.callback)
+            });
+          });
+        },
+        'there should only be one': function(err, docs) {
+          assert.equal(docs.length, 1);
+        },
+        'the value should be from the second update': function(err, docs) {
+          assert.equal(docs[0].is_this_awesome, 'yep');
         }
       },
       teardown: function(){ db.connection.close(); }
