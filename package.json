@@ -11,6 +11,7 @@
   , "ejs": "0.4.x"
   , "connect-cookie-session" : "0.0.x"
   , "request": "2.1.x"
+  , "colors": "0.5.x"
   }
 , "devDependencies":
   { "vows": "0.5.x" }

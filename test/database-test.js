@@ -93,7 +93,6 @@ vows.describe('Database storage & retrieval').addBatch({
     },
     'when upserting': {
       topic: function(collection){
-        console.log('upserting');
         var selector = {plural: {crow: 'murder'}};
         var newDoc = {plural: {crow: 'murder'}, is_this_awesome: 'totally'};
         collection.upsert(selector, newDoc, function(err) {

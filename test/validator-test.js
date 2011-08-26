@@ -1,4 +1,4 @@
-var vows = require('vows')
+var vows = require('./setup').vows
   , assert = require('assert')
   , validate = require('../validator').validate
   , fixture = require('./utils').fixture
