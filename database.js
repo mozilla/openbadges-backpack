@@ -42,8 +42,27 @@ Collection.prototype.command = function() {
   act.collection = this.name;
   actions.push(act);
 }
-Collection.prototype.insert = function(data, callback) {
+Collection.prototype.insert = function(data, opts, callback) {
+  if ('function' === typeof opts) callback = opts, opts = {};
   this.command('insert', data, callback);
+}
+Collection.prototype.update = function(selector, data, opts, callback) {
+  if ('function' === typeof opts) callback = opts, opts = {};
+  this.command('update', selector, data, callback);
+}
+Collection.prototype.remove = function(selector, opts, callback) {
+  if ('function' === typeof opts) callback = opts, opts = {};
+  this.command('remove', selector, callback);
+}
+// `find` just had to go and be different, didn't it.
+Collection.prototype.find = function(query, opts, callback) {
+  if ('function' === typeof opts) callback = opts, opts = {};
+  var act = function(err, col){
+    if (err) throw err;
+    col.find(query, opts).toArray(callback);
+  }
+  act.collection = this.name;
+  actions.push(act);
 }
 
 exports.collection = function(name) { return new Collection(name); }
