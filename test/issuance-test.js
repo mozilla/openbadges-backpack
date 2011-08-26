@@ -2,6 +2,9 @@ var vows = require('./setup').vows
   , assert = require('assert')
   , issuer = require('./fake-issuer')
   , remote = require('../remote')
+  , database = require('../database')
+  , configuration = require('../lib/configuration')
+  , color = require('colors')
 
 vows.describe('Issuing by remote assertion').addBatch({
   'Submitting a': {

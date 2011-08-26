@@ -58,11 +58,29 @@ Collection.prototype.find = function(query, opts, callback) {
   actions.push(act);
 }
 
+function Client() { }
+Client.prototype.command = function() {
+  var args = Array.prototype.slice.call(arguments)
+    , command = args.shift();
+  var act = function(client){
+    client[command].apply(client, args);
+  }
+  act.client = true;
+  actions.push(act);
+}
+
+
 // *side effect of requiring*
 // open a connection to the database, flush all buffered commands
 conn.open(function(err, client) {
   if (err) throw err;
-  function execAction(action) { client.collection(action.collection, action);}
+  function execAction(action) {
+    if (action.client) {
+      return action(client);
+    } else if (action.collection) {
+      return client.collection(action.collection, action);
+    }
+  }
   // first flush buffer.
   actions.flush().forEach(execAction)
   // then listen on queues.
@@ -70,4 +88,6 @@ conn.open(function(err, client) {
 });
 
 exports.collection = function(name) { return new Collection(name); }
+exports.client = new Client();
 exports.connection = conn;
+exports.using = conn.databaseName;
