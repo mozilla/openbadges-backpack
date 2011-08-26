@@ -1,0 +1,57 @@
+<!DOCTYPE html>  <html> <head>   <title>remote.js</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="app.html">                 app.js               </a>                                           <a class="source" href="controller.html">                 controller.js               </a>                                           <a class="source" href="database.html">                 database.js               </a>                                           <a class="source" href="middleware.html">                 middleware.js               </a>                                           <a class="source" href="model.html">                 model.js               </a>                                           <a class="source" href="remote.html">                 remote.js               </a>                                           <a class="source" href="run.html">                 run.js               </a>                                           <a class="source" href="validator.html">                 validator.js               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               remote.js             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="kd">var</span> <span class="nx">request</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;request&#39;</span><span class="p">)</span>
+  <span class="p">,</span> <span class="nx">validator</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./validator&#39;</span><span class="p">)</span>
+
+<span class="nx">exports</span><span class="p">.</span><span class="nx">process</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">onprocess</span><span class="p">,</span> <span class="nx">onsuccess</span><span class="p">){</span>
+  <span class="nx">onsuccess</span> <span class="o">=</span> <span class="nx">onsuccess</span> <span class="o">||</span> <span class="kd">function</span><span class="p">(){</span> <span class="p">};</span>
+  <span class="k">try</span> <span class="p">{</span>
+    <span class="nx">request</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">resp</span><span class="p">,</span> <span class="nx">rawBody</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">err</span> <span class="o">||</span> <span class="nx">resp</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">&gt;=</span> <span class="mi">400</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">onprocess</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="p">{</span>
+          <span class="nx">status</span><span class="o">:</span> <span class="s1">&#39;failure&#39;</span><span class="p">,</span>
+          <span class="nx">error</span><span class="o">:</span> <span class="s1">&#39;unreachable&#39;</span><span class="p">,</span>
+          <span class="nx">reason</span><span class="o">:</span> <span class="s1">&#39;could not reach endpoint (dns, 4xx or 5xx)&#39;</span>
+        <span class="p">});</span>
+      <span class="p">}</span>
+      <span class="k">try</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">assertion</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">rawBody</span><span class="p">);</span>
+      <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">onprocess</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="p">{</span>
+          <span class="nx">status</span><span class="o">:</span> <span class="s1">&#39;failure&#39;</span><span class="p">,</span>
+          <span class="nx">error</span><span class="o">:</span> <span class="s1">&#39;unaccepted&#39;</span><span class="p">,</span>
+          <span class="nx">reason</span><span class="o">:</span> <span class="s1">&#39;could not parse json, or invalid content type&#39;</span>
+        <span class="p">});</span>
+      <span class="p">}</span>
+      <span class="kd">var</span> <span class="nx">validationResult</span> <span class="o">=</span> <span class="nx">validator</span><span class="p">.</span><span class="nx">validate</span><span class="p">(</span><span class="nx">assertion</span><span class="p">);</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">validationResult</span><span class="p">.</span><span class="nx">status</span> <span class="o">===</span> <span class="s1">&#39;success&#39;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">try</span> <span class="p">{</span> 
+          <span class="kd">var</span> <span class="nx">badgeID</span> <span class="o">=</span> <span class="nx">onsuccess</span><span class="p">(</span><span class="nx">assertion</span><span class="p">);</span>
+          <span class="k">return</span> <span class="nx">onprocess</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="p">{</span>
+            <span class="nx">status</span><span class="o">:</span> <span class="s1">&#39;success&#39;</span><span class="p">,</span>
+            <span class="nx">id</span><span class="o">:</span> <span class="nx">badgeID</span>
+          <span class="p">});</span>
+        <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+          <span class="k">return</span> <span class="nx">onprocess</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="p">{</span>
+            <span class="nx">status</span><span class="o">:</span> <span class="s1">&#39;failure&#39;</span><span class="p">,</span>
+            <span class="nx">error</span><span class="o">:</span> <span class="s1">&#39;unknown&#39;</span><span class="p">,</span>
+            <span class="nx">reason</span><span class="o">:</span> <span class="s1">&#39;there was a local error. it may be temporary, try again later?&#39;</span>
+          <span class="p">});</span>
+        <span class="p">}</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">onprocess</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="p">{</span>
+          <span class="nx">status</span><span class="o">:</span> <span class="s1">&#39;failure&#39;</span><span class="p">,</span>
+          <span class="nx">error</span><span class="o">:</span> <span class="s1">&#39;validation&#39;</span><span class="p">,</span>
+          <span class="nx">reason</span><span class="o">:</span> <span class="nx">validationResult</span><span class="p">.</span><span class="nx">errors</span>
+        <span class="p">});</span>
+      <span class="p">}</span>
+    <span class="p">})</span>
+  <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">onprocess</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="p">{</span>
+      <span class="nx">status</span><span class="o">:</span> <span class="s1">&#39;failure&#39;</span><span class="p">,</span>
+      <span class="nx">error</span><span class="o">:</span> <span class="s1">&#39;unreachable&#39;</span><span class="p">,</span>
+      <span class="nx">reason</span><span class="o">:</span> <span class="s1">&#39;could not reach endpoint (invalid url)&#39;</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+  <span class="k">return</span><span class="p">;</span>
+<span class="p">}</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
