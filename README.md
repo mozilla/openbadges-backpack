@@ -2,7 +2,7 @@
 ## What?
 Brief: Push badges to a hub for your users and let them share badges everywhere (and drive traffic back to your site).
 
-Long: https://wiki.mozilla.org/Badges
+Long: http://openbadges.org/
 
 # API Examples
 **NOTE**: Much of this describes a future that will exist come *September 5th*. I will use the present tense regardless.
