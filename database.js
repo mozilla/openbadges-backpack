@@ -20,17 +20,31 @@ actions.flush = function(){
   return ret;
 }
 
-// make a really thin wrapper around collection methods
-function Collection(name) { this.name = name; }
+// make a really thin wrapper around client and collection methods
+function Client() { }
+Client.prototype.command = function() {
+  var args = Array.prototype.slice.call(arguments)
+    , command = args.shift();
+  actions.push(function(client){
+    client[command].apply(client, args);
+  });
+}
+Client.prototype.collection = function(name, callback) {
+  this.command('collection', name, callback);
+}
+
+
+function Collection(name) {
+  this.name = name;
+  this.client = new Client();
+}
 Collection.prototype.command = function() {
   var args = Array.prototype.slice.call(arguments)
     , command = args.shift();
-  var act = function(err, col){
+  this.client.collection(this.name, function(err, col){
     if (err) throw err;
     col[command].apply(col, args);
-  }
-  act.collection = this.name;
-  actions.push(act);
+  });
 }
 Collection.prototype.insert = function(data, opts, callback) {
   if ('function' === typeof opts) callback = opts, opts = {};
@@ -50,36 +64,18 @@ Collection.prototype.remove = function(selector, opts, callback) {
 // `find` just had to go and be different, didn't it.
 Collection.prototype.find = function(query, opts, callback) {
   if ('function' === typeof opts) callback = opts, opts = {};
-  var act = function(err, col){
+  this.client.collection(this.name, function(err, col){
     if (err) throw err;
     col.find(query, opts).toArray(callback);
-  }
-  act.collection = this.name;
-  actions.push(act);
+  });
 }
-
-function Client() { }
-Client.prototype.command = function() {
-  var args = Array.prototype.slice.call(arguments)
-    , command = args.shift();
-  var act = function(client){
-    client[command].apply(client, args);
-  }
-  act.client = true;
-  actions.push(act);
-}
-
 
 // *side effect of requiring*
 // open a connection to the database, flush all buffered commands
 conn.open(function(err, client) {
   if (err) throw err;
   function execAction(action) {
-    if (action.client) {
-      return action(client);
-    } else if (action.collection) {
-      return client.collection(action.collection, action);
-    }
+    return action(client);
   }
   // first flush buffer.
   actions.flush().forEach(execAction)
