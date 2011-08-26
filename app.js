@@ -28,6 +28,7 @@ app.use(express.cookieParser());
 app.use(express.static(path.join(__dirname, "static")));
 app.use(middleware.cookieSessions());
 app.use(middleware.logRequests());
+app.use(middleware.noFrame());
 
 // Routing for the application. See `controller.js` for more information.
 app.post('/authenticate', controller.authenticate);
