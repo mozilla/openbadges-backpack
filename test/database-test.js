@@ -108,7 +108,6 @@ vows.describe('Database storage & retrieval').addBatch({
       'the value should be from the second upsert': function(err, docs) {
         assert.equal(docs[0].is_this_awesome, 'yep');
       }
-    },
-    teardown: function(){ db.connection.close(); }
+    }
   }
 }).export(module)

@@ -54,6 +54,7 @@ Collection.prototype.update = function(selector, data, opts, callback) {
   if ('function' === typeof opts) callback = opts, opts = {};
   this.command('update', selector, data, opts, callback);
 }
+// really annoying that upserting doesn't return the doc
 Collection.prototype.upsert = function(selector, data, callback) {
   this.update(selector, data, {upsert: true}, callback);
 }
@@ -87,3 +88,4 @@ exports.collection = function(name) { return new Collection(name); }
 exports.client = new Client();
 exports.connection = conn;
 exports.using = conn.databaseName;
+exports.ObjectID = conn.bson_serializer.ObjectID;
