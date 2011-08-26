@@ -76,4 +76,3 @@ vows.describe('Badge Validator').addBatch({
     }
   }
 }).export(module);
-

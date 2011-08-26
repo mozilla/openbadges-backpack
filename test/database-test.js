@@ -6,7 +6,7 @@ var vows = require('./setup').vows
 var collection = db.collection('db_test');
 
 // clean slate before we begin
-collection.remove({}) 
+collection.remove({})
 collection.insert([
   {name: 'brian'},
   {name: 'jeremy'},
@@ -29,7 +29,7 @@ collection.insert([
        url: 'http://p2pu.org/schools/sow'
      }
    }
-  },
+  }
 ])
 
 vows.describe('Database storage & retrieval').addBatch({
