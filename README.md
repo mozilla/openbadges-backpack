@@ -1,20 +1,4 @@
 # Open Badge Infrastructure
-## What?
-Brief: Push badges to a hub for your users and let them share badges everywhere (and drive traffic back to your site).
-
-Long: https://wiki.mozilla.org/Badges
-
-# API Examples
-**NOTE**: Much of this describes a future that will exist come *September 5th*. I will use the present tense regardless.
-
-## Pushing A Badge
-A badge assertion is sent to the hub by making a POST request with the path to the badge assertion. For example:
-
-    $ curl -d "assertion=https://example.org/6f81533e9978ae26a3d07b3888206c80.json" http://hub.example.org/badges
-
-This tells the badge hub to do a GET request to
-“https://example.org/6f81533e9978ae26a3d07b3888206c80.json” and process the assertion at
-that URL.
 
 ## Example assertion (with optional fields)
 ```javascript
@@ -66,33 +50,3 @@ user - so that the user could add a personal evidence URL, or could add
 additional information or context to the badge. This would NOT be something
 that they issuer would include in the badge manifest (so it is not listed
 above) and would most likely be managed by the user through the Backpack.
-
-
-## I AM ERROR (or success)
-
-On success, you'll get `HTTP 200` and a JSON response looking something like so:
-
-```javascript
-{"status": "okay", "id":<some-long-hash>}
-```
-
-On a validation error, you'll get `HTTP 422` and can expect a body like this:
-
-```javascript
-{"status": "failure", "error": "validation"}
-```
-You should run your manifest through the validator (TODO: LINK TO VALIDATOR) and figure out what's malformed. 
-
-If the recipient has blocked you from sending them badges, you'll get `HTTP 403` and this little ditty:
-
-```javascript
-{"status": "blocked", "error": "recipient"}
-```
-You should not try to send badges to that user anymore without first communicating with them.
-
-If the entire server has blocked you (*what have you done?!*), you'll still get `HTTP 403`, but expect this:
-
-```javascript
-{"status": "blocked", "error": "server", "contact":"admin@example.com"}
-```
-In which case you should stop trying to send any badges and talk with the admin.
