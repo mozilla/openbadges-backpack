@@ -1,5 +1,4 @@
 # Open Badge Infrastructure
-
 ## Example assertion (with optional fields)
 ```javascript
 {
