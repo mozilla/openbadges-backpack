@@ -10,13 +10,18 @@ For (a lot) more information, check out http://openbadges.org
 *Note: we're in rapid development mode now, but we're aiming for a usable beta on Sept 12th.*
 
 Requirements:
+
 * Webserver capable of serving requests to the general internet.
 * Ability to make a POST request from your server backend and read a JSON response.
 * Email addresses of the users you wish to issue badges.
 * Badge image must be in PNG format.
 
+Usage example:
+
 1. Generate an assertion (see below) for the user recieving the badge.
-2. Store that assertion at a public-but-secret URL.
+2. Store that assertion at a public-but-secret URL and serve it with
+`content-type: application/json`
+  
   * The assertion contains private information about a user, so you want a
     non-predictable URL scheme to prevent automated scraping.
   
