@@ -36,7 +36,9 @@ exports.logRequests = function(){
   });
 };
 
-exports.noFrame = function(req, res, next){
-  res.setHeader('x-frame-options', 'DENY');
-  next();
-}
+exports.noFrame = function(){
+  return function(req, res, next){
+    res.setHeader('x-frame-options', 'DENY');
+    next();
+  };
+};
