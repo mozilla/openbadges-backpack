@@ -1,1 +1,10 @@
 form.signin { display: none; }
+form.baker label {
+  font-size: 18px;
+  line-height: 24px;
+}
+form.baker #assertion {
+  font-size: 22px;
+  height: 30px;
+  width: 650px;
+}

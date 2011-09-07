@@ -1,8 +1,13 @@
 var request = require('request')
+  , url = require('url')
   , path = require('path')
+  , fs = require('fs')
   , qs = require('querystring')
   , logger = require('./lib/logging').logger
   , configuration = require('./lib/configuration')
+  , baker = require('./baker')
+  , remote = require('./remote')
+  , crypto = require('crypto')
 ;
 
 // #FIXME: CSRF
@@ -13,7 +18,7 @@ exports.authenticate = function(req, res) {
   if (!req.body['assertion']) {
     return res.redirect('/login', 303);
   }
-  
+
   // Setup the options and the post body for the verification request.
   // nginx invariably 411s if it doesn't find a content-length header, and
   // express, which is what the main browserid server runs, will refuse to
@@ -33,7 +38,7 @@ exports.authenticate = function(req, res) {
   request.post(opts, function(err, resp, body){
     var assertion = {}
     var hostname = configuration.get('hostname')
-    
+
     // We need to make sure:
     //
     //   * the request could make it out of the system,
@@ -108,12 +113,12 @@ exports.manage = function(req, res) {
   if (!req.session || !req.session.authenticated) {
     return res.redirect('/login', 303);
   }
-  
+
   // #TODO: support multiple users
   var session = req.session
     , user = session.authenticated[0]
     , emailRe = /^.+?\@.+?\.*$/
-  
+
   // very simple sanity check
   if (!emailRe.test(user)) {
     logger.warn('session.authenticate does not contain valid user: ' + user);
@@ -126,6 +131,72 @@ exports.manage = function(req, res) {
   });
 };
 
+// #TODO: don't return 200s if there's a problem
+exports.baker = function(req, res) {
+  var query = req.query || {}
+    , issuer
+    , image
+    , imageURL
+    , badge
+    , md5sum
+    , filename
+    , accepts
+
+  
+  if (!query.assertion) {
+    return res.render('baker', {
+      title: 'Creator',
+      login: false
+    });
+  }
+  accepts = req.headers['accept'] || '';
+  remote.assertion(query.assertion, function(err, data) {
+    if (err.status !== 'success') {
+      logger.warn('failed grabbing assertion for URL '+ query.assertion);
+      logger.warn('reason: '+ JSON.stringify(err));
+      return res.end(JSON.stringify(err))
+    }
+    issuer = url.parse(query.assertion);
+    image = url.parse(data.badge.image);
+    if (!image.hostname) {
+      image.host = issuer.host;
+      image.port = issuer.port;
+      image.slashes = issuer.slashes;
+      image.protocol = issuer.protocol;
+      image.hostname = issuer.hostname;
+    }
+    imageURL = url.format(image);
+    remote.badgeImage(imageURL, function(err, imagedata) {
+      if (err) {
+        logger.warn('failed grabbing badge image '+ imageURL);
+        logger.warn('reason: '+ JSON.stringify(err));
+        return res.end(JSON.stringify(err))
+      }
+      try {
+        badge = baker.prepare(imagedata, query.assertion);
+      } catch (e) {
+        logger.error('failed writing badge image: '+ e);
+        return res.end(JSON.stringify({
+          status: 'failure',
+          reason: 'processing',
+          msg: 'could not write data to PNG: ' + e
+        }));
+      }
+
+      if (accepts.match('application/json')) {
+        res.setHeader('content-type', 'application/json');
+        return res.end(JSON.stringify({'status':'success'}));
+      }
+      md5sum = crypto.createHash('md5');
+      filename = md5sum.update(badge).digest('hex');
+      res.setHeader('content-type', 'image/png');
+      res.setHeader('content-length', badge.length);
+      res.setHeader('content-disposition', 'attachment; filename="'+filename+'.png"');
+      return res.end(badge);
+    });
+  });
+}
+
 exports.login = function(req, res) {
   // req.flash returns an array. Pass on the whole thing to the view and
   // decide there if we want to display all of them or just the first one.
@@ -133,4 +204,3 @@ exports.login = function(req, res) {
     error: req.flash('login_error')
   });
 };
- 

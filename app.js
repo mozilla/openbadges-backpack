@@ -17,6 +17,8 @@ app.set('view engine', 'ejs');
 // checks.
 app.helpers({
   user: null,
+  login: true,
+  title: 'Backpack',
   error: [],
   badges: {}
 });
@@ -34,6 +36,7 @@ app.use(middleware.noFrame());
 app.post('/authenticate', controller.authenticate);
 app.get('/signout',       controller.signout);
 app.get('/login',         controller.login);
+app.get('/baker',         controller.baker);
 app.get('/',              controller.manage);
 
 exports.server = app;

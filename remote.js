@@ -24,7 +24,7 @@ function getRemoteData(opts, accepted, callback) {
         if (err || resp.statusCode >= 400) {
           return callback(_error('unreachable', 'could not reach endpoint (dns, 4xx or 5xx)'));
         }
-        if (resp.headers['content-type'] !== accepted) {
+        if (resp.headers['content-type'].indexOf(accepted) !== 0) {
           return callback(_error('content-type', 'invalid content-type: should be ' + accepted))
         }
         // some servers don't misbehave and don't return a content-length on HEAD requests.

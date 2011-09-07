@@ -6,7 +6,9 @@
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <link rel='stylesheet' href='/css/bootstrap-1.0.0.min.css' type='text/css' media='all'>
     <link rel='stylesheet' href='/css/style.css' type='text/css' media='all'>
-    <title dir='ltr'>Badge Backpack | Welcome</title>
+    <title dir='ltr'>
+      Open Badge <%= title %>
+    </title>
     <script type='text/javascript' src='https://browserid.org/include.js'></script>
     <script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js'></script>
   </head>
@@ -17,29 +19,31 @@
           <div class='fill'>
             <div class='container'>
               <h3>
-                <a href='#'>Badge Backpack</a>
+                <a href='#'>Open Badge <%= title %></a>
               </h3>
               
-              <% if (user) { %>
-                <form action=''>
-                  <input type='text' placeholder='Filter'>
+              <% if (login) { %>
+                <% if (user) { %>
+                  <form action=''>
+                    <input type='text' placeholder='Filter'>
+                  </form>
+                  <ul class='nav secondary-nav'>
+                    <li class='menu'>
+                      <a class='menu js-usermenu-link' href='#'><%= user %></a>
+                      <ul class='menu-dropdown js-usermenu-dropdown'>
+                        <li><a href='/signout'>Sign Out</a></li>
+                      </ul>
+                    </li>
+                  </ul>
+                <% } else { %>
+                <form class='signin js-browserid-form' method='POST' action='/authenticate'>
+                  <input class='js-browserid-input' name='assertion' type='hidden'>
                 </form>
                 <ul class='nav secondary-nav'>
-                  <li class='menu'>
-                    <a class='menu js-usermenu-link' href='#'><%= user %></a>
-                    <ul class='menu-dropdown js-usermenu-dropdown'>
-                      <li><a href='/signout'>Sign Out</a></li>
-                    </ul>
-                  </li>
+                  <li><a href='#' class='js-browserid-link'><img src='https://browserid.org/i/sign_in_green.png'></a><li>
                 </ul>
-              <% } else { %>
-              <form class='signin js-browserid-form' method='POST' action='/authenticate'>
-                <input class='js-browserid-input' name='assertion' type='hidden'>
-              </form>
-              <ul class='nav secondary-nav'>
-                <li><a href='#' class='js-browserid-link'><img src='https://browserid.org/i/sign_in_green.png'></a><li>
-              </ul>
-              <% } %> 
+                <% } %> 
+              <% } %>
             </div>
           </div>
         </div>
