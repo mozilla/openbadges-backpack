@@ -1,1 +1,1 @@
-../../validator.js
+../../lib/validator.js

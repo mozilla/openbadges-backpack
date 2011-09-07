@@ -1,6 +1,6 @@
 var vows = require('./setup').vows
   , assert = require('assert')
-  , validate = require('../validator').validate
+  , validate = require('../lib/validator').validate
   , fixture = require('./utils').fixture
   , genstring = require('./utils').genstring
 

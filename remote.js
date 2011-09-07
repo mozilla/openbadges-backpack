@@ -1,5 +1,5 @@
 var request = require('request')
-  , validator = require('./validator')
+  , validator = require('./lib/validator')
 
 exports.process = function(url, onprocess, onsuccess){
   onsuccess = onsuccess || function(){ };

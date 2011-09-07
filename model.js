@@ -1,5 +1,5 @@
 var database = require('./database'),
-    validator = require('./validator');
+    validator = require('./lib/validator');
 
 // where to store the badges
 var collection = database.collection('badges');
