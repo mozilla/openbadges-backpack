@@ -15,7 +15,6 @@ vows.describe('Handling remote servers').addBatch({
         '`status == success`': function(err, result){ assert.equal(err.status, 'success'); },
         'a proper assertion object': function(err, result){ assert.equal(result.recipient, 'bimmy@example.com'); }
       },
-      teardown: function(server){ server.close(); }
     },
     'assertion with invalid type': {
       topic: issuer.simple.invalidType(),
@@ -24,7 +23,6 @@ vows.describe('Handling remote servers').addBatch({
         '`status == failure`': function(err, result){ assert.equal(err.status, 'failure') },
         '`error == content-type`': function(err, result){ assert.equal(err.error, 'content-type') }
       },
-      teardown: function(server){ server.close(); }
     },
     'bad assertion': {
       topic: issuer.simple.bad(),
@@ -33,7 +31,6 @@ vows.describe('Handling remote servers').addBatch({
         '`status == failure`': function(err, result){ assert.equal(err.status, 'failure') },
         '`error == validation`': function(err, result){ assert.equal(err.error, 'validation') }
       },
-      teardown: function(server){ server.close(); }
     },
     'really bad assertion (bad json)': {
       topic: issuer.simple.reallyBad(),
@@ -42,7 +39,6 @@ vows.describe('Handling remote servers').addBatch({
         '`status == failure`': function(err, result){ assert.equal(err.status, 'failure') },
         '`error == parse`': function(err, result){ assert.equal(err.error, 'parse') }
       },
-      teardown: function(server){ server.close(); }
     },
     'dreadful assertion (4xx or 5xx)': {
       topic: issuer.simple.dreadful(),
@@ -51,7 +47,6 @@ vows.describe('Handling remote servers').addBatch({
         '`status == failure`': function(err, result){ assert.equal(err.status, 'failure') },
         '`error == unreachable`': function(err, result){ assert.equal(err.error, 'unreachable') }
       },
-      teardown: function(server){ server.close(); }
     },
     'bogus assertion (dns error)': {
       'should get': {
