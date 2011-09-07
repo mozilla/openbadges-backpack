@@ -1,4 +1,4 @@
-var vows = require('./setup').vows
+var vows = require('./setup')
   , assert = require('assert')
   , issuer = require('./fake-issuer')
   , remote = require('../remote')

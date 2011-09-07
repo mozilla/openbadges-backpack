@@ -15,4 +15,4 @@ if (oldDb == testDb && oldEnv !== 'test') {
 var database = require('../database')
 if (!(database.using === testDb)) throw "something went wrong, not using test db".red;
 database.client.command('dropDatabase', function(){});
-exports.vows = require('vows');
+module.exports = require('vows');

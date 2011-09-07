@@ -1,4 +1,4 @@
-var vows = require('./setup').vows
+var vows = require('./setup')
   , assert = require('assert')
   , db = require('../database')
 
