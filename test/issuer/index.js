@@ -31,6 +31,9 @@ app.use(express.static(path.join(__dirname, "static")));
 app.get('/good.json', function(req, res){
   res.send(badge());
 });
+app.get('/dupe.json', function(req, res){
+  res.send(badge({badge: { image: '/dupe.png'}}));
+});
 
 exports.complex = function() {
   var obj = {}, port = ++PORT;

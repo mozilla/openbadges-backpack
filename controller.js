@@ -180,8 +180,8 @@ exports.baker = function(req, res) {
         res.setHeader('Content-Type', 'application/json');
         return res.send(JSON.stringify({
           status: 'failure',
-          reason: 'processing',
-          msg: 'could not write data to PNG: ' + e
+          error: 'processing',
+          reason: 'could not write data to PNG: ' + e
         }), 400);
       }
       if (accepts.match('application/json')) {

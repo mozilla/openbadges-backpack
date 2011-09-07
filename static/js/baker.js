@@ -33,18 +33,23 @@
       resultSection.animate({opacity:0});
     }
     
-    jQuery.get(badgeURL, function(data){
-      if (data.status === 'success') {
-        resultSection.queue('fx', function(next){
-          showBadge(badgeURL); next();
-        });
-      }
-      else {
+    jQuery.ajax({
+      url: badgeURL,
+      dataType: 'json',
+      error: function(jqXHR, status, error){
+        var data = jQuery.parseJSON(jqXHR.responseText);
         resultSection.queue('fx', function(next){
           showErrors(data); next();
         });
+      },
+      success: function(data, status) {
+        if (data.status === 'success') {
+          resultSection.queue('fx', function(next){
+            showBadge(badgeURL); next();
+          });
+        }
       }
-    }, 'json')
+    });
     return false;
   })
   resultSection.css({opacity:0})
