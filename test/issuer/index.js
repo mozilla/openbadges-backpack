@@ -14,7 +14,7 @@ var makeServer = function(code, body, type) {
     var server = http.createServer();
     server.on('request', function(req, res){
       res.statusCode = code;
-      res.setHeader('content-type', type);
+      res.setHeader('conTENt-type', type);
       res.end(body);
     });
     server.listen(++PORT, HOST);
@@ -34,6 +34,7 @@ exports.complex = app;
 exports.simple = {
   good: makeServer(200, JSON.stringify(badge())),
   bad: makeServer(200, JSON.stringify(badge({recipient: null}))),
+  invalidType: makeServer(200, JSON.stringify(badge()), 'text/html'),
   reallyBad: makeServer(200, '()dj;1{}this will fail json;())}'),
   extraBad: makeServer(200, '<html><body><h1>EY YO</h1></body></html>', 'text/html'),
   dreadful: makeServer(500, 'totally messed up', 'text/plain')

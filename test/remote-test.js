@@ -17,6 +17,15 @@ vows.describe('Handling remote servers').addBatch({
       },
       teardown: function(server){ server.close(); }
     },
+    'assertion with invalid type': {
+      topic: issuer.simple.invalidType(),
+      'should get': {
+        topic: function(server) { remote.assertion(server.url, this.callback) },
+        '`status == failure`': function(err, result){ assert.equal(err.status, 'failure') },
+        '`error == content-type`': function(err, result){ assert.equal(err.error, 'content-type') }
+      },
+      teardown: function(server){ server.close(); }
+    },
     'bad assertion': {
       topic: issuer.simple.bad(),
       'should get': {
@@ -31,7 +40,7 @@ vows.describe('Handling remote servers').addBatch({
       'should get': {
         topic: function(server) { remote.assertion(server.url, this.callback) },
         '`status == failure`': function(err, result){ assert.equal(err.status, 'failure') },
-        '`error == unaccepted`': function(err, result){ assert.equal(err.error, 'unaccepted') }
+        '`error == parse`': function(err, result){ assert.equal(err.error, 'parse') }
       },
       teardown: function(server){ server.close(); }
     },
