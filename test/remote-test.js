@@ -6,7 +6,7 @@ var vows = require('./setup')
   , configuration = require('../lib/configuration')
   , color = require('colors')
 
-vows.describe('Issuing by remote assertion').addBatch({
+vows.describe('Handling remote servers').addBatch({
   'Submitting a': {
     'good assertion': {
       topic: issuer.simple.good(),
