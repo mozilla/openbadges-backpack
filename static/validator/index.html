@@ -111,7 +111,8 @@
           statusDisplay.css({color: '#3d3'});
         }
       }
-      button.bind('click', function(){
+      button.bind('click', function(e){
+        e.preventDefault();
         var rawData = assertion.session.doc.getValue();
         try {
           var data = JSON.parse(rawData);
@@ -126,6 +127,7 @@
           errors.push([ emphfield, messages[result.errors[field]]].join(' '));
         });
         report(errors);
+        return false;
       });
     </script>
   </body>
