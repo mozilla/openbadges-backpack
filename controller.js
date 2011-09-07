@@ -131,7 +131,6 @@ exports.manage = function(req, res) {
   });
 };
 
-// #TODO: don't return 200s if there's a problem
 exports.baker = function(req, res) {
   var query = req.query || {}
     , issuer
@@ -142,19 +141,20 @@ exports.baker = function(req, res) {
     , filename
     , accepts
 
-  
   if (!query.assertion) {
     return res.render('baker', {
       title: 'Creator',
       login: false
     });
   }
+  
   accepts = req.headers['accept'] || '';
   remote.assertion(query.assertion, function(err, data) {
     if (err.status !== 'success') {
       logger.warn('failed grabbing assertion for URL '+ query.assertion);
       logger.warn('reason: '+ JSON.stringify(err));
-      return res.end(JSON.stringify(err))
+      res.setHeader('Content-Type', 'application/json');
+      return res.send(JSON.stringify(err), 400)
     }
     issuer = url.parse(query.assertion);
     image = url.parse(data.badge.image);
@@ -170,29 +170,29 @@ exports.baker = function(req, res) {
       if (err) {
         logger.warn('failed grabbing badge image '+ imageURL);
         logger.warn('reason: '+ JSON.stringify(err));
-        return res.end(JSON.stringify(err))
+        res.setHeader('Content-Type', 'application/json');
+        return res.send(JSON.stringify(err), 400)
       }
       try {
         badge = baker.prepare(imagedata, query.assertion);
       } catch (e) {
-        logger.error('failed writing badge image: '+ e);
-        return res.end(JSON.stringify({
+        logger.error('failed writing data to badge image: '+ e);
+        res.setHeader('Content-Type', 'application/json');
+        return res.send(JSON.stringify({
           status: 'failure',
           reason: 'processing',
           msg: 'could not write data to PNG: ' + e
-        }));
+        }), 400);
       }
-
       if (accepts.match('application/json')) {
-        res.setHeader('content-type', 'application/json');
-        return res.end(JSON.stringify({'status':'success'}));
+        res.setHeader('Content-Type', 'application/json');
+        return res.send(JSON.stringify({'status':'success'}));
       }
       md5sum = crypto.createHash('md5');
       filename = md5sum.update(badge).digest('hex');
-      res.setHeader('content-type', 'image/png');
-      res.setHeader('content-length', badge.length);
-      res.setHeader('content-disposition', 'attachment; filename="'+filename+'.png"');
-      return res.end(badge);
+      res.setHeader('Content-Type', 'image/png');
+      res.setHeader('Content-Disposition', 'attachment; filename="'+filename+'.png"');
+      return res.send(badge);
     });
   });
 }
