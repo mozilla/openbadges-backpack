@@ -15,7 +15,9 @@ var makeServer = function(code, body, type) {
     server.on('request', function(req, res){
       res.statusCode = code;
       res.setHeader('conTENt-type', type);
-      res.end(body);
+      res.setHeader('content-length', body.length);
+      if (req.method !== 'HEAD') res.write(body);
+      res.end();
     });
     server.listen(++PORT, HOST);
     server.port = PORT;
@@ -30,7 +32,12 @@ app.get('/good.json', function(req, res){
   res.send(badge());
 });
 
-exports.complex = app;
+exports.complex = function() {
+  var obj = {}, port = ++PORT;
+  app.listen(port);
+  obj.url = function(path){ return 'http://' + HOST + ':' + port + '/' + path }
+  return obj;
+}
 exports.simple = {
   good: makeServer(200, JSON.stringify(badge())),
   bad: makeServer(200, JSON.stringify(badge({recipient: null}))),

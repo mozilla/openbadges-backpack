@@ -5,7 +5,11 @@ var vows = require('./setup')
   , database = require('../database')
   , configuration = require('../lib/configuration')
   , color = require('colors')
+  , metapng = require('metapng')
 
+
+  
+var serv = issuer.complex();
 vows.describe('Handling remote servers').addBatch({
   'Submitting a': {
     'good assertion': {
@@ -62,5 +66,48 @@ vows.describe('Handling remote servers').addBatch({
         '`error == unreachable`': function(err, result){ assert.equal(err.error, 'unreachable') }
       }
     }
+  },
+  'Fetching a': {
+    'good badge image (PNG)': {
+      topic: serv.url('badge.png'),
+      'should get': {
+        topic: function(url){ remote.badgeImage(url, this.callback) },
+        'a png buffer': function(err, result){
+          assert.ok(Buffer.isBuffer(result));
+        }
+      }
+    },
+    'bad badge image (JPG)': {
+      topic: serv.url('badge.jpg'),
+      'should get': {
+        topic: function(url){ remote.badgeImage(url, this.callback) },
+        '`status == failure`': function(err, result){ assert.equal(err.status, 'failure') },
+        '`error == content-type`': function(err, result){ assert.equal(err.error, 'content-type') }
+      }
+    },
+    'bad badge image (GIF)': {
+      topic: serv.url('badge.gif'),
+      'should get': {
+        topic: function(url){ remote.badgeImage(url, this.callback) },
+        '`status == failure`': function(err, result){ assert.equal(err.status, 'failure') },
+        '`error == content-type`': function(err, result){ assert.equal(err.error, 'content-type') }
+      }
+    },
+    'sneaky badge image (JPG labeled as PNG)': {
+      topic: serv.url('sneaky-badge.png'),
+      'should get': {
+        topic: function(url){ remote.badgeImage(url, this.callback) },
+        '`status == failure`': function(err, result){ assert.equal(err.status, 'failure') },
+        '`error == parse`': function(err, result){ assert.equal(err.error, 'parse') }
+      }
+    },
+    'huge badge image (PNG)': {
+      topic: serv.url('huge.png'),
+      'should get': {
+        topic: function(url){ remote.badgeImage(url, this.callback) },
+        '`status == failure`': function(err, result){ assert.equal(err.status, 'failure') },
+        '`error == size`': function(err, result){ assert.equal(err.error, 'size') }
+      }
+    },
   }
 }).export(module);
