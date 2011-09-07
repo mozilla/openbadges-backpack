@@ -1,55 +1,35 @@
 var request = require('request')
   , validator = require('./lib/validator')
 
-exports.process = function(url, onprocess, onsuccess){
-  onsuccess = onsuccess || function(){ };
+function error(type, msg) { return {status: 'failure', error: type, reason: msg}; }
+function errUnreachable(msg) { return error('unreachable', msg) };
+function errUnknown(msg) { return error('unknown', msg); }
+function errUnaccepted(msg) { return error('unaccepted', msg); }
+function errValidation(msg) { return error('validation', msg); }
+
+exports.assertion = function(url, callback){
+  var assertion
+    , validationResult
+    , badgeID
   try {
     request.get(url, function(err, resp, rawBody) {
       if (err || resp.statusCode >= 400) {
-        return onprocess(null, {
-          status: 'failure',
-          error: 'unreachable',
-          reason: 'could not reach endpoint (dns, 4xx or 5xx)'
-        });
+        return callback(errUnreachable('could not reach endpoint (dns, 4xx or 5xx)'));
       }
       try {
-        var assertion = JSON.parse(rawBody);
+        assertion = JSON.parse(rawBody);
       } catch(e) {
-        return onprocess(null, {
-          status: 'failure',
-          error: 'unaccepted',
-          reason: 'could not parse json, or invalid content type'
-        });
+        return callback(errUnaccepted('could not parse json or invalid content-type'))
       }
-      var validationResult = validator.validate(assertion);
+      
+      validationResult = validator.validate(assertion);
       if (validationResult.status === 'success') {
-        try { 
-          var badgeID = onsuccess(assertion);
-          return onprocess(null, {
-            status: 'success',
-            id: badgeID
-          });
-        } catch (e) {
-          return onprocess(null, {
-            status: 'failure',
-            error: 'unknown',
-            reason: 'there was a local error. it may be temporary, try again later?'
-          });
-        }
+        return callback({status: 'success'}, assertion);
       } else {
-        return onprocess(null, {
-          status: 'failure',
-          error: 'validation',
-          reason: validationResult.errors
-        });
+        return callback(errValidation(validationResult.errors));
       }
     })
   } catch(e) {
-    return onprocess(null, {
-      status: 'failure',
-      error: 'unreachable',
-      reason: 'could not reach endpoint (invalid url)'
-    });
+    return callback(errUnreachable('could not reach endpoint (invalid url)'))
   }
-  return;
 }

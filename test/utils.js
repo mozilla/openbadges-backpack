@@ -5,9 +5,9 @@ var VALID_BADGE = function(){ return {
   issued_on: '2011-08-23',
   badge: {
     version: 'v0.5.0',
-    name: 'HTML5',
+    name: 'Open Source Contributor',
     description: 'For rocking in the free world',
-    image: '/html5.png',
+    image: '/badge.png',
     criteria: 'http://example.com/criteria.html',
     issuer: {
       name: 'p2pu',
