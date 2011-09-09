@@ -186,7 +186,7 @@ exports.baker = function(req, res) {
       }
       if (accepts.match('application/json')) {
         res.setHeader('Content-Type', 'application/json');
-        return res.send(JSON.stringify({'status':'success'}));
+        return res.send(JSON.stringify({'status':'success', 'assertion': JSON.stringify(data) }));
       }
       md5sum = crypto.createHash('md5');
       filename = md5sum.update(badge).digest('hex');

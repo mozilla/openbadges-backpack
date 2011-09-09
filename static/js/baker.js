@@ -1,14 +1,16 @@
 (function($){
   var assertionField = $('#assertion');
   var resultSection = $('#result');
-  var showBadge = function(badgeURL){
+  var showBadge = function(badgeURL, assertion){
     var img = $('<img>').attr('src', badgeURL)
-      , header = $('<h3>').html('Vóila! Your badge, with assertion embedded.')
+      , header1 = $('<h3>').html('I found this data')
+      , header2 = $('<h3>').html('and put the assertion URL in this badge')
       , link = $('<a>').attr('href', badgeURL)
+      , badgeData = $('<pre>').html(Formatter(assertion).format())
     link.append(img);
     
     resultSection.removeClass('failure').addClass('success');
-    resultSection.empty().append(header, link);
+    resultSection.empty().append(header1, badgeData, header2, link);
     resultSection.animate({opacity: 1.0});
   }
   var process_reason = function(reason) {
@@ -60,7 +62,7 @@
       success: function(data, status) {
         if (data.status === 'success') {
           resultSection.queue('fx', function(next){
-            showBadge(badgeURL); next();
+            showBadge(badgeURL, data.assertion); next();
           });
         }
       }
@@ -69,3 +71,4 @@
   })
   resultSection.css({opacity:0})
 })(jQuery);
+
