@@ -1,0 +1,3 @@
+kill `cat $ROOT/var/server.pid`
+
+                               

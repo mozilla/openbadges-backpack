@@ -3,6 +3,7 @@ var spawn = require('child_process').spawn
   , colors = require('colors')
   , http = require('http')
   , program = require('commander')
+  , qs = require('querystring')
 
 program
   .version('0.5.0')
@@ -47,18 +48,22 @@ var webhook_server = function(port, branch) {
   log('starting webhook server on port', port)
   log('watching for changes on', branch, 'branch');
   http.createServer(function(req, resp){
-    req.on('data', function(incoming){
-      var commitData;
-      try { commitData = JSON.parse(incoming); }
-      catch(e) {
+    var commitData = '';
+    req.on('data', function(incoming){ commitData += incoming; })
+    req.on('end', function(){
+      var commit, payload;
+      resp.end('okay');
+      try {
+        payload = qs.parse(commitData)['payload'];
+        commit = JSON.parse(payload);
+      } catch(e) {
         log('ignoring illegal webhook attempt from', req.client.remoteAddress);
         return;
       }
-      if (commitData.ref.match('refs/heads/' + branch)) {
+      if (commit.ref.match('refs/heads/' + branch)) {
         pull_new_code(function(){ running_server.kill(); })
       }
     })
-    req.on('end', function(){ resp.end('okay');})
  }).listen(port);
 }
 
