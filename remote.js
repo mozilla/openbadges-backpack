@@ -62,7 +62,7 @@ exports.assertion = function(url, callback) {
     try {
       assertion = JSON.parse(data);
     } catch(e) {
-      return callback(_error('parse', 'could not parse json'))
+      return callback(_error('parse', 'could not parse json: ' + e))
     }
     validation = validator.validate(assertion);
     if (validation.status === 'success') {
