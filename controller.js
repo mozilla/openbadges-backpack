@@ -227,5 +227,5 @@ exports.test_badge = function(req, res) {
         }
       }
     }));
-  }, 2000);
+  }, 1200);
 }
