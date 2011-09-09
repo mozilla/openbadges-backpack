@@ -94,5 +94,12 @@ process.on('SIGHUP', function () {
   running_server.kill();
 });
 
+var srs = 0;
+process.on('SIGINT', function () {
+  if (srs) process.exit();
+  srs = 1;
+  setTimeout(function(){srs = 0;}, 1000);
+})
+
 // reduce restart count.
 setInterval(function(){ if (restarts > 0) restarts--; }, 1000);
