@@ -40,6 +40,22 @@
     resultSection.animate({opacity: 1.0});
   }
   
+  $('#submit').ajaxStart(function(){
+    $(this)
+      .removeClass('primary')
+      .addClass('disabled')
+      .attr('disabled', true)
+      .val('Wait for it...')
+  });
+  
+  $('#submit').ajaxComplete(function(){
+    $(this)
+      .removeClass('disabled')
+      .addClass('primary')
+      .attr('disabled', false)
+      .val('Build this badge')
+  });
+  
   $('#bake-form').bind('submit', function(e){
     var assertionURL = assertionField.val()
       , badgeURL = '/baker?assertion='+assertionURL
@@ -49,7 +65,7 @@
     if (resultSection.css('opacity') !== 0) {
       resultSection.animate({opacity:0});
     }
-    
+
     jQuery.ajax({
       url: badgeURL,
       dataType: 'json',
@@ -70,5 +86,6 @@
     return false;
   })
   resultSection.css({opacity:0})
+  
 })(jQuery);
 
