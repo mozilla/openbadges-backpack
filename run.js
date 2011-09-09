@@ -67,7 +67,7 @@ var webhook_server = function(port, branch) {
  }).listen(port);
 }
 
-var pull_new_code = function(callback){
+var pull_new_code = function(callback) {
   var git = spawn('git', ['pull', 'deploy', 'master']);
   var preface = 'git '.magenta
   git.stdout.on('data', function(data){
@@ -79,9 +79,25 @@ var pull_new_code = function(callback){
     process.stderr.write(data);
   })
   git.on('exit', function(code, sig){
+    if (code === 0) { install_new_modules(callback); }
+  })
+}
+var install_new_modules = function(callback) {
+  var npm = spawn('npm', ['install']);
+  var preface = 'npm '.magenta
+  npm.stdout.on('data', function(data){
+    process.stdout.write(preface);
+    process.stderr.write(data);
+  })
+  npm.stderr.on('data', function(data){
+    process.stderr.write(preface);
+    process.stderr.write(data);
+  })
+  npm.on('exit', function(code, sig){
     if (code === 0) { callback(); }
   })
 }
+
 
 log('pid:', process.pid);
 running_server = spawn_server();
