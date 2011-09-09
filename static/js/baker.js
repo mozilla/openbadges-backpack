@@ -5,12 +5,13 @@
     var img = $('<img>').attr('src', badgeURL)
       , header1 = $('<h3>').html('I found this data')
       , header2 = $('<h3>').html('and put the assertion URL in this badge')
-      , link = $('<a>').attr('href', badgeURL)
+      , hint = $('<h4>').html('click image to download!').css({'color': '#ddd'})
+      , link = $('<a>').attr('href', badgeURL).css({'float': 'left'})
       , badgeData = $('<pre>').html(Formatter(assertion).format())
     link.append(img);
     
     resultSection.removeClass('failure').addClass('success');
-    resultSection.empty().append(header1, badgeData, header2, link);
+    resultSection.empty().append(header1, badgeData, header2, link, hint);
     resultSection.animate({opacity: 1.0});
   }
   var process_reason = function(reason) {
