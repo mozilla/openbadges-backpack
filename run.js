@@ -61,6 +61,7 @@ var webhook_server = function(port, branch) {
         return;
       }
       if (commit.ref.match('refs/heads/' + branch)) {
+        log('new deploy at ' + (new Date()).toGMTString())
         pull_new_code(function(){ running_server.kill(); })
       }
     })
