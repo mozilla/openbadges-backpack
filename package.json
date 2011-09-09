@@ -12,6 +12,7 @@
   , "connect-cookie-session" : "0.0.x"
   , "request": "2.1.x"
   , "colors": "0.5.x"
+  , "commander": "0.1.x"
   }
 , "devDependencies":
   { "vows": "0.5.x" }
