@@ -51,8 +51,7 @@ var start_server = function(app) {
   var pidfile = path.join(app.config.get('var_path'), 'server.pid');
 
   app.listen(port);
-  app.logger.info('pid: ' + pid);
-  app.logger.info('port: ' + port);
+  app.logger.info('opening server on port: ' + port);
   app.logger.info('READY PLAYER ONE')
 
   fs.unlink(pidfile, function(){
