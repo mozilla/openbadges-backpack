@@ -229,3 +229,10 @@ exports.test_badge = function(req, res) {
     }));
   }, 200);
 }
+
+exports.bad_badge = function(req, res) {
+  setTimeout(function(){
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify({'this': 'is not a badge'}));
+  }, 200);
+}

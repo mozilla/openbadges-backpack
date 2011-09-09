@@ -38,12 +38,13 @@ app.use(middleware.logRequests());
 app.use(middleware.noFrame());
 
 // Routing for the application. See `controller.js` for more information.
-app.post('/authenticate',   controller.authenticate);
-app.get('/signout',         controller.signout);
-app.get('/login',           controller.login);
-app.get('/baker',           controller.baker);
-app.get('/test/badge.json', controller.test_badge);
-app.get('/',                controller.manage);
+app.post('/authenticate',     controller.authenticate);
+app.get('/signout',           controller.signout);
+app.get('/login',             controller.login);
+app.get('/baker',             controller.baker);
+app.get('/test/badge.json',   controller.test_badge);
+app.get('/test/invalid.json', controller.bad_badge);
+app.get('/',                  controller.manage);
 
 var start_server = function(app) {  
   var port = app.config.get('internal_port');

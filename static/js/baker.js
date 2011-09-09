@@ -34,10 +34,14 @@
       , reason = $('<dt>Reason</dt><dd>' + process_reason(data.reason) + '</dd>')
     description.append(error, reason)
     
-    console.dir(data.reason);
-    
     resultSection.removeClass('success').addClass('failure');
     resultSection.empty().append(header, description);
+    
+    if (data.debug) {
+      resultSection.append($('<h3>').html("I found this data"));
+      resultSection.append($('<pre>').html(Formatter(JSON.stringify(data.debug)).format()));
+    }
+    
     resultSection.animate({opacity: 1.0});
   }
   
