@@ -46,7 +46,7 @@ app.get('/',              controller.manage);
 
 
 var start_server = function(app) {  
-  var port = app.config.get('port');
+  var port = app.config.get('internal_port');
   var pid = process.pid.toString();
   var pidfile = path.join(app.config.get('var_path'), 'server.pid');
 
