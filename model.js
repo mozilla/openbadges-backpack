@@ -57,8 +57,9 @@ UserBadge.prototype.errors = function(){
 }
 
 UserBadge.find = function(idOrSelector, callback){
-  var selector = {};
-  var type = typeof idOrSelector;
+  var selector = {}
+    , type = typeof idOrSelector;
+  callback = callback || function(){};
   if (type === 'object') {
     selector = idOrSelector
   } else if (type === 'string') {
@@ -74,7 +75,7 @@ UserBadge.find = function(idOrSelector, callback){
     selector['_id'] = new database.ObjectID(selector['_id']);
   }
   collection.find(selector, function(err, docs){
-    if (err) throw err;
+    if (err) return callback(err);
     UserBadge.buildFromDatabase(docs, callback);
   });
 }

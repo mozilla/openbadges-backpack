@@ -2,7 +2,10 @@
   <h1>No badges. Get out there and start earning some!</h1>
   <p>(By the way, <a href="http://p2pu.org">P2PU</a> would be a great place to start)</p>
 <% } else { %>
-<!-- let's show some badges -->
-
+  <h1>You have <%= badges.length %> <%= badges.length === 1 ? "badge" : "badges" %>!</h1>
+  
+  <% for (var i=0; i < badges.length; i++) { %>
+     <img src="<%= badges[i].meta.imagePath %>" width="128px">
+  <% } %>
 <% } %>
 

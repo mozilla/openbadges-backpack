@@ -1,17 +1,38 @@
 var url = require('url')
   , crypto = require('crypto')
+  , fs = require('fs')
+  , path = require('path')
   , logger = require('../lib/logging').logger
   , configuration = require('../lib/configuration')
   , baker = require('../baker')
   , remote = require('../remote')
   , model = require('../model')
 
-var _award = function(assertion, url) {
-  var badge = model.UserBadge(assertion, {pingback: url});
-  badge.save(function(err, badge){
-    if (err) logger.warn('error saving badge'), console.dir(err);
-    logger.info('saved new badge'), console.dir(badge);
-  })
+var _award = function(assertion, url, imagedata, filename) {
+  var badgeDir = configuration.get('badge_path');
+  var filepath = path.join(badgeDir, filename);
+  fs.writeFile(filepath, imagedata, function(err){
+    if (err) {
+      logger.warn('error saving badge image');
+      return console.dir(err);
+    }
+    
+    var badge = model.UserBadge(assertion, {
+      pingback: url,
+      // #TODO: don't hardcode this.
+      imagePath: '/_badges/' + filename,
+      // image: imagedata.toString('base64'),
+    });
+    
+    badge.save(function(err, badge){
+      if (err) {
+        logger.warn('error saving badge to database')
+        return console.dir(err);
+      }
+      logger.info('saved new badge');
+      return console.dir(badge);
+    })
+  });
 }
 
 exports.baker = function(req, res) {
@@ -71,10 +92,10 @@ exports.baker = function(req, res) {
       }
       
       md5sum = crypto.createHash('md5');
-      filename = md5sum.update(badge).digest('hex');
+      filename = md5sum.update(badge).digest('hex') + '.png';
       res.setHeader('Content-Type', 'image/png');
-      res.setHeader('Content-Disposition', 'attachment; filename="'+filename+'.png"');
-      if (award) _award(data, query.assertion);
+      res.setHeader('Content-Disposition', 'attachment; filename="'+filename+'"');
+      if (award) _award(data, query.assertion, badge, filename);
       return res.send(badge);
     });
   });

@@ -2,6 +2,7 @@ var request = require('request')
   , qs = require('querystring')
   , logger = require('../lib/logging').logger
   , configuration = require('../lib/configuration')
+  , model = require('../model')
 
 exports.login = function(req, res) {
   // req.flash returns an array. Pass on the whole thing to the view and
@@ -111,14 +112,15 @@ exports.signout = function(req, res) {
 };
 
 exports.manage = function(req, res) {
+  var session, user, emailRe, badges;
   if (!req.session || !req.session.authenticated) {
     return res.redirect('/login', 303);
   }
 
   // #TODO: support multiple users
-  var session = req.session
-    , user = session.authenticated[0]
-    , emailRe = /^.+?\@.+?\.*$/
+  session = req.session
+  user = session.authenticated[0]
+  emailRe = /^.+?\@.+?\.*$/
 
   // very simple sanity check
   if (!emailRe.test(user)) {
@@ -126,9 +128,11 @@ exports.manage = function(req, res) {
     req.session = {};
     return res.redirect('/login', 303);
   }
-  res.render('manage', {
-    user: user,
-    badges: []
-  });
+  model.UserBadge.find({recipient: user}, function(err, docs){
+    res.render('manage', {
+      user: user,
+      badges: docs
+    });
+  })
 };
 
