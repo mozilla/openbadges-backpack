@@ -1,9 +1,9 @@
 var express = require('express')
   , sessions = require('connect-cookie-session')
+  , form = require('connect-form')
   , secrets = require('./lib/secrets')
   , configuration = require('./lib/configuration')
   , logger = require('./lib/logging').logger
-;
 
 // `COOKIE_SECRET` is randomly generated on the first run of the server,
 // then stored to a file and looked up on restart to maintain state.
@@ -42,3 +42,7 @@ exports.noFrame = function(){
     next();
   };
 };
+
+exports.formHandler = function(){
+  return form({keepExtensions: true});
+}

@@ -36,11 +36,12 @@ app.helpers({
 // middleware used.
 app.use(express.bodyParser());
 app.use(express.cookieParser());
-app.use(express.static(path.join(__dirname, "static")));
-app.use(express.static(path.join(configuration.get('var_dir'), "badges")));
-app.use(middleware.cookieSessions());
 app.use(middleware.logRequests());
 app.use(middleware.noFrame());
+app.use(middleware.formHandler());
+app.use(middleware.cookieSessions());
+app.use(express.static(path.join(__dirname, "static")));
+app.use(express.static(path.join(configuration.get('var_dir'), "badges")));
 
 // Routing for the application.
 app.get('/baker',             _('baker.baker'));
