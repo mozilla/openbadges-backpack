@@ -1,7 +1,7 @@
 var vows = require('./setup')
   , assert = require('assert')
   , fixture = require('./utils').fixture
-  , UserBadge = require('../model').UserBadge
+  , UserBadge = require('../models/userbadge')
 
 vows.describe('Badge model').addBatch({
   'An empty badge': {

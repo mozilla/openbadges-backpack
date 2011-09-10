@@ -1,10 +1,10 @@
-var database = require('./lib/database'),
-    validator = require('./lib/validator');
+var database = require('../lib/database'),
+    validator = require('../lib/validator');
 
 // where to store the badges
 var collection = database.collection('badges');
 
-var UserBadge = exports.UserBadge = function(data, meta, objectid){
+var UserBadge = module.exports = function(data, meta, objectid){
   if (!(this instanceof UserBadge)) return new UserBadge(data, meta, objectid);
   this.data = data || {};
   this.meta = meta || {};

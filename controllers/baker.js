@@ -6,7 +6,6 @@ var url = require('url')
   , configuration = require('../lib/configuration')
   , baker = require('../baker')
   , remote = require('../remote')
-  , model = require('../model')
   , _award = require('../lib/award')
 
 exports.baker = function(req, res) {

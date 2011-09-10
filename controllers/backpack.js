@@ -3,11 +3,10 @@ var request = require('request')
   , fs = require('fs')
   , logger = require('../lib/logging').logger
   , configuration = require('../lib/configuration')
-  , model = require('../model')
   , baker = require('../baker')
   , remote = require('../remote')
   , _award = require('../lib/award')
-
+  , UserBadge = require('../models/userbadge')
 
 var getUsers = function(req) {
   var session, user, emailRe;
