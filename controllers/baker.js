@@ -69,7 +69,7 @@ exports.baker = function(req, res) {
       filename = md5sum.update(badge).digest('hex') + '.png';
       res.setHeader('Content-Type', 'image/png');
       res.setHeader('Content-Disposition', 'attachment; filename="'+filename+'"');
-      if (award) _award(data, query.assertion, badge, filename);
+      if (award) _award(data, query.assertion, badge);
       return res.send(badge);
     });
   });
