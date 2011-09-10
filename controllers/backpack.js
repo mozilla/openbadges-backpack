@@ -141,6 +141,7 @@ exports.manage = function(req, res) {
   if (!user) return res.redirect('/login', 303);
   
   Badge.find({recipient: user}, function(err, docs){
+    console.dir(docs);
     res.render('manage', {
       user: user,
       badges: docs,
@@ -186,7 +187,6 @@ exports.upload = function(req, res) {
         }
         _award(assertion, assertionURL, imagedata, function(err, badge) {
           if (err) return redirect('There was a problem saving your badge!');
-          console.dir(badge);
           return redirect();
         });
       })
