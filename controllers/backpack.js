@@ -3,6 +3,9 @@ var request = require('request')
   , logger = require('../lib/logging').logger
   , configuration = require('../lib/configuration')
   , model = require('../model')
+  , baker = require('../baker')
+  , remote = require('../remote')
+  , _award = require('../lib/award')
 
 exports.login = function(req, res) {
   // req.flash returns an array. Pass on the whole thing to the view and
@@ -136,3 +139,37 @@ exports.manage = function(req, res) {
   })
 };
 
+exports.upload = function(req, res) {
+  var redirect = function(err, msg) {
+    if (err) req.flash('upload_error', 'SNAP! There was a problem uploading your badge.');
+    return res.redirect('/', 303);
+  }
+  req.form.complete(function(err, fields, files) {
+    var filedata, assertionURL;
+    if (err) return redirect('SNAP! There was a problem uploading your badge.');
+    filedata = files['userBadge']
+    if (filedata.size > (1024 * 256)) return redirect('Maximum badge size is 256kb! Contact your issuer.');
+    
+    fs.readFile(filedata['path'], function(err, imagedata){
+      if (err) return redirect('SNAP! There was a problem reading uploaded badge.');
+      try {
+        assertionURL = baker.read(imagedata)
+      } catch (e) {
+        return redirect('Badge is malformed! Contact your issuer.');
+      }
+      remote.assertion(assertionURL, function(err, assertion) {
+        if (err.status !== 'success') {
+          logger.warn('failed grabbing assertion for URL '+ assertionURL);
+          logger.warn('reason: '+ JSON.stringify(err));
+          return redirect('There was a problem validating the badge! Contact your issuer.');
+        }
+        if (assertion.recipient !== user) {
+          return redirect('This badge was not issued to you! Contact your issuer.');
+        }
+        _award(
+        console.dir(data);
+      })
+    res.send('okaaaaaay');
+    })
+  });
+}
