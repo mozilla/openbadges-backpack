@@ -7,15 +7,9 @@ var urlre = /(^(https?):\/\/[^\s\/$.?#].[^\s]*$)|(^\/\S+$)/
   , emailre = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
   , originre = /^(https?):\/\/[^\s\/$.?#].[^\s\/]*$/
   , versionre = /^v?\d+\.\d+\.\d+$/
-  
-var maxlen = function(len){
-  return function(v){ return (v||'').length < len }
-}
 
-var slashTrim = function(v){
-  return v.replace(/\/*$/, '');
-}
-
+var maxlen = function(len){ return function(v){ return (v||'').length < len } }
+var slashTrim = function(v){ return v.replace(/\/*$/, ''); }
 var isodate = function(){}
 isodate.set = function(input) {
   var expression = /\d{4}-\d{2}-\d{2}/;
