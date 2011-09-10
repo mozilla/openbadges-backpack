@@ -5,6 +5,7 @@ var database = require('./lib/database'),
 var collection = database.collection('badges');
 
 var UserBadge = exports.UserBadge = function(data, meta, objectid){
+  if (!(this instanceof UserBadge)) return new UserBadge(data, meta, objectid);
   this.data = data || {};
   this.meta = meta || {};
   this.id = objectid;
@@ -33,12 +34,12 @@ UserBadge.prototype.save = function(callback){
   // really hacky, should clone object
   this.data.meta = this.meta;
 
-  // should I pass error or throw it? this kind might be unexpected.
   collection.upsert(selector, this.data, function(err){
-    if (err) throw err;
+    if (err) return callback(err);
+    
     // quite annoying that I have to find after I upsert.
     collection.find(selector, function(err, docs){
-      if (err) throw err;
+      if (err) return callback(err);
       if (!docs) throw "could not find after upsert"
       self.id = docs.pop()['_id'];
       callback(null, self);
