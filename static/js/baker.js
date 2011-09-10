@@ -73,7 +73,7 @@
   
   $('#bake-form').bind('submit', function(e){
     var assertionURL = assertionField.val()
-      , badgeURL = '/baker?assertion='+assertionURL
+      , badgeURL = '/baker?assertion='+encodeURIComponent(assertionURL)
       , self = $(this)
     e.preventDefault();
     if (!assertionURL || self.data('submitting')) return false;

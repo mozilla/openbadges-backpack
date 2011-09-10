@@ -1,17 +1,21 @@
 var remote = require('../remote')
   , configuration = require('../lib/configuration')
+
 exports.issuer = function(req, res) {
   res.render('issuer', {
     login: false,
     title: 'Test Issuer'
   });
 }
+exports.award = function(req, res) {
+  res.send(JSON.stringify(req.body))
+}
 
 exports.test_badge = function(req, res) {
   var protocol = configuration.get('protocol') || 'http'
     , port = configuration.get('external_port') || ''
   
-  var title = req.query.title || 'Open Source Contributor'
+  var title = req.query.title || 'Test Badge'
     , image = req.query.image || '/images/test-badge.png'
     , desc = req.query.desc || 'For rocking in the free world'
     , recp = req.query.recp || 'me@example.com'

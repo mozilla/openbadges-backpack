@@ -37,14 +37,19 @@ app.helpers({
 app.use(express.bodyParser());
 app.use(express.cookieParser());
 app.use(express.static(path.join(__dirname, "static")));
+app.use(express.static(path.join(configuration.get('var_dir'), "badges")));
 app.use(middleware.cookieSessions());
 app.use(middleware.logRequests());
 app.use(middleware.noFrame());
 
 // Routing for the application.
 app.get('/baker',             _('baker.baker'));
+
+app.get('/test',              _('test.issuer'));
+app.post('/test/award',       _('test.award'));
 app.get('/test/badge.json',   _('test.test_badge'));
 app.get('/test/invalid.json', _('test.bad_badge'));
+
 app.get('/login',             _('backpack.login'));
 app.post('/authenticate',     _('backpack.authenticate'));
 app.get('/signout',           _('backpack.signout'));

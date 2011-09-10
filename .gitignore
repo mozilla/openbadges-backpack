@@ -13,3 +13,4 @@
 
 /static/_badges*
 !/static/.gitkeep
+/test.json
