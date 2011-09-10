@@ -7,33 +7,7 @@ var url = require('url')
   , baker = require('../baker')
   , remote = require('../remote')
   , model = require('../model')
-
-var _award = function(assertion, url, imagedata, filename) {
-  var badgeDir = configuration.get('badge_path');
-  var filepath = path.join(badgeDir, filename);
-  fs.writeFile(filepath, imagedata, function(err){
-    if (err) {
-      logger.warn('error saving badge image');
-      return console.dir(err);
-    }
-    
-    var badge = model.UserBadge(assertion, {
-      pingback: url,
-      // #TODO: don't hardcode this.
-      imagePath: '/_badges/' + filename,
-      // image: imagedata.toString('base64'),
-    });
-    
-    badge.save(function(err, badge){
-      if (err) {
-        logger.warn('error saving badge to database')
-        return console.dir(err);
-      }
-      logger.info('saved new badge');
-      return console.dir(badge);
-    })
-  });
-}
+  , _award = require('../lib/award')
 
 exports.baker = function(req, res) {
   var query = req.query || {}
