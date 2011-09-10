@@ -6,7 +6,7 @@ var request = require('request')
   , baker = require('../baker')
   , remote = require('../remote')
   , _award = require('../lib/award')
-  , UserBadge = require('../models/userbadge')
+  , Badge = require('../models/badge')
 
 var getUsers = function(req) {
   var session, user, emailRe;
@@ -140,7 +140,7 @@ exports.manage = function(req, res) {
   var user = getUsers(req);
   if (!user) return res.redirect('/login', 303);
   
-  UserBadge.find({recipient: user}, function(err, docs){
+  Badge.find({recipient: user}, function(err, docs){
     res.render('manage', {
       user: user,
       badges: docs,

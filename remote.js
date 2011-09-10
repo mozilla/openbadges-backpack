@@ -56,7 +56,7 @@ exports.badgeImage = function(url, callback) {
 // computer-readable error status along with a descriptive, user-friendly
 // error message.
 exports.assertion = function(url, callback) {
-  var assertion, validation, status;
+  var assertion, validation, status, badge;
   getRemoteData({url: url}, 'application/json', function(err, data) {
     if (err) return callback(err);
     try {
@@ -64,14 +64,16 @@ exports.assertion = function(url, callback) {
     } catch(e) {
       return callback(_error('parse', 'could not parse json: ' + e))
     }
-    validation = validator.validate(assertion);
-    if (validation.status === 'success') {
-      return callback({status: 'success'}, assertion);
-    } else {
-      status = _error('validation', validation.errors)
-      status.debug = assertion
-      return callback(status);
-    }
-    callback(err, data);
+    badge = new Badge(assertion);
+    badge.validate(function(err) {
+      if (!err) {
+        return callback({status: 'success'}, badge);
+      } else {
+        status = _error('validation', err.errors)
+        status.debug = assertion
+        return callback(status);
+      }
+      callback(err, data);
+    })
   });
 }
