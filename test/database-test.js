@@ -1,6 +1,6 @@
 var vows = require('./setup')
   , assert = require('assert')
-  , db = require('../database')
+  , db = require('../lib/database')
 
 // operations on the database will happen in order.
 var collection = db.collection('db_test');

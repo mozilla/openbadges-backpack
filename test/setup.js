@@ -12,7 +12,7 @@ if (oldDb == testDb && oldEnv !== 'test') {
 }
 
 // wipe out collection from test database
-var database = require('../database')
+var database = require('../lib/database')
 if (!(database.using === testDb)) throw "something went wrong, not using test db".red;
 database.client.command('dropDatabase', function(){});
 module.exports = require('vows');

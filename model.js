@@ -1,4 +1,4 @@
-var database = require('./database'),
+var database = require('./lib/database'),
     validator = require('./lib/validator');
 
 // where to store the badges
