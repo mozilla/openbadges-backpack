@@ -51,14 +51,14 @@ app.get('/signout',           _('backpack.signout'));
 app.get('/',                  _('backpack.manage'));
 
 var start_server = function(app) {  
-  var port = app.config.get('internal_port');
-  var pid = process.pid.toString();
-  var pidfile = path.join(app.config.get('var_path'), 'server.pid');
-
+  var port = app.config.get('internal_port')
+    , pid = process.pid.toString()
+    , pidfile = path.join(app.config.get('var_path'), 'server.pid')
+  
   app.listen(port);
   app.logger.info('opening server on port: ' + port);
   app.logger.info('READY PLAYER ONE')
-
+  
   fs.unlink(pidfile, function(){
     fs.writeFile(pidfile, pid, function(err){
       if (err) throw Error('could not make pidfile: ' + err)
