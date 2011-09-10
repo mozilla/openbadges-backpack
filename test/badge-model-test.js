@@ -1,7 +1,7 @@
 var vows = require('./setup')
   , assert = require('assert')
-  , validate = require('../lib/validator').validate
   , fixture = require('./utils').fixture
+  , Badge = require('../models/badge')
   , genstring = require('./utils').genstring
 
 var BAD_EMAILS = ['lkajd', 'skj@asdk', '@.com', '909090', '____!@']

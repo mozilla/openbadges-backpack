@@ -10,10 +10,10 @@ var VALID_BADGE = function(){ return {
     image: '/badge.png',
     criteria: 'http://example.com/criteria.html',
     issuer: {
+      origin: 'http://p2pu.org',
       name: 'p2pu',
       org: 'school of webcraft',
       contact: 'admin@p2pu.org',
-      url: 'http://p2pu.org/schools/sow'
     }
   }
 }}
