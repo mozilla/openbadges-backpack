@@ -7,6 +7,28 @@ var request = require('request')
   , remote = require('../remote')
   , _award = require('../lib/award')
 
+
+var getUsers = function(req) {
+  var session, user, emailRe;
+  if (!req.session || !req.session.authenticated) {
+    return false;
+  }
+  
+  // #TODO: support multiple users
+  session = req.session
+  user = session.authenticated[0]
+  emailRe = /^.+?\@.+?\.*$/
+
+  // very simple sanity check
+  if (!emailRe.test(user)) {
+    logger.warn('session.authenticate does not contain valid user: ' + user);
+    req.session = {};
+    return false;
+  }
+  
+  return user;
+}
+
 exports.login = function(req, res) {
   // req.flash returns an array. Pass on the whole thing to the view and
   // decide there if we want to display all of them or just the first one.
@@ -115,22 +137,9 @@ exports.signout = function(req, res) {
 };
 
 exports.manage = function(req, res) {
-  var session, user, emailRe, badges;
-  if (!req.session || !req.session.authenticated) {
-    return res.redirect('/login', 303);
-  }
-
-  // #TODO: support multiple users
-  session = req.session
-  user = session.authenticated[0]
-  emailRe = /^.+?\@.+?\.*$/
-
-  // very simple sanity check
-  if (!emailRe.test(user)) {
-    logger.warn('session.authenticate does not contain valid user: ' + user);
-    req.session = {};
-    return res.redirect('/login', 303);
-  }
+  var user = getUsers(req);
+  if (!user) return res.redirect('/login', 303);
+  
   model.UserBadge.find({recipient: user}, function(err, docs){
     res.render('manage', {
       user: user,
