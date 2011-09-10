@@ -119,4 +119,4 @@ process.on('SIGINT', function () {
 })
 
 // reduce restart count.
-setInterval(function(){ if (restarts > 0) restarts--; }, 1000);
+setInterval(function(){ if (restarts > 0) restarts--; }, 5000);
