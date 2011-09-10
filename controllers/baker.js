@@ -4,16 +4,21 @@ var url = require('url')
   , configuration = require('../lib/configuration')
   , baker = require('../baker')
   , remote = require('../remote')
+  , model = require('../model')
+
+var _award = function(assertion, url) {
+  var badge = model.UserBadge(assertion, {pingback: url});
+  badge.save(function(err, badge){
+    if (err) logger.warn('error saving badge'), console.dir(err);
+    logger.info('saved new badge'), console.dir(badge);
+  })
+}
 
 exports.baker = function(req, res) {
   var query = req.query || {}
-    , issuer
-    , image
-    , imageURL
-    , badge
-    , md5sum
-    , filename
-    , accepts
+    , issuer  , image  , imageURL
+    , badge   , md5sum , filename
+    , accepts , award
 
   if (!query.assertion) {
     return res.render('baker', {
@@ -23,6 +28,7 @@ exports.baker = function(req, res) {
   }
   
   accepts = req.headers['accept'] || '';
+  award = req.query.award === 'true';
   remote.assertion(query.assertion, function(err, data) {
     if (err.status !== 'success') {
       logger.warn('failed grabbing assertion for URL '+ query.assertion);
@@ -58,14 +64,17 @@ exports.baker = function(req, res) {
           reason: 'could not write data to PNG: ' + e
         }), 400);
       }
+      
       if (accepts.match('application/json')) {
         res.setHeader('Content-Type', 'application/json');
         return res.send(JSON.stringify({'status':'success', 'assertion': JSON.stringify(data) }));
       }
+      
       md5sum = crypto.createHash('md5');
       filename = md5sum.update(badge).digest('hex');
       res.setHeader('Content-Type', 'image/png');
       res.setHeader('Content-Disposition', 'attachment; filename="'+filename+'.png"');
+      if (award) _award(data, query.assertion);
       return res.send(badge);
     });
   });

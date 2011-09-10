@@ -1,5 +1,10 @@
-var remote = require('../remote')
+var qs = require('querystring')
   , configuration = require('../lib/configuration')
+  , request = require('request')
+
+var protocol = configuration.get('protocol') || 'http'
+  , port = configuration.get('external_port') || ''
+  , ORIGIN = protocol + '://' + configuration.get('hostname') + (port? ':' + port : '');
 
 exports.issuer = function(req, res) {
   res.render('issuer', {
@@ -8,13 +13,14 @@ exports.issuer = function(req, res) {
   });
 }
 exports.award = function(req, res) {
-  res.send(JSON.stringify(req.body))
+  var assertionURL = encodeURIComponent([ORIGIN + '/test/badge.json', qs.stringify(req.body)].join('?'))
+    , bakeURL = ORIGIN + '/baker?award=true&assertion=' + assertionURL;
+  request({url: bakeURL, encoding:'binary'},  function(err, resp, body) {
+    res.send(Buffer(body, 'binary'), {'content-type': 'image/png'});
+  });
 }
 
 exports.test_badge = function(req, res) {
-  var protocol = configuration.get('protocol') || 'http'
-    , port = configuration.get('external_port') || ''
-  
   var title = req.query.title || 'Test Badge'
     , image = req.query.image || '/images/test-badge.png'
     , desc = req.query.desc || 'For rocking in the free world'
@@ -35,7 +41,7 @@ exports.test_badge = function(req, res) {
         criteria: '/test/criteria',
         issuer: {
           name: 'Open Badges Test',
-          origin: protocol + '://' + configuration.get('hostname') + (port? ':' + port : '')
+          origin: ORIGIN
         }
       }
     }));
