@@ -19,7 +19,7 @@
     if (reason && typeof reason === "object") {
       html += '<ul>';
       for (field in reason) {
-        html += '<li><strong>'+ field +'</strong>: '+ reason[field] +'</li>';
+        html += '<li><strong>'+ field +'</strong>: '+ reason[field].type +'</li>';
       }
       html += '</ul>';
     }
