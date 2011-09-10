@@ -11,18 +11,18 @@ var urlre = /(^(https?):\/\/[^\s\/$.?#].[^\s]*$)|(^\/\S+$)/
 var maxlen = function(len){ return function(v){ return (v||'').length < len } }
 var slashTrim = function(v){ return v.replace(/\/*$/, ''); }
 var isodate = function(){}
+isodate.re = /\d{4}-\d{2}-\d{2}/;
 isodate.set = function(input) {
-  var expression = /\d{4}-\d{2}-\d{2}/;
-  if (!expression.test(input)) return false;
+  if (!isodate.re.test(input)) return false;
   var pieces = input.split('-')
     , year = parseInt(pieces[0], 10)
     , month = parseInt(pieces[1], 10)
     , day = parseInt(pieces[2], 10)
   if (month > 12 || month < 1) return false;
   if (day > 31 || day < 1) return false;
-  return (new Date(year, (month-1), day)).getTime();
+  return input;
 };
-isodate.validate = function(v) { return v === null || v > 0; }
+isodate.validate = function(v) { return v === null || v.match(isodate.re) ; }
 
 var Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId

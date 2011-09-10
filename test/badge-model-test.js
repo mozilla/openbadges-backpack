@@ -57,9 +57,19 @@ vows.describe('Badge Validator').addBatch({
     'with bad badge.issuer.url': generateErrorTests('evidence', 'regexp', BAD_URLS)
   },
   'Valid badge assertion' : {
+    topic: function() { return new Badge(fixture()); },
     'without issued_on': {
-    topic: function() { new Badge(fixture({issued_on: null})).validate(this.callback); },
+      topic: function(badge) { badge.issued_on = null; badge.validate(this.callback) },
       'should not have errors': function(err, succ){
+        assert.equal(err, null)
+      }
+    },
+    'can validate multiple times': {
+      topic: function(badge) {
+        var self = this;
+        badge.validate(function(err){ new Badge(badge).validate(self.callback) })
+      },
+      'without errors': function(err, succ){
         assert.equal(err, null)
       }
     }
