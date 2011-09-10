@@ -140,7 +140,7 @@ exports.manage = function(req, res) {
   var user = getUsers(req);
   if (!user) return res.redirect('/login', 303);
   
-  model.UserBadge.find({recipient: user}, function(err, docs){
+  UserBadge.find({recipient: user}, function(err, docs){
     res.render('manage', {
       user: user,
       badges: docs,
