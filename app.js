@@ -7,7 +7,12 @@ var express = require('express')
   , controller = require('./controller')
   , logger = require('./lib/logging').logger
   , configuration = require('./lib/configuration')
-;
+
+// helper method for doing controller routing.
+var _ = function(cPath) {
+  var ref = cPath.split('.');
+  return require('./controllers/' + ref[0])[ref[1]];
+}
 
 // Create the app and set it up to use `ejs` templates which are easier to
 // maintain than the default `jade` templates.
@@ -37,14 +42,14 @@ app.use(middleware.cookieSessions());
 app.use(middleware.logRequests());
 app.use(middleware.noFrame());
 
-// Routing for the application. See `controller.js` for more information.
-app.post('/authenticate',     controller.authenticate);
-app.get('/signout',           controller.signout);
-app.get('/login',             controller.login);
-app.get('/baker',             controller.baker);
-app.get('/test/badge.json',   controller.test_badge);
-app.get('/test/invalid.json', controller.bad_badge);
-app.get('/',                  controller.manage);
+// Routing for the application.
+app.get('/baker',             _('baker.baker'));
+app.get('/test/badge.json',   _('test.test_badge'));
+app.get('/test/invalid.json', _('test.bad_badge'));
+app.get('/login',             _('backpack.login'));
+app.post('/authenticate',     _('backpack.authenticate'));
+app.get('/signout',           _('backpack.signout'));
+app.get('/',                  _('backpack.manage'));
 
 var start_server = function(app) {  
   var port = app.config.get('internal_port');
