@@ -4,7 +4,6 @@ var express = require('express')
   , fs = require('fs')
   , path = require('path')
   , middleware = require('./middleware')
-  , controller = require('./controller')
   , logger = require('./lib/logging').logger
   , configuration = require('./lib/configuration')
 
