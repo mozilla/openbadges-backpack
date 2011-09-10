@@ -54,6 +54,7 @@ app.get('/test/invalid.json', _('test.bad_badge'));
 app.get('/login',             _('backpack.login'));
 app.post('/authenticate',     _('backpack.authenticate'));
 app.get('/signout',           _('backpack.signout'));
+app.post('/badge-upload',     _('backpack.upload'));
 app.get('/',                  _('backpack.manage'));
 
 var start_server = function(app) {  

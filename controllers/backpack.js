@@ -1,5 +1,6 @@
 var request = require('request')
   , qs = require('querystring')
+  , fs = require('fs')
   , logger = require('../lib/logging').logger
   , configuration = require('../lib/configuration')
   , model = require('../model')
@@ -143,20 +144,29 @@ exports.manage = function(req, res) {
   model.UserBadge.find({recipient: user}, function(err, docs){
     res.render('manage', {
       user: user,
-      badges: docs
+      badges: docs,
+      error: req.flash('upload_error')
     });
   })
 };
 
 exports.upload = function(req, res) {
-  var redirect = function(err, msg) {
-    if (err) req.flash('upload_error', 'SNAP! There was a problem uploading your badge.');
+  var user = getUsers(req);
+  if (!user) return res.redirect('/login', 303);
+
+  var redirect = function(err) {
+    if (err) req.flash('upload_error', err);
     return res.redirect('/', 303);
   }
+  
   req.form.complete(function(err, fields, files) {
     var filedata, assertionURL;
-    if (err) return redirect('SNAP! There was a problem uploading your badge.');
-    filedata = files['userBadge']
+    if (err) {
+      logger.warn(err);
+      return redirect('SNAP! There was a problem uploading your badge.');
+    }
+    filedata = files['userBadge'];
+    if (!filedata) return redirect();
     if (filedata.size > (1024 * 256)) return redirect('Maximum badge size is 256kb! Contact your issuer.');
     
     fs.readFile(filedata['path'], function(err, imagedata){
@@ -175,10 +185,12 @@ exports.upload = function(req, res) {
         if (assertion.recipient !== user) {
           return redirect('This badge was not issued to you! Contact your issuer.');
         }
-        _award(
-        console.dir(data);
+        _award(assertion, assertionURL, imagedata, function(err, badge) {
+          if (err) return redirect('There was a problem saving your badge!');
+          console.dir(badge);
+          return redirect();
+        });
       })
-    res.send('okaaaaaay');
     })
   });
 }

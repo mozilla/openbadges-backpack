@@ -1,3 +1,10 @@
+<% if (error.length > 0) { %>
+   <div class='alert-message error js-alert-container'>
+     <a class='close js-alert-close' href='#'>x</a>
+     <p><%= error %></p>
+   </div>
+<% } %>
+
 <% if (!badges || badges.length === 0) { %>
   <h1>No badges. Get out there and start earning some!</h1>
   <p>(By the way, <a href="http://p2pu.org">P2PU</a> would be a great place to start)</p>
@@ -8,4 +15,16 @@
      <img src="<%= badges[i].meta.imagePath %>" width="128px">
   <% } %>
 <% } %>
+
+<h2>Upload Badges</h2>
+<p>If you have badges you've been awarded, you can upload them manually</p>
+
+<form action='badge-upload' method='post' enctype='multipart/form-data'>
+  <fieldset>
+    <div class='input'>
+      <input type='file' name='userBadge' id='userBadge' accept='image/png'>
+      <input class='btn primary' type='submit' value='Upload'>
+    </div>
+  </fieldset>
+</form>
 
