@@ -1,6 +1,6 @@
 var request = require('request')
-  , validator = require('./lib/validator')
   , metapng = require('metapng')
+  , Badge = require('./models/badge')
 
 var MAX_RESPONSE_SIZE = 1024*256;
 function _error(type, msg) {

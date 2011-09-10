@@ -1,5 +1,4 @@
 var mongoose = require('mongoose')
-  , validator = require('../lib/validator')
   , conf = require('../lib/configuration').get('database')
 
 mongoose.connect(conf.host, conf.name, conf.port);
