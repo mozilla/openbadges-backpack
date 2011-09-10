@@ -33,16 +33,17 @@ UserBadge.prototype.save = function(callback){
 
   // really hacky, should clone object
   this.data.meta = this.meta;
-
+  
   collection.upsert(selector, this.data, function(err){
     if (err) return callback(err);
     
     // quite annoying that I have to find after I upsert.
     collection.find(selector, function(err, docs){
+      
       if (err) return callback(err);
-      if (!docs) throw "could not find after upsert"
+      if (!docs) return callback(new Error("could not find after upsert"))
       self.id = docs.pop()['_id'];
-      callback(null, self);
+      return callback(null, self);
     });
   })
 
