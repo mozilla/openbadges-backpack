@@ -7,7 +7,7 @@
   , "express-csrf": "0.3.x"
   , "uglify-js": "1.0.x"
   , "winston": "0.3.x"
-  , "mongoose": "1.8.x"
+  , "mongodb": "0.9.x"
   , "ejs": "0.4.x"
   , "connect-cookie-session" : "0.0.x"
   , "request": "2.1.x"
