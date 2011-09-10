@@ -18,7 +18,6 @@ var slashTrim = function(v){
 
 var isodate = function(){}
 isodate.set = function(input) {
-  console.dir(input);
   var expression = /\d{4}-\d{2}-\d{2}/;
   if (!expression.test(input)) return false;
   var pieces = input.split('-')
