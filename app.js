@@ -45,17 +45,17 @@ app.use(express.static(path.join(__dirname, "static")));
 app.use(express.static(path.join(configuration.get('var_dir'), "badges")));
 
 router(app)
- .get('/baker', 'baker.baker')
- .get('/test',              'test.issuer')
- .get('/test/award',        'test.award')
- .post('/test/badge.json',  'test.test_badge')
- .get('/test/invalid.json', 'test.bad_badge')
- .get('/backpack/login',         'backpack.login')
- .post('/backpack/authenticate', 'backpack.authenticate')
- .get('/backpack/signout',       'backpack.signout')
- .post('/backpack/badge-upload', 'backpack.upload')
- .get('/backpack',               'backpack.manage')
- .get('/',                       'backpack.manage')
+  .get('/baker', 'baker.baker')
+  .get('/test',              'test.issuer')
+  .post('/test/award',        'test.award')
+  .get('/test/badge.json',  'test.test_badge')
+  .get('/test/invalid.json', 'test.bad_badge')
+  .get('/backpack/login',         'backpack.login')
+  .post('/backpack/authenticate', 'backpack.authenticate')
+  .get('/backpack/signout',       'backpack.signout')
+  .post('/backpack/badge-upload', 'backpack.upload')
+  .get('/backpack',               'backpack.manage')
+  .get('/',                       'backpack.manage')
 
 var start_server = function(app) {  
   var port = app.config.get('internal_port')
