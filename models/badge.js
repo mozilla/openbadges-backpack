@@ -29,9 +29,9 @@ var Schema = mongoose.Schema
 
 var Badge = new Schema(
   { meta:
-    { pingback  : String
-    , publicKey : String
-    , imagePath : String
+    { pingback  : { type: String, unique: true }
+    , publicKey : { type: String, unique: true }
+    , imagePath : { type: String }
     }
   , recipient : { type: String, required: true, match: emailre, index: true }
   , evidence  : { type: String, match: urlre }
@@ -52,25 +52,4 @@ var Badge = new Schema(
     }
   }
 )
-
 var BadgeModel = module.exports = mongoose.model('Badge', Badge);
-
-// var instance = new BadgeModel({
-//   recipient: 'bimmy@example.com',
-//   evidence: '/bimmy-badge.json',
-//   expires: '2040-08-13',
-//   issued_on: '2011-08-23',
-//   badge: {
-//     version: 'v0.5.0',
-//     name: 'Open Source Contributor',
-//     description: 'For rocking in the free world',
-//     image: '/badge.png',
-//     criteria: 'http://example.com/criteria.html',
-//     issuer: {
-//       origin: 'http://p2pu.org',
-//       name: 'p2pu',
-//       org: 'school of webcraft',
-//       contact: 'admin@p2pu.org'
-//     }
-//   }
-// });
