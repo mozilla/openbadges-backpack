@@ -47,8 +47,10 @@ var Badge = new Schema(
     { pingback  : { type: String }
     , publicKey : { type: String }
     , imagePath : { type: String }
+    , imageData : { type: String } //expected base64
     , accepted : { type: Boolean }
     , rejected : { type: Boolean }
+    , groups : { type: Array, default: [] }
     }
   , recipient : { type: String, required: true, match: emailre, index: true }
   , evidence  : { type: String, match: urlre, get: fqUrl}
