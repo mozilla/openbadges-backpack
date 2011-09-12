@@ -58,10 +58,8 @@ exports.csrf.token = function(req, res) {
 exports.csrf.check = function() {
   return function(req, res, next) {
     csrf = null; // Clear csrf for next request
-    if (req.body && req.method.toLowerCase() === 'post') {
-      if (!('csrf' in req.body && req.body.csrf === req.session.csrf)) {
-        console.log(csrf);
-        console.log(req.session.csrf);
+    if (req.method.toLowerCase() === 'post') {
+      if (!(req.body && 'csrf' in req.body && req.body.csrf === req.session.csrf)) {
         return res.send("Cross-site request forgery attempt discovered!", 403);
       }
     }
