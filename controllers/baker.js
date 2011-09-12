@@ -4,8 +4,8 @@ var url = require('url')
   , path = require('path')
   , logger = require('../lib/logging').logger
   , configuration = require('../lib/configuration')
-  , baker = require('../baker')
-  , remote = require('../remote')
+  , baker = require('../lib/baker')
+  , remote = require('../lib/remote')
   , _award = require('../lib/award')
 
 exports.baker = function(req, res) {

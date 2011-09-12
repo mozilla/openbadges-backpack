@@ -1,10 +1,10 @@
 var vows = require('./setup')
   , assert = require('assert')
-  , issuer = require('./issuer')
-  , remote = require('../remote')
-  , configuration = require('../lib/configuration')
   , color = require('colors')
   , metapng = require('metapng')
+  , issuer = require('./issuer')
+  , remote = require('../lib/remote')
+  , configuration = require('../lib/configuration')
   
 var serv = issuer.complex();
 vows.describe('Handling remote servers').addBatch({

@@ -1,6 +1,6 @@
 var vows = require('./setup')
   , assert = require('assert')
-  , baker = require('../baker')
+  , baker = require('../lib/baker')
   , path = require('path')
 
 var PNGFILE = path.join(__dirname, 'no-badge-data.png');
