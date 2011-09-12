@@ -79,6 +79,25 @@ vows.describe('Badge Validator').addBatch({
     },
     'does not change fully qualified members': function(badge){
       assert.equal(badge.criteria, badge._doc.criteria);
+    },
+    'can be added to groups': {
+      topic: function(badge){
+        badge.group('Facebook');
+        badge.group('Facebook');
+        badge.group('Linked In');
+        return badge;
+      },
+      'and retrieve group from meta' : function(badge) {
+        assert.ok(badge.inGroup('Facebook'));
+      },
+      'without duplicating groups': function(badge) {
+        assert.length(badge.meta.groups.filter(function(v){ return v === 'Facebook' }), 1)
+      },
+      'and be removed from groups': function(badge) {
+        badge.degroup('Facebook');
+        assert.length(badge.meta.groups, 1);
+        assert.include(badge.meta.groups, 'Linked In');
+      }
     }
   }
 }).export(module);
