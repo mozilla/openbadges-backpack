@@ -6,6 +6,7 @@ var request = require('request')
   , baker = require('../baker')
   , remote = require('../remote')
   , _award = require('../lib/award')
+  , reverse = require('../lib/router').reverse
   , Badge = require('../models/badge')
 
 var getUsers = function(req) {
@@ -42,7 +43,7 @@ exports.authenticate = function(req, res) {
   // We could return 403 or redirect to login page. It's more polite
   // to just redirect to the login page.
   if (!req.body['assertion']) {
-    return res.redirect('/login', 303);
+    return res.redirect(reverse('backpack.login'), 303);
   }
 
   // Setup the options and the post body for the verification request.
@@ -120,7 +121,7 @@ exports.authenticate = function(req, res) {
     // and redirect to the front page.
     if (!req.session) res.session = {}
     req.session.authenticated = [assertion.email]
-    return res.redirect('/', 303);
+    return res.redirect(reverse('backpack.manage', 303));
   })
 };
 
@@ -131,12 +132,12 @@ exports.signout = function(req, res) {
       if (k !== 'csrf') delete session[k];
     });
   }
-  res.redirect('/login', 303);
+  res.redirect(reverse('backpack.login'), 303);
 };
 
 exports.manage = function(req, res) {
   var user = getUsers(req);
-  if (!user) return res.redirect('/login', 303);
+  if (!user) return res.redirect(reverse('backpack.login'), 303);
   
   Badge.find({recipient: user}, function(err, docs){
     res.render('manage', {
@@ -147,13 +148,20 @@ exports.manage = function(req, res) {
   })
 };
 
+exports.apiAccept = function(req, res) {
+  res.send('accepting');
+}
+exports.apiReject = function(req,res) {
+  res.send('rejecting');
+}
+
 exports.upload = function(req, res) {
   var user = getUsers(req);
-  if (!user) return res.redirect('/login', 303);
+  if (!user) return res.redirect(reverse('backpack.login'), 303);
 
   var redirect = function(err) {
     if (err) req.flash('upload_error', err);
-    return res.redirect('/', 303);
+    return res.redirect(reverse('backpack.manage'), 303);
   }
   
   req.form.complete(function(err, fields, files) {
