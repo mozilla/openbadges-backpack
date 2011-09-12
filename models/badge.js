@@ -1,6 +1,6 @@
 var mongoose = require('mongoose')
   , conf = require('../lib/configuration').get('database')
-
+  , url = require('url')
 mongoose.connect(conf.host, conf.name, conf.port);
 
 var urlre = /(^(https?):\/\/[^\s\/$.?#].[^\s]*$)|(^\/\S+$)/
@@ -11,6 +11,21 @@ var urlre = /(^(https?):\/\/[^\s\/$.?#].[^\s]*$)|(^\/\S+$)/
 var maxlen = function(len){ return function(v){ return (v||'').length < len } }
 var slashTrim = function(v){ return v.replace(/\/*$/, ''); }
 var isodate = function(){}
+var fqUrl = function(v){
+  if (!v) return v;
+  var baseurl = url.parse(v)
+    , origin
+  if (!baseurl.hostname) {
+    origin = url.parse(this.meta.pingback || this.badge.issuer.origin)
+    baseurl.host = origin.host;
+    baseurl.port = origin.port;
+    baseurl.slashes = origin.slashes;
+    baseurl.protocol = origin.protocol;
+    baseurl.hostname = origin.hostname;
+  }
+  return url.format(baseurl);
+}
+
 isodate.re = /\d{4}-\d{2}-\d{2}/;
 isodate.set = function(input) {
   if (!isodate.re.test(input)) return false;
@@ -36,15 +51,15 @@ var Badge = new Schema(
     , rejected : { type: Boolean }
     }
   , recipient : { type: String, required: true, match: emailre, index: true }
-  , evidence  : { type: String, match: urlre }
+  , evidence  : { type: String, match: urlre, get: fqUrl}
   , expires   : { type: String, set: isodate.set, validate: [isodate.validate, 'isodate'] }
   , issued_on : { type: String, set: isodate.set, validate: [isodate.validate, 'isodate'] }
   , badge:
     { version     : { type: String, required: true, match: versionre }
     , name        : { type: String, required: true, validate: [maxlen(128), 'maxlen'] }
     , description : { type: String, required: true, validate: [maxlen(128), 'maxlen'] }
-    , image       : { type: String, required: true, match: urlre }
-    , criteria    : { type: String, required: true, match: urlre }
+    , image       : { type: String, required: true, match: urlre, get: fqUrl }
+    , criteria    : { type: String, required: true, match: urlre, get: fqUrl }
     , issuer:
       { origin  : { type: String, required: true, match: originre, set: slashTrim }
       , name    : { type: String, required: true, validate: [maxlen(128), 'maxlen'] }
@@ -55,9 +70,23 @@ var Badge = new Schema(
   }
 )
 
+Badge.virtual('evidenced')
+  .get(function(){
+    var evidence = url.parse(this.evidence)
+      , origin
+    if (!evidence.hostname) {
+      origin = url.parse(this.meta.pingback || this.issuer.origin)
+      evidence.host = origin.host;
+      evidence.port = origin.port;
+      evidence.slashes = origin.slashes;
+      evidence.protocol = origin.protocol;
+      evidence.hostname = origin.hostname;
+    }
+    return url.format(evidence);
+  })
+  .set(function(v){ this.set('evidence', v) })
 
 var BadgeModel = module.exports = mongoose.model('Badge', Badge);
-
 BadgeModel.prototype.upsert = function(callback) {
   var self = this
     , query = {recipient: this.recipient, 'meta.pingback': this.meta.pingback}

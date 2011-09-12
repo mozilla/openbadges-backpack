@@ -3,6 +3,7 @@ var vows = require('./setup')
   , fixture = require('./utils').fixture
   , Badge = require('../models/badge')
   , genstring = require('./utils').genstring
+  , url = require('url')
 
 var BAD_EMAILS = ['lkajd', 'skj@asdk', '@.com', '909090', '____!@']
 var BAD_URLS = ['-not-asdo', 'ftp://bad-scheme', '@.com:90/']
@@ -72,6 +73,12 @@ vows.describe('Badge Validator').addBatch({
       'without errors': function(err, succ){
         assert.equal(err, null)
       }
+    },
+    'gets fully qualified urls from members': function(badge){
+      assert.ok(url.parse(badge.evidence).hostname);
+    },
+    'does not change fully qualified members': function(badge){
+      assert.equal(badge.criteria, badge._doc.criteria);
     }
   }
 }).export(module);
