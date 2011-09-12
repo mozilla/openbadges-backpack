@@ -50,7 +50,6 @@ var Badge = new Schema(
     , imageData : { type: String } //expected base64
     , accepted : { type: Boolean }
     , rejected : { type: Boolean }
-    , groups : { type: Array, default: [] }
     , groups : { type: Array, default: [], get: function(v){ return v||[]  } }
     }
   , recipient : { type: String, required: true, match: emailre, index: true }
