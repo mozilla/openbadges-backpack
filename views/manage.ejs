@@ -13,24 +13,37 @@
   <h1>You have <%= badges.howMany %>!</h1>
   <% if (badges.pending.length) { %>
     <h2><%= badges.pending.length %> pending approval</h2>
-    <div class='js-pending' id='pending-badges'>
+    <div class='js-badges' id='pending-badges'>
       <% for (var i=badges.pending.length; i--; ) { %>
-        <form action='<%= reverse('backpack.apiAccept', {badgeId: badges.pending[i].id}) %>' method='post'>
-          <input type='hidden' name='csrf' value='<%= csrf %>'>
-          <input type='image' id='id.<%= badges.pending[i].id %>' src="<%= badges.pending[i].meta.imagePath %>" width="64px">
-        </form
+      <a href='<%= reverse('backpack.details', {badgeId: badges.pending[i].id}) %>'>
+        <img id='id.' src="<%= badges.pending[i].meta.imagePath %>" width="64px">
+      </a>
       <% } %>
     </div>
   <% } %>
   
   <% if (badges.accepted.length) { %>
     <h2><%= badges.accepted.length %> accepted</h2>
-    <div class='js-accepted' id='accepted-badges'>
+    <div class='js-badges' id='accepted-badges'>
       <% for (var i=badges.accepted.length; i--; ) { %>
-        <img id='id.<%= badges.accepted[i].id %>' src="<%= badges.accepted[i].meta.imagePath %>" width="64px">
+      <a href='<%= reverse('backpack.details', {badgeId: badges.accepted[i].id}) %>'>
+        <img id='id.' src="<%= badges.accepted[i].meta.imagePath %>" width="64px">
+      </a>
       <% } %>
     </div>
   <% } %>
+
+  <% if (badges.rejected.length) { %>
+    <h2><%= badges.rejected.length %> rejected</h2>
+    <div class='js-badges' id='rejected-badges'>
+      <% for (var i=badges.rejected.length; i--; ) { %>
+      <a href='<%= reverse('backpack.details', {badgeId: badges.rejected[i].id}) %>'>
+        <img id='id.' src="<%= badges.rejected[i].meta.imagePath %>" width="64px">
+      </a>
+      <% } %>
+    </div>
+  <% } %>
+
 <% } %>
 
 <h2>Upload Badges</h2>
@@ -39,6 +52,7 @@
 <form action='<%= reverse('backpack.upload') %>' method='post' enctype='multipart/form-data'>
   <fieldset>
     <div class='input'>
+      <input type='hidden' name='csrf' value='<%= csrf %>'>
       <input type='file' name='userBadge' id='userBadge' accept='image/png'>
       <input class='btn primary' type='submit' value='Upload'>
     </div>
