@@ -34,6 +34,7 @@ var Badge = new Schema(
     , imagePath : { type: String }
     , accepted : { type: Boolean }
     , rejected : { type: Boolean }
+    , groups : { type: Array, default: [], get: function(v){ return v||[]  } }
     }
   , recipient : { type: String, required: true, match: emailre, index: true }
   , evidence  : { type: String, match: urlre }
@@ -72,4 +73,16 @@ BadgeModel.prototype.upsert = function(callback) {
       self.save(callback);
     }
   })
+}
+BadgeModel.prototype.group = function(name) {
+  var g = this.get('meta.groups');
+  (g.indexOf(name) !== -1) || g.push(name);
+  return this;
+}
+BadgeModel.prototype.degroup = function(name) {
+  this.meta.groups = this.get('meta.groups').filter(function(v){ return v !== name });
+  return this;
+}
+BadgeModel.prototype.inGroup = function(name) {
+  return (this.get('meta.groups').indexOf(name) !== -1)
 }
