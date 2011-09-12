@@ -37,7 +37,6 @@ exports.login = function(req, res) {
   });
 };
 
-// #FIXME: CSRF
 exports.authenticate = function(req, res) {
   // If `assertion` wasn't posted in, the user has no business here.
   // We could return 403 or redirect to login page. It's more polite
@@ -125,7 +124,6 @@ exports.authenticate = function(req, res) {
   })
 };
 
-// #FIXME: CSRF
 exports.signout = function(req, res) {
   var session = req.session;
   if (session) {
@@ -141,7 +139,6 @@ exports.manage = function(req, res) {
   if (!user) return res.redirect('/login', 303);
   
   Badge.find({recipient: user}, function(err, docs){
-    console.dir(docs);
     res.render('manage', {
       user: user,
       badges: docs,

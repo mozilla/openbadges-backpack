@@ -1,5 +1,6 @@
 // Configure & start express.
 var express = require('express')
+  , csrf = require('express-csrf')
   , ejs = require('ejs')
   , fs = require('fs')
   , path = require('path')
@@ -31,6 +32,9 @@ app.helpers({
   error: [],
   badges: {}
 });
+app.dynamicHelpers({
+  csrf: csrf.token
+});
 
 // Middleware. See `middleware.js` for more information on the custom
 // middleware used.
@@ -40,6 +44,7 @@ app.use(middleware.logRequests());
 app.use(middleware.noFrame());
 app.use(middleware.formHandler());
 app.use(middleware.cookieSessions());
+app.use(csrf.check());
 app.use(express.static(path.join(__dirname, "static")));
 app.use(express.static(path.join(configuration.get('var_dir'), "badges")));
 
