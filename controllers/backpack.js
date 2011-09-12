@@ -33,7 +33,7 @@ var getUsers = function(req) {
 // #TODO: consider using route param pre-conditions
 var getBadge = function(fn) {
   return function(req, res, next){
-    var badgeId = req.params.id;
+    var badgeId = req.params.badgeId;
     Badge.findById(badgeId, function(err, doc) {
       if (!doc) return res.send('could not find badge', 404);
       fn(req, res, doc);
@@ -42,8 +42,21 @@ var getBadge = function(fn) {
 }
 
 var organize = function(badges) {
-  console.dir(badges);
-  return badges;
+  var o =
+    { pending: []
+    , accepted: []
+    , groups:  {}
+    , issuers: {}
+    , howMany: badges.length + (badges.length === 1 ? " badge" : " badges") 
+    }
+  
+  badges.forEach(function(badge){
+    if (!badge.meta.accepted)
+      o.pending.push(badge)
+    else
+      o.pending.push(accepted)
+  })
+  return o;
 }
 
 exports.login = function(req, res) {
@@ -164,12 +177,13 @@ exports.manage = function(req, res) {
   })
 };
 
-exports.apiAccept = function(req, res) {
-  res.send('accepting');
-}
-exports.apiReject = function(req,res) {
-  res.send('rejecting');
-}
+exports.apiAccept = getBadge(function(req, res, badge) {
+  res.send('accepting' + badge);
+})
+
+exports.apiReject = getBadge(function(req, res, badge) {
+  res.send('rejecting' + badge);
+})
 
 exports.upload = function(req, res) {
   var user = getUsers(req);
