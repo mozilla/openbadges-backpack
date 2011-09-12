@@ -31,12 +31,12 @@
                     <li class='menu'>
                       <a class='menu js-usermenu-link' href='#'><%= user %></a>
                       <ul class='menu-dropdown js-usermenu-dropdown'>
-                        <li><a href='/signout'>Sign Out</a></li>
+                        <li><a href='<%= reverse('backpack.signout') %>'>Sign Out</a></li>
                       </ul>
                     </li>
                   </ul>
                 <% } else { %>
-                <form class='signin js-browserid-form' method='POST' action='/authenticate'>
+                <form class='signin js-browserid-form' method='POST' action='<%= reverse('backpack.authenticate') %>'>
                   <input class='js-browserid-input' name='assertion' type='hidden'>
                   <input name='csrf' type='hidden' value='<%=csrf %>'>
                 </form>

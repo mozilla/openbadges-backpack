@@ -7,12 +7,7 @@ var express = require('express')
   , middleware = require('./middleware')
   , logger = require('./lib/logging').logger
   , configuration = require('./lib/configuration')
-
-// helper method for doing controller routing.
-var _ = function(cPath) {
-  var ref = cPath.split('.');
-  return require('./controllers/' + ref[0])[ref[1]];
-}
+  , router = require('./lib/router')
 
 // Create the app and set it up to use `ejs` templates which are easier to
 // maintain than the default `jade` templates.
@@ -30,7 +25,8 @@ app.helpers({
   login: true,
   title: 'Backpack',
   error: [],
-  badges: {}
+  badges: {},
+  reverse: router.reverse
 });
 app.dynamicHelpers({
   csrf: csrf.token
@@ -48,19 +44,18 @@ app.use(csrf.check());
 app.use(express.static(path.join(__dirname, "static")));
 app.use(express.static(path.join(configuration.get('var_dir'), "badges")));
 
-// Routing for the application.
-app.get('/baker',             _('baker.baker'));
-
-app.get('/test',              _('test.issuer'));
-app.post('/test/award',       _('test.award'));
-app.get('/test/badge.json',   _('test.test_badge'));
-app.get('/test/invalid.json', _('test.bad_badge'));
-
-app.get('/login',             _('backpack.login'));
-app.post('/authenticate',     _('backpack.authenticate'));
-app.get('/signout',           _('backpack.signout'));
-app.post('/badge-upload',     _('backpack.upload'));
-app.get('/',                  _('backpack.manage'));
+router(app)
+ .get('/baker', 'baker.baker')
+ .get('/test',              'test.issuer')
+ .get('/test/award',        'test.award')
+ .post('/test/badge.json',  'test.test_badge')
+ .get('/test/invalid.json', 'test.bad_badge')
+ .get('/backpack/login',         'backpack.login')
+ .post('/backpack/authenticate', 'backpack.authenticate')
+ .get('/backpack/signout',       'backpack.signout')
+ .post('/backpack/badge-upload', 'backpack.upload')
+ .get('/backpack',               'backpack.manage')
+ .get('/',                       'backpack.manage')
 
 var start_server = function(app) {  
   var port = app.config.get('internal_port')
