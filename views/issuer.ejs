@@ -1,4 +1,4 @@
-<form action='/test/award' method='POST'>
+<form action='<%= reverse('test.award') %>' method='POST'>
   <input type='hidden' name='csrf' value='<%= csrf %>'>
   <fieldset>
     <div class='clearfix'>

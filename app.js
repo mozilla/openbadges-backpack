@@ -25,7 +25,8 @@ app.helpers({
   login: true,
   title: 'Backpack',
   error: [],
-  badges: {}
+  badges: {},
+  reverse: router.reverse
 });
 app.dynamicHelpers({
   csrf: csrf.token

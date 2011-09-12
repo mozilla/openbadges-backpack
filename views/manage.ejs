@@ -19,7 +19,7 @@
 <h2>Upload Badges</h2>
 <p>If you have badges you've been awarded, you can upload them manually</p>
 
-<form action='badge-upload' method='post' enctype='multipart/form-data'>
+<form action='<%= reverse('backpack.upload') %>' method='post' enctype='multipart/form-data'>
   <fieldset>
     <div class='input'>
       <input type='file' name='userBadge' id='userBadge' accept='image/png'>
