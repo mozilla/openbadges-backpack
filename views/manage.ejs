@@ -24,7 +24,7 @@
   <% } %>
   
   <% if (badges.accepted.length) { %>
-    <h2><%= badges.pending.length %> approved badges</h2>
+    <h2><%= badges.accepted.length %> accepted</h2>
     <div class='js-accepted' id='accepted-badges'>
       <% for (var i=badges.accepted.length; i--; ) { %>
         <img id='id.<%= badges.accepted[i].id %>' src="<%= badges.accepted[i].meta.imagePath %>" width="64px">

@@ -36,7 +36,7 @@ var getBadge = function(fn) {
     var badgeId = req.params.badgeId;
     Badge.findById(badgeId, function(err, doc) {
       if (!doc) return res.send('could not find badge', 404);
-      fn(req, res, doc);
+      fn(req, res, doc, next);
     })
   }
 }
@@ -53,8 +53,8 @@ var organize = function(badges) {
   badges.forEach(function(badge){
     if (!badge.meta.accepted)
       o.pending.push(badge)
-    else
-      o.pending.push(accepted)
+    else if (!badge.meta.rejected)
+      o.accepted.push(badge)
   })
   return o;
 }
@@ -177,13 +177,22 @@ exports.manage = function(req, res) {
   })
 };
 
-exports.apiAccept = getBadge(function(req, res, badge) {
-  res.send('accepting' + badge);
+exports.apiAccept = getBadge(function(req, res, badge, next) {
+  badge.meta.accepted = true;
+  badge.save(function(err, badge){
+    if (err) next(err)
+    return res.redirect(reverse('backpack.manage'), 303);
+  })  
 })
 
 exports.apiReject = getBadge(function(req, res, badge) {
-  res.send('rejecting' + badge);
-})
+ badge.meta.accepted = false;
+ badge.meta.rejected = true;
+  badge.save(function(err, badge){
+    if (err) next(err)
+    return res.redirect(reverse('backpack.manage'), 303);
+  })
+ })
 
 exports.upload = function(req, res) {
   var user = getUsers(req);
