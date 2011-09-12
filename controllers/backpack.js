@@ -191,7 +191,10 @@ exports.upload = function(req, res) {
           return redirect('This badge was not issued to you! Contact your issuer.');
         }
         _award(assertion, assertionURL, imagedata, function(err, badge) {
-          if (err) return redirect('There was a problem saving your badge!');
+          if (err) {
+            logger.error('could not save badge: ' + err);
+            return redirect('There was a problem saving your badge!');
+          }
           return redirect();
         });
       })

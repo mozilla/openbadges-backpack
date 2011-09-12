@@ -29,8 +29,8 @@ var Schema = mongoose.Schema
 
 var Badge = new Schema(
   { meta:
-    { pingback  : { type: String, unique: true }
-    , publicKey : { type: String, unique: true }
+    { pingback  : { type: String }
+    , publicKey : { type: String }
     , imagePath : { type: String }
     }
   , recipient : { type: String, required: true, match: emailre, index: true }

@@ -26,6 +26,5 @@ vows.describe('Awarding Badges').addBatch({
         assert.length(docs, 1);
       }
     },
-    tearDown: function(){ Badge.remove(); }
   },
 }).export(module)
