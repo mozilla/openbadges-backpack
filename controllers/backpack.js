@@ -45,16 +45,18 @@ var organize = function(badges) {
   var o =
     { pending: []
     , accepted: []
+    , rejected: []
     , groups:  {}
     , issuers: {}
     , howMany: badges.length + (badges.length === 1 ? " badge" : " badges") 
     }
   
   badges.forEach(function(badge){
-    if (!badge.meta.accepted)
-      o.pending.push(badge)
-    else if (!badge.meta.rejected)
-      o.accepted.push(badge)
+    if (badge.meta.rejected)
+      return o.rejected.push(badge)
+    if (badge.meta.accepted)
+      return o.accepted.push(badge)
+    return o.pending.push(badge)
   })
   return o;
 }
@@ -177,8 +179,22 @@ exports.manage = function(req, res) {
   })
 };
 
+exports.details = getBadge(function(req, res, badge, next) {
+  var user = getUsers(req);
+  console.dir(badge);
+  res.render('badge-details', {
+    recipient: badge.recipient,
+    id: badge.id,
+    badge: badge.badge,
+    owner: (badge.recipient === user),
+    title: '',
+    login: false
+  })
+})
+
 exports.apiAccept = getBadge(function(req, res, badge, next) {
   badge.meta.accepted = true;
+  badge.meta.rejected = false;
   badge.save(function(err, badge){
     if (err) next(err)
     return res.redirect(reverse('backpack.manage'), 303);

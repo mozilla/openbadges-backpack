@@ -40,24 +40,26 @@ app.use(middleware.logRequests());
 app.use(middleware.noFrame());
 app.use(middleware.formHandler());
 app.use(middleware.cookieSessions());
-app.use(middleware.csrf.check());
+app.use(middleware.csrf.check([ '/backpack/badge' ]));
+
 app.use(express.static(path.join(__dirname, "static")));
 app.use(express.static(path.join(configuration.get('var_dir'), "badges")));
 
 router(app)
-  .get('/baker',                      'baker.baker')
-  .get('/test',                       'test.issuer')
-  .post('/test/award',                'test.award')
-  .get('/test/badge.json',            'test.test_badge')
-  .get('/test/invalid.json',          'test.bad_badge')
-  .get('/backpack/login',             'backpack.login')
-  .post('/backpack/authenticate',     'backpack.authenticate')
-  .get('/backpack/signout',           'backpack.signout')
-  .post('/backpack/badge/upload',     'backpack.upload')
+  .get('/baker',                            'baker.baker')
+  .get('/test',                             'test.issuer')
+  .post('/test/award',                      'test.award')
+  .get('/test/badge.json',                  'test.test_badge')
+  .get('/test/invalid.json',                'test.bad_badge')
+  .get('/backpack/login',                   'backpack.login')
+  .post('/backpack/authenticate',           'backpack.authenticate')
+  .get('/backpack/signout',                 'backpack.signout')
+  .post('/backpack/badge',                  'backpack.upload')
+  .get('/backpack/badge/:badgeId',          'backpack.details')
   .post('/backpack/badge/:badgeId/accept',  'backpack.apiAccept')
   .post('/backpack/badge/:badgeId/reject',  'backpack.apiReject')
-  .get('/backpack',                   'backpack.manage')
-  .get('/',                           'backpack.manage')
+  .get('/backpack',                         'backpack.manage')
+  .get('/',                                 'backpack.manage')
 
 var start_server = function(app) {  
   var port = app.config.get('internal_port')
