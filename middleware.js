@@ -55,10 +55,17 @@ exports.csrf.token = function(req, res) {
   return csrf;
 };
 
-exports.csrf.check = function() {
+exports.csrf.check = function(whitelist) {
+  var whitelisted = function(input){
+    for (var i = whitelist.length; i--; ) {
+      if (RegExp('^' + whitelist[i] + '$').test(input)) return true;
+    }
+    return false;
+  }
   return function(req, res, next) {
     csrf = null; // Clear csrf for next request
-    if (req.method.toLowerCase() === 'post') {
+    if (req.method.toLowerCase() === 'post' && !whitelisted(req.url)) {
+      console.dir(req.url);
       if (!(req.body && 'csrf' in req.body && req.body.csrf === req.session.csrf)) {
         return res.send("Cross-site request forgery attempt discovered!", 403);
       }
