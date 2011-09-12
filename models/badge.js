@@ -72,22 +72,6 @@ var Badge = new Schema(
   }
 )
 
-Badge.virtual('evidenced')
-  .get(function(){
-    var evidence = url.parse(this.evidence)
-      , origin
-    if (!evidence.hostname) {
-      origin = url.parse(this.meta.pingback || this.issuer.origin)
-      evidence.host = origin.host;
-      evidence.port = origin.port;
-      evidence.slashes = origin.slashes;
-      evidence.protocol = origin.protocol;
-      evidence.hostname = origin.hostname;
-    }
-    return url.format(evidence);
-  })
-  .set(function(v){ this.set('evidence', v) })
-
 var BadgeModel = module.exports = mongoose.model('Badge', Badge);
 BadgeModel.prototype.upsert = function(callback) {
   var self = this
