@@ -52,4 +52,22 @@ var Badge = new Schema(
     }
   }
 )
+
+
 var BadgeModel = module.exports = mongoose.model('Badge', Badge);
+
+BadgeModel.prototype.upsert = function(callback) {
+  var self = this
+    , query = {recipient: this.recipient, 'meta.pingback': this.meta.pingback}
+  
+  BadgeModel.findOne(query, function(err, doc) {
+    var id;
+    if (doc) {
+      self._doc._id = doc._doc._id;
+      doc._doc = self._doc;
+      doc.save(callback);
+    } else {
+      self.save(callback);
+    }
+  })
+}

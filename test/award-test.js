@@ -9,6 +9,7 @@ var vows = require('./setup')
 var PNGFILE = path.join(__dirname, 'no-badge-data.png')
   , PNGDATA = fs.readFileSync(PNGFILE)
 
+Badge.collection.drop();
 vows.describe('Awarding Badges').addBatch({
   'A valid badge' : {
     topic: function() { award(assertion, 'http://example.com/this-badge', PNGDATA, this.callback) },
