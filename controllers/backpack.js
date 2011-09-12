@@ -30,6 +30,35 @@ var getUsers = function(req) {
   return user;
 }
 
+// #TODO: consider using route param pre-conditions
+var getBadge = function(fn) {
+  return function(req, res, next){
+    var badgeId = req.params.badgeId;
+    Badge.findById(badgeId, function(err, doc) {
+      if (!doc) return res.send('could not find badge', 404);
+      fn(req, res, doc, next);
+    })
+  }
+}
+
+var organize = function(badges) {
+  var o =
+    { pending: []
+    , accepted: []
+    , groups:  {}
+    , issuers: {}
+    , howMany: badges.length + (badges.length === 1 ? " badge" : " badges") 
+    }
+  
+  badges.forEach(function(badge){
+    if (!badge.meta.accepted)
+      o.pending.push(badge)
+    else if (!badge.meta.rejected)
+      o.accepted.push(badge)
+  })
+  return o;
+}
+
 exports.login = function(req, res) {
   // req.flash returns an array. Pass on the whole thing to the view and
   // decide there if we want to display all of them or just the first one.
@@ -142,18 +171,28 @@ exports.manage = function(req, res) {
   Badge.find({recipient: user}, function(err, docs){
     res.render('manage', {
       user: user,
-      badges: docs,
+      badges: organize(docs),
       error: req.flash('upload_error')
     });
   })
 };
 
-exports.apiAccept = function(req, res) {
-  res.send('accepting');
-}
-exports.apiReject = function(req,res) {
-  res.send('rejecting');
-}
+exports.apiAccept = getBadge(function(req, res, badge, next) {
+  badge.meta.accepted = true;
+  badge.save(function(err, badge){
+    if (err) next(err)
+    return res.redirect(reverse('backpack.manage'), 303);
+  })  
+})
+
+exports.apiReject = getBadge(function(req, res, badge) {
+ badge.meta.accepted = false;
+ badge.meta.rejected = true;
+  badge.save(function(err, badge){
+    if (err) next(err)
+    return res.redirect(reverse('backpack.manage'), 303);
+  })
+ })
 
 exports.upload = function(req, res) {
   var user = getUsers(req);

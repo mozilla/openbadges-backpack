@@ -4,6 +4,7 @@ var express = require('express')
   , secrets = require('./lib/secrets')
   , configuration = require('./lib/configuration')
   , logger = require('./lib/logging').logger
+  , crypto = require('crypto')
 
 // `COOKIE_SECRET` is randomly generated on the first run of the server,
 // then stored to a file and looked up on restart to maintain state.
@@ -40,6 +41,31 @@ exports.noFrame = function(){
   return function(req, res, next){
     res.setHeader('x-frame-options', 'DENY');
     next();
+  };
+};
+
+
+var csrf = null;
+exports.csrf = {}
+exports.csrf.token = function(req, res) {
+  if (!(typeof csrf !== "undefined" && csrf !== null)) {
+    csrf = crypto.createHash('md5').update('' + new Date().getTime() + req.session.lastAccess).digest('hex');
+    req.session.csrf = csrf;
+  }
+  return csrf;
+};
+
+exports.csrf.check = function() {
+  return function(req, res, next) {
+    csrf = null; // Clear csrf for next request
+    if (req.body && req.method.toLowerCase() === 'post') {
+      if (!('csrf' in req.body && req.body.csrf === req.session.csrf)) {
+        console.log(csrf);
+        console.log(req.session.csrf);
+        return res.send("Cross-site request forgery attempt discovered!", 403);
+      }
+    }
+    return next();
   };
 };
 
