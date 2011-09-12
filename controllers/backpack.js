@@ -30,6 +30,22 @@ var getUsers = function(req) {
   return user;
 }
 
+// #TODO: consider using route param pre-conditions
+var getBadge = function(fn) {
+  return function(req, res, next){
+    var badgeId = req.params.id;
+    Badge.findById(badgeId, function(err, doc) {
+      if (!doc) return res.send('could not find badge', 404);
+      fn(req, res, doc);
+    })
+  }
+}
+
+var organize = function(badges) {
+  console.dir(badges);
+  return badges;
+}
+
 exports.login = function(req, res) {
   // req.flash returns an array. Pass on the whole thing to the view and
   // decide there if we want to display all of them or just the first one.
@@ -142,7 +158,7 @@ exports.manage = function(req, res) {
   Badge.find({recipient: user}, function(err, docs){
     res.render('manage', {
       user: user,
-      badges: docs,
+      badges: organize(docs),
       error: req.flash('upload_error')
     });
   })
