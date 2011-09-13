@@ -1,3 +1,6 @@
+#body {
+  margin-top: 60px;
+}
 form.signin { display: none; }
 form.baker label {
   font-size: 18px;
@@ -7,4 +10,30 @@ form.baker #assertion {
   font-size: 22px;
   height: 30px;
   width: 650px;
+}
+
+.management .groups {
+  margin: 20px 0 0;
+}
+.management .groups .clearfix {
+  margin-bottom: 10px;
+}
+.management .groups input.mini {
+  width: 128px;
+  color: #333;
+}
+.management .groups input.mini {
+}
+  
+.management .or {
+  font-size: 14px;
+  padding: 6px 20px;
+}
+
+.badge-details {
+  color: #333;
+  font-size: 16px;
+}
+.badge-details dd {
+  padding: 3px 0 6px;
 }

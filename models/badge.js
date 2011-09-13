@@ -48,8 +48,8 @@ var Badge = new Schema(
     , publicKey : { type: String }
     , imagePath : { type: String }
     , imageData : { type: String } //expected base64
-    , accepted : { type: Boolean }
-    , rejected : { type: Boolean }
+    , accepted : { type: Boolean, default: false }
+    , rejected : { type: Boolean, default: false }
     , groups : { type: Array, default: [] }
     }
   , recipient : { type: String, required: true, match: emailre, index: true }
@@ -72,27 +72,12 @@ var Badge = new Schema(
   }
 )
 
-Badge.virtual('evidenced')
-  .get(function(){
-    var evidence = url.parse(this.evidence)
-      , origin
-    if (!evidence.hostname) {
-      origin = url.parse(this.meta.pingback || this.issuer.origin)
-      evidence.host = origin.host;
-      evidence.port = origin.port;
-      evidence.slashes = origin.slashes;
-      evidence.protocol = origin.protocol;
-      evidence.hostname = origin.hostname;
-    }
-    return url.format(evidence);
-  })
-  .set(function(v){ this.set('evidence', v) })
-
 var BadgeModel = module.exports = mongoose.model('Badge', Badge);
+
 BadgeModel.prototype.upsert = function(callback) {
   var self = this
     , query = {recipient: this.recipient, 'meta.pingback': this.meta.pingback}
-  
+
   BadgeModel.findOne(query, function(err, doc) {
     var id;
     if (doc) {
@@ -103,4 +88,32 @@ BadgeModel.prototype.upsert = function(callback) {
       self.save(callback);
     }
   })
+}
+BadgeModel.groups = function(badges) {
+  var groups = {}
+  badges.forEach(function(badge){
+    (badge.meta.groups||[]).forEach(function(group) {
+      var g = groups[group] = (groups[group] || []);
+      g.push(badge);
+    })
+  })
+  return groups;
+}
+BadgeModel.userGroups = function(user, callback) {
+  BadgeModel.find({recipient: user}, ['meta.groups'], function(err, docs) {
+    if (err) return callback(err)
+    return callback(err, BadgeModel.groups(docs))
+  })
+}
+BadgeModel.prototype.group = function(name) {
+  var g = this.meta.groups || []
+  if (g.indexOf(name) === -1) g.push(name);
+  this.meta.groups = g;
+}
+BadgeModel.prototype.degroup = function(name) {
+  this.meta.groups = this.get('meta.groups').filter(function(v){ return v !== name });
+  return this;
+}
+BadgeModel.prototype.inGroup = function(name) {
+  return (this.meta.groups||[]).indexOf(name) !== -1
 }

@@ -41,12 +41,13 @@ var getBadge = function(fn) {
   }
 }
 
+// #TODO: move this into badge model?
 var organize = function(badges) {
   var o =
     { pending: []
     , accepted: []
     , rejected: []
-    , groups:  {}
+    , groups: Badge.groups(badges)
     , issuers: {}
     , howMany: badges.length + (badges.length === 1 ? " badge" : " badges") 
     }
@@ -170,41 +171,68 @@ exports.manage = function(req, res) {
   var user = getUsers(req);
   if (!user) return res.redirect(reverse('backpack.login'), 303);
   
+  var error = req.flash('error')
+    , success = req.flash('success')
+  
   Badge.find({recipient: user}, function(err, docs){
     res.render('manage', {
+      error: error,
+      success: success,
       user: user,
-      badges: organize(docs),
-      error: req.flash('upload_error')
+      badges: organize(docs)
     });
   })
 };
 
 exports.details = getBadge(function(req, res, badge, next) {
-  var user = getUsers(req);
-  console.dir(badge);
-  res.render('badge-details', {
-    recipient: badge.recipient,
-    id: badge.id,
-    image: badge.meta.imagePath,
-    badge: badge.badge,
-    owner: (badge.recipient === user),
+  var user = getUsers(req)
+  var fields = {
     title: '',
-    login: false
-  })
+    login: false,
+    
+    id: badge.id,
+    recipient: badge.recipient,
+    image: badge.meta.imagePath,
+    owner: (badge.recipient === user),
+    
+    badge: badge,
+    type: badge.badge,
+    meta: badge.meta
+  }
+  if (fields.owner) {
+    return Badge.userGroups(user, function(err, groups){
+      fields.groups = Object.keys(groups);
+      res.render('badge-details', fields)
+    })
+  }
+  res.render('badge-details', fields)
 })
 
+// #TODO: make sure user owns badge
 exports.apiAccept = getBadge(function(req, res, badge, next) {
   badge.meta.accepted = true;
   badge.meta.rejected = false;
   badge.save(function(err, badge){
-    if (err) next(err)
+    if (err) req.flash('error', err);
     return res.redirect(reverse('backpack.manage'), 303);
   })  
 })
 
+// #TODO: make sure user owns badge
+exports.apiGroups = getBadge(function(req, res, badge, next) {
+  badge.meta.groups = Object.keys(req.body['group']||{})
+  if (req.body['newGroup']) badge.group(req.body['newGroup'])
+  badge.save(function(err, badge){
+    if (err) req.flash('error', err);
+    else req.flash('success', 'Updated badge groups!');
+    return res.redirect(reverse('backpack.manage'), 303);
+  });
+})
+
+// #TODO: make sure user owns badge
 exports.apiReject = getBadge(function(req, res, badge) {
- badge.meta.accepted = false;
- badge.meta.rejected = true;
+  badge.meta.accepted = false;
+  badge.meta.rejected = true;
   badge.save(function(err, badge){
     if (err) next(err)
     return res.redirect(reverse('backpack.manage'), 303);
@@ -216,7 +244,7 @@ exports.upload = function(req, res) {
   if (!user) return res.redirect(reverse('backpack.login'), 303);
 
   var redirect = function(err) {
-    if (err) req.flash('upload_error', err);
+    if (err) req.flash('error', err);
     return res.redirect(reverse('backpack.manage'), 303);
   }
   

@@ -1,32 +1,84 @@
-if @owner
-  h2 -> 'This is your badge'
-img src: @image
-dl ->
-  dt -> 'Recipient'
-  dd -> @recipient
+h1 -> @type.name
+div '.row', ->
+  div '.span5.columns.badge-details', ->
+    img '#badge-image', src: @image, alt: 'Badge Image'
+    dl ->
+      dt -> 'Recipient'
+      dd -> @recipient
 
-  dt -> 'Name'
-  dd -> @badge.name
+      dt -> 'Name'
+      dd -> @type.name
 
-  dt -> 'Description'
-  dd -> @badge.description
+      dt -> 'Description'
+      dd -> @type.description
 
-  dt -> 'Criteria'
-  dd -> @badge.criteria
+      dt -> 'Criteria'
+      dd -> @type.criteria
 
-  dt -> 'Issuer'
-  dd ->
-    text @badge.issuer.name
-    "(#{@badge.issuer.origin})"
+      dt -> 'Issuer'
+      dd -> "#{@type.issuer.name} (#{@type.issuer.origin})"
 
-  if @badge.issuer.org
-    dt -> 'Organization'
-    dd -> @badge.issuer.org
+      if @type.issuer.org
+        dt -> 'Organization'
+        dd -> @type.issuer.org
 
-if @owner
-  form action: @reverse('backpack.apiAccept', { badgeId: @id }), method: 'post', style: 'float: left', ->
-    input type: 'hidden', name: 'csrf', value: @csrf
-    input '.btn.primary', type: 'submit', value: 'Accept'
-  form action: @reverse('backpack.apiReject', { badgeId: @id }), method: 'post', style: 'float: left', ->
-    input type: 'hidden', name: 'csrf', value: @csrf
-    input '.btn', type: 'submit', value: 'Reject'
+  if @owner
+    div '.span11.columns.management', ->
+      div '.accept-reject', ->
+        h2 -> 'Keep this badge?'
+        form action: @reverse('backpack.apiAccept', { badgeId: @id }), method: 'post', style: 'display: inline', ->
+          input type: 'hidden', name: 'csrf', value: @csrf
+          input '.btn.primary', type: 'submit', value: 'Accept Badge'
+        form action: @reverse('backpack.apiReject', { badgeId: @id }), method: 'post', style: 'display: inline', ->
+          input type: 'hidden', name: 'csrf', value: @csrf
+          input '.btn.danger', type: 'submit', value: 'Reject Badge'
+
+      div '.groups', ->
+        h2 -> 'Manage Groups'
+        form action: @reverse('backpack.apiGroups', { badgeId: @id }), method: 'post', ->
+          input type: 'hidden', name: 'csrf', value: @csrf
+
+          if @groups.length
+            for group in @groups
+              div '.clearfix', -> div '.input-append', ->
+                input '.mini', maxlength: 32,  type: 'text', value: group, disabled: true
+                label '.add-on', -> input type: 'checkbox', name: "group[#{group}]", checked: @badge.inGroup(group)
+
+          div '.clearfix', -> div '.input-append', ->
+            input '#new-group.mini', maxlength: 32,  type: 'text', name: "newGroup", placeholder: 'New group'
+            label '.add-on', -> input type: 'checkbox'
+
+          input '.btn.primary', type: 'submit', value: 'Manage Groups'
+
+coffeescript ->
+  newGroup = $('#new-group')
+  checkboxes = $('.input-append input[type=checkbox]')
+  image = $('#badge-image')
+
+  image.bind 'load', (event) ->
+    if @clientWidth > 256 then $(@).css(width: '256px')
+
+  watchChanges = (event) ->
+    elem = $(@)
+    label = elem.parent()
+    input = label.siblings('input').first()
+    if elem.attr('checked')
+      label.addClass('active')
+      if not input.val() then input.trigger('focus')
+    else
+      label.removeClass('active')
+
+  autocheck = (event) ->
+    elem = $(@)
+    checkbox = elem.siblings('label').first().find('input')
+    checked = if elem.val() then true else false
+    checkbox
+      .attr('checked', checked)
+      .attr('disabled', true)
+      .trigger('change')
+    setTimeout ->
+      checkbox.attr('disabled', false)
+    , 30
+
+  checkboxes.bind('change', watchChanges).trigger('change')
+  newGroup.bind('keydown', autocheck).bind('blur', autocheck)

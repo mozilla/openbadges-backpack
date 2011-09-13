@@ -26,8 +26,17 @@ app.helpers({
   login: true,
   title: 'Backpack',
   error: [],
+  success: [],
   badges: {},
-  reverse: router.reverse
+  reverse: router.reverse,
+
+  hardcode: {
+    textbox: function(attrs){
+      attrs.type = 'text';
+      attrs.name = attrs.id;
+      return div(function(){input(attrs)});
+    }
+  }
 });
 app.dynamicHelpers({
   csrf: middleware.csrf.token
@@ -59,6 +68,7 @@ router(app)
   .get('/backpack/badge/:badgeId',          'backpack.details')
   .post('/backpack/badge/:badgeId/accept',  'backpack.apiAccept')
   .post('/backpack/badge/:badgeId/reject',  'backpack.apiReject')
+  .post('/backpack/badge/:badgeId/groups',  'backpack.apiGroups')
   .get('/backpack',                         'backpack.manage')
   .get('/',                                 'backpack.manage')
 

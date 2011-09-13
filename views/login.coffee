@@ -3,7 +3,7 @@ if @error.length
     a '.close.js-alert-close', href: '#', -> 'x'
     p ->
       strong -> "Oh no!"
-      text @error
+      text @error[0]
 
 h1 -> 'Welcome'
 h2 -> """
