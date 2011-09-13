@@ -191,7 +191,9 @@ exports.details = getBadge(function(req, res, badge, next) {
     image: badge.meta.imagePath,
     groups: badge.meta.groups,
     owner: (badge.recipient === user),
-    badge: badge.badge,
+    
+    badge: badge,
+    type: badge.badge,
     meta: badge.meta
   })
 })
