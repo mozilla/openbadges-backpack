@@ -1,6 +1,6 @@
 div '.row', ->
   div '.span5.columns.badge-details', ->
-    img src: @image
+    img '#badge-image', src: @image, alt: 'Badge Image'
     dl ->
       dt -> 'Recipient'
       dd -> @recipient
@@ -34,7 +34,7 @@ div '.row', ->
 
       div '.groups', ->
         h2 -> 'Manage Groups'
-        form action: @reverse('backpack.apiGroupAdd', { badgeId: @id }), method: 'post', ->
+        form action: @reverse('backpack.apiGroups', { badgeId: @id }), method: 'post', ->
           input type: 'hidden', name: 'csrf', value: @csrf
           if @groups.length
             for group in @groups
@@ -43,21 +43,34 @@ div '.row', ->
                 label '.add-on', -> input type: 'checkbox', name: "group.#{group}", checked: true
 
           div '.clearfix', -> div '.input-append', ->
-            input '.mini', maxlength: 32,  type: 'text', name: "newGroup", placeholder: 'New group'
+            input '#new-group.mini', maxlength: 32,  type: 'text', name: "newGroup", placeholder: 'New group'
             label '.add-on', -> input type: 'checkbox'
 
           input '.btn.primary', type: 'submit', value: 'Manage Groups'
 
 coffeescript ->
+  newGroup = $('#new-group')
   checkboxes = $('.input-append input[type=checkbox]')
-  change = (event) ->
-    self = $(@)
-    label = self.parent()
+  image = $('#badge-image')
+
+  image.bind 'load', (event) ->
+    if @clientWidth > 256 then $(@).css(width: '256px')
+
+  watchChanges = (event) ->
+    elem = $(@)
+    label = elem.parent()
     input = label.siblings('input').first()
-    if self.attr('checked')
+    if elem.attr('checked')
       label.addClass('active')
       if not input.val() then input.trigger('focus')
     else
       label.removeClass('active')
 
-  checkboxes.bind('change', change).trigger('change')
+  autocheck = (event) ->
+    elem = $(@)
+    checkbox = elem.siblings('label').first().find('input')
+    checked = if elem.val() then true else false
+    checkbox.attr('checked', checked).trigger('change')
+
+  checkboxes.bind('change', watchChanges).trigger('change')
+  newGroup.bind('keydown', autocheck).bind('blur', autocheck)
