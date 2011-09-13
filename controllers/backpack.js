@@ -152,7 +152,7 @@ exports.authenticate = function(req, res) {
     // and redirect to the front page.
     if (!req.session) res.session = {}
     req.session.authenticated = [assertion.email]
-    return res.redirect(reverse('backpack.manage', 303));
+    return res.redirect(reverse('backpack.manage'), 303);
   })
 };
 
@@ -185,6 +185,7 @@ exports.details = getBadge(function(req, res, badge, next) {
   res.render('badge-details', {
     recipient: badge.recipient,
     id: badge.id,
+    image: badge.meta.imagePath,
     badge: badge.badge,
     owner: (badge.recipient === user),
     title: '',

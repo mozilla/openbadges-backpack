@@ -15,7 +15,8 @@ var app = express.createServer();
 app.logger = logger;
 app.config = configuration;
 
-app.set('view engine', 'ejs');
+app.set('view engine', 'coffee');
+app.register('.coffee', require('coffeekup').adapters.express)
 
 // View helpers. `user` and `badges` are set so we can use them in `if`
 // statements without getting undefined errors and without having to use typeof
@@ -61,24 +62,25 @@ router(app)
   .get('/backpack',                         'backpack.manage')
   .get('/',                                 'backpack.manage')
 
-var start_server = function(app) {  
-  var port = app.config.get('internal_port')
-    , pid = process.pid.toString()
-    , pidfile = path.join(app.config.get('var_path'), 'server.pid')
-  
-  app.listen(port);
-  app.logger.info('opening server on port: ' + port);
-  app.logger.info('READY PLAYER ONE')
-  
-  fs.unlink(pidfile, function(){
-    fs.writeFile(pidfile, pid, function(err){
-      if (err) throw Error('could not make pidfile: ' + err)
-    });
-  })
-}
-
-start_server(app);
-
 exports.server = app;
 exports.logger = logger;
 exports.config = configuration;
+
+if (!module.parent) {
+  var start_server = function(app) {  
+    var port = app.config.get('internal_port')
+      , pid = process.pid.toString()
+      , pidfile = path.join(app.config.get('var_path'), 'server.pid')
+
+    app.listen(port);
+    app.logger.info('opening server on port: ' + port);
+    app.logger.info('READY PLAYER ONE')
+
+    fs.unlink(pidfile, function(){
+      fs.writeFile(pidfile, pid, function(err){
+        if (err) throw Error('could not make pidfile: ' + err)
+      });
+    })
+  }
+  start_server(app);
+}

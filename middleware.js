@@ -65,7 +65,6 @@ exports.csrf.check = function(whitelist) {
   return function(req, res, next) {
     csrf = null; // Clear csrf for next request
     if (req.method.toLowerCase() === 'post' && !whitelisted(req.url)) {
-      console.dir(req.url);
       if (!(req.body && 'csrf' in req.body && req.body.csrf === req.session.csrf)) {
         return res.send("Cross-site request forgery attempt discovered!", 403);
       }
