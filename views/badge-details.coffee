@@ -1,26 +1,26 @@
 h1 -> @type.name
 div '.row', ->
   div '.span-one-third.columns.badge-details', ->
-    img '#badge-image', src: @image, alt: 'Badge Image'
+    img '#badge-image', src: @image, alt: 'Badge Image"'
     dl ->
       dt -> 'Recipient'
       dd -> @recipient
 
       dt -> 'Name'
-      dd -> @type.name
+      dd -> safe @type.name
 
       dt -> 'Description'
-      dd -> @type.description
+      dd -> safe @type.description
 
       dt -> 'Criteria'
       dd -> @type.criteria
 
       dt -> 'Issuer'
-      dd -> "#{@type.issuer.name} (#{@type.issuer.origin})"
+      dd -> safe "#{@type.issuer.name} (#{@type.issuer.origin})"
 
       if @type.issuer.org
         dt -> 'Organization'
-        dd -> @type.issuer.org
+        dd -> safe @type.issuer.org
 
   if @owner
     div '.span-two-thirds.columns.management', ->
