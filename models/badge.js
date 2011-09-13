@@ -76,7 +76,7 @@ var BadgeModel = module.exports = mongoose.model('Badge', Badge);
 BadgeModel.groups = function(badges) {
   var groups = {}
   badges.forEach(function(badge){
-    badge.meta.groups.forEach(function(group){
+    (badge.meta.groups||[]).forEach(function(group){
       var g = groups[group] = (groups[group] || []);
       g.push(badge);
     })
