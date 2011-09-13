@@ -99,5 +99,25 @@ vows.describe('Badge Validator').addBatch({
         assert.include(badge.meta.groups, 'Linked In');
       }
     }
+  },
+  'Badge model': {
+    topic: function(){
+      var badge1 = new Badge(fixture())
+        , badge2 = new Badge(fixture())
+        , badge3 = new Badge(fixture())
+      badge1.group('Facebook');
+      
+      badge2.group('Linked In');
+      
+      badge3.group('Twitter');
+      badge3.group('Facebook');
+      return [badge1, badge2, badge3]
+    },
+    'shoud be able to find groups of badges' : function(badges){
+      var groups = Badge.groups(badges);
+      assert.length(groups['Linked In'], 1);
+      assert.length(groups['Twitter'], 1);
+      assert.length(groups['Facebook'], 2);
+    }
   }
 }).export(module);
