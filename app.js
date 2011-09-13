@@ -67,7 +67,7 @@ router(app)
   .get('/backpack/badge/:badgeId',          'backpack.details')
   .post('/backpack/badge/:badgeId/accept',  'backpack.apiAccept')
   .post('/backpack/badge/:badgeId/reject',  'backpack.apiReject')
-  .post('/backpack/badge/:badgeId/group/add',  'backpack.apiGroupAdd')
+  .post('/backpack/badge/:badgeId/groups',  'backpack.apiGroups')
   .get('/backpack',                         'backpack.manage')
   .get('/',                                 'backpack.manage')
 
