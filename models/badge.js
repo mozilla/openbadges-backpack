@@ -1,16 +1,37 @@
 var mongoose = require('mongoose')
   , conf = require('../lib/configuration').get('database')
   , url = require('url')
-mongoose.connect(conf.host, conf.name, conf.port);
-
-var urlre = /(^(https?):\/\/[^\s\/$.?#].[^\s]*$)|(^\/\S+$)/
+var Schema = mongoose.Schema
+  , ObjectId = Schema.ObjectId
+  , urlre = /(^(https?):\/\/[^\s\/$.?#].[^\s]*$)|(^\/\S+$)/
   , emailre = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
   , originre = /^(https?):\/\/[^\s\/$.?#].[^\s\/]*$/
   , versionre = /^v?\d+\.\d+\.\d+$/
 
-var maxlen = function(len){ return function(v){ return (v||'').length < len } }
-var slashTrim = function(v){ return v.replace(/\/*$/, ''); }
+mongoose.connect(conf.host, conf.name, conf.port);
+
+// validators and getters. Consider moving to its own file.
+var maxlen = function(len){
+  return function(v){ return (v||'').length < len }
+}
+var slashTrim = function(v){
+  return v.replace(/\/*$/, '');
+}
 var isodate = function(){}
+isodate.re = /\d{4}-\d{2}-\d{2}/;
+isodate.set = function(input) {
+  if (!isodate.re.test(input)) return false;
+  var pieces = input.split('-')
+    , year = parseInt(pieces[0], 10)
+    , month = parseInt(pieces[1], 10)
+    , day = parseInt(pieces[2], 10)
+  if (month > 12 || month < 1) return false;
+  if (day > 31 || day < 1) return false;
+  return input;
+};
+isodate.validate = function(v) {
+  return v === null || v.match(isodate.re) ;
+}
 var fqUrl = function(v){
   if (!v) return v;
   var baseurl = url.parse(v)
@@ -26,23 +47,7 @@ var fqUrl = function(v){
   return url.format(baseurl);
 }
 
-isodate.re = /\d{4}-\d{2}-\d{2}/;
-isodate.set = function(input) {
-  if (!isodate.re.test(input)) return false;
-  var pieces = input.split('-')
-    , year = parseInt(pieces[0], 10)
-    , month = parseInt(pieces[1], 10)
-    , day = parseInt(pieces[2], 10)
-  if (month > 12 || month < 1) return false;
-  if (day > 31 || day < 1) return false;
-  return input;
-};
-isodate.validate = function(v) { return v === null || v.match(isodate.re) ; }
-
-var Schema = mongoose.Schema
-  , ObjectId = Schema.ObjectId
-
-var Badge = new Schema(
+var BadgeSchema = new Schema(
   { meta:
     { pingback  : { type: String }
     , publicKey : { type: String }
@@ -72,12 +77,11 @@ var Badge = new Schema(
   }
 )
 
-var BadgeModel = module.exports = mongoose.model('Badge', Badge);
+var BadgeModel = module.exports = mongoose.model('Badge', BadgeSchema);
 
 BadgeModel.prototype.upsert = function(callback) {
   var self = this
     , query = {recipient: this.recipient, 'meta.pingback': this.meta.pingback}
-
   BadgeModel.findOne(query, function(err, doc) {
     var id;
     if (doc) {
