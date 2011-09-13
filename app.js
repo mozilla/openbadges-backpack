@@ -15,7 +15,8 @@ var app = express.createServer();
 app.logger = logger;
 app.config = configuration;
 
-app.set('view engine', 'ejs');
+app.set('view engine', 'coffee');
+app.register('.coffee', require('coffeekup').adapters.express)
 
 // View helpers. `user` and `badges` are set so we can use them in `if`
 // statements without getting undefined errors and without having to use typeof

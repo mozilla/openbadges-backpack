@@ -185,6 +185,7 @@ exports.details = getBadge(function(req, res, badge, next) {
   res.render('badge-details', {
     recipient: badge.recipient,
     id: badge.id,
+    image: badge.meta.imagePath,
     badge: badge.badge,
     owner: (badge.recipient === user),
     title: '',
