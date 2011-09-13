@@ -1,3 +1,4 @@
+h1 -> @type.name
 div '.row', ->
   div '.span5.columns.badge-details', ->
     img '#badge-image', src: @image, alt: 'Badge Image'
@@ -30,7 +31,7 @@ div '.row', ->
           input '.btn.primary', type: 'submit', value: 'Accept Badge'
         form action: @reverse('backpack.apiReject', { badgeId: @id }), method: 'post', style: 'display: inline', ->
           input type: 'hidden', name: 'csrf', value: @csrf
-          input '.btn', type: 'submit', value: 'Reject Badge'
+          input '.btn.danger', type: 'submit', value: 'Reject Badge'
 
       div '.groups', ->
         h2 -> 'Manage Groups'
@@ -41,7 +42,7 @@ div '.row', ->
             for group in @groups
               div '.clearfix', -> div '.input-append', ->
                 input '.mini', maxlength: 32,  type: 'text', value: group, disabled: true
-                label '.add-on', -> input type: 'checkbox', name: "group.#{group}", checked: @badge.inGroup(group)
+                label '.add-on', -> input type: 'checkbox', name: "group[#{group}]", checked: @badge.inGroup(group)
 
           div '.clearfix', -> div '.input-append', ->
             input '#new-group.mini', maxlength: 32,  type: 'text', name: "newGroup", placeholder: 'New group'
@@ -71,7 +72,13 @@ coffeescript ->
     elem = $(@)
     checkbox = elem.siblings('label').first().find('input')
     checked = if elem.val() then true else false
-    checkbox.attr('checked', checked).trigger('change')
+    checkbox
+      .attr('checked', checked)
+      .attr('disabled', true)
+      .trigger('change')
+    setTimeout ->
+      checkbox.attr('disabled', false)
+    , 30
 
   checkboxes.bind('change', watchChanges).trigger('change')
   newGroup.bind('keydown', autocheck).bind('blur', autocheck)

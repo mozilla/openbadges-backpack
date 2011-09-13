@@ -173,6 +173,8 @@ exports.manage = function(req, res) {
   
   Badge.find({recipient: user}, function(err, docs){
     res.render('manage', {
+      error: req.flash('error'),
+      success: req.flash('success'),
       user: user,
       badges: organize(docs),
       error: req.flash('upload_error')
@@ -208,16 +210,19 @@ exports.apiAccept = getBadge(function(req, res, badge, next) {
   badge.meta.accepted = true;
   badge.meta.rejected = false;
   badge.save(function(err, badge){
-    if (err) next(err)
+    if (err) req.flash('error', err);
     return res.redirect(reverse('backpack.manage'), 303);
   })  
 })
 
 // #TODO: make sure user owns badge
 exports.apiGroups = getBadge(function(req, res, badge, next) {
-  res.send(req.body)
+  badge.meta.groups = Object.keys(req.body['group']||{})
+  if (req.body['newGroup']) badge.group(req.body['newGroup'])
   badge.save(function(err, badge){
-    if (err) next(err)
+    if (err) req.flash('error', err);
+    else req.flash('success', 'Updated badge groups!');
+    return res.redirect(reverse('backpack.manage'), 303);
   });
 })
 

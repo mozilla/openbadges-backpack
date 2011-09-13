@@ -26,6 +26,7 @@ app.helpers({
   login: true,
   title: 'Backpack',
   error: [],
+  success: [],
   badges: {},
   reverse: router.reverse,
 
