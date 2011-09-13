@@ -36,11 +36,12 @@ div '.row', ->
         h2 -> 'Manage Groups'
         form action: @reverse('backpack.apiGroups', { badgeId: @id }), method: 'post', ->
           input type: 'hidden', name: 'csrf', value: @csrf
+
           if @groups.length
             for group in @groups
               div '.clearfix', -> div '.input-append', ->
                 input '.mini', maxlength: 32,  type: 'text', value: group, disabled: true
-                label '.add-on', -> input type: 'checkbox', name: "group.#{group}", checked: true
+                label '.add-on', -> input type: 'checkbox', name: "group.#{group}", checked: @badge.inGroup(group)
 
           div '.clearfix', -> div '.input-append', ->
             input '#new-group.mini', maxlength: 32,  type: 'text', name: "newGroup", placeholder: 'New group'

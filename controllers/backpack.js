@@ -181,21 +181,26 @@ exports.manage = function(req, res) {
 };
 
 exports.details = getBadge(function(req, res, badge, next) {
-  var user = getUsers(req);
-  res.render('badge-details', {
+  var user = getUsers(req)
+  var fields = {
     title: '',
     login: false,
     
     id: badge.id,
     recipient: badge.recipient,
     image: badge.meta.imagePath,
-    groups: badge.meta.groups,
     owner: (badge.recipient === user),
     
     badge: badge,
     type: badge.badge,
     meta: badge.meta
-  })
+  }
+  if (fields.owner)
+    return Badge.userGroups(user, function(err, groups){
+      fields.groups = Object.keys(groups);
+      res.render('badge-details', fields)
+    })
+  res.render('badge-details', fields)
 })
 
 // #TODO: make sure user owns badge
@@ -209,17 +214,11 @@ exports.apiAccept = getBadge(function(req, res, badge, next) {
 })
 
 // #TODO: make sure user owns badge
-exports.apiGroupAdd = getBadge(function(req, res, badge, next) {
-  badge.group('facebook');
+exports.apiGroups = getBadge(function(req, res, badge, next) {
+  res.send(req.body)
   badge.save(function(err, badge){
-    if (err) next(err);
-    res.redirect('back', 303);
-  })
-})
-
-// #TODO: make sure user owns badge
-exports.apiGroupRemove = getBadge(function(req, res, badge, next) {
-  res.send('removing from group' + req.body.group)
+    if (err) next(err)
+  });
 })
 
 // #TODO: make sure user owns badge

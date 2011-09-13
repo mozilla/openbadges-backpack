@@ -73,21 +73,11 @@ var Badge = new Schema(
 )
 
 var BadgeModel = module.exports = mongoose.model('Badge', Badge);
-BadgeModel.groups = function(badges) {
-  var groups = {}
-  badges.forEach(function(badge){
-    (badge.meta.groups||[]).forEach(function(group){
-      var g = groups[group] = (groups[group] || []);
-      g.push(badge);
-    })
-  })
-  return groups;
-}
 
 BadgeModel.prototype.upsert = function(callback) {
   var self = this
     , query = {recipient: this.recipient, 'meta.pingback': this.meta.pingback}
-  
+
   BadgeModel.findOne(query, function(err, doc) {
     var id;
     if (doc) {
@@ -97,6 +87,22 @@ BadgeModel.prototype.upsert = function(callback) {
     } else {
       self.save(callback);
     }
+  })
+}
+BadgeModel.groups = function(badges) {
+  var groups = {}
+  badges.forEach(function(badge){
+    (badge.meta.groups||[]).forEach(function(group) {
+      var g = groups[group] = (groups[group] || []);
+      g.push(badge);
+    })
+  })
+  return groups;
+}
+BadgeModel.userGroups = function(user, callback) {
+  BadgeModel.find({recipient: user}, ['meta.groups'], function(err, docs) {
+    if (err) return callback(err)
+    return callback(err, BadgeModel.groups(docs))
   })
 }
 BadgeModel.prototype.group = function(name) {
@@ -109,5 +115,5 @@ BadgeModel.prototype.degroup = function(name) {
   return this;
 }
 BadgeModel.prototype.inGroup = function(name) {
-  return (this.get('meta.groups').indexOf(name) !== -1)
+  return (this.meta.groups||[]).indexOf(name) !== -1
 }
