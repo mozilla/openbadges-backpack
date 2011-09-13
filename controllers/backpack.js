@@ -41,12 +41,13 @@ var getBadge = function(fn) {
   }
 }
 
+// #TODO: move this into badge model?
 var organize = function(badges) {
   var o =
     { pending: []
     , accepted: []
     , rejected: []
-    , groups:  {}
+    , groups: Badge.groups(badges)
     , issuers: {}
     , howMany: badges.length + (badges.length === 1 ? " badge" : " badges") 
     }
@@ -181,18 +182,21 @@ exports.manage = function(req, res) {
 
 exports.details = getBadge(function(req, res, badge, next) {
   var user = getUsers(req);
-  console.dir(badge);
   res.render('badge-details', {
-    recipient: badge.recipient,
-    id: badge.id,
-    image: badge.meta.imagePath,
-    badge: badge.badge,
-    owner: (badge.recipient === user),
     title: '',
-    login: false
+    login: false,
+    
+    id: badge.id,
+    recipient: badge.recipient,
+    image: badge.meta.imagePath,
+    groups: badge.meta.groups,
+    owner: (badge.recipient === user),
+    badge: badge.badge,
+    meta: badge.meta
   })
 })
 
+// #TODO: make sure user owns badge
 exports.apiAccept = getBadge(function(req, res, badge, next) {
   badge.meta.accepted = true;
   badge.meta.rejected = false;
@@ -202,9 +206,24 @@ exports.apiAccept = getBadge(function(req, res, badge, next) {
   })  
 })
 
+// #TODO: make sure user owns badge
+exports.apiGroupAdd = getBadge(function(req, res, badge, next) {
+  badge.group('facebook');
+  badge.save(function(err, badge){
+    if (err) next(err);
+    res.redirect('back', 303);
+  })
+})
+
+// #TODO: make sure user owns badge
+exports.apiGroupRemove = getBadge(function(req, res, badge, next) {
+  res.send('removing from group' + req.body.group)
+})
+
+// #TODO: make sure user owns badge
 exports.apiReject = getBadge(function(req, res, badge) {
- badge.meta.accepted = false;
- badge.meta.rejected = true;
+  badge.meta.accepted = false;
+  badge.meta.rejected = true;
   badge.save(function(err, badge){
     if (err) next(err)
     return res.redirect(reverse('backpack.manage'), 303);

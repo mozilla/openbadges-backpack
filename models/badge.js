@@ -48,9 +48,9 @@ var Badge = new Schema(
     , publicKey : { type: String }
     , imagePath : { type: String }
     , imageData : { type: String } //expected base64
-    , accepted : { type: Boolean }
-    , rejected : { type: Boolean }
-    , groups : { type: Array, default: [], get: function(v){ return v||[]  } }
+    , accepted : { type: Boolean, default: false }
+    , rejected : { type: Boolean, default: false }
+    , groups : { type: Array, default: [] }
     }
   , recipient : { type: String, required: true, match: emailre, index: true }
   , evidence  : { type: String, match: urlre, get: fqUrl}
@@ -100,9 +100,9 @@ BadgeModel.prototype.upsert = function(callback) {
   })
 }
 BadgeModel.prototype.group = function(name) {
-  var g = this.get('meta.groups');
-  (g.indexOf(name) !== -1) || g.push(name);
-  return this;
+  var g = this.meta.groups || []
+  if (g.indexOf(name) === -1) g.push(name);
+  this.meta.groups = g;
 }
 BadgeModel.prototype.degroup = function(name) {
   this.meta.groups = this.get('meta.groups').filter(function(v){ return v !== name });
