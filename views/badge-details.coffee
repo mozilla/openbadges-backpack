@@ -74,11 +74,16 @@ coffeescript ->
     checked = if elem.val() then true else false
     checkbox
       .attr('checked', checked)
-      .attr('disabled', true)
       .trigger('change')
+
+  shortDisable = () ->
+    elem = $(@)
+    checkbox = elem.siblings('label').first().find('input')
+    checkbox.attr('disabled', true)
     setTimeout ->
       checkbox.attr('disabled', false)
-    , 30
+    , 20
+
 
   checkboxes.bind('change', watchChanges).trigger('change')
-  newGroup.bind('keydown', autocheck).bind('blur', autocheck)
+  newGroup.bind('keydown', autocheck).bind('blur', autocheck).bind('blur', shortDisable)
