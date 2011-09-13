@@ -1,5 +1,11 @@
+html {
+  background: #fff url('/images/stripes.png') repeat-x;
+}
+body {
+  background: transparent;
+}
 #body {
-  margin-top: 60px;
+  padding-top: 60px;
 }
 form.signin { display: none; }
 form.baker label {
@@ -11,7 +17,6 @@ form.baker #assertion {
   height: 30px;
   width: 650px;
 }
-
 .management .groups {
   margin: 20px 0 0;
 }
@@ -24,16 +29,38 @@ form.baker #assertion {
 }
 .management .groups input.mini {
 }
-  
 .management .or {
   font-size: 14px;
   padding: 6px 20px;
 }
-
 .badge-details {
   color: #333;
   font-size: 16px;
 }
 .badge-details dd {
   padding: 3px 0 6px;
+}
+#moztab {
+  background-image: url('/images/icons-sprite.png');
+  height: 49px;
+  width: 118px;
+  text-indent: -999em;
+  position: absolute;
+  right: 10px;
+  top: 0px;
+  overflow: hidden;
+  display: block;
+}
+.topbar .topbar-inner {
+  height: 30px;
+}
+.topbar h3 {
+  top: -3px;
+}
+.topbar .nav {
+  top: -5px;
+}
+ 
+.topbar h3 a {
+  font-size: 18px;
 }

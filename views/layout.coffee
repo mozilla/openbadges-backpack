@@ -13,23 +13,13 @@ html ->
   body ->
     div '.topbar' ,->
       div '.topbar-inner' ,->
-        div '.container' ,->
+        div '.container', style: 'position: relative;', ->
           h3 -> a href: '#', -> "Open Badge #{@title}"
-          if @login
-            if @user
-              # form -> input type: 'text', placeholder: 'Filter'
-              ul '.nav.secondary-nav', ->
-                li '.menu', ->
-                  a '.menu.js-usermenu-link', href: '#', -> @user
-                  ul '.menu-dropdown.js-usermenu-dropdown', ->
-                    li -> a href: @reverse 'backpack.signout', -> 'Sign Out'
-            else
-              form '.signin.js-browserid-form', method: 'POST', action: @reverse 'backpack.authenticate', ->
-                input '.js-browserid-input', name: 'assertion', type: 'hidden'
-                input name: 'csrf', type: 'hidden', value: @csrf
-              ul '.nav.secondary-nav',  ->
-                li -> a '.js-browserid-link', href: '#', ->
-                  img src: 'https://browserid.org/i/sign_in_green.png'
+          a '#moztab', href: 'http://mozilla.org', -> 'a mozilla.org joint'
+          if @user
+            ul '.nav', ->
+              li -> a href: @reverse 'backpack.manage', -> 'Home'
+              li -> a href: @reverse 'backpack.signout', -> 'Sign Out'
 
     div '#body.container' ,->
       if @error.length

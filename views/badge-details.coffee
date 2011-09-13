@@ -1,6 +1,6 @@
 h1 -> @type.name
 div '.row', ->
-  div '.span5.columns.badge-details', ->
+  div '.span-one-third.columns.badge-details', ->
     img '#badge-image', src: @image, alt: 'Badge Image'
     dl ->
       dt -> 'Recipient'
@@ -23,7 +23,7 @@ div '.row', ->
         dd -> @type.issuer.org
 
   if @owner
-    div '.span11.columns.management', ->
+    div '.span-two-thirds.columns.management', ->
       div '.accept-reject', ->
         h2 -> 'Keep this badge?'
         form action: @reverse('backpack.apiAccept', { badgeId: @id }), method: 'post', style: 'display: inline', ->

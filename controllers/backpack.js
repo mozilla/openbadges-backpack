@@ -188,7 +188,7 @@ exports.details = getBadge(function(req, res, badge, next) {
   var user = getUsers(req)
   var fields = {
     title: '',
-    login: false,
+    user: (badge.recipient === user) ? user : null,
     
     id: badge.id,
     recipient: badge.recipient,
