@@ -11,27 +11,27 @@ html ->
     script type: 'text/javascript', src: 'http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js'
     script type: "text/javascript", src: '/js/modernizr.js'
   body ->
-    div '.container' ,->
-      div '.topbar' ,->
-        div '.fill' ,->
-          div '.container' ,->
-            h3 -> a href: '#', -> "Open Badge #{@title}"
-            if @login
-              if @user
-                # form -> input type: 'text', placeholder: 'Filter'
-                ul '.nav.secondary-nav', ->
-                  li '.menu', ->
-                    a '.menu.js-usermenu-link', href: '#', -> @user
-                    ul '.menu-dropdown.js-usermenu-dropdown', ->
-                      li -> a href: @reverse 'backpack.signout', -> 'Sign Out'
-              else
-                form '.signin.js-browserid-form', method: 'POST', action: @reverse 'backpack.authenticate', ->
-                  input '.js-browserid-input', name: 'assertion', type: 'hidden'
-                  input name: 'csrf', type: 'hidden', value: @csrf
-                ul '.nav.secondary-nav',  ->
-                  li -> a '.js-browserid-link', href: '#', ->
-                    img src: 'https://browserid.org/i/sign_in_green.png'
+    div '.topbar' ,->
+      div '.topbar-inner' ,->
+        div '.container' ,->
+          h3 -> a href: '#', -> "Open Badge #{@title}"
+          if @login
+            if @user
+              # form -> input type: 'text', placeholder: 'Filter'
+              ul '.nav.secondary-nav', ->
+                li '.menu', ->
+                  a '.menu.js-usermenu-link', href: '#', -> @user
+                  ul '.menu-dropdown.js-usermenu-dropdown', ->
+                    li -> a href: @reverse 'backpack.signout', -> 'Sign Out'
+            else
+              form '.signin.js-browserid-form', method: 'POST', action: @reverse 'backpack.authenticate', ->
+                input '.js-browserid-input', name: 'assertion', type: 'hidden'
+                input name: 'csrf', type: 'hidden', value: @csrf
+              ul '.nav.secondary-nav',  ->
+                li -> a '.js-browserid-link', href: '#', ->
+                  img src: 'https://browserid.org/i/sign_in_green.png'
 
+    div '#body.container' ,->
       if @error.length
         div '.alert-message.error.js-alert-container', ->
           a '.close.js-alert-close', href: '#', -> 'x'

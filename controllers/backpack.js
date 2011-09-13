@@ -171,13 +171,15 @@ exports.manage = function(req, res) {
   var user = getUsers(req);
   if (!user) return res.redirect(reverse('backpack.login'), 303);
   
+  var error = req.flash('error')
+    , success = req.flash('success')
+  
   Badge.find({recipient: user}, function(err, docs){
     res.render('manage', {
-      error: req.flash('error'),
-      success: req.flash('success'),
+      error: error,
+      success: success,
       user: user,
-      badges: organize(docs),
-      error: req.flash('upload_error')
+      badges: organize(docs)
     });
   })
 };
@@ -197,11 +199,12 @@ exports.details = getBadge(function(req, res, badge, next) {
     type: badge.badge,
     meta: badge.meta
   }
-  if (fields.owner)
+  if (fields.owner) {
     return Badge.userGroups(user, function(err, groups){
       fields.groups = Object.keys(groups);
       res.render('badge-details', fields)
     })
+  }
   res.render('badge-details', fields)
 })
 
@@ -241,7 +244,7 @@ exports.upload = function(req, res) {
   if (!user) return res.redirect(reverse('backpack.login'), 303);
 
   var redirect = function(err) {
-    if (err) req.flash('upload_error', err);
+    if (err) req.flash('error', err);
     return res.redirect(reverse('backpack.manage'), 303);
   }
   

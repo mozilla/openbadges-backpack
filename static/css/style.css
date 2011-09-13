@@ -1,3 +1,6 @@
+#body {
+  margin-top: 60px;
+}
 form.signin { display: none; }
 form.baker label {
   font-size: 18px;
