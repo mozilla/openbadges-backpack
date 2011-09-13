@@ -37,5 +37,16 @@ html ->
             text @success[0]
 
       text @body
-      script type: 'text/javascript', src: '/js/backpack.js'
+    div '.blanker', ->
+    div '.modal', style: 'position: relative, top: auto, left: auto, margin: 0 auto; z-index: 10', ->
+      div '.modal-header', ->
+        h3 ->
+        a '.close', href: '#', -> '×'
+      div '.modal-body', ->
+        p ->
+      div '.modal-footer', ->
+        a '.btn.primary', href: '#', -> 'Okay'
+
+
+    script type: 'text/javascript', src: '/js/backpack.js'
 

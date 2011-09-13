@@ -64,3 +64,16 @@ form.baker #assertion {
 .topbar h3 a {
   font-size: 18px;
 }
+.blanker {
+  display: none;
+  position: absolute;
+  opacity: 0.3;
+  background: #000;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+.modal {
+  display: none;
+}
