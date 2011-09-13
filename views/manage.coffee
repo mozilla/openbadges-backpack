@@ -49,6 +49,8 @@ else
         h2 -> "You haven't made any groups yet."
       for name, group of @badges.groups
         h3 -> name
-        div '.well', ->
+
+        div '.well', style: 'position: relative', ->
+          button '.btn.small.primary', style: 'position: absolute; top: 3px; right: 3px; padding: 4px;', -> 'embed'
           for badge in group
             img id: "id.#{badge.id}", src: badge.meta.imagePath, width: '64px'
