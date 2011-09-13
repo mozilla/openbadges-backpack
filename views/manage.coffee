@@ -53,4 +53,5 @@ else
         div '.well', style: 'position: relative', ->
           button '.btn.small.primary', style: 'position: absolute; top: 4px; right: 4px; padding: 4px;', -> 'embed'
           for badge in group
-            img id: "id.#{badge.id}", src: badge.meta.imagePath, width: '64px'
+            a href: @reverse('backpack.details', { badgeId: badge.id }), ->
+              img id: "id.#{badge.id}", src: badge.meta.imagePath, width: '64px'
