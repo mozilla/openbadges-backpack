@@ -8,3 +8,19 @@ form.baker #assertion {
   height: 30px;
   width: 650px;
 }
+.management {
+  padding-left: 300px;
+}
+.management .groups {
+  margin: 20px 0 0;
+}
+
+.badge-details {
+  float: left;
+  color: #333;
+  font-size: 16px;
+  width: 300px;
+}
+.badge-details dd {
+  padding: 3px 0 6px;
+}
