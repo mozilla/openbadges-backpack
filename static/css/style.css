@@ -12,6 +12,9 @@ form.baker #assertion {
 .management .groups {
   margin: 20px 0 0;
 }
+.management .groups .clearfix {
+  margin-bottom: 10px;
+}
 .management .groups input.mini {
   width: 128px;
   color: #333;

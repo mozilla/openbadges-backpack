@@ -39,11 +39,11 @@ div '.row', ->
           if @groups.length
             for group in @groups
               div '.clearfix', -> div '.input-append', ->
-                input '.mini', type: 'text', value: group, disabled: true
+                input '.mini', maxlength: 32,  type: 'text', value: group, disabled: true
                 label '.add-on', -> input type: 'checkbox', name: "group.#{group}", checked: true
 
           div '.clearfix', -> div '.input-append', ->
-            input '.mini', type: 'text', name: "newGroup", placeholder: 'New group'
+            input '.mini', maxlength: 32,  type: 'text', name: "newGroup", placeholder: 'New group'
             label '.add-on', -> input type: 'checkbox'
 
           input '.btn.primary', type: 'submit', value: 'Manage Groups'
