@@ -152,7 +152,7 @@ exports.authenticate = function(req, res) {
     // and redirect to the front page.
     if (!req.session) res.session = {}
     req.session.authenticated = [assertion.email]
-    return res.redirect(reverse('backpack.manage', 303));
+    return res.redirect(reverse('backpack.manage'), 303);
   })
 };
 
