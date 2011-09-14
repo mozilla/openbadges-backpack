@@ -7,8 +7,14 @@ var User = require('../models/user')
 
 exports.param = {}
 exports.param['groupId'] = function(req, res, next, id) {
-  var objId = ObjectID(id)
-    , badgeIds = []
+  var objId, badgeIds;
+  if (req.url.match(/.js$/)) {
+    req.query.js = true;
+    id = id.replace(/.js$/, '');
+  }
+  try { objId = ObjectID(id) }
+  catch(err) { return res.send('could not find group', 404) }
+  badgeIds = []
   User.findOne({'groups': {'$elemMatch' : { _id : objId }}}, function(err, doc) {
     if (!doc) return res.send('could not find group', 404);
     badgeIds = doc.groups.id(objId).badges
