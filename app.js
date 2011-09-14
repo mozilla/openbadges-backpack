@@ -84,6 +84,7 @@ if (!module.parent) {
       , pidfile = path.join(app.config.get('var_path'), 'server.pid')
 
     app.listen(port);
+    app.logger.info('environment: ' + process.env['NODE_ENV']);
     app.logger.info('opening server on port: ' + port);
     app.logger.info('READY PLAYER ONE')
 

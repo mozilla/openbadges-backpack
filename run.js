@@ -9,6 +9,7 @@ program
   .version('0.5.0')
   .option('-p, --port [port]', 'Run a webhook server on specified port')
   .option('-b, --branch [branch]', 'Only watch for changes on specified branch [master]', 'master')
+  .option('-e, --env [env]', 'Run under specified environment')
   .parse(process.argv)
 
 var restarts = 0;
@@ -99,6 +100,7 @@ var install_new_modules = function(callback) {
   })
 }
 
+if (program.env) process.env['NODE_ENV'] = program.env
 
 log('pid:', process.pid);
 running_server = spawn_server();
