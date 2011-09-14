@@ -124,39 +124,39 @@ exports.signout = function(req, res) {
 };
 
 exports.manage = function(req, res, next) {
-  var user = req.user;
-  if (!user) return res.redirect(reverse('backpack.login'), 303);
-  var error = req.flash('error')
+  if (!req.user) return res.redirect(reverse('backpack.login'), 303);
+  var userEmail = req.user.email
+    , error = req.flash('error')
     , success = req.flash('success')
-  Badge.organize(user, function(err, badges){
+  Badge.organize(userEmail, function(err, badges){
     if (err) next(err)
     res.render('manage', {
       error: error,
       success: success,
-      user: user,
+      user: userEmail,
       badges: badges
     });
   })
 };
 
 exports.details = function(req, res, next) {
-  var user = req.user
+  var userEmail = (req.user || {}).email
     , badge = req.badge
   var fields = {
     title: '',
-    user: (badge.recipient === user) ? user : null,
+    user: (badge.recipient === userEmail) ? userEmail : null,
     
     id: badge.id,
     recipient: badge.recipient,
     image: badge.meta.imagePath,
-    owner: (badge.recipient === user),
+    owner: (badge.recipient === userEmail),
     
     badge: badge,
     type: badge.badge,
     meta: badge.meta
   }
   if (fields.owner) {
-    return Badge.userGroups(user, function(err, groups){
+    return Badge.userGroups(email, function(err, groups){
       fields.groups = Object.keys(groups);
       res.render('badge-details', fields)
     })
@@ -199,8 +199,8 @@ exports.apiReject = function(req, res) {
 }
 
 exports.upload = function(req, res) {
-  var user = req.user;
-  if (!user) return res.redirect(reverse('backpack.login'), 303);
+  if (!req.user) return res.redirect(reverse('backpack.login'), 303);
+  var user = req.user.email;
 
   var redirect = function(err) {
     if (err) req.flash('error', err);

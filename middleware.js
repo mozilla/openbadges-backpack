@@ -5,6 +5,7 @@ var express = require('express')
   , configuration = require('./lib/configuration')
   , logger = require('./lib/logging').logger
   , crypto = require('crypto')
+  , User = require('./models/user')
 
 // `COOKIE_SECRET` is randomly generated on the first run of the server,
 // then stored to a file and looked up on restart to maintain state.
@@ -56,8 +57,16 @@ exports.getUser = function() {
       req.session = {};
       return next();
     }
-    req.user = user;
-    return next();
+    User.findOne({'email': user}, function(err, existingUser){
+      if (err) next(err)
+      if (!existingUser) {
+        return (new User({'email': user})).save(function(err, newUser){
+          req.user = newUser
+        })
+      }
+      req.user = existingUser;
+      return next();
+    });
   }
 }
 
