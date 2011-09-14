@@ -140,33 +140,29 @@ exports.manage = function(req, res, next) {
 };
 
 exports.details = function(req, res, next) {
-  var userEmail = (req.user || {}).email
+  var user = req.user
     , badge = req.badge
-  var fields = {
+    , email = user ? user.email : null
+  res.render('badge-details', {
     title: '',
-    user: (badge.recipient === userEmail) ? userEmail : null,
+    user: (badge.recipient === email) ? email : null,
     
     id: badge.id,
     recipient: badge.recipient,
     image: badge.meta.imagePath,
-    owner: (badge.recipient === userEmail),
+    owner: (badge.recipient === email),
     
     badge: badge,
     type: badge.badge,
-    meta: badge.meta
-  }
-  if (fields.owner) {
-    return Badge.userGroups(email, function(err, groups){
-      fields.groups = Object.keys(groups);
-      res.render('badge-details', fields)
-    })
-  }
-  res.render('badge-details', fields)
+    meta: badge.meta,
+    groups: user.groups
+  })
 }
 
-// #TODO: make sure user owns badge
 exports.apiAccept = function(req, res) {
   var badge = req.badge
+  if (!req.user || req.user.email !== req.badge.recipient)
+    return res.send('forbidden', 403)
   badge.meta.accepted = true;
   badge.meta.rejected = false;
   badge.save(function(err, badge){
@@ -175,9 +171,10 @@ exports.apiAccept = function(req, res) {
   })  
 }
 
-// #TODO: make sure user owns badge
 exports.apiGroups = function(req, res) {
   var badge = req.badge
+  if (!req.user || req.user.email !== req.badge.recipient)
+    return res.send('forbidden', 403)
   badge.meta.groups = Object.keys(req.body['group']||{})
   if (req.body['newGroup']) badge.group(req.body['newGroup'])
   badge.save(function(err, badge){
@@ -187,9 +184,10 @@ exports.apiGroups = function(req, res) {
   });
 }
 
-// #TODO: make sure user owns badge
 exports.apiReject = function(req, res) {
   var badge = req.badge
+  if (!req.user || req.user.email !== req.badge.recipient)
+    return res.send('forbidden', 403)
   badge.meta.accepted = false;
   badge.meta.rejected = true;
   badge.save(function(err, badge){

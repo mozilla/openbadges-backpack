@@ -55,7 +55,7 @@ var BadgeSchema = new Schema(
     , imageData : { type: String } //expected base64
     , accepted : { type: Boolean, default: false }
     , rejected : { type: Boolean, default: false }
-    , groups : { type: Array, default: [] }
+    , groups : { type: [ObjectId], default: [] }
     }
   , recipient : { type: String, required: true, match: emailre, index: true }
   , evidence  : { type: String, match: urlre, get: fqUrl}
