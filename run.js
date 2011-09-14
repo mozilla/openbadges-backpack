@@ -23,7 +23,7 @@ var spawn_server = function(){
     log('too many failures, shut. down. everything.');
     process.exit();
   }
-  
+
   log('spawning new server');
   app = spawn('node', ['app.js']);
   fancypid = ('('+app.pid+') ').grey;
@@ -41,7 +41,7 @@ var spawn_server = function(){
     if (code) log('server exited with code ' + code);
     running_server = spawn_server();
   })
-  
+
   return app;
 }
 var webhook_server = function(port, branch) {

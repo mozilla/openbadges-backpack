@@ -2,7 +2,7 @@ var mongoose = require('mongoose')
   , conf = require('../lib/configuration').get('database')
 var Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId
-  
+
 mongoose.connect(conf.host, conf.name, conf.port);
 
 var Group = new Schema(
@@ -17,4 +17,3 @@ var User = new Schema(
 )
 
 var UserModel = module.exports = mongoose.model('User', User);
-

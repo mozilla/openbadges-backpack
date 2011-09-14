@@ -20,7 +20,7 @@ exports.baker = function(req, res) {
       login: false
     });
   }
-  
+
   accepts = req.headers['accept'] || '';
   award = req.query.award === 'true';
   remote.assertion(query.assertion, function(err, data) {
@@ -58,12 +58,12 @@ exports.baker = function(req, res) {
           reason: 'could not write data to PNG: ' + e
         }), 400);
       }
-      
+
       if (accepts.match('application/json')) {
         res.setHeader('Content-Type', 'application/json');
         return res.send(JSON.stringify({'status':'success', 'assertion': JSON.stringify(data) }));
       }
-      
+
       md5sum = crypto.createHash('md5');
       filename = md5sum.update(badge).digest('hex') + '.png';
       res.setHeader('Content-Type', 'image/png');
@@ -73,4 +73,3 @@ exports.baker = function(req, res) {
     });
   });
 }
-

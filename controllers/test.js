@@ -25,7 +25,7 @@ exports.test_badge = function(req, res) {
     , image = req.query.image || '/images/test-badge.png'
     , desc = req.query.desc || 'For rocking in the free world'
     , recp = req.query.recp || 'me@example.com'
-  
+
   setTimeout(function(){
     res.setHeader('Content-Type', 'application/json');
     res.send(JSON.stringify({

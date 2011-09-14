@@ -113,7 +113,7 @@ BadgeModel.organize = function(user, callback) {
       , rejected: []
       , groups: BadgeModel.groups(badges)
       , issuers: {}
-      , howMany: badges.length + (badges.length === 1 ? " badge" : " badges") 
+      , howMany: badges.length + (badges.length === 1 ? " badge" : " badges")
       }
 
     badges.forEach(function(badge){
