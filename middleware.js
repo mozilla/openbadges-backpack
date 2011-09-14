@@ -68,6 +68,7 @@ exports.getUser = function() {
       if (!existingUser) {
         return (new User({'email': user})).save(function(err, newUser){
           req.user = newUser
+          return next();
         })
       }
       req.user = existingUser;
