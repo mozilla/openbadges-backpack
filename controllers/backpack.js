@@ -9,27 +9,6 @@ var request = require('request')
   , reverse = require('../lib/router').reverse
   , Badge = require('../models/badge')
 
-// #TODO: move this into badge model?
-var organize = function(badges) {
-  var o =
-    { pending: []
-    , accepted: []
-    , rejected: []
-    , groups: Badge.groups(badges)
-    , issuers: {}
-    , howMany: badges.length + (badges.length === 1 ? " badge" : " badges") 
-    }
-  
-  badges.forEach(function(badge){
-    if (badge.meta.rejected)
-      return o.rejected.push(badge)
-    if (badge.meta.accepted)
-      return o.accepted.push(badge)
-    return o.pending.push(badge)
-  })
-  return o;
-}
-
 exports.param = {}
 exports.param['badgeId'] = function(req, res, next, id) {
   Badge.findById(id, function(err, doc) {
@@ -144,17 +123,18 @@ exports.signout = function(req, res) {
   res.redirect(reverse('backpack.login'), 303);
 };
 
-exports.manage = function(req, res) {
+exports.manage = function(req, res, next) {
   var user = req.user;
   if (!user) return res.redirect(reverse('backpack.login'), 303);
   var error = req.flash('error')
     , success = req.flash('success')
-  Badge.find({recipient: user}, function(err, docs){
+  Badge.organize(user, function(err, badges){
+    if (err) next(err)
     res.render('manage', {
       error: error,
       success: success,
       user: user,
-      badges: organize(docs)
+      badges: badges
     });
   })
 };

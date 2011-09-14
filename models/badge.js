@@ -103,6 +103,29 @@ BadgeModel.groups = function(badges) {
   })
   return groups;
 }
+BadgeModel.organize = function(user, callback) {
+  BadgeModel.find({recipient: user}, function(err, badges){
+    if (err) return callback(err);
+    badges = badges||[]
+    var o =
+      { pending: []
+      , accepted: []
+      , rejected: []
+      , groups: BadgeModel.groups(badges)
+      , issuers: {}
+      , howMany: badges.length + (badges.length === 1 ? " badge" : " badges") 
+      }
+
+    badges.forEach(function(badge){
+      if (badge.meta.rejected)
+        return o.rejected.push(badge)
+      if (badge.meta.accepted)
+        return o.accepted.push(badge)
+      return o.pending.push(badge)
+    })
+    return callback(null, o);
+  })
+}
 BadgeModel.userGroups = function(user, callback) {
   BadgeModel.find({recipient: user}, ['meta.groups'], function(err, docs) {
     if (err) return callback(err)
