@@ -2,6 +2,7 @@ var request = require('request')
   , qs = require('querystring')
   , fs = require('fs')
   , logger = require('../lib/logging').logger
+  , url = require('url')
   , configuration = require('../lib/configuration')
   , baker = require('../lib/baker')
   , remote = require('../lib/remote')
@@ -128,7 +129,6 @@ exports.manage = function(req, res, next) {
   if (!req.user) return res.redirect(reverse('backpack.login'), 303);
   var error = req.flash('error')
     , success = req.flash('success')
-  
   req.user.populateGroups(function(){
     Badge.organize(req.user.email, function(err, badges){
       if (err) next(err)
@@ -136,7 +136,15 @@ exports.manage = function(req, res, next) {
         error: error,
         success: success,
         user: req.user,
-        badges: badges
+        badges: badges,
+        fqrev: function(p, o){
+          var u = url.parse(reverse(p, o))
+          u.hostname = configuration.get('hostname');
+          u.protocol = configuration.get('protocol');
+          u.port = configuration.get('external_port');
+          u.port = '80' ? null : u.port;
+          return url.format(u);
+        }
       });
     })
   })    

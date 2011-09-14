@@ -51,7 +51,17 @@ else
         h3 -> group.name
 
         div '.well', style: 'position: relative', ->
-          button '.btn.small.primary', style: 'position: absolute; top: 4px; right: 4px; padding: 4px;', -> 'embed'
+          input '.embed-link', value: "&ltscript src='#{@fqrev('share.group', {groupId: group.id})}.js'&gt;&lt;/script&gt", type: 'hidden'
+          button '.embed.btn.small.primary', id: group.id, style: 'position: absolute; top: 4px; right: 4px; padding: 4px;', -> 'embed'
           for badge in group.realBadges
             a href: @reverse('backpack.details', { badgeId: badge.id }), ->
               img id: "id.#{badge.id}", src: badge.meta.imagePath, width: '64px'
+
+coffeescript ->
+  $('.embed').bind 'click', (event) ->
+    self = $(@)
+    script = self.siblings('input').first().val()
+    modal.show('Copy and paste this into a web page', "<div><textarea style='width:98%'; height:75px'>#{script}</textarea></div>")
+    false
+
+

@@ -50,3 +50,28 @@ html ->
 
     script type: 'text/javascript', src: '/js/backpack.js'
 
+coffeescript ->
+  window.modal =
+    main: $('.modal')
+    blanker: $('.blanker')
+    close: $('.modal a.close')
+    button: $('.modal a.btn')
+    title: $('.modal-header h3')
+    body: $('.modal-body')
+    hide: ->
+      modal.main.fadeOut()
+      modal.blanker.fadeOut()
+    show: (title, body) ->
+      modal.title.html(title)
+      modal.body.html(body)
+      modal.main.fadeIn()
+      modal.blanker.fadeIn()
+      modal
+    setup: ->
+      modal.close.bind 'click', modal.hide
+      modal.blanker.bind 'click', modal.hide
+      modal.button.bind 'click', modal.hide
+      $('body').bind 'keyup', (e) -> console.log(e); if e.keyCode is 27 then modal.hide()
+      modal
+
+  modal.setup()
