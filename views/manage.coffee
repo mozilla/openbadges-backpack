@@ -45,13 +45,13 @@ else
     div '.span-two-thirds.column.groups', ->
       h1 -> "Groups"
 
-      if not Object.keys(@badges.groups).length
+      if not @user.groups.length
         h2 -> "You haven't made any groups yet."
-      for name, group of @badges.groups
-        h3 -> name
+      for group in @user.groups
+        h3 -> group.name
 
         div '.well', style: 'position: relative', ->
           button '.btn.small.primary', style: 'position: absolute; top: 4px; right: 4px; padding: 4px;', -> 'embed'
-          for badge in group
+          for badge in group.realBadges
             a href: @reverse('backpack.details', { badgeId: badge.id }), ->
               img id: "id.#{badge.id}", src: badge.meta.imagePath, width: '64px'

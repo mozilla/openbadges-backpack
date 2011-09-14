@@ -126,18 +126,20 @@ exports.signout = function(req, res) {
 
 exports.manage = function(req, res, next) {
   if (!req.user) return res.redirect(reverse('backpack.login'), 303);
-  var userEmail = req.user.email
-    , error = req.flash('error')
+  var error = req.flash('error')
     , success = req.flash('success')
-  Badge.organize(userEmail, function(err, badges){
-    if (err) next(err)
-    res.render('manage', {
-      error: error,
-      success: success,
-      user: userEmail,
-      badges: badges
-    });
-  })
+  
+  req.user.populateGroups(function(){
+    Badge.organize(req.user.email, function(err, badges){
+      if (err) next(err)
+      res.render('manage', {
+        error: error,
+        success: success,
+        user: req.user,
+        badges: badges
+      });
+    })
+  })    
 };
 
 exports.details = function(req, res, next) {
