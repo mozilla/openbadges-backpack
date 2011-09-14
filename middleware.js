@@ -38,9 +38,15 @@ exports.logRequests = function(){
   });
 };
 
-exports.noFrame = function(){
+exports.noFrame = function(whitelist) {
+  var whitelisted = function(input){
+    for (var i = whitelist.length; i--; ) {
+      if (RegExp('^' + whitelist[i] + '$').test(input)) return true;
+    }
+    return false;
+  }
   return function(req, res, next){
-    res.setHeader('x-frame-options', 'DENY');
+    if (!whitelisted(req.url)) res.setHeader('x-frame-options', 'DENY');
     next();
   };
 };

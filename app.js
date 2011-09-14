@@ -50,9 +50,9 @@ app.dynamicHelpers({
 app.use(express.bodyParser());
 app.use(express.cookieParser());
 app.use(middleware.logRequests());
-app.use(middleware.noFrame());
 app.use(middleware.formHandler());
 app.use(middleware.cookieSessions());
+app.use(middleware.noFrame([ '/share/.*' ]));
 app.use(middleware.csrf.check([ '/backpack/badge' ]));
 app.use(middleware.getUser());
 
@@ -74,6 +74,8 @@ router(app)
   .post('/backpack/badge/:badgeId/reject',  'backpack.apiReject')
   .post('/backpack/badge/:badgeId/groups',  'backpack.apiGroups')
   .get('/backpack',                         'backpack.manage')
+  .get('/share/g/:groupId',                 'share.group')
+  .get('/share/b/:badgeId',                 'share.badge')
   .get('/',                                 'backpack.manage')
 
 if (!module.parent) {
