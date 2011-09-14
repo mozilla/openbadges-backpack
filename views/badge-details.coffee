@@ -50,40 +50,41 @@ div '.row', ->
 
           input '.btn.primary', type: 'submit', value: 'Manage Groups'
 
-coffeescript ->
-  newGroup = $('#new-group')
-  checkboxes = $('.input-append input[type=checkbox]')
-  image = $('#badge-image')
+    coffeescript ->
+      newGroup = $('#new-group')
+      checkboxes = $('.input-append input[type=checkbox]')
+      watchChanges = (event) ->
+        elem = $(@)
+        label = elem.parent()
+        input = label.siblings('input').first()
+        if elem.attr('checked')
+          label.addClass('active')
+          if not input.val() then input.trigger('focus')
+        else
+          label.removeClass('active')
 
+      autocheck = (event) ->
+        elem = $(@)
+        checkbox = elem.siblings('label').first().find('input')
+        checked = if elem.val() then true else false
+        checkbox
+          .attr('checked', checked)
+          .trigger('change')
+
+      shortDisable = () ->
+        elem = $(@)
+        checkbox = elem.siblings('label').first().find('input')
+        checkbox.attr('disabled', true)
+        setTimeout ->
+          checkbox.attr('disabled', false)
+        , 20
+
+
+      checkboxes.bind('change', watchChanges).trigger('change')
+      newGroup.bind('keydown', autocheck).bind('blur', autocheck).bind('blur', shortDisable)
+
+coffeescript ->
+  image = $('#badge-image')
   image.bind 'load', (event) ->
     if @clientWidth > 256 then $(@).css(width: '256px')
 
-  watchChanges = (event) ->
-    elem = $(@)
-    label = elem.parent()
-    input = label.siblings('input').first()
-    if elem.attr('checked')
-      label.addClass('active')
-      if not input.val() then input.trigger('focus')
-    else
-      label.removeClass('active')
-
-  autocheck = (event) ->
-    elem = $(@)
-    checkbox = elem.siblings('label').first().find('input')
-    checked = if elem.val() then true else false
-    checkbox
-      .attr('checked', checked)
-      .trigger('change')
-
-  shortDisable = () ->
-    elem = $(@)
-    checkbox = elem.siblings('label').first().find('input')
-    checkbox.attr('disabled', true)
-    setTimeout ->
-      checkbox.attr('disabled', false)
-    , 20
-
-
-  checkboxes.bind('change', watchChanges).trigger('change')
-  newGroup.bind('keydown', autocheck).bind('blur', autocheck).bind('blur', shortDisable)
