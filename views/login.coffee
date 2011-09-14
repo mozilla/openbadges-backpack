@@ -1,10 +1,3 @@
-if @error.length
-  div '.alert-message.error.js-alert-container', ->
-    a '.close.js-alert-close', href: '#', -> 'x'
-    p ->
-      strong -> "Oh no!"
-      text @error[0]
-
 h1 -> 'Welcome'
 h2 ->
   text 'Use the green button below to '

@@ -64,7 +64,7 @@ exports.login = function(req, res) {
   // req.flash returns an array. Pass on the whole thing to the view and
   // decide there if we want to display all of them or just the first one.
   res.render('login', {
-    error: req.flash('login_error')
+    error: req.flash('error')
   });
 };
 
