@@ -1,7 +1,6 @@
 // Configure & start express.
 var express = require('express')
   , csrf = require('express-csrf')
-  , ejs = require('ejs')
   , fs = require('fs')
   , path = require('path')
   , middleware = require('./middleware')
