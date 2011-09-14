@@ -75,10 +75,6 @@ router(app)
   .get('/backpack',                         'backpack.manage')
   .get('/',                                 'backpack.manage')
 
-exports.server = app;
-exports.logger = logger;
-exports.config = configuration;
-
 if (!module.parent) {
   var start_server = function(app) {  
     var port = app.config.get('internal_port')
@@ -96,4 +92,6 @@ if (!module.parent) {
     })
   }
   start_server(app);
+} else {
+  module.exports = app;
 }
