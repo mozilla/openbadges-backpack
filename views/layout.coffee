@@ -4,7 +4,7 @@ html ->
     meta charset: 'utf-8'
     meta 'http-equiv': 'X-UA-Compatible', content: 'IE=edge;chrome=1'
     meta name: 'viewport', content: 'width=device-width, initial-scale=1.0'
-    link rel: "stylesheet", href: 'http://twitter.github.com/bootstrap/assets/css/bootstrap-1.2.0.min.css'
+    link rel: "stylesheet", href: '/css/bootstrap-1.2.0.min.css'
     link rel: 'stylesheet', href: '/css/style.css', type: 'text/css', media: 'all'
     title dir:'ltr' ,-> "Open Badge #{@title}"
     script type: 'text/javascript', src: 'https://browserid.org/include.js'

@@ -8,6 +8,7 @@ var request = require('request')
   , _award = require('../lib/award')
   , reverse = require('../lib/router').reverse
   , Badge = require('../models/badge')
+  , User = require('../models/user')
 
 exports.param = {}
 exports.param['badgeId'] = function(req, res, next, id) {
@@ -160,8 +161,8 @@ exports.details = function(req, res, next) {
 }
 
 exports.apiAccept = function(req, res) {
-  var badge = req.badge
-  if (!req.user || req.user.email !== req.badge.recipient)
+  var badge = req.badge, user = req.user
+  if (!user || user.email !== badge.recipient)
     return res.send('forbidden', 403)
   badge.meta.accepted = true;
   badge.meta.rejected = false;
@@ -171,23 +172,26 @@ exports.apiAccept = function(req, res) {
   })  
 }
 
-exports.apiGroups = function(req, res) {
+exports.apiGroups = function(req, res, next) {
   var badge = req.badge
-  if (!req.user || req.user.email !== req.badge.recipient)
+    , user = req.user
+    , fields = (req.body || {})
+    , keep = (fields['group'] || {})
+    , newGroup = (fields['newGroup'] || '').trim()
+    , updated = []
+    , groupsByName = user.groups.map(function(g){ return g.name })
+  if (!user || user.email !== badge.recipient)
     return res.send('forbidden', 403)
-  badge.meta.groups = Object.keys(req.body['group']||{})
-  if (req.body['newGroup']) badge.group(req.body['newGroup'])
-  badge.save(function(err, badge){
-    if (err) req.flash('error', err);
-    else req.flash('success', 'Updated badge groups!');
-    return res.redirect(reverse('backpack.manage'), 303);
-  });
+  user.updateBadgeGroups(badge, keep, newGroup, function(err){
+    if (err) return next(err);
+    res.redirect('back', 303);
+  })
 }
 
 exports.apiReject = function(req, res) {
-  var badge = req.badge
-  if (!req.user || req.user.email !== req.badge.recipient)
-    return res.send('forbidden', 403)
+  var badge = req.badge, user = req.user
+  if (!user || user.email !== badge.recipient)
+    return res.send('forbidden', 403);
   badge.meta.accepted = false;
   badge.meta.rejected = true;
   badge.save(function(err, badge){

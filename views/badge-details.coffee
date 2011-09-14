@@ -41,8 +41,8 @@ div '.row', ->
           if @groups.length
             for group in @groups
               div '.clearfix', -> div '.input-append', ->
-                input '.mini', maxlength: 32,  type: 'text', value: group, disabled: true
-                label '.add-on', -> input type: 'checkbox', name: "group[#{group}]", checked: @badge.inGroup(group)
+                input '.mini', maxlength: 32,  type: 'text', value: group.name, disabled: true
+                label '.add-on', -> input type: 'checkbox', name: "group[#{group.id}]", checked: group.badges.indexOf(@badge.id) > -1
 
           div '.clearfix', -> div '.input-append', ->
             input '#new-group.mini', maxlength: 32,  type: 'text', name: "newGroup", placeholder: 'New group'
