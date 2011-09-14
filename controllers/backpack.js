@@ -62,6 +62,16 @@ var organize = function(badges) {
   return o;
 }
 
+exports.param = {}
+exports.param['badgeId'] = function(req, res, next, id) {
+  console.dir(id)
+  Badge.findById(id, function(err, doc) {
+    if (!doc) return res.send('could not find badge', 404);
+    req.badge = doc;
+    return next();
+  })
+}
+
 exports.login = function(req, res) {
   // req.flash returns an array. Pass on the whole thing to the view and
   // decide there if we want to display all of them or just the first one.
@@ -184,8 +194,9 @@ exports.manage = function(req, res) {
   })
 };
 
-exports.details = getBadge(function(req, res, badge, next) {
+exports.details = function(req, res, next) {
   var user = getUsers(req)
+    , badge = req.badge
   var fields = {
     title: '',
     user: (badge.recipient === user) ? user : null,
@@ -206,20 +217,22 @@ exports.details = getBadge(function(req, res, badge, next) {
     })
   }
   res.render('badge-details', fields)
-})
+}
 
 // #TODO: make sure user owns badge
-exports.apiAccept = getBadge(function(req, res, badge, next) {
+exports.apiAccept = function(req, res) {
+  var badge = req.badge
   badge.meta.accepted = true;
   badge.meta.rejected = false;
   badge.save(function(err, badge){
     if (err) req.flash('error', err);
     return res.redirect(reverse('backpack.manage'), 303);
   })  
-})
+}
 
 // #TODO: make sure user owns badge
-exports.apiGroups = getBadge(function(req, res, badge, next) {
+exports.apiGroups = function(req, res) {
+  var badge = req.badge
   badge.meta.groups = Object.keys(req.body['group']||{})
   if (req.body['newGroup']) badge.group(req.body['newGroup'])
   badge.save(function(err, badge){
@@ -227,17 +240,18 @@ exports.apiGroups = getBadge(function(req, res, badge, next) {
     else req.flash('success', 'Updated badge groups!');
     return res.redirect(reverse('backpack.manage'), 303);
   });
-})
+}
 
 // #TODO: make sure user owns badge
-exports.apiReject = getBadge(function(req, res, badge) {
+exports.apiReject = function(req, res) {
+  var badge = req.badge
   badge.meta.accepted = false;
   badge.meta.rejected = true;
   badge.save(function(err, badge){
     if (err) next(err)
     return res.redirect(reverse('backpack.manage'), 303);
   })
- })
+}
 
 exports.upload = function(req, res) {
   var user = getUsers(req);
