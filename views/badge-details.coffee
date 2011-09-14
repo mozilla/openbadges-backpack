@@ -13,10 +13,13 @@ div '.row', ->
       dd -> safe @type.description
 
       dt -> 'Criteria'
-      dd -> @type.criteria
+      dd -> a href: @type.criteria, -> @type.criteria
 
       dt -> 'Issuer'
-      dd -> safe "#{@type.issuer.name} (#{@type.issuer.origin})"
+      dd ->
+        safe "#{@type.issuer.name} ("
+        a href: @type.issuer.origin, -> @type.issuer.origin
+        text ")"
 
       if @type.issuer.org
         dt -> 'Organization'
