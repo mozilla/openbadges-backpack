@@ -44,6 +44,22 @@ exports.noFrame = function(){
   };
 };
 
+exports.getUser = function() {
+  return function(req, res, next){
+    var session, user, emailRe;
+    if (!req.session || !req.session.authenticated) return next();
+    session = req.session;
+    user = session.authenticated[0];
+    emailRe = /^.+?\@.+?\.*$/;
+    if (!emailRe.test(user)) {
+      logger.warn('session.authenticate does not contain valid user: ' + user);
+      req.session = {};
+      return next();
+    }
+    req.user = user;
+    return next();
+  }
+}
 
 var csrf = null;
 exports.csrf = {}

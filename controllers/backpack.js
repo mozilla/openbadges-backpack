@@ -9,27 +9,6 @@ var request = require('request')
   , reverse = require('../lib/router').reverse
   , Badge = require('../models/badge')
 
-var getUsers = function(req) {
-  var session, user, emailRe;
-  if (!req.session || !req.session.authenticated) {
-    return false;
-  }
-  
-  // #TODO: support multiple users
-  session = req.session
-  user = session.authenticated[0]
-  emailRe = /^.+?\@.+?\.*$/
-
-  // very simple sanity check
-  if (!emailRe.test(user)) {
-    logger.warn('session.authenticate does not contain valid user: ' + user);
-    req.session = {};
-    return false;
-  }
-  
-  return user;
-}
-
 // #TODO: move this into badge model?
 var organize = function(badges) {
   var o =
@@ -166,12 +145,10 @@ exports.signout = function(req, res) {
 };
 
 exports.manage = function(req, res) {
-  var user = getUsers(req);
+  var user = req.user;
   if (!user) return res.redirect(reverse('backpack.login'), 303);
-  
   var error = req.flash('error')
     , success = req.flash('success')
-  
   Badge.find({recipient: user}, function(err, docs){
     res.render('manage', {
       error: error,
@@ -183,7 +160,7 @@ exports.manage = function(req, res) {
 };
 
 exports.details = function(req, res, next) {
-  var user = getUsers(req)
+  var user = req.user
     , badge = req.badge
   var fields = {
     title: '',
@@ -242,7 +219,7 @@ exports.apiReject = function(req, res) {
 }
 
 exports.upload = function(req, res) {
-  var user = getUsers(req);
+  var user = req.user;
   if (!user) return res.redirect(reverse('backpack.login'), 303);
 
   var redirect = function(err) {
