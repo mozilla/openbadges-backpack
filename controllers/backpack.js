@@ -30,17 +30,6 @@ var getUsers = function(req) {
   return user;
 }
 
-// #TODO: consider using route param pre-conditions
-var getBadge = function(fn) {
-  return function(req, res, next){
-    var badgeId = req.params.badgeId;
-    Badge.findById(badgeId, function(err, doc) {
-      if (!doc) return res.send('could not find badge', 404);
-      fn(req, res, doc, next);
-    })
-  }
-}
-
 // #TODO: move this into badge model?
 var organize = function(badges) {
   var o =
@@ -64,7 +53,6 @@ var organize = function(badges) {
 
 exports.param = {}
 exports.param['badgeId'] = function(req, res, next, id) {
-  console.dir(id)
   Badge.findById(id, function(err, doc) {
     if (!doc) return res.send('could not find badge', 404);
     req.badge = doc;
