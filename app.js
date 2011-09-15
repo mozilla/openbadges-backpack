@@ -52,7 +52,7 @@ app.use(middleware.logRequests());
 app.use(middleware.formHandler());
 app.use(middleware.cookieSessions());
 app.use(middleware.noFrame([ '/share/.*' ]));
-app.use(middleware.csrf.check([ '/backpack/badge' ]));
+app.use(middleware.csrf.check([ '/backpack/badge', '/backpack/authenticate' ]));
 app.use(middleware.getUser());
 
 app.use(express.static(path.join(__dirname, "static")));
@@ -92,6 +92,10 @@ if (!module.parent) {
       fs.writeFile(pidfile, pid, function(err){
         if (err) throw Error('could not make pidfile: ' + err)
       });
+    })
+    process.on('SIGTERM', function(){
+      app.logger.info('recieved SIGTERM, exiting');
+      process.exit();
     })
   }
   start_server(app);
