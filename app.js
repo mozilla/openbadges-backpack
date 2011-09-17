@@ -8,8 +8,6 @@ var express = require('express')
   , configuration = require('./lib/configuration')
   , router = require('./lib/router')
 
-// Create the app and set it up to use `ejs` templates which are easier to
-// maintain than the default `jade` templates.
 var app = express.createServer();
 app.logger = logger;
 app.config = configuration;
