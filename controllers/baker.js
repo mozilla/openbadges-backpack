@@ -6,13 +6,13 @@ var url = require('url')
   , configuration = require('../lib/configuration')
   , baker = require('../lib/baker')
   , remote = require('../lib/remote')
-  , _award = require('../lib/award')
+  , awardBadge = require('../lib/award')
 
 exports.baker = function(req, res) {
   var query = req.query || {}
-    , issuer  , image  , imageURL
-    , badge   , md5sum , filename
-    , accepts , award
+    , issuer       , image  , imageURL
+    , badgePNGData , md5sum , filename
+    , accepts      , shouldAward
 
   if (!query.assertion) {
     return res.render('baker', {
@@ -20,9 +20,8 @@ exports.baker = function(req, res) {
       login: false
     });
   }
-
   accepts = req.headers['accept'] || '';
-  award = req.query.award === 'true';
+  shouldAward = req.query.award === 'true';
   remote.assertion(query.assertion, function(err, data) {
     if (err.status !== 'success') {
       logger.warn('failed grabbing assertion for URL '+ query.assertion);
@@ -48,7 +47,7 @@ exports.baker = function(req, res) {
         return res.send(JSON.stringify(err), 400)
       }
       try {
-        badge = baker.prepare(imagedata, query.assertion);
+        badgePNGData = baker.prepare(imagedata, query.assertion);
       } catch (e) {
         logger.error('failed writing data to badge image: '+ e);
         res.setHeader('Content-Type', 'application/json');
@@ -65,11 +64,19 @@ exports.baker = function(req, res) {
       }
 
       md5sum = crypto.createHash('md5');
-      filename = md5sum.update(badge).digest('hex') + '.png';
+      filename = md5sum.update(badgePNGData).digest('hex') + '.png';
       res.setHeader('Content-Type', 'image/png');
       res.setHeader('Content-Disposition', 'attachment; filename="'+filename+'"');
-      if (award) _award(data, query.assertion, badge);
-      return res.send(badge);
+      
+      if (shouldAward) {
+        awardBadge(data, query.assertion, badgePNGData, function (err, badge) {
+          if (err) res.setHeader('x-badge-awarded', 'false');
+          else res.setHeader('x-badge-awarded', badge.recipient);
+          return res.send(badgePNGData);
+        });
+      } else {
+        return res.send(badgePNGData);
+      }
     });
   });
 }
