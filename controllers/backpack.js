@@ -69,7 +69,7 @@ exports.authenticate = function(req, res) {
     // bottom, and call `goBackWithError` to redirect to the previous page
     // with a human-friendly message telling the user to try again.
     function goBackWithError(msg) {
-      req.flash('login_error', (msg || 'There was a problem authenticating, please try again.'));
+      req.flash('error', (msg || 'There was a problem authenticating, please try again.'));
       return res.redirect('back', 303)
     }
     try {
