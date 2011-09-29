@@ -64,7 +64,7 @@ exports.getUser = function() {
       return next();
     }
     User.findOne({'email': user}, function(err, existingUser){
-      if (err) next(err)
+      if (err) return next(err)
       if (!existingUser) {
         return (new User({'email': user})).save(function(err, newUser){
           req.user = newUser
