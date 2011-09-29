@@ -32,7 +32,7 @@ exports.authenticate = function(req, res) {
   // If `assertion` wasn't posted in, the user has no business here.
   // We could return 403 or redirect to login page. It's more polite
   // to just redirect to the login page.
-  if (!req.body['assertion']) {
+  if (!req.body || !req.body['assertion']) {
     return res.redirect(reverse('backpack.login'), 303);
   }
 
@@ -98,10 +98,6 @@ exports.authenticate = function(req, res) {
       if (assertion.audience !== hostname) {
         logger.warn('unexpected audience for this assertion, expecting ' + hostname +'; got ' + assertion.audience);
         throw 'unexpected audience';
-      }
-      if (assertion.issuer !== ident.server) {
-        logger.warn('unexpected issuer for this assertion, expecting ' + ident.server +'; got ' + assertion.issuer);
-        throw 'unexpected issuer';
       }
     } catch (validationError) {
       return goBackWithError();
