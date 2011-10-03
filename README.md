@@ -43,3 +43,9 @@ Please [see the page on Assertions](https://github.com/brianlovesdata/openbadges
 learn how to format your assertions, and [see the page on Badge Baking](https://github.com/brianlovesdata/openbadges/wiki/Badge-Baking) to
 learn more about how to use the baking API and what kind of responses to
 expect in case of error.
+
+
+## Related Projects
+* https://github.com/lmorchard/django-badger -- Issuing app for Django
+* https://github.com/PRX/badges_engine -- Rails Engine for issuing.
+* https://github.com/openmichigan/open_badges -- Drupal module for managing/issuing badges
