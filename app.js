@@ -53,7 +53,6 @@ app.use(middleware.formHandler());
 app.use(middleware.cookieSessions());
 app.use(middleware.noFrame([ '/share/.*' ]));
 app.use(middleware.csrf.check([ '/backpack/badge', '/backpack/authenticate' ]));
-app.use(middleware.getUser());
 
 router(app)
   .get('/baker',                            'baker.baker')
