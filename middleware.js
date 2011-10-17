@@ -51,32 +51,6 @@ exports.noFrame = function(whitelist) {
   };
 };
 
-exports.getUser = function() {
-  return function(req, res, next){
-    var session, user, emailRe;
-    if (!req.session || !req.session.authenticated) return next();
-    session = req.session;
-    user = session.authenticated[0];
-    emailRe = /^.+?\@.+?\.*$/;
-    if (!emailRe.test(user)) {
-      logger.warn('session.authenticate does not contain valid user: ' + user);
-      req.session = {};
-      return next();
-    }
-    User.findOne({'email': user}, function(err, existingUser){
-      if (err) return next(err)
-      if (!existingUser) {
-        return (new User({'email': user})).save(function(err, newUser){
-          req.user = newUser
-          return next();
-        })
-      }
-      req.user = existingUser;
-      return next();
-    });
-  }
-}
-
 var csrf = null;
 exports.csrf = {}
 exports.csrf.token = function(req, res) {
