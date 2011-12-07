@@ -1,3 +1,8 @@
+// #TODO: un-insane this. This is relational data and should be stored in a
+// relational database (sqlite, postgre or mysql), not in mongo (or any other
+// nosql database).
+//
+// This needs to be fixed before doing display API or facebook integration.
 var mongoose = require('mongoose')
   , conf = require('../lib/configuration').get('database')
   , Badge = require('./badge')
@@ -17,7 +22,6 @@ var User = new Schema(
   }
 )
 var UserModel = module.exports = mongoose.model('User', User);
-
 UserModel.prototype.populateGroups = function(callback) {
   if (!this.groups.length) return callback();
   var times = {}
@@ -35,7 +39,6 @@ UserModel.prototype.populateGroups = function(callback) {
     })
   })
 }
-
 UserModel.prototype.groupExists = function(name) {
   return this.groups.some(function(g){ return g.name.toLowerCase() === name.toLowerCase() })
 }

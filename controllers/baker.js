@@ -22,6 +22,7 @@ exports.baker = function(req, res) {
   }
   accepts = req.headers['accept'] || '';
   shouldAward = req.query.award === 'true';
+  
   remote.assertion(query.assertion, function(err, data) {
     if (err.status !== 'success') {
       logger.warn('failed grabbing assertion for URL '+ query.assertion);
