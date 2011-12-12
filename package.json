@@ -5,6 +5,7 @@
 , "dependencies":
   { "express": "2.4.x"
   , "express-csrf": "0.3.x"
+  , "mysql": "0.9.5"
   , "uglify-js": "1.0.x"
   , "winston": "0.3.x"
   , "mongoose": "2.1.x"
@@ -17,5 +18,6 @@
   , "metapng": "git+https://github.com/brianlovesdata/metapng.js.git"
   , "vows": "0.5.x"
   }
-, "engine": "node 0.4.x"
+, "engines":
+  { "node":  "*" }
 }

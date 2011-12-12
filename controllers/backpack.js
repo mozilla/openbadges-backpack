@@ -126,29 +126,24 @@ exports.manage = function(req, res, next) {
   if (!email) return res.redirect(reverse('backpack.login'), 303);
   var error = req.flash('error')
     , success = req.flash('success')
-  
-  makeOrGetUser(email, function(err, user) { 
+  Badge.organize(email, function(err, badges){
     if (err) return next(err);
-    user.populateGroups(function() {
-      Badge.organize(email, function(err, badges){
-        if (err) return next(err);
-        res.render('manage', {
-          error: error,
-          success: success,
-          user: user,
-          badges: badges,
-          fqrev: function(p, o){
-            var u = url.parse(reverse(p, o))
-            u.hostname = configuration.get('hostname');
-            u.protocol = configuration.get('protocol');
-            u.port = configuration.get('external_port');
-            u.port = '80' ? null : u.port;
-            return url.format(u);
-          }
-        });
-      })
-    })
-  })
+    res.render('manage', {
+      error: error,
+      success: success,
+      user: email,
+      badges: badges,
+      groups: [],
+      fqrev: function(p, o){
+        var u = url.parse(reverse(p, o))
+        u.hostname = configuration.get('hostname');
+        u.protocol = configuration.get('protocol');
+        u.port = configuration.get('external_port');
+        u.port = '80' ? null : u.port;
+        return url.format(u);
+      }
+    });
+  });
 };
 
 exports.details = function(req, res, next) {
