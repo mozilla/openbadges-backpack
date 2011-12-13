@@ -1,5 +1,5 @@
 var mongoose = require('mongoose')
-  , conf = require('../lib/configuration').get('database')
+  , conf = require('../lib/configuration').get('database').nosql
   , url = require('url')
 var Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId
