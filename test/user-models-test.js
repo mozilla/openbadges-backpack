@@ -13,7 +13,7 @@ vows.describe('user model').addBatch({
       bimmy.save(this.callback);
     },
     'no errors are thrown': function (err, user) { assert.ifError(err) },
-    'user object': {
+    'the user object': {
       topic: function (user) { return user },
       'is returned': function (user) { assert.ok(user) },
       'contains id': function (user) { assert.ok(user.data.id) },
@@ -26,9 +26,10 @@ vows.describe('user model').addBatch({
         'without error': function (err, user) { assert.ifError(err) },
         'and return the right data': function (err, user) { assert.equal(user.data.active, 0) }
       },
-      'can be found': {
-        topic: function(user) {
-          return user;
+      'contains an id, that when searched for': {
+        topic: function(user) { User.findById(user.data.id, this.callback) },
+        'returns the very same user object': function (err, result) {
+          assert.equal(result.data.email, 'bimmy@example.com');
         }
       }
     }
