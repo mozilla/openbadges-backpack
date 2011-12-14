@@ -7,7 +7,7 @@ var vows = require('./setup')
 mysql.prepareTesting();
 
 vows.describe('user model').addBatch({
-  'When saving a new user': {
+  'When saving a basic new user': {
     topic: function () {
       var bimmy = new User({email: 'bimmy@example.com'})
       bimmy.save(this.callback);
@@ -31,6 +31,38 @@ vows.describe('user model').addBatch({
         'returns the very same user object': function (err, result) {
           assert.equal(result.data.email, 'bimmy@example.com');
         }
+      }
+    }
+  },
+  // #XXX: maybe move the collections stuff into it's own file (both test and model)?
+  'Creating a new collection for a user': {
+    topic: function () {
+      var jimmy = new User({email: 'jimmy@example.com'})
+      return jimmy.createCollection('heyy');
+    },
+    'should return a collection object': function (collection) {
+      assert.instanceOf(collection, User.Collection);
+      assert.instanceOf(collection.user, User);
+      assert.equal(collection.user.data.email, 'jimmy@example.com');
+      assert.equal(collection.data.name, 'heyy');
+    }
+  },
+  
+  'After saving a user with collections': {
+    topic: function () {
+      var timmy = new User({email: 'timmy@example.com'})
+      timmy.createCollection('ohsup');
+      timmy.save(this.callback);
+    },
+    'and looking up by id': {
+      topic: function (user) {
+        User.findById(user.data.id, this.callback);
+      },
+      'collections can be retrieved': function (err, user) {
+        var cols = user.collections();
+        assert.isObject(cols);
+        assert.isNotEmpty(cols);
+        assert.include(cols, 'ohsup');
       }
     }
   }

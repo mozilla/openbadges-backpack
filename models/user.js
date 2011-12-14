@@ -1,50 +1,17 @@
 var mysql = require('../lib/mysql')
+var Base = require('./mysql-base')
 
-var User = function(data){
+var User = function(data) {
   this.fields = ['id', 'email', 'passwd', 'last_login', 'active'];
   this.data = data;
 }
 
-User.prototype.save = function(callback) {
-  var data = this.data
-    , client = User._client
-    , self = this;
-  
-  client._upsert(User._table, data, function (err, result) {
-    if (err) return callback(err, null);
-    if (!data.id && result.insertId) data.id = result.insertId;
-    return callback(null, self);
-  })
-  
-}
+Base.apply(User, 'user');
 
-User.prototype.destroy = function() { }
-User.prototype.collections = function() { }
-User.prototype.createCollection = function(data) { }
-
-User.findOrCreate = function() {  }
-
-User.fromDbResult = function (data) {
-  if (data === undefined) return null;
-  return new User(data);
-}
-User.find = function(criteria, callback) {
-  var client = User._client
-    , keys = Object.keys(criteria)
-    , values = keys.map(function (k) { return criteria[k] })
-  var qstring
-    = 'SELECT * FROM `'+User._table+'` WHERE '
-    + keys.map(function (k) { return (k + ' = ?')}).join(' AND ')
-  client.query(qstring, values, function (err, results) {
-    if (err) callback(err);
-    else callback(null, results.map(User.fromDbResult));
-  });
-}
-User.findById = function (id, callback) {
-  User.find({id: id}, function (err, results) {
-    if (err) callback(err);
-    callback(null, results.pop());
-  })
+User.prototype.collections = function() { return 'lolllll' }
+User.prototype.createCollection = function(name) {
+  var data = {name: name};
+  return new Collection(this, data);
 }
 User.findByEmail = function (email, callback) {
   User.find({email: email}, function (err, results) {
@@ -53,11 +20,12 @@ User.findByEmail = function (email, callback) {
   })
 }
 
-User._table = 'user';
-User._client = mysql.client;
-
-var Collection = function(data){
+var Collection = function(user, data) {
+  this.user = user;
   this.data = data;
 }
+Base.apply(Collection, 'collection');
 
+
+User.Collection = Collection;
 module.exports = User;
