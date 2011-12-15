@@ -45,6 +45,13 @@ vows.describe('user model').addBatch({
       assert.instanceOf(collection.user, User);
       assert.equal(collection.user.data.email, 'jimmy@example.com');
       assert.equal(collection.data.name, 'heyy');
+    },
+    'should put it into collections array': function (collection) {
+      var user = collection.user;
+      var col = user.collections()[0];
+      assert.isArray(user.collections());
+      assert.isNotEmpty(user.collections());
+      assert.equal(col.data.name, collection.data.name);
     }
   },
   
@@ -60,7 +67,7 @@ vows.describe('user model').addBatch({
       },
       'collections can be retrieved': function (err, user) {
         var cols = user.collections();
-        assert.isObject(cols);
+        assert.isArray(cols);
         assert.isNotEmpty(cols);
         assert.include(cols, 'ohsup');
       }

@@ -25,6 +25,7 @@ Base.apply = function (Model, table) {
     })
   }
   Model.prototype = new Base;
+  Model.prototype.client = client;
   Model.prototype.getTableName = function () { return table };
 }
 
