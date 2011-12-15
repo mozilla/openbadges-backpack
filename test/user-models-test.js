@@ -6,71 +6,61 @@ var vows = require('./setup')
 // all queries get queued and executed in series.
 mysql.prepareTesting();
 
-vows.describe('user model').addBatch({
-  'When saving a basic new user': {
+vows.describe('user functions').addBatch({
+  'making a new user': {
     topic: function () {
-      var bimmy = new User({email: 'bimmy@example.com'})
-      bimmy.save(this.callback);
+      User.create({email: 'bimmy@example.com'}, this.callback)
     },
-    'no errors are thrown': function (err, user) { assert.ifError(err) },
-    'the user object': {
-      topic: function (user) { return user },
-      'is returned': function (user) { assert.ok(user) },
-      'contains id': function (user) { assert.ok(user.data.id) },
-      'contains email': function (user) { assert.equal(user.data.email, 'bimmy@example.com') },
-      'can be updated': {
-        topic: function (user) {
-          user.data.active = 0;
-          user.save(this.callback);
-        },
-        'without error': function (err, user) { assert.ifError(err) },
-        'and return the right data': function (err, user) { assert.equal(user.data.active, 0) }
-      },
-      'contains an id, that when searched for': {
-        topic: function(user) { User.findById(user.data.id, this.callback) },
-        'returns the very same user object': function (err, result) {
-          assert.equal(result.data.email, 'bimmy@example.com');
+    'makes a new user': function (err, user) {
+      // {email: ..., id: ..., active: 0/1, passwd: ..., last_login: ...}
+      assert.isObject(user);
+      assert.include(user, 'email');
+      assert.include(user, 'id');
+      assert.include(user, 'active');
+      assert.include(user, 'passwd');
+      assert.include(user, 'last_login');
+      assert.equal(user.email, 'bimmy@example.com');
+    },
+    
+    'and making a new collection': {
+      topic: function () {},
+      'makes a new collection': function () {},
+      
+      'and adding a badge to a collection': {
+        topic: function () {},
+        'adds a badge to that collections': function () {}
+      }
+    },
+    
+    'and making a new collection (2)': {
+      topic: function () {},
+      'then renaming a collection': {
+        topic: function () {},
+        'renames that collection': function () {},
+        
+        'and then deleting a collection': {
+          topic: function () {},
+          'deletes that collection': function () {}
+        }
+      }
+    },
+    
+    'making a new collection (3)': {
+      'adding a bunch of badges': {
+        topic: function () {},
+        'adds all those badges': function () {},
+        
+        'getting all the badges': {
+          topic: function () {},
+          'gets all those badges': function () {},
+          
+          'removing a badge': {
+            topic: function () {},
+            'removes that badge': function () {}
+          }
         }
       }
     }
-  },
-  // #XXX: maybe move the collections stuff into it's own file (both test and model)?
-  'Creating a new collection for a user': {
-    topic: function () {
-      var jimmy = new User({email: 'jimmy@example.com'})
-      return jimmy.createCollection('heyy');
-    },
-    'should return a collection object': function (collection) {
-      assert.instanceOf(collection, User.Collection);
-      assert.instanceOf(collection.user, User);
-      assert.equal(collection.user.data.email, 'jimmy@example.com');
-      assert.equal(collection.data.name, 'heyy');
-    },
-    'should put it into collections array': function (collection) {
-      var user = collection.user;
-      var col = user.collections()[0];
-      assert.isArray(user.collections());
-      assert.isNotEmpty(user.collections());
-      assert.equal(col.data.name, collection.data.name);
-    }
-  },
-  
-  'After saving a user with collections': {
-    topic: function () {
-      var timmy = new User({email: 'timmy@example.com'})
-      timmy.createCollection('ohsup');
-      timmy.save(this.callback);
-    },
-    'and looking up by id': {
-      topic: function (user) {
-        User.findById(user.data.id, this.callback);
-      },
-      'collections can be retrieved': function (err, user) {
-        var cols = user.collections();
-        assert.isArray(cols);
-        assert.isNotEmpty(cols);
-        assert.include(cols, 'ohsup');
-      }
-    }
   }
+  
 }).export(module)
