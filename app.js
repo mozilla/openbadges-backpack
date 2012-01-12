@@ -53,6 +53,12 @@ app.use(middleware.formHandler());
 app.use(middleware.cookieSessions());
 app.use(middleware.noFrame([ '/share/.*' ]));
 app.use(middleware.csrf.check([ '/backpack/badge', '/backpack/authenticate' ]));
+// Allow everything to be used with CORS.
+// This should probably just be limited to badges
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  next();
+});
 
 router(app)
   .get('/baker',                            'baker.baker')
