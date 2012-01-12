@@ -9,7 +9,7 @@ mysql.prepareTesting();
 vows.describe('user functions').addBatch({
   'making a new user': {
     topic: function () {
-      User.create({email: 'bimmy@example.com'}, this.callback)
+      User.newUser({email: 'bimmy@example.com'}, this.callback)
     },
     'makes a new user': function (err, user) {
       // {email: ..., id: ..., active: 0/1, passwd: ..., last_login: ...}
@@ -23,7 +23,9 @@ vows.describe('user functions').addBatch({
     },
     
     'and making a new collection': {
-      topic: function () {},
+      topic: function (user) {
+        User.newCollection({user_id: user.id, name: 'wutttt'}, this.callback)
+      },
       'makes a new collection': function () {},
       
       'and adding a badge to a collection': {
