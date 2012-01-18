@@ -44,6 +44,18 @@ learn how to format your assertions, and [see the page on Badge Baking](https://
 learn more about how to use the baking API and what kind of responses to
 expect in case of error.
 
+## I want to play with the code, where do I start?
+
+Running the app in a development environment is easy:
+
+1. Install dependencies `npm install`
+
+2. Copy the `openbadges/lib/environments/local-dist.js` `openbadges/lib/environments/local.js` and edit the configuration to match your local development environment.
+
+3. Start your server, `node run.js`
+
+4. Join the [Open Badges Google Group](https://groups.google.com/forum/#!forum/openbadges).
+
 
 ## Related Projects
 * https://github.com/lmorchard/django-badger -- Issuing app for Django
