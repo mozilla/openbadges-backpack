@@ -14,7 +14,7 @@
   , "request": "2.1.x"
   , "colors": "0.5.x"
   , "commander": "0.1.x"
-  , "metapng": "git+https://github.com/brianlovesdata/metapng.js.git"
+  , "metapng": "git+https://github.com/brianloveswords/metapng.js.git"
   , "vows": "0.5.x"
   }
 , "engine": "node 0.4.x"
