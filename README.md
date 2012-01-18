@@ -50,7 +50,7 @@ Running the app in a development environment is easy:
 
 1. Install dependencies `npm install`
 
-2. Copy the `openbadges/lib/environments/local-dist.js` `openbadges/lib/environments/local.js` and edit the configuration to match your local development environment.
+2. Copy the `openbadges/lib/environments/local-dist.js` to `openbadges/lib/environments/local.js` and edit the configuration to match your local development environment.
 
 3. Start your server, `node run.js`
 
