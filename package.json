@@ -17,5 +17,5 @@
   , "metapng": "git+https://github.com/brianloveswords/metapng.js.git"
   , "vows": "0.5.x"
   }
-, "engine": "node 0.4.x"
+, "engine": "node 0.6.x"
 }
