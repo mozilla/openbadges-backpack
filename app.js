@@ -7,13 +7,15 @@ var express = require('express')
   , logger = require('./lib/logging').logger
   , configuration = require('./lib/configuration')
   , router = require('./lib/router')
+  , hogan = require('hogan.js')
+  , adapter = require('./hogan-express.js')
 
 var app = express.createServer();
 app.logger = logger;
 app.config = configuration;
 
-app.set('view engine', 'coffee');
-app.register('.coffee', require('coffeekup').adapters.express)
+app.set('view engine', 'hogan.js');
+app.register('hogan.js', adapter.init(hogan))
 
 // View helpers. `user` and `badges` are set so we can use them in `if`
 // statements without getting undefined errors and without having to use typeof
