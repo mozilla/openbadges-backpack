@@ -23,7 +23,7 @@ exports.param['badgeId'] = function(req, res, next, id) {
 exports.login = function(req, res) {
   // req.flash returns an array. Pass on the whole thing to the view and
   // decide there if we want to display all of them or just the first one.
-  res.render('login', {
+  res.render('login.coffee', {
     error: req.flash('error')
   });
 };
@@ -132,7 +132,7 @@ exports.manage = function(req, res, next) {
     user.populateGroups(function() {
       Badge.organize(email, function(err, badges){
         if (err) return next(err);
-        res.render('manage', {
+        res.render('manage.coffee', {
           error: error,
           success: success,
           user: user,
@@ -156,7 +156,7 @@ exports.details = function(req, res, next) {
     , email = emailFromSession(req)
   
   makeOrGetUser(email, function(err, user) {
-    res.render('badge-details', {
+    res.render('badge-details.coffee', {
       title: '',
       user: (badge.recipient === email) ? email : null,
       
