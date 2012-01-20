@@ -8,7 +8,7 @@ var express = require('express')
   , configuration = require('./lib/configuration')
   , router = require('./lib/router')
   , hogan = require('hogan.js')
-  , adapter = require('./hogan-express.js')
+  , adapter = require('./lib/hogan-express.js')
 
 var app = express.createServer();
 app.logger = logger;
@@ -63,6 +63,7 @@ app.use(function(req, res, next) {
 });
 
 router(app)
+  .get('/chris',                            'chris.chris')
   .get('/baker',                            'baker.baker')
   .get('/test',                             'test.issuer')
   .post('/test/award',                      'test.award')
