@@ -25,6 +25,70 @@
       </div>
     </div>
 
-    <div>{{body}}</div>
+    <div id="body" class="container">
+      {{#error.length}}
+        <div class="alert-message error js-alert-container">
+          <a href="#"><p><strong>Oh no! {{error[0]}}</strong></p></a>
+        </div>
+      {{/error.length}}
+
+      {{#success.length}}
+        <div class="alert-message success js-alert-container">
+          <a href="#"><p><strong>Yay! {{success[0]}}</strong></p></a>
+        </div>
+      {{/success.length}}
+             
+      {{body}}
+
+        <script type="text/javascript" src="/js/backpack.js"></script>
+        <script type="text/javascript">
+          (function() {
+
+          window.modal = {
+          main: $('.modal'),
+          blanker: $('.blanker'),
+          close: $('.modal a.close'),
+          button: $('.modal a.btn'),
+          title: $('.modal-header h3'),
+          body: $('.modal-body'),
+          hide: function() {
+          modal.main.fadeOut();
+          return modal.blanker.fadeOut();
+          },
+          show: function(title, body) {
+          modal.title.html(title);
+          modal.body.html(body);
+          modal.main.fadeIn();
+          modal.blanker.fadeIn();
+          return modal;
+          },
+          setup: function() {
+          modal.close.bind('click', modal.hide);
+          modal.blanker.bind('click', modal.hide);
+          modal.button.bind('click', modal.hide);
+          $('body').bind('keyup', function(e) {
+          console.log(e);
+          if (e.keyCode === 27) return modal.hide();
+          });
+          return modal;
+          }
+          };
+
+          }).call(this);
+
+        </script>
+        <div class="modal" style="position: relative, top: auto, left: auto, margin: 0 auto; z-index: 10">
+          <div class="modal-header">
+            <h3></h3>
+            <a class="close" href="#">×</a>
+          </div>
+          <div class="modal-body">
+            <p></p>
+          </div>
+          <div class="modal-footer">
+            <a class="btn primary" href="#">Okay</a>
+          </div>
+        </div>
+    </div>
   </body>
 </html>
