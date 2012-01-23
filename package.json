@@ -7,6 +7,7 @@
   , "express-csrf": "0.3.x"
   , "uglify-js": "1.0.x"
   , "winston": "0.3.x"
+  , "hogan.js": "1.0.x"
   , "mongoose": "2.1.x"
   , "coffeekup": "0.3.x"
   , "connect-cookie-session" : "0.0.x"
