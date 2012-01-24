@@ -11,7 +11,7 @@ Base.apply = function (Model, table) {
     var keys = Object.keys(criteria)
         , values = keys.map(function (k) { return criteria[k] })
         var qstring
-      = 'SELECT * FROM `'+table+'` WHERE '
+      = 'SELECT * FROM `' + table + '` WHERE '
       + keys.map(function (k) { return (k + ' = ?')}).join(' AND ')
     client.query(qstring, values, function (err, results) {
       if (err) callback(err);
@@ -25,15 +25,19 @@ Base.apply = function (Model, table) {
     })
   }
   Model.prototype = new Base;
+  Model.prototype.super = function (method, args) { return Model.prototype[method].apply(this, args); }
   Model.prototype.client = client;
   Model.prototype.getTableName = function () { return table };
 }
-
 
 Base.prototype.save = function (callback) {
   var data = this.data
     , table = this.getTableName()
     , self = this;
+  
+  Object.keys(data).forEach(function (k) {
+    if (k in self.prepare) data[k] = self.prepare[k](data[k]);
+  })
   
   client._upsert(table, data, function (err, result) {
     if (err) return callback(err, null);

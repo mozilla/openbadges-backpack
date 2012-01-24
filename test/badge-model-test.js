@@ -1,84 +1,46 @@
-var vows = require('./setup')
+var vows = require('vows')
+  , mysql = require('../lib/mysql')
   , assert = require('assert')
-  , fixture = require('./utils').fixture
-  , Badge = require('../models/badge')
-  , genstring = require('./utils').genstring
   , url = require('url')
+  , fixture = require('./utils').fixture
+  , genstring = require('./utils').genstring
+  , crypto = require('crypto')
+  , Badge = require('../models/badge')
+  , client = mysql.client;
 
 var BAD_EMAILS = ['lkajd', 'skj@asdk', '@.com', '909090', '____!@']
 var BAD_URLS = ['-not-asdo', 'ftp://bad-scheme', '@.com:90/']
 var BAD_DATES = ['oiajsd09gjas;oj09', 'foreever ago', '111111', '1314145531', '@.com:90/']
 var BAD_VERSIONS = ['v100', '50', 'v10.1alpha']
 
-var generateErrorTests = function(field, errType, badData) {
-  var tests = {}, currentTest;
-  for (var i = 0; i < badData.length; i += 1) {
-    var hierarchy = field.split('.');
-    var changes = {}, struct, currentField;
-    changes[hierarchy.pop()] = badData[i];
-    for (var j = hierarchy.length - 1; j >= 0; j--) {
-      struct = {};
-      struct[hierarchy[j]] = changes;
-      changes = struct;
-    }
-    currentTest = tests['“' + badData[i] + '”'] = {}
-    currentTest['topic'] = function(){
-      new Badge(fixture(changes)).validate(this.callback)
-    };
-    currentTest['should fail with `' +  errType + '` error'] = function(err, suc) {
-      assert.ok(err);
-      assert.includes(err.errors, field)
-      assert.equal(err.errors[field].type, errType);
+var sha256 = function (str) { return crypto.createHash('sha256').update(str).digest('hex'); }
+
+mysql.prepareTesting();
+vows.describe('Badggesss').addBatch({
+  'A valid badge assertion': {
+    topic: function () {
+      return fixture()
+    },
+    'that is hosted': {
+      topic: function (assertion) {
+        var badge = new Badge({
+          type: 'hosted',
+          endpoint: 'http://example.com/awesomebadge.json',
+          image_path: '/dev/null',
+          body: assertion,
+          body_hash: 'sha256$' + sha256(JSON.stringify(assertion))
+        });
+        badge.save(this.callback);
+      },
+      'can be saved': function (err, badge) {
+        console.dir(badge);
+      }
+    },
+    'that is signed': {
+      'can be saved': {
+        'and retrieved': {
+        }
+      }
     }
   }
-  return tests;
-}
-
-vows.describe('Badge Validator').addBatch({
-  'When validating something invalid': {
-    topic: function() { new Badge({}).validate(this.callback); },
-    'we get errors': function(err, suc) {
-      assert.ok(err);
-      assert.instanceOf(err, Error);
-    }
-  },
-  'Invalid badge assertion': {
-    'with bad recipient': generateErrorTests('recipient', 'regexp', BAD_EMAILS),
-    'with bad evidence': generateErrorTests('evidence', 'regexp', BAD_URLS),
-    'with bad expires': generateErrorTests('expires', 'isodate', BAD_DATES),
-    'with bad issued_on': generateErrorTests('expires', 'isodate', BAD_DATES),
-    'with bad badge.version': generateErrorTests('badge.version', 'regexp', BAD_VERSIONS),
-    'with bad badge.name': generateErrorTests('badge.name', 'maxlen', [genstring(500)]),
-    'with bad badge.description': generateErrorTests('badge.description', 'maxlen', [genstring(500)]),
-    'with bad badge.image': generateErrorTests('badge.image', 'regexp', BAD_URLS),
-    'with bad badge.criteria': generateErrorTests('badge.criteria', 'regexp', BAD_URLS),
-    'with bad badge.issuer.name': generateErrorTests('badge.issuer.name', 'maxlen', [genstring(500)]),
-    'with bad badge.issuer.org': generateErrorTests('badge.issuer.org', 'maxlen', [genstring(500)]),
-    'with bad badge.issuer.contact': generateErrorTests('badge.issuer.contact', 'regexp', BAD_EMAILS),
-    'with bad badge.issuer.url': generateErrorTests('evidence', 'regexp', BAD_URLS)
-  },
-  'Valid badge assertion' : {
-    topic: function() { return new Badge(fixture()); },
-    'without issued_on': {
-      topic: function(badge) { badge.issued_on = null; badge.validate(this.callback) },
-      'should not have errors': function(err, succ){
-        assert.equal(err, null)
-      }
-    },
-    'can validate multiple times': {
-      topic: function(badge) {
-        var self = this;
-        badge.validate(function(err){ new Badge(badge).validate(self.callback) })
-      },
-      'without errors': function(err, succ){
-        assert.equal(err, null)
-      }
-    },
-    'gets fully qualified urls from members': function(badge){
-      assert.ok(url.parse(badge.evidence).hostname);
-    },
-    'does not change fully qualified members': function(badge){
-      assert.equal(badge.criteria, badge._doc.criteria);
-    },
-  },
 }).export(module);
