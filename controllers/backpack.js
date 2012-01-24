@@ -11,14 +11,14 @@ var request = require('request')
   , Badge = require('../models/badge')
   , User = require('../models/user')
 
-exports.param = {}
+exports.param = {};
 exports.param['badgeId'] = function(req, res, next, id) {
   Badge.findById(id, function(err, doc) {
     if (!doc) return res.send('could not find badge', 404);
     req.badge = doc;
     return next();
-  })
-}
+  });
+};
 
 exports.login = function(req, res) {
   // req.flash returns an array. Pass on the whole thing to the view and
@@ -105,10 +105,10 @@ exports.authenticate = function(req, res) {
 
     // Everything seems to be in order, store the user's email in the session
     // and redirect to the front page.
-    if (!req.session) res.session = {}
-    req.session.authenticated = [assertion.email]
+    if (!req.session) res.session = {};
+    req.session.authenticated = [assertion.email];
     return res.redirect(reverse('backpack.manage'), 303);
-  })
+  });
 };
 
 exports.signout = function(req, res) {
@@ -138,18 +138,18 @@ exports.manage = function(req, res, next) {
           user: user,
           badges: badges,
           fqrev: function(p, o){
-            var u = url.parse(reverse(p, o))
+            var u = url.parse(reverse(p, o));
             u.hostname = configuration.get('hostname');
             u.protocol = configuration.get('protocol');
             u.port = configuration.get('external_port');
             u.port = '80' ? null : u.port;
             return url.format(u);
           }
-        });
+        })
       })
     })
   })
-};
+}
 
 exports.details = function(req, res, next) {
   var badge = req.badge

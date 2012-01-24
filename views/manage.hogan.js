@@ -1,12 +1,13 @@
-{{^badges}}
-<h1>No badges.  Bet out there and start earning some!</h1>
+{{^badges.length}}
+<h1>No badges.  Better get out there and start earning some!</h1>
 <p>By the way, <a href="http://p2pu.org">P2PU</a> would be a great place to start
-{{/badges}}
+{{/badges.length}}
 
-{{#badges.length}}
 <div class="row">
   <div class="span-one-third column">
     <h1>Badges</h1>
+
+    {{#badges.length}}
 
     {{#badges.pending.length}}
     <h3>Pending</h3>
@@ -34,6 +35,7 @@
       {{/badges.rejected}}
     </div>
     {{/badges.rejected.length}}
+    {{/badges.length}}
     
     <div class="upload">
       <h4>Upload Badges</h4>
@@ -46,23 +48,22 @@
           </div>
         </fieldset>
         <div class="clearfix">
-          <input class="btn primary" type="submit" value="Upload></input>
+          <input class="btn primary" type="submit" value="Upload"></input>
         </div>
+      </form>
     </div>
   </div>
 
   <div class="span-two-thirds column groups">
     <h1>Groups</h1>
     {{^user.groups.length}}
-      <h2>You haven't made any groups yet.</h2>
+    <h2>You haven't made any groups yet.</h2>
     {{/user.groups.length}}
     {{#user.groups}}
-      <h3>{{name}}</h3>
-      <div class="well" style="position:relative">
-        
-      </div>
+    <h3>{{name}}</h3>
+    <div class="well" style="position:relative">
+      p
+    </div>
     {{/user.groups}}
   </div>
-
 </div>
-{{/badges.length}}
