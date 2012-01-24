@@ -24,14 +24,14 @@
       {{> badges_partial}}
       {{/badges.accepted}}
     </div>
-    {/badges.accepted.length}}
+    {{/badges.accepted.length}}
 
     {{#badges.rejected.length}}
     <h3>Rejected</h3>
     <div id="rejected-badges" class="js-badges">
       {{#badges.rejected}}
       {{ > badges_partial}}
-      {{/badges.accepted}}
+      {{/badges.rejected}}
     </div>
     {{/badges.rejected.length}}
     
@@ -61,6 +61,7 @@
       <div class="well" style="position:relative">
         
       </div>
+    {{/user.groups}}
   </div>
 
 </div>

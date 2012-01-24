@@ -41,7 +41,7 @@ exports.authenticate = function(req, res) {
   // express, which is what the main browserid server runs, will refuse to
   // populate req.body unless the proper content-type is set.
   var ident = configuration.get('identity');
-  var opts = {}
+  var opts = {};
   opts.uri = ident.protocol + '://' +  ident.server + ident.path;
   opts.body = qs.stringify({
     assertion: req.body['assertion'],
@@ -53,8 +53,8 @@ exports.authenticate = function(req, res) {
   };
 
   request.post(opts, function(err, resp, body){
-    var assertion = {}
-    var hostname = configuration.get('hostname')
+    var assertion = {};
+    var hostname = configuration.get('hostname');
 
     // We need to make sure:
     //
@@ -70,11 +70,11 @@ exports.authenticate = function(req, res) {
     // with a human-friendly message telling the user to try again.
     function goBackWithError(msg) {
       req.flash('error', (msg || 'There was a problem authenticating, please try again.'));
-      return res.redirect('back', 303)
+      return res.redirect('back', 303);
     }
     try {
       if (err) {
-        logger.error('could not make request to identity server')
+        logger.error('could not make request to identity server');
         logger.error('  err obj: ' + JSON.stringify(err));
         throw 'could not request';
       }
@@ -87,7 +87,7 @@ exports.authenticate = function(req, res) {
       try {
         assertion = JSON.parse(body);
       } catch (syntaxError) {
-        logger.warn('could not parse response from identity server: ' + body)
+        logger.warn('could not parse response from identity server: ' + body);
         throw 'invalid response';
       }
       if (assertion.status !== 'okay') {
@@ -125,7 +125,7 @@ exports.manage = function(req, res, next) {
   var email = emailFromSession(req);
   if (!email) return res.redirect(reverse('backpack.login'), 303);
   var error = req.flash('error')
-    , success = req.flash('success')
+    , success = req.flash('success');
   
   makeOrGetUser(email, function(err, user) { 
     if (err) return next(err);
