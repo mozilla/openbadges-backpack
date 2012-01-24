@@ -15,7 +15,7 @@ exports.baker = function(req, res) {
     , accepts      , shouldAward
 
   if (!query.assertion) {
-    return res.render('baker.coffee', {
+    return res.render('baker', {
       title: 'Creator',
       login: false
     });

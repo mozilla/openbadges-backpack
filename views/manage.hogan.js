@@ -62,8 +62,22 @@
     {{#user.groups}}
     <h3>{{name}}</h3>
     <div class="well" style="position:relative">
-      p
+      <!-- todo - pull this from coffee -->
     </div>
     {{/user.groups}}
   </div>
+  <script type="text/javascript">
+    (function() {
+    coffeescript(function() {
+    return $('.embed').bind('click', function(event) {
+      var script, self;
+      self = $(this);
+      script = self.siblings('input').first().val();
+      modal.show('Copy and paste this into a web page', "<div><textarea style='width:98%'; height:75px'>" + script + "</textarea></div>");
+      return false;
+    });
+  });
+}).call(this);
+</script>
+
 </div>
