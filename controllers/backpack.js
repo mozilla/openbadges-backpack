@@ -9,7 +9,6 @@ var request = require('request')
   , _award = require('../lib/award')
   , reverse = require('../lib/router').reverse
   , Badge = require('../models/badge')
-  , User = require('../models/user')
 
 exports.param = {};
 exports.param['badgeId'] = function(req, res, next, id) {
@@ -125,51 +124,43 @@ exports.manage = function(req, res, next) {
   var email = emailFromSession(req);
   if (!email) return res.redirect(reverse('backpack.login'), 303);
   var error = req.flash('error')
-    , success = req.flash('success');
-  
-  makeOrGetUser(email, function(err, user) { 
+    , success = req.flash('success')
+  Badge.organize(email, function(err, badges){
     if (err) return next(err);
-    user.populateGroups(function() {
-      Badge.organize(email, function(err, badges){
-        if (err) return next(err);
-        res.render('manage', {
-          error: error,
-          success: success,
-          user: user,
-          badges: badges,
-          fqrev: function(p, o){
-            var u = url.parse(reverse(p, o));
-            u.hostname = configuration.get('hostname');
-            u.protocol = configuration.get('protocol');
-            u.port = configuration.get('external_port');
-            u.port = '80' ? null : u.port;
-            return url.format(u);
-          }
-        })
-      })
-    })
-  })
-}
+    res.render('manage', {
+      error: error,
+      success: success,
+      user: email,
+      badges: badges,
+      groups: [], // #TODO: replace with real grouping
+      fqrev: function(p, o){
+        var u = url.parse(reverse(p, o))
+        u.hostname = configuration.get('hostname');
+        u.protocol = configuration.get('protocol');
+        u.port = configuration.get('external_port');
+        u.port = '80' ? null : u.port;
+        return url.format(u);
+      }
+    });
+  });
+};
 
 exports.details = function(req, res, next) {
   var badge = req.badge
     , email = emailFromSession(req)
-  
-  makeOrGetUser(email, function(err, user) {
-    res.render('badge-details.coffee', {
-      title: '',
-      user: (badge.recipient === email) ? email : null,
-      
-      id: badge.id,
-      recipient: badge.recipient,
-      image: badge.meta.imagePath,
-      owner: (badge.recipient === email),
-      
-      badge: badge,
-      type: badge.badge,
-      meta: badge.meta,
-      groups: user.groups
-    })
+  res.render('badge-details', {
+    title: '',
+    user: (badge.recipient === email) ? email : null,
+    
+    id: badge.id,
+    recipient: badge.recipient,
+    image: badge.meta.imagePath,
+    owner: (badge.recipient === email),
+    
+    badge: badge,
+    type: badge.badge,
+    meta: badge.meta,
+    groups: [] // #TODO: replace with real grouping
   })
 }
 
@@ -193,13 +184,7 @@ exports.apiGroups = function(req, res, next) {
     , updated = []
   if (!email || email !== badge.recipient) return res.send('forbidden', 403);
     
-  makeOrGetUser(email, function(err, user) {
-    if (err) return next(err);
-    user.updateBadgeGroups(badge, keep, newGroup, function(err){
-      if (err) return next(err);
-      res.redirect('back', 303);
-    })
-  })    
+  res.send('not implemented yet', 500);
 }
 
 exports.apiReject = function(req, res) {
@@ -273,16 +258,4 @@ var emailFromSession = function(req) {
     return false;
   }
   return userEmail;
-}
-
-var makeOrGetUser = function(email, callback) { 
-  User.findOne({ 'email': email }, function(err, existingUser){
-    if (err) return callback(err)
-    if (!existingUser) {
-      return (new User({ 'email': email })).save(function(err, newUser){
-        return callback(null, newUser);
-      })
-    }
-    return callback(null, existingUser);
-  });
 }

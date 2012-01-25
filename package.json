@@ -5,6 +5,7 @@
 , "dependencies":
   { "express": "2.5.x"
   , "express-csrf": "0.3.x"
+  , "mysql": "0.9.5"
   , "uglify-js": "1.0.x"
   , "winston": "0.3.x"
   , "hogan.js": "1.0.x"
@@ -18,5 +19,6 @@
   , "metapng": "git+https://github.com/brianloveswords/metapng.js.git"
   , "vows": "0.5.x"
   }
-, "engine": "node 0.6.x"
+, "engines":
+  { "node":  "*" }
 }

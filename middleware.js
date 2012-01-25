@@ -5,7 +5,6 @@ var express = require('express')
   , configuration = require('./lib/configuration')
   , logger = require('./lib/logging').logger
   , crypto = require('crypto')
-  , User = require('./models/user')
 
 // `COOKIE_SECRET` is randomly generated on the first run of the server,
 // then stored to a file and looked up on restart to maintain state.

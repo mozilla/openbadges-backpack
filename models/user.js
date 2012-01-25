@@ -1,67 +1,82 @@
-// #TODO: un-insane this. This is relational data and should be stored in a
-// relational database (sqlite, postgre or mysql), not in mongo (or any other
-// nosql database).
-//
-// This needs to be fixed before doing display API or facebook integration.
-var mongoose = require('mongoose')
-  , conf = require('../lib/configuration').get('database')
-  , Badge = require('./badge')
-var Schema = mongoose.Schema
-  , ObjectId = Schema.ObjectId
+var mysql = require('../lib/mysql')
+  , crypto = require('crypto')
+var Base = require('./mysql-base')
 
-mongoose.connect(conf.host, conf.name, conf.port);
+var User = function(data) {
+  this._collections = [];
+  this.fields = ['id', 'email', 'passwd', 'last_login', 'active'];
+  this.data = data;
+  if (data.id) this.getCollectionsFromDb();
+}
 
-var Group = new Schema(
-  { name: { type: String }
-  , badges: [ObjectId]
-  }
-)
-var User = new Schema(
-  { email: { type: String }
-  , groups: [Group]
-  }
-)
-var UserModel = module.exports = mongoose.model('User', User);
-UserModel.prototype.populateGroups = function(callback) {
-  if (!this.groups.length) return callback();
-  var times = {}
-  times.amount = this.groups.length;
-  times.hit = function() {
-    times.amount -= 1;
-    if (!times.amount) callback()
-  }
+Base.apply(User, 'user');
+
+User.prototype.save = function (callback) {
+  var data = this.data
+    , table = this.getTableName()
+    , self = this;
+  this.client._upsert(table, data, function (err, result) {
+    if (err) return callback(err, null);
+    if (!data.id && result.insertId) self.data.id = result.insertId;
+    
+    // #FIXME: all of the collection saves are async -- the main callback will
+    // be triggered before the collection saves are complete. we should wait
+    // until the last collection save finishes, check for errors, then fire
+    // the main callback.
+    var errPass = function (err, resp) {if (err) callback(err) }
+    self.collections().forEach(function (c) { c.save(errPass) })
+    
+    return callback(null, self);
+  })
+}
+
+User.prototype.collections = function() {
+  return this._collections;
+}
+User.prototype.getCollectionsFromDb = function () {
+  var self = this;
+  Collection.find({user_id: this.data.id}, function (err, results) {
+    console.dir(results);
+  })
+}
+User.prototype.createCollection = function(name) {
+  var coll = new Collection(this, {name: name});
+  this._collections.push(coll);
+  return coll;
+}
+User.findByEmail = function (email, callback) {
+  User.find({email: email}, function (err, results) {
+    if (err) callback(err);
+    else callback(null, results.pop());
+  })
+}
+
+var Collection = function(user, data) {
+  this.user = user;
+  this.data = data;
+  this.data.obfurl = this.generateUrl();
+}
+Base.apply(Collection, 'collection');
+
+Collection.prototype.generateUrl = function () {
+  var sum = crypto.createHash('sha1');
+  sum.update((new Date).toString + this.user.data.email + this.data.name);
+  return sum.digest('hex');
+}
+Collection.prototype.save = function (callback) {
+  var data = this.data
+    , table = this.getTableName()
+    , self = this;
   
-  this.groups.forEach(function(g) {
-    Badge.find({'_id': {'$in': g.badges}}, function(err, docs) {
-      if (err) return callback(err)
-      g.realBadges = docs;
-      return times.hit();
-    })
+  this.data.user_id = this.user.data.id;
+  
+  this.client._upsert(table, data, function (err, result) {
+    if (err) return callback(err, null);
+    if (!data.id && result.insertId) data.id = result.insertId;
+    return callback(null, self);
   })
+
 }
-UserModel.prototype.groupExists = function(name) {
-  return this.groups.some(function(g){ return g.name.toLowerCase() === name.toLowerCase() })
-}
-UserModel.prototype.updateBadgeGroups = function(badge, keep, newGroup, callback) {
-  var updated = [];
-  this.groups.forEach(function(g){
-    if (!(g.id in keep)) {
-      g.badges = g.badges.filter(function(b){ return b.toString() !== badge.id; });
-      if (g.badges.length) updated.push(g);
-    } else {
-      if (g.badges.indexOf(badge.id) === -1) g.badges.push(badge.id);
-      updated.push(g);
-    }
-  })
-  if (newGroup) {
-    var exists = this.groups.map(function(g){ return g.name.toLowerCase(); }).indexOf(newGroup.toLowerCase()) !== -1
-    if (!exists) {
-      this.groups.push({
-        name: newGroup,
-        badges: [ badge.id ]
-      })
-      updated.push(this.groups.pop());
-    }
-  }
-  UserModel.update({_id: this.id}, {'$set': {'groups': updated}}, callback)
-}
+
+User.Collection = Collection;
+module.exports = User;
