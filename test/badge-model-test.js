@@ -17,30 +17,34 @@ var sha256 = function (str) { return crypto.createHash('sha256').update(str).dig
 
 mysql.prepareTesting();
 vows.describe('Badggesss').addBatch({
-  'A valid badge assertion': {
+  'When saving a valid hosted assertion': {
     topic: function () {
-      return fixture()
+      var assertion = fixture();
+      var badge = new Badge({
+        type: 'hosted',
+        endpoint: 'http://example.com/awesomebadge.json',
+        image_path: '/dev/null',
+        body: assertion,
+        body_hash: 'sha256$' + sha256(JSON.stringify(assertion))
+      });
+      badge.save(this.callback);
     },
-    'that is hosted': {
-      topic: function (assertion) {
-        var badge = new Badge({
-          type: 'hosted',
-          endpoint: 'http://example.com/awesomebadge.json',
-          image_path: '/dev/null',
-          body: assertion,
-          body_hash: 'sha256$' + sha256(JSON.stringify(assertion))
-        });
-        badge.save(this.callback);
-      },
-      'can be saved': function (err, badge) {
-        console.dir(badge);
-      }
-    },
-    'that is signed': {
-      'can be saved': {
-        'and retrieved': {
-        }
-      }
+    'the badge is saved into the database and given an id': function (err, badge) {
+      assert.isNumber(badge.data.id);
     }
-  }
+  },
+  'When trying to save with incomplete data': {
+    topic: function () { 
+      var assertion = fixture({recipient: 'yo@example.com'});
+      var badge = new Badge({
+        body: assertion,
+        body_hash: 'sha256$' + sha256(JSON.stringify(assertion))
+      });
+      badge.save(this.callback);
+    },
+    'the validation errors are given back in the error object': function (err, badge) {
+      console.dir(err);
+      console.dir(badge);
+    }
+  },
 }).export(module);

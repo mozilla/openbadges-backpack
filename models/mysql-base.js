@@ -9,8 +9,8 @@ Base.apply = function (Model, table) {
   }
   Model.find = function(criteria, callback) {
     var keys = Object.keys(criteria)
-        , values = keys.map(function (k) { return criteria[k] })
-        var qstring
+      , values = keys.map(function (k) { return criteria[k] })
+    var qstring
       = 'SELECT * FROM `' + table + '` WHERE '
       + keys.map(function (k) { return (k + ' = ?')}).join(' AND ')
     client.query(qstring, values, function (err, results) {
