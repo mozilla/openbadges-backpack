@@ -16,32 +16,31 @@ var sha256 = function (str) { return crypto.createHash('sha256').update(str).dig
 
 mysql.prepareTesting();
 vows.describe('Badggesss').addBatch({
-  'Validating:': {
-    'When saving a valid hosted assertion': {
-      topic: function () {
-        var assertion = fixture();
-        var badge = new Badge({
-          type: 'hosted',
-          endpoint: 'http://example.com/awesomebadge.json',
-          image_path: '/dev/null',
-          body: assertion,
-          body_hash: 'sha256$' + sha256(JSON.stringify(assertion))
-        });
+  'Trying to save': {
+    
+    topic: function () {
+      var assertion = fixture();
+      return new Badge({
+        type: 'hosted',
+        endpoint: 'http://example.com/awesomebadge.json',
+        image_path: '/dev/null',
+        body: assertion,
+        body_hash: 'sha256$' + genstring(64)
+      });
+    },
+    
+    'a valid hosted assertion': {
+      topic: function (badge) {
         badge.save(this.callback);
       },
-      'the badge is saved into the database and given an id': function (err, badge) {
+      'saves badge into the database and gives an id': function (err, badge) {
         assert.isNumber(badge.data.id);
       }
     },
 
-    'Saving a hosted assertion without an `endpoint`': {
-      topic: function () { 
-        var assertion = fixture({recipient: 'yo@example.com'});
-        var badge = new Badge({
-          type: 'hosted',
-          body: assertion,
-          body_hash: 'sha256$' + sha256(JSON.stringify(assertion))
-        });
+    'a hosted assertion without an `endpoint`': {
+      topic: function (badge) { 
+        delete badge.data.endpoint;
         badge.save(this.callback);
       },
       'should fail with validation error on `endpoint`': function (err, badge) {
@@ -52,14 +51,10 @@ vows.describe('Badggesss').addBatch({
       }
     },
 
-    'Saving a signed assertion without a `jwt`': {
-      topic: function () { 
-        var assertion = fixture({recipient: 'yo@example.com'});
-        var badge = new Badge({
-          type: 'signed',
-          body: assertion,
-          body_hash: 'sha256$' + sha256(JSON.stringify(assertion))
-        });
+    'a signed assertion without a `jwt`': {
+      topic: function (badge) { 
+        delete badge.data.jwt;
+        badge.data.type = 'signed';
         badge.save(this.callback);
       },
       'should fail with validation error on `jwt`': function (err, badge) {
@@ -70,15 +65,9 @@ vows.describe('Badggesss').addBatch({
       }
     },
 
-    'Saving an assertion without an `image_path`': {
-      topic: function () { 
-        var assertion = fixture({recipient: 'yo@example.com'});
-        var badge = new Badge({
-          type: 'hosted',
-          endpoint: 'whaaaat',
-          body: assertion,
-          body_hash: 'sha256$' + sha256(JSON.stringify(assertion))
-        });
+    'an assertion without an `image_path`': {
+      topic: function (badge) { 
+        delete badge.data.image_path;
         badge.save(this.callback);
       },
       'should fail with validation error on `image_path`': function (err, badge) {
@@ -88,15 +77,9 @@ vows.describe('Badggesss').addBatch({
       }
     },
 
-    'Saving an assertion without a `body`': {
-      topic: function () { 
-        var assertion = fixture({recipient: 'yo@example.com'});
-        var badge = new Badge({
-          type: 'hosted',
-          endpoint: 'whaaaat',
-          image_path: '/',
-          body_hash: 'sha256$' + sha256(JSON.stringify(assertion))
-        });
+    'an assertion without a `body`': {
+      topic: function (badge) { 
+        delete badge.data.body;
         badge.save(this.callback);
       },
       'should fail with validation error on `body`': function (err, badge) {
@@ -105,16 +88,10 @@ vows.describe('Badggesss').addBatch({
         assert.isNull(badge);
       }
     },
-    'Saving an assertion with an unexpected `body` type': {
-      topic: function () { 
-        var assertion = fixture({recipient: 'yo@example.com'});
-        var badge = new Badge({
-          type: 'hosted',
-          endpoint: 'whaaaat',
-          body: 'ohhhhh suppppppp',
-          image_path: '/',
-          body_hash: 'sha256$' + sha256(JSON.stringify(assertion))
-        });
+    
+    'an assertion with an unexpected `body` type': {
+      topic: function (badge) { 
+        badge.data.body = "I just don't understand skrillex";
         badge.save(this.callback);
       },
       'should fail with validation error on `body`': function (err, badge) {
@@ -122,6 +99,6 @@ vows.describe('Badggesss').addBatch({
         assert.includes(err.fields, 'body');
         assert.isNull(badge);
       }
-    },
+    }
   }
 }).export(module);
