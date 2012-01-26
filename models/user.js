@@ -27,8 +27,9 @@ User.makeSalt = function () { return crypto.randomBytes(16) + ''; }
 
 User.pw = {bcrypt: {
   hash: function (pw, salt) {
+    var rounds = 10;
     var saltedpw = pw + salt;
-    return 'bcrypt$' + bcrypt.hashSync(saltedpw, bcrypt.genSaltSync(10));
+    return 'bcrypt$' + bcrypt.hashSync(saltedpw, bcrypt.genSaltSync(rounds));
   },
   check: function (pw, salt, hash) {
     var saltedpw = pw + salt;
