@@ -56,53 +56,56 @@ Badge.validateBody = function (body) {
     })
     return previous[fields.pop()];
   };
-  var missingtest = function (fieldStr) {
-    var field = fieldFromDottedString(fieldStr, body);
-    if (!field) {
-      err.fields[fieldStr] = 'missing email address for `' + fieldStr + '`';
+  
+  var test = {
+    missing: function (fieldStr) {
+      var field = fieldFromDottedString(fieldStr, body);
+      if (!field) {
+        err.fields[fieldStr] = 'missing email address for `' + fieldStr + '`';
+      }
+    },
+    regexp: function (fieldStr, type) {
+      var field = fieldFromDottedString(fieldStr, body);
+      if (field && !regex[type].test(field)) {
+        err.fields[fieldStr] = 'invalid ' + type + ' for `' + fieldStr + '`';
+      }
+    },
+    length: function (fieldStr, maxlength) {
+      var field = fieldFromDottedString(fieldStr, body);
+      if (field && field.length > maxlength) {
+        err.fields[fieldStr] = 'invalid value for `' + fieldStr + '`: too long, maximum length should be ' + maxlength;
+      }
     }
-  };
-  var regexptest = function (fieldStr, type) {
-    var field = fieldFromDottedString(fieldStr, body);
-    if (field && !regex[type].test(field)) {
-      err.fields[fieldStr] = 'invalid ' + type + ' for `' + fieldStr + '`';
-    }
-  };
-  var lengthtest = function (fieldStr, maxlength) {
-    var field = fieldFromDottedString(fieldStr, body);
-    if (field && field.length > maxlength) {
-      err.fields[fieldStr] = 'invalid value for `' + fieldStr + '`: too long, maximum length should be ' + maxlength;
-    }
-  };
+  }
   
   // begin tests
-  missingtest('recipient');
-  regexptest('recipient', 'email');
-  regexptest('evidence', 'url');
-  regexptest('expires', 'date');
-  regexptest('issued_on', 'date');
+  test.missing('recipient');
+  test.regexp('recipient', 'email');
+  test.regexp('evidence', 'url');
+  test.regexp('expires', 'date');
+  test.regexp('issued_on', 'date');
   if (!body.badge) {
     err.fields['badge'] = 'missing required field `badge`';
   } else {
-    missingtest('badge.version');
-    missingtest('badge.name');
-    missingtest('badge.description');
-    missingtest('badge.criteria');
-    missingtest('badge.image');
-    regexptest('badge.version', 'version');
-    regexptest('badge.image', 'url');
-    regexptest('badge.criteria', 'url');
-    lengthtest('badge.name', 128);
-    lengthtest('badge.description', 128);
+    test.missing('badge.version');
+    test.missing('badge.name');
+    test.missing('badge.description');
+    test.missing('badge.criteria');
+    test.missing('badge.image');
+    test.regexp('badge.version', 'version');
+    test.regexp('badge.image', 'url');
+    test.regexp('badge.criteria', 'url');
+    test.length('badge.name', 128);
+    test.length('badge.description', 128);
     if (!body.badge.issuer) {
       err.fields['badge.issuer'] = 'missing required field `badge.issuer`';
     } else {
-      missingtest('badge.issuer.origin');
-      missingtest('badge.issuer.name');
-      regexptest('badge.issuer.origin', 'url');
-      regexptest('badge.issuer.contact', 'email');
-      lengthtest('badge.issuer.org', 128);
-      lengthtest('badge.issuer.name', 128);
+      test.missing('badge.issuer.origin');
+      test.missing('badge.issuer.name');
+      test.regexp('badge.issuer.origin', 'url');
+      test.regexp('badge.issuer.contact', 'email');
+      test.length('badge.issuer.org', 128);
+      test.length('badge.issuer.name', 128);
     }
   }
   if (Object.keys(err.fields).length) { return err; }
