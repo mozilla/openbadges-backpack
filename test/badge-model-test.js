@@ -205,6 +205,11 @@ vows.describe('Badggesss').addBatch({
     'an assertion with an unexpected `body` type': {
       topic: makeBadgeAndSave({body: "I just don't understand skrillex"}),
       'should fail with validation error on `body`': assertErrors(['body'])
+    },
+    
+    'an assertion with an invalid `body`': {
+      topic: makeBadgeAndSave({body: makeAssertion({'badge': null})}),
+      'should fail with validation error on `body`': assertErrors(['body'])
     }
   }
 }).export(module);

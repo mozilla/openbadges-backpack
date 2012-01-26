@@ -37,6 +37,7 @@ var Badge = function (data) {
     'body': function (v) {
       if (!v) { return "Must have a body."; }
       if (String(v) !== '[object Object]') { return "body must be an object"; }
+      if (Badge.validateBody(v) instanceof Error) { return "invalid body"; }
     }
   }
 }
