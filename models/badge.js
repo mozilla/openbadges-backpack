@@ -52,8 +52,8 @@ Badge.validators = {
 
 // Prepare a field as it goes into or comes out of the database.
 Badge.prepare = {
-  in: { body: function (v) { return JSON.stringify(v); } },
-  out: { body: function (v) { return JSON.parse(v); } }
+  in: { body: function (value) { return JSON.stringify(value); } },
+  out: { body: function (value) { return JSON.parse(value); } }
 };
 
 // Virtual finders. By default, `find()` will take the keys of the criteria

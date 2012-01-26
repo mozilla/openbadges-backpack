@@ -7,9 +7,9 @@ Base.apply = function (Model, table) {
     if (data === undefined) {
       return null;
     }
-    Object.keys(data).forEach(function (k) {
-      if (k in Model.prepare.out) {
-        data[k] = Model.prepare.out[k](data[k]);
+    Object.keys(data).forEach(function (key) {
+      if (key in Model.prepare.out) {
+        data[key] = Model.prepare.out[key](data[key]);
       }
     });
     return new Model(data);
@@ -19,8 +19,8 @@ Base.apply = function (Model, table) {
     var finders = Model.finders
       , keys = Object.keys(criteria)
       , firstKey = keys[0]
-      , values = keys.map(function (k) { return criteria[k] })
-      , qstring = 'SELECT * FROM `' + table + '` WHERE ' + keys.map(function (k) { return (k + ' = ?')}).join(' AND '); 
+      , values = keys.map(function (key) { return criteria[key] })
+      , qstring = 'SELECT * FROM `' + table + '` WHERE ' + keys.map(function (key) { return (key + ' = ?')}).join(' AND '); 
     var parseResults = function (err, results) {
       if (err) { callback(err); }
       else callback(null, results.map(Model.fromDbResult));
@@ -67,9 +67,9 @@ Base.prototype.save = function (callback) {
   
   if (err) { return callback(err, null); }
   
-  Object.keys(data).forEach(function (k) {
-    if (k in model.prepare.in) {
-      data[k] = model.prepare.in[k](data[k]);
+  Object.keys(data).forEach(function (key) {
+    if (key in model.prepare.in) {
+      data[key] = model.prepare.in[key](data[key]);
     }
   });
   
