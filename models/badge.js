@@ -1,32 +1,39 @@
 var mysql = require('mysql')
   , url = require('url')
-  , Base = require('./mysql-base');
+  , Base = require('./mysql-base')
+  , regex = require('../lib/regex')
 
 var Badge = function (data) {
   this.data = data;
   this.prepare = {
     body: function (v) { return JSON.stringify(v); }
   }
-  this.validate = function (data) {
-    var err = new Error('Invalid data');
-    err.fields = {}
-    data = (data || this.data);
-    if (data.type === 'hosted' && !data.endpoint) {
-      err.fields.type = err.fields.endpoint = "If type is hosted, endpoint must be set";
+  this.validators = {
+    'type': function (v, data) {
+      if (v === 'hosted' && !data.endpoint) {
+        return "If type is hosted, endpoint must be set";
+      }
+      if (v === 'signed' && !data.jwt) {
+        return "If type is signed, jwt must be set";
+      }
+    },
+    'endpoint': function (v, data) {
+      if (!v && data.type === 'hosted') {
+        return "If type is hosted, endpoint must be set";
+      }
+    },
+    'jwt': function (v, data) {
+      if (!v && data.type === 'signed') {
+        return "If type is signed, jwt must be set";
+      }
+    },
+    'image_path': function (v) {
+      if (!v) { return "Must have an image path."; }
+    },
+    'body': function (v) {
+      if (!v) { return "Must have a body."; }
+      if (String(v) !== '[object Object]') { return "body must be an object"; }
     }
-    if (data.type === 'signed' && !data.jwt) {
-      err.fields.type = err.fields.jwt = "If type is signed, jwt must be set";
-    }
-    if (!data.image_path) {
-      err.fields.image_path = "Must have an image path.";
-    }
-    if (!data.body) {
-      err.fields.body = "Must have a body.";
-    }
-    if (String(data.body) !== '[object Object]') {
-      err.fields.body = "body must be an object.";
-    }
-    if (Object.keys(err.fields).length > 0) { return err; }
   }
 }
 Base.apply(Badge, 'badge');

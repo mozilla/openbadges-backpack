@@ -29,12 +29,24 @@ Base.apply = function (Model, table) {
   Model.prototype.client = client;
   Model.prototype.getTableName = function () { return table };
 }
+  
+Base.prototype.validate = function (data) {
+  var err = new Error('Invalid data')
+    , validators = this.validators || {};
+  data = (data || this.data);
+  err.fields = {};
+  Object.keys(validators).forEach(function (field) {
+    var msg = validators[field](data[field], data);
+    if (msg) { err.fields[field] = msg; } 
+  })
+  if (Object.keys(err.fields).length > 0) { return err; }
+}
 
 Base.prototype.save = function (callback) {
   var self = this
     , data = this.data
     , table = this.getTableName()
-    , err = (this.validate || function(){return;})(data);
+    , err = this.validate(data);
   
   if (err) { return callback(err, null); }
   

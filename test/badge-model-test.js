@@ -45,6 +45,7 @@ vows.describe('Badggesss').addBatch({
       },
       'should fail with validation error on `endpoint`': function (err, badge) {
         assert.instanceOf(err, Error);
+        assert.isObject(err.fields);
         assert.includes(err.fields, 'type');
         assert.includes(err.fields, 'endpoint');
         assert.isNull(badge);
@@ -59,6 +60,7 @@ vows.describe('Badggesss').addBatch({
       },
       'should fail with validation error on `jwt`': function (err, badge) {
         assert.instanceOf(err, Error);
+        assert.isObject(err.fields);
         assert.includes(err.fields, 'type');
         assert.includes(err.fields, 'jwt');
         assert.isNull(badge);
@@ -72,6 +74,7 @@ vows.describe('Badggesss').addBatch({
       },
       'should fail with validation error on `image_path`': function (err, badge) {
         assert.instanceOf(err, Error);
+        assert.isObject(err.fields);
         assert.includes(err.fields, 'image_path');
         assert.isNull(badge);
       }
@@ -84,6 +87,7 @@ vows.describe('Badggesss').addBatch({
       },
       'should fail with validation error on `body`': function (err, badge) {
         assert.instanceOf(err, Error);
+        assert.isObject(err.fields);
         assert.includes(err.fields, 'body');
         assert.isNull(badge);
       }
@@ -96,6 +100,7 @@ vows.describe('Badggesss').addBatch({
       },
       'should fail with validation error on `body`': function (err, badge) {
         assert.instanceOf(err, Error);
+        assert.isObject(err.fields);
         assert.includes(err.fields, 'body');
         assert.isNull(badge);
       }
