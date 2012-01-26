@@ -44,78 +44,65 @@ Base.apply(Badge, 'badge');
 Badge.validateBody = function (body) {
   var err = new Error('Invalid badge assertion');
   err.fields = {};
-  if (!body.recipient) {
-    err.fields['recipient'] = 'missing email address for `recipient`';
-  }
-  if (body.recipient && !regex.email.test(body.recipient)) {
-    err.fields['recipient'] = 'invalid email for `recipient`';
-  }
-  if (body.evidence && !regex.url.test(body.evidence)) {
-    err.fields['evidence'] = 'invalid url for `evidence`';
-  }
-  if (body.expires && !regex.date.test(body.expires)) {
-    err.fields['expires'] = 'invalid date for `expires`';
-  }
-  if (body.issued_on && !regex.date.test(body.issued_on)) {
-    err.fields['issued_on'] = 'invalid date for `issued_on`';
-  }
-  if (body.issued_on && !regex.date.test(body.issued_on)) {
-    err.fields['issued_on'] = 'invalid date for `issued_on`';
-  }
+  
+  // helpers
+  var fieldFromDottedString = function (str, obj) {
+    var fields = str.split('.')
+      , current = obj
+      , previous = null;
+    fields.forEach(function (f) {
+      previous = current;
+      current = current[f];
+    })
+    return previous[fields.pop()];
+  };
+  var missingtest = function (fieldStr) {
+    var field = fieldFromDottedString(fieldStr, body);
+    if (!field) {
+      err.fields[fieldStr] = 'missing email address for `' + fieldStr + '`';
+    }
+  };
+  var regexptest = function (fieldStr, type) {
+    var field = fieldFromDottedString(fieldStr, body);
+    if (field && !regex[type].test(field)) {
+      err.fields[fieldStr] = 'invalid ' + type + ' for `' + fieldStr + '`';
+    }
+  };
+  var lengthtest = function (fieldStr, maxlength) {
+    var field = fieldFromDottedString(fieldStr, body);
+    if (field && field.length > maxlength) {
+      err.fields[fieldStr] = 'invalid value for `' + fieldStr + '`: too long, maximum length should be ' + maxlength;
+    }
+  };
+  
+  // begin tests
+  missingtest('recipient');
+  regexptest('recipient', 'email');
+  regexptest('evidence', 'url');
+  regexptest('expires', 'date');
+  regexptest('issued_on', 'date');
   if (!body.badge) {
     err.fields['badge'] = 'missing required field `badge`';
   } else {
-    if (!body.badge.version) {
-      err.fields['badge.version'] = 'missing required field `badge.version`';
-    }
-    if (body.badge.version && !regex.version.test(body.badge.version)) {
-      err.fields['badge.version'] = 'invalid version for `badge.version`';
-    }
-    if (!body.badge.name) {
-      err.fields['badge.name'] = 'missing required field `badge.name`';
-    }
-    if (body.badge.name && body.badge.name.length > 128) {
-      err.fields['badge.name'] = 'invalid field `badge.name`: too long';
-    }
-    if (!body.badge.description) {
-      err.fields['badge.description'] = 'missing required field `badge.description`';
-    }
-    if (body.badge.description && body.badge.description.length > 128) {
-      err.fields['badge.description'] = 'invalid field `badge.description`: too long';
-    }
-    if (!body.badge.image) {
-      err.fields['badge.image'] = 'missing required field `badge.image`';
-    }
-    if (body.badge.image && !regex.url.test(body.badge.image)) {
-      err.fields['badge.image'] = 'invalid url for required field `badge.image`';
-    }
-    if (!body.badge.criteria) {
-      err.fields['badge.criteria'] = 'missing required field `badge.criteria`';
-    }
-    if (body.badge.criteria && !regex.url.test(body.badge.criteria)) {
-      err.fields['badge.criteria'] = 'invalid url for required field `badge.criteria`';
-    }
+    missingtest('badge.version');
+    missingtest('badge.name');
+    missingtest('badge.description');
+    missingtest('badge.criteria');
+    missingtest('badge.image');
+    regexptest('badge.version', 'version');
+    regexptest('badge.image', 'url');
+    regexptest('badge.criteria', 'url');
+    lengthtest('badge.name', 128);
+    lengthtest('badge.description', 128);
     if (!body.badge.issuer) {
       err.fields['badge.issuer'] = 'missing required field `badge.issuer`';
     } else {
-      if (!body.badge.issuer.origin) {
-        err.fields['badge.issuer.origin'] = 'missing required field `badge.issuer.origin`';
-      }
-      if (body.badge.issuer.origin && !regex.origin.test(body.badge.issuer.origin)) {
-        err.fields['badge.issuer.origin'] = 'invalid required field `badge.issuer.origin`: bad origin';
-      }
-      if (!body.badge.issuer.name) {
-        err.fields['badge.issuer.name'] = 'missing required field `badge.issuer.name`';
-      }
-      if (body.badge.issuer.name && body.badge.issuer.name.length > 128) {
-        err.fields['badge.issuer.name'] = 'invalid required field `badge.issuer.name`: too long';
-      }
-      if (body.badge.issuer.org && body.badge.issuer.org.length > 128) {
-        err.fields['badge.issuer.org'] = 'invalid required field `badge.issuer.org`: too long';
-      }
-      if (body.badge.issuer.contact && !regex.email.test(body.badge.issuer.contact)) {
-        err.fields['badge.issuer.contact'] = 'invalid email for required field `badge.issuer.contact`';
-      }
+      missingtest('badge.issuer.origin');
+      missingtest('badge.issuer.name');
+      regexptest('badge.issuer.origin', 'url');
+      regexptest('badge.issuer.contact', 'email');
+      lengthtest('badge.issuer.org', 128);
+      lengthtest('badge.issuer.name', 128);
     }
   }
   if (Object.keys(err.fields).length) { return err; }

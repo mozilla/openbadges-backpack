@@ -43,6 +43,5 @@ var fixture = function (changes) {
   })
   return assertion;
 }
-
 exports.fixture = fixture;
 exports.genstring = genstring;
