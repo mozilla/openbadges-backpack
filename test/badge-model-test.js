@@ -33,18 +33,21 @@ vows.describe('Badggesss').addBatch({
       assert.isNumber(badge.data.id);
     }
   },
-  'When trying to save with incomplete data': {
+  'Saving a hosted assertion without an `endpoint`': {
     topic: function () { 
       var assertion = fixture({recipient: 'yo@example.com'});
       var badge = new Badge({
+        type: 'hosted',
         body: assertion,
         body_hash: 'sha256$' + sha256(JSON.stringify(assertion))
       });
       badge.save(this.callback);
     },
-    'the validation errors are given back in the error object': function (err, badge) {
-      console.dir(err);
-      console.dir(badge);
+    'should fail with validation error on `endpoint`': function (err, badge) {
+      assert.instanceOf(err, Error);
+      assert.includes(err.fields, 'type');
+      assert.includes(err.fields, 'endpoint');
+      assert.isNull(badge);
     }
   },
 }).export(module);

@@ -31,9 +31,12 @@ Base.apply = function (Model, table) {
 }
 
 Base.prototype.save = function (callback) {
-  var data = this.data
+  var self = this
+    , data = this.data
     , table = this.getTableName()
-    , self = this;
+    , err = (this.validate || function(){return;})(data);
+  
+  if (err) { return callback(err, null); }
   
   Object.keys(data).forEach(function (k) {
     if (k in self.prepare) data[k] = self.prepare[k](data[k]);
