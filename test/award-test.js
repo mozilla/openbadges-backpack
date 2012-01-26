@@ -1,4 +1,5 @@
-var vows = require('./setup')
+var vows = require('vows')
+  , mysql = require('../lib/mysql')
   , assert = require('assert')
   , award = require('../lib/award')
   , fs = require('fs')
@@ -11,7 +12,7 @@ var vows = require('./setup')
 var PNGFILE = path.join(__dirname, 'no-badge-data.png')
   , PNGDATA = fs.readFileSync(PNGFILE)
 
-Badge.collection.drop();
+mysql.prepareTesting();
 vows.describe('Awarding Badges').addBatch({
   'An awarded badge' : {
     topic: function() { award(assertion, 'http://example.com/this-badge', PNGDATA, this.callback) },
@@ -20,18 +21,17 @@ vows.describe('Awarding Badges').addBatch({
     },
     'can be retrieved' : {
       topic: function(err, badge) {
-        var self = this;
         award(assertion, 'http://example.com/this-badge', PNGDATA, function(err, badge){
-          Badge.find({'meta.pingback': 'http://example.com/this-badge'}, self.callback)
-        });
+          Badge.find({'endpoint': 'http://example.com/this-badge'}, this.callback)
+        }.bind(this));
       },
-      'and updated without duplicating': function(err, docs) {
-        assert.length(docs, 1);
+      'and updated without duplicating': function(err, badges) {
+        assert.equal(badges.length, 1);
       },
-      'and has expected imagePath': function(err, docs) {
+      'and has expected imagePath': function(err, badges) {
         var path = badgeDir.replace(/^.*?static/, '');
-        assert.ok(docs[0].meta.imagePath.match(path));
+        assert.ok(badges[0].data.image_path.match(path));
       }
-    },
-  },
+    }
+  }
 }).export(module)
