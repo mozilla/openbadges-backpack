@@ -28,7 +28,7 @@
     <div id="body" class="container">
       {{#error.length}}
         <div class="alert-message error js-alert-container">
-          <a href="#"><p><strong>Oh no! {{error[0]}}</strong></p></a>
+          <a href="#"><p><strong>Oh no! {{error}}</strong></p></a>
         </div>
       {{/error.length}}
 
