@@ -39,9 +39,9 @@ Base.apply = function (Model, table) {
   }
   
   Model.prototype = new Base;
+  Model.prototype.model = Model;
   Model.prototype.client = client;
   Model.prototype.getTableName = function () { return table };
-  Model.prototype.model = Model;
 }
   
 Base.prototype.validate = function (data) {
@@ -59,8 +59,7 @@ Base.prototype.validate = function (data) {
 }
 
 Base.prototype.save = function (callback) {
-  var self = this
-    , data = this.data
+  var data = this.data
     , table = this.getTableName()
     , err = this.validate(data)
     , model = this.model;
@@ -73,11 +72,13 @@ Base.prototype.save = function (callback) {
     }
   });
   
-  client._upsert(table, data, function (err, result) {
+  var parseResult = function (err, result) {
     if (err) { return callback(err, null); }
     if (!data.id && result.insertId) { data.id = result.insertId ; }
-    return callback(null, self);
-  })
+    return callback(null, this);
+  };
+  
+  client._upsert(table, data, parseResult.bind(this))
 }
 
 module.exports = Base;
