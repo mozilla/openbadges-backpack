@@ -1,7 +1,6 @@
 var mysql = require('../lib/mysql')
-  , url = require('url')
-  , Base = require('./mysql-base')
   , regex = require('../lib/regex')
+  , Base = require('./mysql-base')
 
 var Badge = function (data) { this.data = data; }
 Base.apply(Badge, 'badge');
