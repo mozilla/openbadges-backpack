@@ -118,141 +118,147 @@ var assertFixtureBadge = function (err, results) {
   assert.equal(badge.data.body_hash, 'sha256$lol');
 };
 
-mysql.prepareTesting();
-createDbFixtures();
 
 vows.describe('Badggesss').addBatch({
-  'Finding badges': {
-    'by user id': {
-      topic: function () {
-        Badge.find({user_id: 1}, this.callback);
-      },
-      'should retrieve the right badge': assertFixtureBadge
+  'Badge testing:': {
+    topic: function () {
+      mysql.prepareTesting();
+      createDbFixtures();
+      return true;
     },
-    'by email address': {
-      topic: function () {  
-        Badge.find({email: 'brian@example.com'}, this.callback);
-      },
-      'should retrieve the right badge': assertFixtureBadge
-    }
-  },
-  'Validating an assertion': {
-    'with a missing `recipient` field': makeMissingTest('recipient'),
-    'with a missing `badge` field': makeMissingTest('badge'),
-    'with a missing `badge.version` field': makeMissingTest('badge.version'),
-    'with a missing `badge.name` field': makeMissingTest('badge.name'),
-    'with a missing `badge.description` field': makeMissingTest('badge.description'),
-    'with a missing `badge.image` field': makeMissingTest('badge.image'),
-    'with a missing `badge.criteria` field': makeMissingTest('badge.criteria'),
-    'with a missing `badge.issuer` field': makeMissingTest('badge.issuer'),
-    'with a missing `badge.issuer.origin` field': makeMissingTest('badge.issuer.origin'),
-    'with a missing `badge.issuer.name` field': makeMissingTest('badge.issuer.name'),
     
-    'with bogus `recipient`': makeInvalidationTests('recipient', EMAILS.bad),
-    'with valid `recipient`': makeValidationTests('recipient', EMAILS.good),
-    
-    'with bogus `evidence`': makeInvalidationTests('evidence', URLS.bad),
-    'with valid `evidence`': makeValidationTests('evidence', URLS.good),
-    
-    'with bogus `expires`': makeInvalidationTests('expires', DATES.bad),
-    'with valid `expires`': makeValidationTests('expires', DATES.good),
-    
-    'with bogus `issued_on`': makeInvalidationTests('issued_on', DATES.bad),
-    'with valid `issued_on`': makeValidationTests('issued_on', DATES.good),
-
-    'with bogus `badge.version`': makeInvalidationTests('badge.version', VERSIONS.bad),
-    'with valid `badge.version`': makeValidationTests('badge.version', VERSIONS.good),
-    
-    'with bogus `badge.name`': makeInvalidationTests('badge.name', [genstring(129)] ),
-    'with valid `badge.name`': makeValidationTests('badge.name', [genstring(127)] ),
-    
-    'with bogus `badge.description`': makeInvalidationTests('badge.description', [genstring(129)] ),
-    'with valid `badge.description`': makeValidationTests('badge.description', [genstring(127)] ),
-    
-    'with bogus `badge.image`': makeInvalidationTests('badge.image', URLS.bad),
-    'with valid `badge.image`': makeValidationTests('badge.image', URLS.good),
-
-    'with bogus `badge.criteria`': makeInvalidationTests('badge.criteria', URLS.bad),
-    'with valid `badge.criteria`': makeValidationTests('badge.criteria', URLS.good),
-    
-    'with bogus `badge.issuer.origin`': makeInvalidationTests('badge.issuer.origin', ORIGINS.bad),
-    'with valid `badge.issuer.origin`': makeValidationTests('badge.issuer.origin', ORIGINS.good),
-    
-    'with bogus `badge.issuer.name`': makeInvalidationTests('badge.issuer.name', [genstring(129)] ),
-    'with valid `badge.issuer.name`': makeValidationTests('badge.issuer.name', [genstring(127)] ),
-    
-    'with bogus `badge.issuer.org`': makeInvalidationTests('badge.issuer.org', [genstring(129)] ),
-    'with valid `badge.issuer.org`': makeValidationTests('badge.issuer.org', [genstring(127)] ),
-    
-    'with bogus `badge.issuer.contact`': makeInvalidationTests('badge.issuer.contact', EMAILS.bad ),
-    'with valid `badge.issuer.contact`': makeValidationTests('badge.issuer.contact', EMAILS.good ),
-    
-    'that is totally valid': {
-      topic: function () {
-        return Badge.validateBody(makeAssertion({}))
-      },
-      'should succeed': function (err) {
-        assert.isNull(err);
-      }
-    }
-  },
-  'Trying to save': {
-    'a valid hosted assertion': {
-      topic: makeBadgeAndSave(),
-      'saves badge into the database and gives an id': function (err, badge) {
-        assert.ifError(err);
-        assert.isNumber(badge.data.id);
-      },
-      'can be retrieved once saved': {
-        topic: function (badge) {
-          Badge.findById(badge.data.id, this.callback);
+    'Finding badges': {
+      'by user id': {
+        topic: function () {
+          Badge.find({user_id: 1}, this.callback);
         },
-        'and the body data is unmangled': function (err, badge) {
-          assert.isObject(badge.data.body);
-          assert.isObject(badge.data.body.badge);
-          assert.isObject(badge.data.body.badge.issuer);
+        'should retrieve the right badge': assertFixtureBadge
+      },
+      'by email address': {
+        topic: function () {  
+          Badge.find({email: 'brian@example.com'}, this.callback);
         },
+        'should retrieve the right badge': assertFixtureBadge
       }
     },
+    'Validating an assertion': {
+      'with a missing `recipient` field': makeMissingTest('recipient'),
+      'with a missing `badge` field': makeMissingTest('badge'),
+      'with a missing `badge.version` field': makeMissingTest('badge.version'),
+      'with a missing `badge.name` field': makeMissingTest('badge.name'),
+      'with a missing `badge.description` field': makeMissingTest('badge.description'),
+      'with a missing `badge.image` field': makeMissingTest('badge.image'),
+      'with a missing `badge.criteria` field': makeMissingTest('badge.criteria'),
+      'with a missing `badge.issuer` field': makeMissingTest('badge.issuer'),
+      'with a missing `badge.issuer.origin` field': makeMissingTest('badge.issuer.origin'),
+      'with a missing `badge.issuer.name` field': makeMissingTest('badge.issuer.name'),
+      
+      'with bogus `recipient`': makeInvalidationTests('recipient', EMAILS.bad),
+      'with valid `recipient`': makeValidationTests('recipient', EMAILS.good),
+      
+      'with bogus `evidence`': makeInvalidationTests('evidence', URLS.bad),
+      'with valid `evidence`': makeValidationTests('evidence', URLS.good),
+      
+      'with bogus `expires`': makeInvalidationTests('expires', DATES.bad),
+      'with valid `expires`': makeValidationTests('expires', DATES.good),
+      
+      'with bogus `issued_on`': makeInvalidationTests('issued_on', DATES.bad),
+      'with valid `issued_on`': makeValidationTests('issued_on', DATES.good),
 
-    'a hosted assertion without an `endpoint`': {
-      topic: makeBadgeAndSave({endpoint: null}),
-      'should fail with validation error on `endpoint`': assertErrors(['type', 'endpoint'])
-    },
+      'with bogus `badge.version`': makeInvalidationTests('badge.version', VERSIONS.bad),
+      'with valid `badge.version`': makeValidationTests('badge.version', VERSIONS.good),
+      
+      'with bogus `badge.name`': makeInvalidationTests('badge.name', [genstring(129)] ),
+      'with valid `badge.name`': makeValidationTests('badge.name', [genstring(127)] ),
+      
+      'with bogus `badge.description`': makeInvalidationTests('badge.description', [genstring(129)] ),
+      'with valid `badge.description`': makeValidationTests('badge.description', [genstring(127)] ),
+      
+      'with bogus `badge.image`': makeInvalidationTests('badge.image', URLS.bad),
+      'with valid `badge.image`': makeValidationTests('badge.image', URLS.good),
 
-    'a signed assertion without a `jwt`': {
-      topic: makeBadgeAndSave({type: 'signed', jwt: null}),
-      'should fail with validation error on `jwt`': assertErrors(['type', 'jwt'])
+      'with bogus `badge.criteria`': makeInvalidationTests('badge.criteria', URLS.bad),
+      'with valid `badge.criteria`': makeValidationTests('badge.criteria', URLS.good),
+      
+      'with bogus `badge.issuer.origin`': makeInvalidationTests('badge.issuer.origin', ORIGINS.bad),
+      'with valid `badge.issuer.origin`': makeValidationTests('badge.issuer.origin', ORIGINS.good),
+      
+      'with bogus `badge.issuer.name`': makeInvalidationTests('badge.issuer.name', [genstring(129)] ),
+      'with valid `badge.issuer.name`': makeValidationTests('badge.issuer.name', [genstring(127)] ),
+      
+      'with bogus `badge.issuer.org`': makeInvalidationTests('badge.issuer.org', [genstring(129)] ),
+      'with valid `badge.issuer.org`': makeValidationTests('badge.issuer.org', [genstring(127)] ),
+      
+      'with bogus `badge.issuer.contact`': makeInvalidationTests('badge.issuer.contact', EMAILS.bad ),
+      'with valid `badge.issuer.contact`': makeValidationTests('badge.issuer.contact', EMAILS.good ),
+      
+      'that is totally valid': {
+        topic: function () {
+          return Badge.validateBody(makeAssertion({}))
+        },
+        'should succeed': function (err) {
+          assert.isNull(err);
+        }
+      }
     },
+    'Trying to save': {
+      'a valid hosted assertion': {
+        topic: makeBadgeAndSave(),
+        'saves badge into the database and gives an id': function (err, badge) {
+          assert.ifError(err);
+          assert.isNumber(badge.data.id);
+        },
+        'can be retrieved once saved': {
+          topic: function (badge) {
+            Badge.findById(badge.data.id, this.callback);
+          },
+          'and the body data is unmangled': function (err, badge) {
+            assert.isObject(badge.data.body);
+            assert.isObject(badge.data.body.badge);
+            assert.isObject(badge.data.body.badge.issuer);
+          },
+        }
+      },
 
-    'a signed assertion without a `public_key`': {
-      topic: makeBadgeAndSave({type: 'signed', jwt: 'stuff', public_key: null}),
-      'should fail with validation error on `public_key`': assertErrors(['type', 'public_key'])
-    },
-    
-    'an assertion with an unknown type': {
-      topic: makeBadgeAndSave({type: 'glurble'}),
-      'should fail with validation error on `type`': assertErrors(['type'])
-    },
+      'a hosted assertion without an `endpoint`': {
+        topic: makeBadgeAndSave({endpoint: null}),
+        'should fail with validation error on `endpoint`': assertErrors(['type', 'endpoint'])
+      },
 
-    'an assertion without an `image_path`': {
-      topic: makeBadgeAndSave({image_path: null}),
-      'should fail with validation error on `image_path`': assertErrors(['image_path'])
-    },
+      'a signed assertion without a `jwt`': {
+        topic: makeBadgeAndSave({type: 'signed', jwt: null}),
+        'should fail with validation error on `jwt`': assertErrors(['type', 'jwt'])
+      },
 
-    'an assertion without a `body`': {
-      topic: makeBadgeAndSave({body: null}),
-      'should fail with validation error on `body`': assertErrors(['body'])
-    },
-    
-    'an assertion with an unexpected `body` type': {
-      topic: makeBadgeAndSave({body: "I just don't understand skrillex"}),
-      'should fail with validation error on `body`': assertErrors(['body'])
-    },
-    
-    'an assertion with an invalid `body`': {
-      topic: makeBadgeAndSave({body: makeAssertion({'badge': null})}),
-      'should fail with validation error on `body`': assertErrors(['body'])
+      'a signed assertion without a `public_key`': {
+        topic: makeBadgeAndSave({type: 'signed', jwt: 'stuff', public_key: null}),
+        'should fail with validation error on `public_key`': assertErrors(['type', 'public_key'])
+      },
+      
+      'an assertion with an unknown type': {
+        topic: makeBadgeAndSave({type: 'glurble'}),
+        'should fail with validation error on `type`': assertErrors(['type'])
+      },
+
+      'an assertion without an `image_path`': {
+        topic: makeBadgeAndSave({image_path: null}),
+        'should fail with validation error on `image_path`': assertErrors(['image_path'])
+      },
+
+      'an assertion without a `body`': {
+        topic: makeBadgeAndSave({body: null}),
+        'should fail with validation error on `body`': assertErrors(['body'])
+      },
+      
+      'an assertion with an unexpected `body` type': {
+        topic: makeBadgeAndSave({body: "I just don't understand skrillex"}),
+        'should fail with validation error on `body`': assertErrors(['body'])
+      },
+      
+      'an assertion with an invalid `body`': {
+        topic: makeBadgeAndSave({body: makeAssertion({'badge': null})}),
+        'should fail with validation error on `body`': assertErrors(['body'])
+      }
     }
   }
 }).export(module);

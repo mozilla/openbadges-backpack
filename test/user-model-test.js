@@ -55,69 +55,74 @@ var assertErrors = function (fields, msgContains) {
   }
 };
 
-mysql.prepareTesting();
 vows.describe('Useeeerrrrrs').addBatch({
-  'A valid user': {
-    'can be saved' : {
+  'User testing:': {
+    topic: function () {
+      mysql.prepareTesting();
+      return true;
+    },
+    'A valid user': {
+      'can be saved' : {
+        topic: function () {
+          var user = createUser();
+          user.save(this.callback);
+        },
+        'and an id is given back': function (err, user) {
+          assert.ifError(err);
+          assert.isNumber(user.data.id);
+        },
+        'and retrieved': {
+          topic: function (user) {
+            User.findById(user.data.id, this.callback);
+          },
+          'without getting mangled data': function (err, user) {
+            assert.equal(user.data.email, 'brian@example.com');
+          },
+          'with a salt being created': function (err, user) {
+            assert.isString(user.data.salt);
+            assert.ok(user.data.salt.length > 5);
+          },
+          'and the password should have been hashed': function (err, user) {
+            assert.notEqual(user.data.passwd, 'secret');
+          },
+          'and the password can be checked accurately': function (err, user) {
+            assert.isTrue(user.checkPassword('secret'));
+            assert.isFalse(user.checkPassword('not correct'));
+          },
+          'and the password can be changed': function (err, user) {
+            assert.isTrue(user.checkPassword('secret'));
+            assert.isFalse(user.checkPassword('not correct'));
+          }
+        }
+      }
+    },
+    'A user can be logged in': {
       topic: function () {
-        var user = createUser()
+        var user = createUser('logintest@example.com');
+        user.setLoginDate();
         user.save(this.callback);
       },
-      'and an id is given back': function (err, user) {
-        assert.ifError(err);
-        assert.isNumber(user.data.id);
-      },
-      'and retrieved': {
+      'and when retrieved again': {
         topic: function (user) {
           User.findById(user.data.id, this.callback);
         },
-        'without getting mangled data': function (err, user) {
-          assert.equal(user.data.email, 'brian@example.com');
-        },
-        'with a salt being created': function (err, user) {
-          assert.isString(user.data.salt);
-          assert.ok(user.data.salt.length > 5);
-        },
-        'and the password should have been hashed': function (err, user) {
-          assert.notEqual(user.data.passwd, 'secret');
-        },
-        'and the password can be checked accurately': function (err, user) {
-          assert.isTrue(user.checkPassword('secret'));
-          assert.isFalse(user.checkPassword('not correct'));
-        },
-        'and the password can be changed': function (err, user) {
-          assert.isTrue(user.checkPassword('secret'));
-          assert.isFalse(user.checkPassword('not correct'));
+        'the login date is something reasonable': function (err, user) {
+          assert.isNumber(user.data.last_login);
+          assert.greater(user.data.last_login, 0);
         }
       }
-    }
-  },
-  'A user can be logged in': {
-    topic: function () {
-      var user = createUser('logintest@example.com');
-      user.setLoginDate();
-      user.save(this.callback);
     },
-    'and when retrieved again': {
-      topic: function (user) {
-        User.findById(user.data.id, this.callback);
-      },
-      'the login date is something reasonable': function (err, user) {
-        assert.isNumber(user.data.last_login);
-        assert.greater(user.data.last_login, 0);
+    'Trying to save a user': {
+      'with bogus `recipient`': makeInvalidEmailTests(EMAILS.bad),
+      'with valid `recipient`': makeValidEmailTests(EMAILS.good)
+    },
+    'A user': {
+      topic: createUser(),
+      'can change her password': function (user) {
+        var newpw = 'whaat';
+        user.changePassword(newpw);
+        assert.isTrue(user.checkPassword(newpw));
       }
-    }
-  },
-  'Trying to save a user': {
-    'with bogus `recipient`': makeInvalidEmailTests(EMAILS.bad),
-    'with valid `recipient`': makeValidEmailTests(EMAILS.good)
-  },
-  'A user': {
-    topic: createUser(),
-    'can change her password': function (user) {
-      var newpw = 'whaat';
-      user.changePassword(newpw);
-      assert.isTrue(user.checkPassword(newpw));
     }
   }
 }).export(module);
