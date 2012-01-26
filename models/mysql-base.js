@@ -8,7 +8,8 @@ Base.apply = function (Model, table) {
       return null;
     }
     Object.keys(data).forEach(function (key) {
-      if (key in Model.prepare.out) {
+      var prep = (Model.prepare || {})['out'] || {}
+      if (key in prep) {
         data[key] = Model.prepare.out[key](data[key]);
       }
     });
@@ -67,7 +68,8 @@ Base.prototype.save = function (callback) {
   if (err) { return callback(err, null); }
   
   Object.keys(data).forEach(function (key) {
-    if (key in model.prepare.in) {
+    var prep = (model.prepare || {})['in'] || {}
+    if (key in prep) {
       data[key] = model.prepare.in[key](data[key]);
     }
   });

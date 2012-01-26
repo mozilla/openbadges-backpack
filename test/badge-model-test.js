@@ -36,7 +36,6 @@ var makeBadge = function () {
     body_hash: 'sha256$' + genstring(64)
   });
 };
-
 var makeBadgeAndSave = function (changes) {
   var badge = makeBadge();
   changes = changes || {};
@@ -48,7 +47,6 @@ var makeBadgeAndSave = function (changes) {
     badge.save(this.callback);
   }
 };
-
 var assertErrors = function (fields, msgContains) {
   return function (err, badge) {
     if (badge instanceof Error) {
@@ -68,7 +66,6 @@ var assertErrors = function (fields, msgContains) {
 
   }
 };
-
 var makeInvalidationTests = function (field, badData) {
   var tests = {};
   badData.forEach(function (v) {
@@ -114,7 +111,6 @@ var createDbFixtures = function () {
   mysql.client.query(addUser);
   mysql.client.query(addBadge);
 };
-
 var assertFixtureBadge = function (err, results) {
   var badge;
   assert.ifError(err);
