@@ -65,6 +65,11 @@ Badge.finders = {
     mysql.client.query(query, [value], callback);
   }
 };
+
+// Validate the structure and values of the body field, which contains the 
+// badge assertion as received from the issuer. Returns an error object with a
+// `fields` attribute describing the errors if invalid, and `undefined` if
+// valid.
 Badge.validateBody = function (body) {
   var err = new Error('Invalid badge assertion');
   err.fields = {};
