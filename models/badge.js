@@ -9,7 +9,7 @@ var Badge = function (data) {
     body: function (v) { return JSON.stringify(v); }
   }
   this.validators = {
-    'type': function (v, data) {
+    type: function (v, data) {
       var valid = ['signed', 'hosted'];
       if (valid.indexOf(v) === -1) {
         return "Unknown type: " + v;
@@ -21,20 +21,20 @@ var Badge = function (data) {
         return "If type is signed, jwt must be set";
       }
     },
-    'endpoint': function (v, data) {
+    endpoint: function (v, data) {
       if (!v && data.type === 'hosted') {
         return "If type is hosted, endpoint must be set";
       }
     },
-    'jwt': function (v, data) {
+    jwt: function (v, data) {
       if (!v && data.type === 'signed') {
         return "If type is signed, jwt must be set";
       }
     },
-    'image_path': function (v) {
+    image_path: function (v) {
       if (!v) { return "Must have an image_path."; }
     },
-    'body': function (v) {
+    body: function (v) {
       if (!v) { return "Must have a body."; }
       if (String(v) !== '[object Object]') { return "body must be an object"; }
       if (Badge.validateBody(v) instanceof Error) { return "invalid body"; }
