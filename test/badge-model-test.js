@@ -121,7 +121,7 @@ var assertFixtureBadge = function (err, results) {
   assert.isArray(results);
   badge = results.pop();
   assert.equal(badge.data.body_hash, 'sha256$lol');
-}
+};
 
 mysql.prepareTesting();
 createDbFixtures();
