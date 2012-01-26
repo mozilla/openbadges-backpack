@@ -20,6 +20,9 @@ var Badge = function (data) {
       if (v === 'signed' && !data.jwt) {
         return "If type is signed, jwt must be set";
       }
+      if (v === 'signed' && !data.public_key) {
+        return "If type is signed, public_key must be set";
+      }
     },
     endpoint: function (v, data) {
       if (!v && data.type === 'hosted') {
@@ -29,6 +32,11 @@ var Badge = function (data) {
     jwt: function (v, data) {
       if (!v && data.type === 'signed') {
         return "If type is signed, jwt must be set";
+      }
+    },
+    public_key: function (v, data) {
+      if (!v && data.type === 'signed') {
+        return "If type is signed, public_key must be set";
       }
     },
     image_path: function (v) {

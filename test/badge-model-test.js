@@ -220,6 +220,11 @@ vows.describe('Badggesss').addBatch({
       'should fail with validation error on `jwt`': assertErrors(['type', 'jwt'])
     },
 
+    'a signed assertion without a `public_key`': {
+      topic: makeBadgeAndSave({type: 'signed', jwt: 'stuff', public_key: null}),
+      'should fail with validation error on `public_key`': assertErrors(['type', 'public_key'])
+    },
+    
     'an assertion with an unknown type': {
       topic: makeBadgeAndSave({type: 'glurble'}),
       'should fail with validation error on `type`': assertErrors(['type'])
