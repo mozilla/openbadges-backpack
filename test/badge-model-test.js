@@ -1,12 +1,9 @@
 var vows = require('vows')
   , mysql = require('../lib/mysql')
   , assert = require('assert')
-  , url = require('url')
   , makeAssertion = require('./utils').fixture
   , genstring = require('./utils').genstring
-  , crypto = require('crypto')
   , Badge = require('../models/badge')
-  , client = mysql.client;
 
 var EMAILS = {
   good: ['brian@awesome.com', 'yo+wut@example.com', /*'elniño@español.es',*/ 'ümlaut@heavymetal.de'],
@@ -28,8 +25,6 @@ var VERSIONS = {
   good: ['0.1.1', '2.0.1', '1.2.3', 'v1.2.1'],
   bad: ['v100', '50', 'v10.1alpha', '1.2.x']
 };
-
-var sha256 = function (str) { return crypto.createHash('sha256').update(str).digest('hex'); };
 
 var makeBadge = function () {
   var assertion = makeAssertion();
