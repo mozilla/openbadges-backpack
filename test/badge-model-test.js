@@ -81,7 +81,7 @@ var makeInvalidationTests = function (field, badData) {
     test['should fail with error on `' + field + '`'] = assertErrors([field], 'invalid');
   })
   return tests;
-}
+};
 var makeValidationTests = function (field, goodData) {
   var tests = {};
   goodData.forEach(function (v) {
@@ -94,7 +94,7 @@ var makeValidationTests = function (field, goodData) {
     test['should succeed'] = function (err) { assert.isNull(err); };
   })
   return tests;
-}
+};
 var makeMissingTest = function (field) {
   var test = {};
   test['topic'] = function () {
@@ -104,10 +104,43 @@ var makeMissingTest = function (field) {
   };
   test['should fail with error on `' + field + '`'] = assertErrors([field], 'missing');
   return test;
+};
+var createDbFixtures = function () {
+  var addUser = "INSERT INTO `user` (email) VALUES ('brian@example.com')";
+  var addBadge = "INSERT INTO `badge`"
+    + "(user_id, type, endpoint, image_path, body, body_hash)"
+    + "VALUES"
+    + "(1, 'hosted', 'http://example.com', '/dev/null', 'wut', 'sha256$lol')";
+  mysql.client.query(addUser);
+  mysql.client.query(addBadge);
+};
+
+var assertFixtureBadge = function (err, results) {
+  var badge;
+  assert.ifError(err);
+  assert.isArray(results);
+  badge = results.pop();
+  assert.equal(badge.data.body_hash, 'sha256$lol');
 }
 
 mysql.prepareTesting();
+createDbFixtures();
+
 vows.describe('Badggesss').addBatch({
+  'Finding badges': {
+    'by user id': {
+      topic: function () {
+        Badge.find({user_id: 1}, this.callback);
+      },
+      'should retrieve the right badge': assertFixtureBadge
+    },
+    'by email address': {
+      topic: function () {  
+        Badge.find({email: 'brian@example.com'}, this.callback);
+      },
+      'should retrieve the right badge': assertFixtureBadge
+    }
+  },
   'Validating an assertion': {
     'with a missing `recipient` field': makeMissingTest('recipient'),
     'with a missing `badge` field': makeMissingTest('badge'),

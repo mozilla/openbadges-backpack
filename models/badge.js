@@ -1,4 +1,4 @@
-var mysql = require('mysql')
+var mysql = require('../lib/mysql')
   , url = require('url')
   , Base = require('./mysql-base')
   , regex = require('../lib/regex')
@@ -42,6 +42,12 @@ var Badge = function (data) {
   }
 }
 Base.apply(Badge, 'badge');
+Badge.finders = {
+  email: function (value, callback) {
+    var query = "SELECT * FROM `badge` WHERE `user_id` = (SELECT `id` FROM `user` WHERE `email` = ?)";
+    mysql.client.query(query, [value], callback);
+  }
+}
 Badge.validateBody = function (body) {
   var err = new Error('Invalid badge assertion');
   err.fields = {};

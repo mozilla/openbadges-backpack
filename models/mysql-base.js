@@ -7,23 +7,30 @@ Base.apply = function (Model, table) {
     if (data === undefined) return null;
     return new Model(data);
   }
+  
   Model.find = function(criteria, callback) {
-    var keys = Object.keys(criteria)
+    var finders = Model.finders
+      , keys = Object.keys(criteria)
+      , firstKey = keys[0]
       , values = keys.map(function (k) { return criteria[k] })
-    var qstring
-      = 'SELECT * FROM `' + table + '` WHERE '
-      + keys.map(function (k) { return (k + ' = ?')}).join(' AND ')
-    client.query(qstring, values, function (err, results) {
-      if (err) callback(err);
+      , qstring = 'SELECT * FROM `' + table + '` WHERE ' + keys.map(function (k) { return (k + ' = ?')}).join(' AND '); 
+    var parseResults = function (err, results) {
+      if (err) { callback(err); }
       else callback(null, results.map(Model.fromDbResult));
-    });
+    };
+    if (keys.length == 1 && firstKey in finders) {
+      return Model.finders[firstKey](criteria[firstKey], parseResults)
+    }
+    client.query(qstring, values, parseResults);
   }
+  
   Model.findById = function (id, callback) {
     Model.find({id: id}, function (err, results) {
       if (err) callback(err);
       callback(null, results.pop());
     })
   }
+  
   Model.prototype = new Base;
   Model.prototype.super = function (method, args) { return Model.prototype[method].apply(this, args); }
   Model.prototype.client = client;
