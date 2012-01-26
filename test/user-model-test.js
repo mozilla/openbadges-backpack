@@ -36,6 +36,10 @@ vows.describe('Useeeerrrrrs').addBatch({
         },
         'and the password should have been hashed': function (user) {
           assert.notEqual(user.data.passwd, 'secret');
+        },
+        'and the password can be checked accurately': function (user) {
+          assert.isTrue(user.checkPassword('secret'));
+          assert.isFalse(user.checkPassword('not correct'));
         }
       }
     }
