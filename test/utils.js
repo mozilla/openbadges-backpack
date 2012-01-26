@@ -29,21 +29,20 @@ var genstring = function(length) {
   return str.join('');
 }
 
-var fixture = function(changes){
-  changes = changes || {}
-  var _fixture = VALID_BADGE();
-  function makeChange(_base, _changes) {
-    Object.keys(_changes).forEach(function(k){
-      if (typeof _changes[k] === 'object' && _changes[k]) {
-        makeChange(_base[k], _changes[k]);
-      } else {
-        _base[k] = _changes[k];
-      }
+var fixture = function (changes) {
+  var assertion = VALID_BADGE();
+  Object.keys(changes||{}).forEach(function (k) {
+    var fields = k.split('.')
+      , current = assertion
+      , previous = null;
+    fields.forEach(function (f) {
+      previous = current;
+      current = current[f];
     })
-  }
-  makeChange(_fixture, changes);
-  return _fixture;
-};
+    previous[fields.pop()] = changes[k];
+  })
+  return assertion;
+}
 
 exports.fixture = fixture;
 exports.genstring = genstring;
