@@ -20,6 +20,12 @@ var Badge = function (data) {
     if (!data.image_path) {
       err.fields.image_path = "Must have an image path.";
     }
+    if (!data.body) {
+      err.fields.body = "Must have a body.";
+    }
+    if (String(data.body) !== '[object Object]') {
+      err.fields.body = "body must be an object.";
+    }
     if (Object.keys(err.fields).length > 0) { return err; }
   }
 }
