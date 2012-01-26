@@ -1,4 +1,4 @@
-var vows = require('./setup')
+var vows = require('vows')
   , assert = require('assert')
   , color = require('colors')
   , metapng = require('metapng')
@@ -105,6 +105,6 @@ vows.describe('Handling remote servers').addBatch({
         '`status == failure`': function(err, result){ assert.equal(err.status, 'failure') },
         '`error == size`': function(err, result){ assert.equal(err.error, 'size') }
       }
-    },
+    }
   }
 }).export(module);

@@ -1,4 +1,4 @@
-var vows = require('./setup')
+var vows = require('vows')
   , assert = require('assert')
   , baker = require('../lib/baker')
   , path = require('path')
