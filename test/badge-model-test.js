@@ -63,7 +63,6 @@ var assertErrors = function (fields, msgContains) {
         assert.match(err.fields[f], RegExp(msgContains));
       }
     })
-
   }
 };
 var makeInvalidationTests = function (field, badData) {

@@ -17,7 +17,7 @@ Base.apply = function (Model, table) {
   }
   
   Model.find = function(criteria, callback) {
-    var finders = Model.finders
+    var finders = Model.finders || {}
       , keys = Object.keys(criteria)
       , firstKey = keys[0]
       , values = keys.map(function (key) { return criteria[key] })
@@ -65,6 +65,7 @@ Base.prototype.save = function (callback) {
     , err = this.validate(data)
     , model = this.model;
   
+  callback = callback || function(){};
   if (err) { return callback(err, null); }
   
   Object.keys(data).forEach(function (key) {

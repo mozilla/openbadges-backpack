@@ -1,7 +1,8 @@
-var mysql = require('../lib/mysql')
-  , crypto = require('crypto')
-  , bcrypt = require('bcrypt')
-  , Base = require('./mysql-base');
+var crypto = require('crypto'),
+    bcrypt = require('bcrypt'),
+    regex = require('../lib/regex'),
+    mysql = require('../lib/mysql'),
+    Base = require('./mysql-base');
 
 var User = function (data) {
   var ALGO = 'bcrypt';
@@ -20,6 +21,9 @@ var User = function (data) {
       , hash = parts.join('$');
     return User.pw[algo].check(given, this.data.salt, hash);
   };
+  this.setLoginDate = function () {
+    this.data.last_login = Math.floor(Date.now()/1000);
+  };
 }
 Base.apply(User, 'user');
 
@@ -36,4 +40,11 @@ User.pw = {bcrypt: {
     return bcrypt.compareSync(saltedpw, hash);
   }
 }};
+
+User.validators = {
+  email: function (value) {
+    if (!regex.email.test(value)) { return "invalid value for required field `email`"; }
+  }
+}
+
 module.exports = User;
