@@ -8,11 +8,21 @@ var vows = require('vows')
   , Badge = require('../models/badge')
   , client = mysql.client;
 
-var BAD_EMAILS = ['lkajd', 'skj@asdk', '@.com', '909090', '____!@']
-var BAD_URLS = ['-not-asdo', 'ftp://bad-scheme', '@.com:90/', 'just totally wrong']
-var BAD_DATES = ['oiajsd09gjas;oj09', 'foreever ago', '@.com:90/', '2001-10-190-19', '901d1', '000000000000000000000']
-var BAD_VERSIONS = ['v100', '50', 'v10.1alpha']
-var sha256 = function (str) { return crypto.createHash('sha256').update(str).digest('hex'); }
+var EMAILS = {
+  good: ['brian@awesome.com', 'yo+wut@example.com', /*'elniño@español.es',*/ 'ümlaut@heavymetal.de'],
+  bad: ['lkajd', 'skj@asdk', '@.com', '909090', '____!@']
+};
+var URLS = {
+  good: ['http://example.com/', '/partial/path', '/rad.awesome/great/', '/foreign/crázy/ååú´¨la/'],
+  bad: ['-not-asdo', 'ftp://bad-scheme', '@.com:90/', 'just totally wrong']
+};
+var DATES = {
+  good: [Math.floor(Date.now()/1000), '2012-01-01'],
+  bad: ['oiajsd09gjas;oj09', 'foreever ago', '@.com:90/', '2001-10-190-19', '901d1', '000000000000000000000']
+};                                                                                                             
+
+var BAD_VERSIONS = ['v100', '50', 'v10.1alpha'];
+var sha256 = function (str) { return crypto.createHash('sha256').update(str).digest('hex'); };
 
 var makeBadge = function () {
   var assertion = makeAssertion();
@@ -23,7 +33,7 @@ var makeBadge = function () {
     body: assertion,
     body_hash: 'sha256$' + genstring(64)
   });
-}
+};
 
 var makeBadgeAndSave = function (changes) {
   var badge = makeBadge();
@@ -35,7 +45,7 @@ var makeBadgeAndSave = function (changes) {
   return function () { 
     badge.save(this.callback);
   }
-}
+};
 
 var assertErrors = function (fields, msgContains) {
   return function (err, badge) {
@@ -70,23 +80,49 @@ var makeInvalidationTests = function (field, badData) {
   })
   return tests;
 }
+var makeValidationTests = function (field, goodData) {
+  var tests = {};
+  goodData.forEach(function (v) {
+    var test = tests['like "' + v + '"'] = {}
+    test['topic'] = function () {
+      var fieldReplacement = {}
+      fieldReplacement[field] = v;
+      return Badge.validateBody(makeAssertion(fieldReplacement));
+    };
+    test['should succeed'] = function (err) { assert.isNull(err); };
+  })
+  return tests;
+}
+var makeMissingTest = function (field) {
+  var test = {};
+  test['topic'] = function () {
+    var fieldReplacement = {}
+    fieldReplacement[field] = null;
+    return Badge.validateBody(makeAssertion(fieldReplacement));
+  };
+  test['should fail with error on `' + field + '`'] = assertErrors([field], 'missing');
+  return test;
+}
 
 mysql.prepareTesting();
 vows.describe('Badggesss').addBatch({
   'Validating an assertion': {
-    'with a missing recipient': {
-      topic: function () {
-        return Badge.validateBody(makeAssertion({recipient: null}))
-      },
-      'should fail with error on `recipient`': assertErrors(['recipient'], 'missing')
-    },
+    'with a missing `recipient` field': makeMissingTest('recipient'),
+    'with a missing `badge` field': makeMissingTest('badge'),
+    'with a missing `badge.version` field': makeMissingTest('badge.version'),
     
-    'with a bogus `recipient`': makeInvalidationTests('recipient', BAD_EMAILS),
+    'with bogus `recipient`': makeInvalidationTests('recipient', EMAILS.bad),
+    'with valid `recipient`': makeValidationTests('recipient', EMAILS.good),
     
-    'with a bogus `evidence`': makeInvalidationTests('evidence', BAD_URLS),
+    'with bogus `evidence`': makeInvalidationTests('evidence', URLS.bad),
+    'with valid `evidence`': makeValidationTests('evidence', URLS.good),
     
-    'with a bogus `expires`': makeInvalidationTests('expires', BAD_DATES),
+    'with bogus `expires`': makeInvalidationTests('expires', DATES.bad),
+    'with valid `expires`': makeValidationTests('expires', DATES.good),
     
+    'with bogus `issued_on`': makeInvalidationTests('issued_on', DATES.bad),
+    'with valid `issued_on`': makeValidationTests('issued_on', DATES.good),
+
     'that is totally valid': {
       topic: function () {
         return Badge.validateBody(makeAssertion({}))

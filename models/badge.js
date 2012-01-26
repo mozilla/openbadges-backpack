@@ -41,20 +41,33 @@ var Badge = function (data) {
   }
 }
 Base.apply(Badge, 'badge');
-Badge.validateBody = function (badge) {
+Badge.validateBody = function (body) {
   var err = new Error('Invalid badge assertion');
   err.fields = {};
-  if (!badge.recipient) {
+  if (!body.recipient) {
     err.fields['recipient'] = 'missing email address for `recipient`';
   }
-  if (badge.recipient && !regex.email.test(badge.recipient)) {
+  if (body.recipient && !regex.email.test(body.recipient)) {
     err.fields['recipient'] = 'invalid email for `recipient`';
   }
-  if (badge.evidence && !regex.url.test(badge.evidence)) {
+  if (body.evidence && !regex.url.test(body.evidence)) {
     err.fields['evidence'] = 'invalid url for `evidence`';
   }
-  if (badge.expires && !regex.date.test(badge.expires)) {
+  if (body.expires && !regex.date.test(body.expires)) {
     err.fields['expires'] = 'invalid date for `expires`';
+  }
+  if (body.issued_on && !regex.date.test(body.issued_on)) {
+    err.fields['issued_on'] = 'invalid date for `issued_on`';
+  }
+  if (body.issued_on && !regex.date.test(body.issued_on)) {
+    err.fields['issued_on'] = 'invalid date for `issued_on`';
+  }
+  if (!body.badge) {
+    err.fields['badge'] = 'missing required field `badge`';
+  } else {
+    if (!body.badge.version) {
+      err.fields['badge.version'] = 'missing required field `badge.version`';
+    }
   }
   if (Object.keys(err.fields).length) { return err; }
   return null;
