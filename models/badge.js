@@ -10,6 +10,10 @@ var Badge = function (data) {
   }
   this.validators = {
     'type': function (v, data) {
+      var valid = ['signed', 'hosted'];
+      if (valid.indexOf(v) === -1) {
+        return "Unknown type: " + v;
+      }
       if (v === 'hosted' && !data.endpoint) {
         return "If type is hosted, endpoint must be set";
       }
@@ -37,4 +41,7 @@ var Badge = function (data) {
   }
 }
 Base.apply(Badge, 'badge');
+Badge.validateBody = function (badge) {
+  
+}
 module.exports = Badge;

@@ -67,6 +67,11 @@ vows.describe('Badggesss').addBatch({
       'should fail with validation error on `jwt`': assertErrors('type', 'jwt')
     },
 
+    'an assertion with an unknown type': {
+      topic: makeBadgeAndSave({type: 'glurble'}),
+      'should fail with validation error on `type`': assertErrors('type')
+    },
+
     'an assertion without an `image_path`': {
       topic: makeBadgeAndSave({image_path: null}),
       'should fail with validation error on `image_path`': assertErrors('image_path')
