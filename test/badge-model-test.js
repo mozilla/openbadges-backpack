@@ -110,6 +110,10 @@ vows.describe('Badggesss').addBatch({
     'with a missing `recipient` field': makeMissingTest('recipient'),
     'with a missing `badge` field': makeMissingTest('badge'),
     'with a missing `badge.version` field': makeMissingTest('badge.version'),
+    'with a missing `badge.name` field': makeMissingTest('badge.name'),
+    'with a missing `badge.description` field': makeMissingTest('badge.description'),
+    'with a missing `badge.image` field': makeMissingTest('badge.image'),
+    'with a missing `badge.criteria` field': makeMissingTest('badge.criteria'),
     
     'with bogus `recipient`': makeInvalidationTests('recipient', EMAILS.bad),
     'with valid `recipient`': makeValidationTests('recipient', EMAILS.good),

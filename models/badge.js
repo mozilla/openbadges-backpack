@@ -68,6 +68,18 @@ Badge.validateBody = function (body) {
     if (!body.badge.version) {
       err.fields['badge.version'] = 'missing required field `badge.version`';
     }
+    if (!body.badge.name) {
+      err.fields['badge.name'] = 'missing required field `badge.name`';
+    }
+    if (!body.badge.description) {
+      err.fields['badge.description'] = 'missing required field `badge.description`';
+    }
+    if (!body.badge.image) {
+      err.fields['badge.image'] = 'missing required field `badge.image`';
+    }
+    if (!body.badge.criteria) {
+      err.fields['badge.criteria'] = 'missing required field `badge.criteria`';
+    }
   }
   if (Object.keys(err.fields).length) { return err; }
   return null;
