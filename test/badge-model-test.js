@@ -56,7 +56,7 @@ var assertErrors = function (fields, msgContains) {
   }
 };
 
-var makeInvalidationTest = function (field, badData) {
+var makeInvalidationTests = function (field, badData) {
   var tests = {};
   badData.forEach(function (v) {
     var test = tests['like "' + v + '"'] = {}
@@ -67,7 +67,6 @@ var makeInvalidationTest = function (field, badData) {
     };
     test['should fail with error on `' + field + '`'] = assertErrors([field], 'invalid');
   })
-  console.dir(tests);
   return tests;
 }
 
@@ -81,7 +80,7 @@ vows.describe('Badggesss').addBatch({
       'should fail with error on `recipient`': assertErrors(['recipient'], 'missing')
     },
     
-    'with a bogus recipient': makeInvalidationTest('recipient', BAD_EMAILS),
+    'with a bogus recipient': makeInvalidationTests('recipient', BAD_EMAILS),
     
     'that is totally valid': {
       topic: function () {
