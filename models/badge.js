@@ -3,64 +3,73 @@ var mysql = require('../lib/mysql')
   , Base = require('./mysql-base')
   , regex = require('../lib/regex')
 
-var Badge = function (data) {
-  this.data = data;
-  this.prepare = {
-    body: function (v) { return JSON.stringify(v); }
-  }
-  this.validators = {
-    type: function (v, data) {
-      var valid = ['signed', 'hosted'];
-      if (valid.indexOf(v) === -1) {
-        return "Unknown type: " + v;
-      }
-      if (v === 'hosted' && !data.endpoint) {
-        return "If type is hosted, endpoint must be set";
-      }
-      if (v === 'signed' && !data.jwt) {
-        return "If type is signed, jwt must be set";
-      }
-      if (v === 'signed' && !data.public_key) {
-        return "If type is signed, public_key must be set";
-      }
-    },
-    endpoint: function (v, data) {
-      if (!v && data.type === 'hosted') {
-        return "If type is hosted, endpoint must be set";
-      }
-    },
-    jwt: function (v, data) {
-      if (!v && data.type === 'signed') {
-        return "If type is signed, jwt must be set";
-      }
-    },
-    public_key: function (v, data) {
-      if (!v && data.type === 'signed') {
-        return "If type is signed, public_key must be set";
-      }
-    },
-    image_path: function (v) {
-      if (!v) { return "Must have an image_path."; }
-    },
-    body: function (v) {
-      if (!v) { return "Must have a body."; }
-      if (String(v) !== '[object Object]') { return "body must be an object"; }
-      if (Badge.validateBody(v) instanceof Error) { return "invalid body"; }
-    }
-  }
-}
+var Badge = function (data) { this.data = data; }
 Base.apply(Badge, 'badge');
+
+// Validators called by `save()` (see mysql-base) in preparation for saving.
+// A valid pass returns nothing (or a falsy value); an invalid pass returns a
+// message about why a thing was invalid.
+Badge.validators = {
+  type: function (value, data) {
+    var valid = ['signed', 'hosted'];
+    if (valid.indexOf(value) === -1) {
+      return "Unknown type: " + value;
+    }
+    if (value === 'hosted' && !data.endpoint) {
+      return "If type is hosted, endpoint must be set";
+    }
+    if (value === 'signed' && !data.jwt) {
+      return "If type is signed, jwt must be set";
+    }
+    if (value === 'signed' && !data.public_key) {
+      return "If type is signed, public_key must be set";
+    }
+  },
+  endpoint: function (value, data) {
+    if (!value && data.type === 'hosted') {
+      return "If type is hosted, endpoint must be set";
+    }
+  },
+  jwt: function (value, data) {
+    if (!value && data.type === 'signed') {
+      return "If type is signed, jwt must be set";
+    }
+  },
+  public_key: function (value, data) {
+    if (!value && data.type === 'signed') {
+      return "If type is signed, public_key must be set";
+    }
+  },
+  image_path: function (value) {
+    if (!value) { return "Must have an image_path."; }
+  },
+  body: function (value) {
+    if (!value) { return "Must have a body."; }
+    if (String(value) !== '[object Object]') { return "body must be an object"; }
+    if (Badge.validateBody(value) instanceof Error) { return "invalid body"; }
+  }
+};
+
+// Prepare a field as it goes into or comes out of the database.
+Badge.prepare = {
+  in: { body: function (v) { return JSON.stringify(v); } },
+  out: { body: function (v) { return JSON.parse(v); } }
+};
+
+// Virtual finders. By default, `find()` will take the keys of the criteria
+// and create WHERE statements based on those. This object provides more
+// nuanced control over how the query is formed and also allows creation
+// of finders that don't map directly to a column name.
 Badge.finders = {
   email: function (value, callback) {
     var query = "SELECT * FROM `badge` WHERE `user_id` = (SELECT `id` FROM `user` WHERE `email` = ?)";
     mysql.client.query(query, [value], callback);
   }
-}
+};
 Badge.validateBody = function (body) {
   var err = new Error('Invalid badge assertion');
   err.fields = {};
   
-  // helpers
   var fieldFromDottedString = function (str, obj) {
     var fields = str.split('.')
       , current = obj
@@ -91,7 +100,7 @@ Badge.validateBody = function (body) {
         err.fields[fieldStr] = 'invalid value for `' + fieldStr + '`: too long, maximum length should be ' + maxlength;
       }
     }
-  }
+  };
   
   // begin tests
   test.missing('recipient');

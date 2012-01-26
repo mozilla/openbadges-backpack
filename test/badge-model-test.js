@@ -110,7 +110,7 @@ var createDbFixtures = function () {
   var addBadge = "INSERT INTO `badge`"
     + "(user_id, type, endpoint, image_path, body, body_hash)"
     + "VALUES"
-    + "(1, 'hosted', 'http://example.com', '/dev/null', 'wut', 'sha256$lol')";
+    + "(1, 'hosted', 'http://example.com', '/dev/null', '{\"wut\":\"lol\"}', 'sha256$lol')";
   mysql.client.query(addUser);
   mysql.client.query(addBadge);
 };
@@ -207,6 +207,16 @@ vows.describe('Badggesss').addBatch({
       'saves badge into the database and gives an id': function (err, badge) {
         assert.ifError(err);
         assert.isNumber(badge.data.id);
+      },
+      'can be retrieved once saved': {
+        topic: function (badge) {
+          Badge.findById(badge.data.id, this.callback);
+        },
+        'and the body data is unmangled': function (err, badge) {
+          assert.isObject(badge.data.body);
+          assert.isObject(badge.data.body.badge);
+          assert.isObject(badge.data.body.badge.issuer);
+        },
       }
     },
 
