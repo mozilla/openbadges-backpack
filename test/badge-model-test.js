@@ -14,24 +14,34 @@ var BAD_DATES = ['oiajsd09gjas;oj09', 'foreever ago', '111111', '1314145531', '@
 var BAD_VERSIONS = ['v100', '50', 'v10.1alpha']
 var sha256 = function (str) { return crypto.createHash('sha256').update(str).digest('hex'); }
 
+
+var assertErrors = function () {
+  var fields = Array.prototype.slice.call(arguments);
+  return function (err, badge) {
+    assert.isNull(badge);
+    assert.instanceOf(err, Error);
+    assert.isObject(err.fields);
+    fields.forEach(function (f) { assert.includes(err.fields, f); })
+  }
+};
+
+var makeBadge = function () {
+  var assertion = fixture();
+  return new Badge({
+    type: 'hosted',
+    endpoint: 'http://example.com/awesomebadge.json',
+    image_path: '/dev/null',
+    body: assertion,
+    body_hash: 'sha256$' + genstring(64)
+  });
+}
+
 mysql.prepareTesting();
 vows.describe('Badggesss').addBatch({
   'Trying to save': {
-    
-    topic: function () {
-      var assertion = fixture();
-      return new Badge({
-        type: 'hosted',
-        endpoint: 'http://example.com/awesomebadge.json',
-        image_path: '/dev/null',
-        body: assertion,
-        body_hash: 'sha256$' + genstring(64)
-      });
-    },
-    
     'a valid hosted assertion': {
-      topic: function (badge) {
-        badge.save(this.callback);
+      topic: function () {
+        makeBadge().save(this.callback);
       },
       'saves badge into the database and gives an id': function (err, badge) {
         assert.isNumber(badge.data.id);
@@ -39,71 +49,56 @@ vows.describe('Badggesss').addBatch({
     },
 
     'a hosted assertion without an `endpoint`': {
-      topic: function (badge) { 
+      topic: function () { 
+        var badge = makeBadge();
         delete badge.data.endpoint;
         badge.save(this.callback);
       },
-      'should fail with validation error on `endpoint`': function (err, badge) {
-        assert.instanceOf(err, Error);
-        assert.isObject(err.fields);
-        assert.includes(err.fields, 'type');
-        assert.includes(err.fields, 'endpoint');
-        assert.isNull(badge);
-      }
+      'should fail with validation error on `endpoint`': assertErrors('type', 'endpoint')
     },
 
     'a signed assertion without a `jwt`': {
-      topic: function (badge) { 
-        delete badge.data.jwt;
+      topic: function () { 
+        var badge = makeBadge();
         badge.data.type = 'signed';
         badge.save(this.callback);
       },
-      'should fail with validation error on `jwt`': function (err, badge) {
-        assert.instanceOf(err, Error);
-        assert.isObject(err.fields);
-        assert.includes(err.fields, 'type');
-        assert.includes(err.fields, 'jwt');
-        assert.isNull(badge);
-      }
+      'should fail with validation error on `jwt`': assertErrors('type', 'jwt')
     },
 
     'an assertion without an `image_path`': {
-      topic: function (badge) { 
+      topic: function () { 
+        var badge = makeBadge();
         delete badge.data.image_path;
         badge.save(this.callback);
       },
-      'should fail with validation error on `image_path`': function (err, badge) {
-        assert.instanceOf(err, Error);
-        assert.isObject(err.fields);
-        assert.includes(err.fields, 'image_path');
-        assert.isNull(badge);
-      }
+      'should fail with validation error on `image_path`': assertErrors('image_path')
     },
 
     'an assertion without a `body`': {
-      topic: function (badge) { 
+      topic: function () { 
+        var badge = makeBadge();
         delete badge.data.body;
         badge.save(this.callback);
       },
-      'should fail with validation error on `body`': function (err, badge) {
-        assert.instanceOf(err, Error);
-        assert.isObject(err.fields);
-        assert.includes(err.fields, 'body');
-        assert.isNull(badge);
-      }
+      'should fail with validation error on `body`': assertErrors('body')
     },
     
     'an assertion with an unexpected `body` type': {
-      topic: function (badge) { 
+      topic: function () { 
+        var badge = makeBadge();
         badge.data.body = "I just don't understand skrillex";
         badge.save(this.callback);
       },
-      'should fail with validation error on `body`': function (err, badge) {
-        assert.instanceOf(err, Error);
-        assert.isObject(err.fields);
-        assert.includes(err.fields, 'body');
-        assert.isNull(badge);
-      }
+      'should fail with validation error on `body`': assertErrors('body')
+    },
+    'an assertion with an invalid `body.recipient`': {
+      topic: function () { 
+        var badge = makeBadge();
+        badge.data.body.recipient = "he's just not my jam";
+        badge.save(this.callback);
+      },
+      'should fail with validation error on `body.recipient`': assertErrors('body.recipient')
     }
   }
 }).export(module);
