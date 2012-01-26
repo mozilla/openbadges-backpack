@@ -207,41 +207,37 @@ exports.upload = function(req, res) {
     if (err) req.flash('error', err);
     return res.redirect(reverse('backpack.manage'), 303);
   }
+ 
+  var filedata, assertionURL;
+  filedata = req.files.userBadge;
+
+  if (!filedata) return redirect();
+
+  if (filedata.size > (1024 * 256)) return redirect('Maximum badge size is 256kb! Contact your issuer.');
   
-  req.form.complete(function(err, fields, files) {
-    var filedata, assertionURL;
-    if (err) {
-      logger.warn(err);
-      return redirect('SNAP! There was a problem uploading your badge.');
+  fs.readFile(filedata.path, function(err, imagedata){
+    if (err) return redirect('SNAP! There was a problem reading uploaded badge.');
+    try {
+      assertionURL = baker.read(imagedata)
+    } catch (e) {
+      return redirect('Badge is malformed! Contact your issuer.');
     }
-    filedata = files['userBadge'];
-    if (!filedata) return redirect();
-    if (filedata.size > (1024 * 256)) return redirect('Maximum badge size is 256kb! Contact your issuer.');
-    
-    fs.readFile(filedata['path'], function(err, imagedata){
-      if (err) return redirect('SNAP! There was a problem reading uploaded badge.');
-      try {
-        assertionURL = baker.read(imagedata)
-      } catch (e) {
-        return redirect('Badge is malformed! Contact your issuer.');
+    remote.assertion(assertionURL, function(err, assertion) {
+      if (err.status !== 'success') {
+        logger.warn('failed grabbing assertion for URL '+ assertionURL);
+        logger.warn('reason: '+ JSON.stringify(err));
+        return redirect('There was a problem validating the badge! Contact your issuer.');
       }
-      remote.assertion(assertionURL, function(err, assertion) {
-        if (err.status !== 'success') {
-          logger.warn('failed grabbing assertion for URL '+ assertionURL);
-          logger.warn('reason: '+ JSON.stringify(err));
-          return redirect('There was a problem validating the badge! Contact your issuer.');
+      if (assertion.recipient !== email) {
+        return redirect('This badge was not issued to you! Contact your issuer.');
+      }
+      _award(assertion, assertionURL, imagedata, function(err, badge) {
+        if (err) {
+          logger.error('could not save badge: ' + err);
+          return redirect('There was a problem saving your badge!');
         }
-        if (assertion.recipient !== email) {
-          return redirect('This badge was not issued to you! Contact your issuer.');
-        }
-        _award(assertion, assertionURL, imagedata, function(err, badge) {
-          if (err) {
-            logger.error('could not save badge: ' + err);
-            return redirect('There was a problem saving your badge!');
-          }
-          return redirect();
-        });
-      })
+        return redirect();
+      });
     })
   });
 }
