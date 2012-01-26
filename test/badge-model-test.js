@@ -33,6 +33,7 @@ vows.describe('Badggesss').addBatch({
       assert.isNumber(badge.data.id);
     }
   },
+  
   'Saving a hosted assertion without an `endpoint`': {
     topic: function () { 
       var assertion = fixture({recipient: 'yo@example.com'});
@@ -50,6 +51,7 @@ vows.describe('Badggesss').addBatch({
       assert.isNull(badge);
     }
   },
+  
   'Saving a signed assertion without a `jwt`': {
     topic: function () { 
       var assertion = fixture({recipient: 'yo@example.com'});
@@ -64,6 +66,24 @@ vows.describe('Badggesss').addBatch({
       assert.instanceOf(err, Error);
       assert.includes(err.fields, 'type');
       assert.includes(err.fields, 'jwt');
+      assert.isNull(badge);
+    }
+  },
+  
+  'Saving an assertion without an `image_path`': {
+    topic: function () { 
+      var assertion = fixture({recipient: 'yo@example.com'});
+      var badge = new Badge({
+        type: 'hosted',
+        endpoint: 'whaaaat',
+        body: assertion,
+        body_hash: 'sha256$' + sha256(JSON.stringify(assertion))
+      });
+      badge.save(this.callback);
+    },
+    'should fail with validation error on `image_path`': function (err, badge) {
+      assert.instanceOf(err, Error);
+      assert.includes(err.fields, 'image_path');
       assert.isNull(badge);
     }
   },
