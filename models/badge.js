@@ -68,17 +68,35 @@ Badge.validateBody = function (body) {
     if (!body.badge.version) {
       err.fields['badge.version'] = 'missing required field `badge.version`';
     }
+    if (body.badge.version && !regex.version.test(body.badge.version)) {
+      err.fields['badge.version'] = 'invalid version for `badge.version`';
+    }
     if (!body.badge.name) {
       err.fields['badge.name'] = 'missing required field `badge.name`';
+    }
+    if (body.badge.name && body.badge.name.length > 128) {
+      err.fields['badge.name'] = 'invalid field `badge.name`: too long';
     }
     if (!body.badge.description) {
       err.fields['badge.description'] = 'missing required field `badge.description`';
     }
+    if (body.badge.description && body.badge.description.length > 128) {
+      err.fields['badge.description'] = 'invalid field `badge.description`: too long';
+    }
     if (!body.badge.image) {
       err.fields['badge.image'] = 'missing required field `badge.image`';
     }
+    if (body.badge.image && !regex.url.test(body.badge.image)) {
+      err.fields['badge.image'] = 'invalid url for required field `badge.image`';
+    }
     if (!body.badge.criteria) {
       err.fields['badge.criteria'] = 'missing required field `badge.criteria`';
+    }
+    if (body.badge.criteria && !regex.url.test(body.badge.criteria)) {
+      err.fields['badge.criteria'] = 'invalid url for required field `badge.criteria`';
+    }
+    if (!body.badge.issuer) {
+      err.fields['badge.issuer'] = 'missing required field `badge.issuer`';
     }
   }
   if (Object.keys(err.fields).length) { return err; }

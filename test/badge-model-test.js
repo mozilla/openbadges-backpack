@@ -20,8 +20,11 @@ var DATES = {
   good: [Math.floor(Date.now()/1000), '2012-01-01'],
   bad: ['oiajsd09gjas;oj09', 'foreever ago', '@.com:90/', '2001-10-190-19', '901d1', '000000000000000000000']
 };                                                                                                             
+var VERSIONS = {
+  good: ['0.1.1', '2.0.1', '1.2.3', 'v1.2.1'],
+  bad: ['v100', '50', 'v10.1alpha', '1.2.x']
+};
 
-var BAD_VERSIONS = ['v100', '50', 'v10.1alpha'];
 var sha256 = function (str) { return crypto.createHash('sha256').update(str).digest('hex'); };
 
 var makeBadge = function () {
@@ -114,6 +117,7 @@ vows.describe('Badggesss').addBatch({
     'with a missing `badge.description` field': makeMissingTest('badge.description'),
     'with a missing `badge.image` field': makeMissingTest('badge.image'),
     'with a missing `badge.criteria` field': makeMissingTest('badge.criteria'),
+    'with a missing `badge.issuer` field': makeMissingTest('badge.issuer'),
     
     'with bogus `recipient`': makeInvalidationTests('recipient', EMAILS.bad),
     'with valid `recipient`': makeValidationTests('recipient', EMAILS.good),
@@ -127,6 +131,21 @@ vows.describe('Badggesss').addBatch({
     'with bogus `issued_on`': makeInvalidationTests('issued_on', DATES.bad),
     'with valid `issued_on`': makeValidationTests('issued_on', DATES.good),
 
+    'with bogus `badge.version`': makeInvalidationTests('badge.version', VERSIONS.bad),
+    'with valid `badge.version`': makeValidationTests('badge.version', VERSIONS.good),
+    
+    'with bogus `badge.name`': makeInvalidationTests('badge.name', [genstring(129)] ),
+    'with valid `badge.name`': makeValidationTests('badge.name', [genstring(127)] ),
+    
+    'with bogus `badge.description`': makeInvalidationTests('badge.description', [genstring(129)] ),
+    'with valid `badge.description`': makeValidationTests('badge.description', [genstring(127)] ),
+    
+    'with bogus `badge.image`': makeInvalidationTests('badge.image', URLS.bad),
+    'with valid `badge.image`': makeValidationTests('badge.image', URLS.good),
+
+    'with bogus `badge.criteria`': makeInvalidationTests('badge.criteria', URLS.bad),
+    'with valid `badge.criteria`': makeValidationTests('badge.criteria', URLS.good),
+    
     'that is totally valid': {
       topic: function () {
         return Badge.validateBody(makeAssertion({}))
