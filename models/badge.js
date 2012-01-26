@@ -42,6 +42,16 @@ var Badge = function (data) {
 }
 Base.apply(Badge, 'badge');
 Badge.validateBody = function (badge) {
+  var err = new Error('Invalid badge assertion');
+  err.fields = {};
+  if (!badge.recipient) {
+    err.fields['recipient'] = 'missing email address for `recipient`';
+  }
+  if (badge.recipient && !regex.email.test(badge.recipient)) {
+    err.fields['recipient'] = 'invalid email address for `recipient`';
+  }
   
+  if (Object.keys(err.fields).length) { return err; }
+  return null;
 }
 module.exports = Badge;

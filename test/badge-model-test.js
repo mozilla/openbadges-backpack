@@ -2,7 +2,7 @@ var vows = require('vows')
   , mysql = require('../lib/mysql')
   , assert = require('assert')
   , url = require('url')
-  , fixture = require('./utils').fixture
+  , makeAssertion = require('./utils').fixture
   , genstring = require('./utils').genstring
   , crypto = require('crypto')
   , Badge = require('../models/badge')
@@ -15,7 +15,7 @@ var BAD_VERSIONS = ['v100', '50', 'v10.1alpha']
 var sha256 = function (str) { return crypto.createHash('sha256').update(str).digest('hex'); }
 
 var makeBadge = function () {
-  var assertion = fixture();
+  var assertion = makeAssertion();
   return new Badge({
     type: 'hosted',
     endpoint: 'http://example.com/awesomebadge.json',
@@ -37,54 +37,98 @@ var makeBadgeAndSave = function (changes) {
   }
 }
 
-var assertErrors = function () {
-  var fields = Array.prototype.slice.call(arguments);
+var assertErrors = function (fields, msgContains) {
   return function (err, badge) {
+    if (badge instanceof Error) {
+      err = badge;
+      badge = null;
+    }
     assert.isNull(badge);
     assert.instanceOf(err, Error);
     assert.isObject(err.fields);
-    fields.forEach(function (f) { assert.includes(err.fields, f); })
+    fields.forEach(function (f) {
+      assert.includes(err.fields, f);
+      if (msgContains) {
+        assert.match(err.fields[f], RegExp(msgContains));
+      }
+    })
+
   }
 };
 
+var makeInvalidationTest = function (field, badData) {
+  var tests = {};
+  badData.forEach(function (v) {
+    var test = tests['like "' + v + '"'] = {}
+    test['topic'] = function () {
+      var fieldReplacement = {}
+      fieldReplacement[field] = v;
+      return Badge.validateBody(makeAssertion(fieldReplacement));
+    };
+    test['should fail with error on `' + field + '`'] = assertErrors([field], 'invalid');
+  })
+  console.dir(tests);
+  return tests;
+}
+
 mysql.prepareTesting();
 vows.describe('Badggesss').addBatch({
+  'Validating an assertion': {
+    'with a missing recipient': {
+      topic: function () {
+        return Badge.validateBody(makeAssertion({recipient: null}))
+      },
+      'should fail with error on `recipient`': assertErrors(['recipient'], 'missing')
+    },
+    
+    'with a bogus recipient': makeInvalidationTest('recipient', BAD_EMAILS),
+    
+    'that is totally valid': {
+      topic: function () {
+        return Badge.validateBody(makeAssertion({}))
+      },
+      'should succeed': function (err) {
+        assert.isNull(err);
+      }
+    }
+  },
   'Trying to save': {
     'a valid hosted assertion': {
       topic: makeBadgeAndSave(),
       'saves badge into the database and gives an id': function (err, badge) {
+        assert.ifError(err);
         assert.isNumber(badge.data.id);
       }
     },
 
     'a hosted assertion without an `endpoint`': {
       topic: makeBadgeAndSave({endpoint: null}),
-      'should fail with validation error on `endpoint`': assertErrors('type', 'endpoint')
+      'should fail with validation error on `endpoint`': assertErrors(['type', 'endpoint'])
     },
 
     'a signed assertion without a `jwt`': {
       topic: makeBadgeAndSave({type: 'signed', jwt: null}),
-      'should fail with validation error on `jwt`': assertErrors('type', 'jwt')
+      'should fail with validation error on `jwt`': assertErrors(['type', 'jwt'])
     },
 
     'an assertion with an unknown type': {
       topic: makeBadgeAndSave({type: 'glurble'}),
-      'should fail with validation error on `type`': assertErrors('type')
+      'should fail with validation error on `type`': assertErrors(['type'])
     },
 
     'an assertion without an `image_path`': {
       topic: makeBadgeAndSave({image_path: null}),
-      'should fail with validation error on `image_path`': assertErrors('image_path')
+      'should fail with validation error on `image_path`': assertErrors(['image_path'])
     },
 
     'an assertion without a `body`': {
       topic: makeBadgeAndSave({body: null}),
-      'should fail with validation error on `body`': assertErrors('body')
+      'should fail with validation error on `body`': assertErrors(['body'])
     },
     
     'an assertion with an unexpected `body` type': {
       topic: makeBadgeAndSave({body: "I just don't understand skrillex"}),
-      'should fail with validation error on `body`': assertErrors('body')
+      'should fail with validation error on `body`': assertErrors(['body'])
     }
   }
 }).export(module);
