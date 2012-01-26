@@ -8,18 +8,20 @@ var EMAILS = {
   bad: ['lkajd', 'skj@asdk', '@.com', '909090', '____!@']
 };
 
+var createUser = function (email) {
+  email = email || 'brian@example.com';
+  return new User({
+    email: 'brian@example.com',
+    passwd: 'secret'
+  });
+}
+
 mysql.prepareTesting();
 vows.describe('Useeeerrrrrs').addBatch({
   'A valid user': {
-    topic: function () {
-      return new User({
-        email: 'brian@example.com',
-        passwd: 'secret'
-      })
-    },
     'can be saved' : {
       topic: function (user) {
-        user.save(this.callback);
+        createUser().save(this.callback);
       },
       'and an id is given back': function (err, user) {
         assert.ifError(err);
@@ -40,8 +42,20 @@ vows.describe('Useeeerrrrrs').addBatch({
         'and the password can be checked accurately': function (user) {
           assert.isTrue(user.checkPassword('secret'));
           assert.isFalse(user.checkPassword('not correct'));
+        },
+        'and the password can be changed': function (user) {
+          assert.isTrue(user.checkPassword('secret'));
+          assert.isFalse(user.checkPassword('not correct'));
         }
       }
+    }
+  },
+  'A user': {
+    topic: createUser(),
+    'can change her password': function (user) {
+      var newpw = 'whaat';
+      user.changePassword(newpw);
+      assert.isTrue(user.checkPassword(newpw));
     }
   }
 }).export(module);

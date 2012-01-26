@@ -4,14 +4,15 @@ var mysql = require('../lib/mysql')
   , Base = require('./mysql-base');
 
 var User = function (data) {
+  var ALGO = 'bcrypt';
   if (!data.id) {
     data.salt = User.makeSalt();
-    data.passwd = 'bcrypt$' + User.pw.bcrypt.hash(data.passwd, data.salt)
+    data.passwd = User.pw[ALGO].hash(data.passwd, data.salt)
   }
   this.data = data;
   this.changePassword = function (newPassword) {
-    this.data.salt = User.makeSalt();
-    this.data.passwd = User.hashPassword(data.passwd, data.salt);
+    var salt = this.data.salt = User.makeSalt();
+    this.data.passwd = User.pw[ALGO].hash(newPassword, salt);
   };
   this.checkPassword = function (given) {
     var parts = this.data.passwd.split('$')
@@ -27,7 +28,7 @@ User.makeSalt = function () { return crypto.randomBytes(16) + ''; }
 User.pw = {bcrypt: {
   hash: function (pw, salt) {
     var saltedpw = pw + salt;
-    return bcrypt.hashSync(saltedpw, bcrypt.genSaltSync(10));
+    return 'bcrypt$' + bcrypt.hashSync(saltedpw, bcrypt.genSaltSync(10));
   },
   check: function (pw, salt, hash) {
     var saltedpw = pw + salt;
