@@ -13,8 +13,12 @@ var EMAILS = {
   bad: ['lkajd', 'skj@asdk', '@.com', '909090', '____!@']
 };
 var URLS = {
-  good: ['http://example.com/', '/partial/path', '/rad.awesome/great/', '/foreign/crázy/ååú´¨la/'],
+  good: ['http://example.com/', 'https://example.com/w/yo', '/partial/path', '/rad.awesome/great/', '/foreign/crázy/ååú´¨la/'],
   bad: ['-not-asdo', 'ftp://bad-scheme', '@.com:90/', 'just totally wrong']
+};
+var ORIGINS = {
+  good: ['http://example.com', 'https://example.com:80', 'https://www.example.com', 'https://www.example.com:8080'],
+  bad: URLS.bad
 };
 var DATES = {
   good: [Math.floor(Date.now()/1000), '2012-01-01'],
@@ -118,6 +122,8 @@ vows.describe('Badggesss').addBatch({
     'with a missing `badge.image` field': makeMissingTest('badge.image'),
     'with a missing `badge.criteria` field': makeMissingTest('badge.criteria'),
     'with a missing `badge.issuer` field': makeMissingTest('badge.issuer'),
+    'with a missing `badge.issuer.origin` field': makeMissingTest('badge.issuer.origin'),
+    'with a missing `badge.issuer.name` field': makeMissingTest('badge.issuer.name'),
     
     'with bogus `recipient`': makeInvalidationTests('recipient', EMAILS.bad),
     'with valid `recipient`': makeValidationTests('recipient', EMAILS.good),
@@ -145,6 +151,18 @@ vows.describe('Badggesss').addBatch({
 
     'with bogus `badge.criteria`': makeInvalidationTests('badge.criteria', URLS.bad),
     'with valid `badge.criteria`': makeValidationTests('badge.criteria', URLS.good),
+    
+    'with bogus `badge.issuer.origin`': makeInvalidationTests('badge.issuer.origin', ORIGINS.bad),
+    'with valid `badge.issuer.origin`': makeValidationTests('badge.issuer.origin', ORIGINS.good),
+    
+    'with bogus `badge.issuer.name`': makeInvalidationTests('badge.issuer.name', [genstring(129)] ),
+    'with valid `badge.issuer.name`': makeValidationTests('badge.issuer.name', [genstring(127)] ),
+    
+    'with bogus `badge.issuer.org`': makeInvalidationTests('badge.issuer.org', [genstring(129)] ),
+    'with valid `badge.issuer.org`': makeValidationTests('badge.issuer.org', [genstring(127)] ),
+    
+    'with bogus `badge.issuer.contact`': makeInvalidationTests('badge.issuer.contact', EMAILS.bad ),
+    'with valid `badge.issuer.contact`': makeValidationTests('badge.issuer.contact', EMAILS.good ),
     
     'that is totally valid': {
       topic: function () {

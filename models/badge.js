@@ -97,6 +97,25 @@ Badge.validateBody = function (body) {
     }
     if (!body.badge.issuer) {
       err.fields['badge.issuer'] = 'missing required field `badge.issuer`';
+    } else {
+      if (!body.badge.issuer.origin) {
+        err.fields['badge.issuer.origin'] = 'missing required field `badge.issuer.origin`';
+      }
+      if (body.badge.issuer.origin && !regex.origin.test(body.badge.issuer.origin)) {
+        err.fields['badge.issuer.origin'] = 'invalid required field `badge.issuer.origin`: bad origin';
+      }
+      if (!body.badge.issuer.name) {
+        err.fields['badge.issuer.name'] = 'missing required field `badge.issuer.name`';
+      }
+      if (body.badge.issuer.name && body.badge.issuer.name.length > 128) {
+        err.fields['badge.issuer.name'] = 'invalid required field `badge.issuer.name`: too long';
+      }
+      if (body.badge.issuer.org && body.badge.issuer.org.length > 128) {
+        err.fields['badge.issuer.org'] = 'invalid required field `badge.issuer.org`: too long';
+      }
+      if (body.badge.issuer.contact && !regex.email.test(body.badge.issuer.contact)) {
+        err.fields['badge.issuer.contact'] = 'invalid email for required field `badge.issuer.contact`';
+      }
     }
   }
   if (Object.keys(err.fields).length) { return err; }
