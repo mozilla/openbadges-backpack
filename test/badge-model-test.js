@@ -50,4 +50,21 @@ vows.describe('Badggesss').addBatch({
       assert.isNull(badge);
     }
   },
+  'Saving a signed assertion without a `jwt`': {
+    topic: function () { 
+      var assertion = fixture({recipient: 'yo@example.com'});
+      var badge = new Badge({
+        type: 'signed',
+        body: assertion,
+        body_hash: 'sha256$' + sha256(JSON.stringify(assertion))
+      });
+      badge.save(this.callback);
+    },
+    'should fail with validation error on `jwt`': function (err, badge) {
+      assert.instanceOf(err, Error);
+      assert.includes(err.fields, 'type');
+      assert.includes(err.fields, 'jwt');
+      assert.isNull(badge);
+    }
+  },
 }).export(module);
