@@ -50,10 +50,9 @@ app.dynamicHelpers({
 // middleware used.
 app.use(express.static(path.join(__dirname, "static")));
 app.use(express.static(path.join(configuration.get('var_dir'), "badges")));
-app.use(express.bodyParser());
+app.use(express.bodyParser({uploadDir:configuration.get('badge_path')}));
 app.use(express.cookieParser());
 app.use(middleware.logRequests());
-app.use(middleware.formHandler());
 app.use(middleware.cookieSessions());
 app.use(middleware.noFrame([ '/share/.*' ]));
 app.use(middleware.csrf.check([ '/backpack/badge', '/backpack/authenticate' ]));
