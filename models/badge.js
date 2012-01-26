@@ -32,7 +32,7 @@ var Badge = function (data) {
       }
     },
     'image_path': function (v) {
-      if (!v) { return "Must have an image path."; }
+      if (!v) { return "Must have an image_path."; }
     },
     'body': function (v) {
       if (!v) { return "Must have a body."; }
@@ -48,9 +48,14 @@ Badge.validateBody = function (badge) {
     err.fields['recipient'] = 'missing email address for `recipient`';
   }
   if (badge.recipient && !regex.email.test(badge.recipient)) {
-    err.fields['recipient'] = 'invalid email address for `recipient`';
+    err.fields['recipient'] = 'invalid email for `recipient`';
   }
-  
+  if (badge.evidence && !regex.url.test(badge.evidence)) {
+    err.fields['evidence'] = 'invalid url for `evidence`';
+  }
+  if (badge.expires && !regex.date.test(badge.expires)) {
+    err.fields['expires'] = 'invalid date for `expires`';
+  }
   if (Object.keys(err.fields).length) { return err; }
   return null;
 }

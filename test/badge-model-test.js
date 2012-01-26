@@ -9,8 +9,8 @@ var vows = require('vows')
   , client = mysql.client;
 
 var BAD_EMAILS = ['lkajd', 'skj@asdk', '@.com', '909090', '____!@']
-var BAD_URLS = ['-not-asdo', 'ftp://bad-scheme', '@.com:90/']
-var BAD_DATES = ['oiajsd09gjas;oj09', 'foreever ago', '111111', '1314145531', '@.com:90/']
+var BAD_URLS = ['-not-asdo', 'ftp://bad-scheme', '@.com:90/', 'just totally wrong']
+var BAD_DATES = ['oiajsd09gjas;oj09', 'foreever ago', '@.com:90/', '2001-10-190-19', '901d1', '000000000000000000000']
 var BAD_VERSIONS = ['v100', '50', 'v10.1alpha']
 var sha256 = function (str) { return crypto.createHash('sha256').update(str).digest('hex'); }
 
@@ -48,6 +48,7 @@ var assertErrors = function (fields, msgContains) {
     assert.isObject(err.fields);
     fields.forEach(function (f) {
       assert.includes(err.fields, f);
+      assert.match(err.fields[f], RegExp(f));
       if (msgContains) {
         assert.match(err.fields[f], RegExp(msgContains));
       }
@@ -80,7 +81,11 @@ vows.describe('Badggesss').addBatch({
       'should fail with error on `recipient`': assertErrors(['recipient'], 'missing')
     },
     
-    'with a bogus recipient': makeInvalidationTests('recipient', BAD_EMAILS),
+    'with a bogus `recipient`': makeInvalidationTests('recipient', BAD_EMAILS),
+    
+    'with a bogus `evidence`': makeInvalidationTests('evidence', BAD_URLS),
+    
+    'with a bogus `expires`': makeInvalidationTests('expires', BAD_DATES),
     
     'that is totally valid': {
       topic: function () {
