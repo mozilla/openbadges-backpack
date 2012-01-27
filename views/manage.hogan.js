@@ -1,19 +1,20 @@
-{{^badges.length}}
+{{^badges.total}}
 <h1>No badges.  Better get out there and start earning some!</h1>
 <p>By the way, <a href="http://p2pu.org">P2PU</a> would be a great place to start
-{{/badges.length}}
+{{/badges.total}}
 
 <div class="row">
   <div class="span-one-third column">
+    {{#badges.total}}
     <h1>Badges</h1>
-
-    {{#badges.length}}
 
     {{#badges.pending.length}}
     <h3>Pending</h3>
     <div id="pending-badges" class="js-badges">
       {{#badges.pending}}
-      {{> badges_partial}}
+      <a href="{{#reverse}}backpack.details, {'badgeId': {{id}} }{{/reverse}}">
+        <img id="id.{{id}}" src="{{meta.imagePath}}" width="64px"/>
+      </a>
       {{/badges.pending}}
     </div>
     {{/badges.pending.length}}
@@ -22,7 +23,9 @@
     <h3>Accepted</h3>
     <div id="accepted-badges" class="js-badges">
       {{#badges.accepted}}
-      {{> badges_partial}}
+      <a href="{{#reverse}}backpack.details, {'badgeId': {{id}} }{{/reverse}}">
+        <img id="id.{{id}}" src="{{meta.imagePath}}" width="64px"/>
+      </a>
       {{/badges.accepted}}
     </div>
     {{/badges.accepted.length}}
@@ -31,11 +34,13 @@
     <h3>Rejected</h3>
     <div id="rejected-badges" class="js-badges">
       {{#badges.rejected}}
-      {{ > badges_partial}}
+      <a href="{{#reverse}}backpack.details, {'badgeId': {{id}} }{{/reverse}}">
+        <img id="id.{{id}}" src="{{meta.imagePath}}" width="64px"/>
+      </a>
       {{/badges.rejected}}
     </div>
     {{/badges.rejected.length}}
-    {{/badges.length}}
+    {{/badges.total}}
     
     <div class="upload">
       <h4>Upload Badges</h4>
