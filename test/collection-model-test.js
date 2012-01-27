@@ -56,7 +56,6 @@ vows.describe('Collllleccctions').addBatch({
           }.bind(this))
         },
         'and have them be there when retrieving': function (err, badges) {
-          console.dir(badges);
           assert.equal(badges.length, 2);
         }
       }
