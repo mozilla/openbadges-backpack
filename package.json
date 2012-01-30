@@ -2,11 +2,12 @@
 , "description": "http://openbadges.org"
 , "version": "0.5.0"
 , "private": true
+, "scripts" :
+  { "test" : "node ./node_modules/vows/bin/vows --spec --isolate" }
 , "dependencies":
   { "express": "2.5.x"
   , "formidable": "1.0.x"
   , "mysql": "0.9.x"
-  , "uglify-js": "1.0.x"
   , "winston": "0.3.x"
   , "hogan.js": "1.0.x"
   , "coffeekup": "0.3.x"
@@ -15,11 +16,12 @@
   , "request": "2.9.x"
   , "commander": "0.5.x"
   , "metapng": "git+https://github.com/brianloveswords/metapng.js.git"
-  , "vows": "0.6.x"
   , "bcrypt": "0.5.x"
   , "mysql": "0.9.x"      
   , "colors": "*"
   }
+, "devDependencies":
+  { "vows": "0.6.x" }
 , "engines":
   { "node":  "*" }
 }
