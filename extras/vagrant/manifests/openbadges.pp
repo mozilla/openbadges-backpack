@@ -1,3 +1,8 @@
+group { "puppet" :
+  ensure => present,
+  name => "puppet";
+}
+
 Exec {
   path => [
       '/usr/local/bin',
