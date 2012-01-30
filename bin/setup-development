@@ -1,0 +1,12 @@
+#!/bin/bash
+
+echo -e "•\033[32m Creating database 'openbadges' and and user 'badgemaker' \033[39m"
+mysql -uroot < extras/vagrant/manifests/database.sql 2> /dev/null
+
+echo -e "•\033[32m Copying local-dist.js to local.js \033[39m"
+cp lib/environments/local-dist.js lib/environments/local.js
+
+echo -e "•\033[32m Installing npm packages \033[39m"
+npm install
+
+echo -e "Done! Run 'npm test' to confirm."
