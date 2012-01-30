@@ -33,18 +33,26 @@
     </div>
   </div>
 
-  <div class="span-two-thirds column groups">
-    <h1>Groups</h1>
-    {{^user.groups.length}}
-    <h2>You haven't made any groups yet.</h2>
-    {{/user.groups.length}}
-    {{#user.groups}}
-    <h3>{{name}}</h3>
-    <div class="well" style="position:relative">
-      <!-- todo - pull this from coffee -->
+  {{#badges.length}}
+    <div class="span-two-thirds column groups">
+      <h1>Groups</h1>
+      {{^user.groups.length}}
+      <h2>
+        You haven't made any groups yet.<br/>
+        <form action='' method='post'>
+          <input class='btn primary' type='submit' value="Create a new group">
+        </form>
+      </h2>
+      {{/user.groups.length}}
+      {{#user.groups}}
+      <h3>{{name}}</h3>
+      <div class="well" style="position:relative">
+        <!-- todo - pull this from coffee -->
+      </div>
+      {{/user.groups}}
     </div>
-    {{/user.groups}}
-  </div>
+  {{/badges.length}}
+
   <script type="text/javascript">
     (function() {
     coffeescript(function() {

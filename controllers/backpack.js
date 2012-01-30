@@ -22,8 +22,10 @@ exports.param['badgeId'] = function(req, res, next, id) {
 exports.login = function(req, res) {
   // req.flash returns an array. Pass on the whole thing to the view and
   // decide there if we want to display all of them or just the first one.
+  console.dir(req.session);
   res.render('login', {
-    error: req.flash('error')
+    error: req.flash('error'),
+    csrfToken: req.session._csrf
   });
 };
 
@@ -177,16 +179,16 @@ exports.details = function(req, res, next) {
   })
 }
 
-exports.apiGroups = function(req, res, next) {
+exports.addBadgeToGroup = function(req, res, next) {
   var badge = req.badge
-    , email = emailFromSession(req)
-    , fields = (req.body || {})
-    , keep = (fields['group'] || {})
-    , newGroup = (fields['newGroup'] || '').trim()
-    , updated = [];
-  if (!email || email !== badge.recipient) return res.send('forbidden', 403);
-    
-  res.send('not implemented yet', 500);
+    , assertion = badge.data.body
+    , email = emailFromSession(req);
+  if (email !== assertion.recipient) return res.send('forbidden', 403);
+  res.send('Not implemented yet', 500);
+};
+
+exports.createGroup = function(req, res, next) {
+  res.send('Not implemented yet', 500);
 };
 
 exports.deleteBadge = function (req, res) {

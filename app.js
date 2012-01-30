@@ -1,6 +1,5 @@
 // Configure & start express.
 var express = require('express')
-  , csrf = require('express-csrf')
   , fs = require('fs')
   , path = require('path')
   , middleware = require('./middleware')
@@ -42,21 +41,17 @@ app.helpers({
     }
   }
 });
-app.dynamicHelpers({
-  csrf: middleware.csrf.token
-});
-
 // Middleware. See `middleware.js` for more information on the custom
 // middleware used.
 app.use(express.static(path.join(__dirname, "static")));
 app.use(express.static(path.join(configuration.get('var_dir'), "badges")));
-app.use(express.bodyParser({uploadDir:configuration.get('badge_path')}));
+app.use(express.bodyParser({ uploadDir:configuration.get('badge_path') }));
 app.use(express.cookieParser());
 app.use(express.methodOverride());
 app.use(middleware.logRequests());
 app.use(middleware.cookieSessions());
+app.use(express.csrf());
 app.use(middleware.noFrame([ '/share/.*' ]));
-app.use(middleware.csrf.check([ '/backpack/badge', '/backpack/authenticate' ]));
 // Allow everything to be used with CORS.
 // This should probably just be limited to badges
 app.use(function(req, res, next) {

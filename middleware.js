@@ -50,34 +50,6 @@ exports.noFrame = function(whitelist) {
   };
 };
 
-var csrf = null;
-exports.csrf = {}
-exports.csrf.token = function(req, res) {
-  if (!(typeof csrf !== "undefined" && csrf !== null)) {
-    csrf = crypto.createHash('md5').update('' + new Date().getTime() + req.session.lastAccess).digest('hex');
-    req.session.csrf = csrf;
-  }
-  return csrf;
-};
-
-exports.csrf.check = function(whitelist) {
-  var whitelisted = function(input){
-    for (var i = whitelist.length; i--; ) {
-      if (RegExp('^' + whitelist[i] + '$').test(input)) return true;
-    }
-    return false;
-  }
-  return function(req, res, next) {
-    csrf = null; // Clear csrf for next request
-    if (req.method.toLowerCase() === 'post' && !whitelisted(req.url)) {
-      if (!(req.body && 'csrf' in req.body && req.body.csrf === req.session.csrf)) {
-        return res.send("Cross-site request forgery attempt discovered!", 403);
-      }
-    }
-    return next();
-  };
-};
-
 // #TODO: use a form handler that supports HTML5 multiple for files.
 exports.formHandler = function(){
   return form({keepExtensions: true});
