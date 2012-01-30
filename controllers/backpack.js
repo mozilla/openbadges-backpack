@@ -132,7 +132,6 @@ exports.manage = function(req, res, next) {
     if (err) return next(err);
     
     badges.forEach(function (b) {
-      console.dir(b);
       b.detailsUrl = reverse('backpack.details', { badgeId: b.data.body_hash })
       return b;
     })
@@ -191,7 +190,12 @@ exports.apiGroups = function(req, res, next) {
 };
 
 exports.deleteBadge = function (req, res) {
-  var badge = req.badge;
+  var badge = req.badge
+    , assertion = badge.data.body
+    , email = emailFromSession(req);
+  
+  if (assertion.recipient !== email) { return res.send("Cannot delete a badge you don't own", 403); }
+  
   badge.destroy(function (err, badge) {
     if (err) {
       logger.warn('Failed to delete badge');
