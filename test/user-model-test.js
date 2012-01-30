@@ -55,7 +55,7 @@ var assertErrors = function (fields, msgContains) {
   }
 };
 
-vows.describe('Useeeerrrrrs').addBatch({
+vows.describe('User model').addBatch({
   'User testing:': {
     topic: function () {
       mysql.prepareTesting();

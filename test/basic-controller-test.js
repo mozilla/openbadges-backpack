@@ -15,7 +15,7 @@ var testGen = function(files) {
   return test;
 }
 
-vows.describe('controller sanity').addBatch({
+vows.describe('Controller sanity').addBatch({
   'Controller': {
     topic: controllers,
     'exists': function (files){

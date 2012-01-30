@@ -126,7 +126,7 @@ var assertFixtureBadge = function (err, results) {
 };
 
 
-vows.describe('Badggesss').addBatch({
+vows.describe('Badge model').addBatch({
   'Badge testing:': {
     topic: function () {
       mysql.prepareTesting();

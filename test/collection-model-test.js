@@ -28,7 +28,7 @@ var createCollection = function () {
   })
 };
 
-vows.describe('Collllleccctions').addBatch({
+vows.describe('Collection Model').addBatch({
   'Collection testing:': {
     topic: function () {
       mysql.prepareTesting();
