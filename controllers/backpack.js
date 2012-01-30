@@ -105,8 +105,6 @@ exports.manage = function(req, res, next) {
   var error = req.flash('error')
     , success = req.flash('success')
   
-
-  // #TODO: replace below method with the new model methods.
   Badge.find({email: email}, function(err, badges){
     if (err) return next(err);
     
@@ -120,6 +118,7 @@ exports.manage = function(req, res, next) {
       success: success,
       user: email,
       badges: badges,
+      csrfToken: req.session._csrf,
       groups: [], // #TODO: replace with real grouping
       fqrev: function(p, o){
         var u = url.parse(reverse(p, o))
@@ -190,50 +189,59 @@ exports.deleteBadge = function (req, res) {
 };
 
 
+/**
+ * Handle upload of a badge from a user's filesystem. Gets embedded data from
+ * uploaded PNG with `urlFromUpload` from lib/baker, retrieves the assertion
+ * using `getHostedAssertion` from lib/remote and finally awards the badge
+ * using `award` from lib/award.
+ *
+ * @param {File} userBadge uploaded badge from user (from request)
+ * @return {HTTP 303} redirects to manage (with error, if necessary)
+ */
 
-// #TODO: de-complicate this.
-exports.upload = function(req, res) {
-  var email = emailFromSession(req);
+exports.userBadgeUpload = function(req, res) {
+  var email = emailFromSession(req)
+    , tmpfile = req.files.userBadge;
   if (!email) return res.redirect(reverse('backpack.login'), 303);
-
+  if (!tmpfile) return redirect();
+  
+  // go back to the manage page and potentially show an error
   var redirect = function(err) {
-    if (err) req.flash('error', err);
+    if (err) {
+      logger.warn('There was an error uploading a badge');
+      logger.debug(err);
+      req.flash('error', err.message);
+    }
     return res.redirect(reverse('backpack.manage'), 303);
   }
- 
-  var filedata, assertionURL;
-  filedata = req.files.userBadge;
-
-  if (!filedata) return redirect();
-
-  if (filedata.size > (1024 * 256)) return redirect('Maximum badge size is 256kb! Contact your issuer.');
   
-  fs.readFile(filedata.path, function(err, imagedata){
-    if (err) return redirect('SNAP! There was a problem reading uploaded badge.');
-    try {
-      assertionURL = baker.read(imagedata)
-    } catch (e) {
-      return redirect('Badge is malformed! Contact your issuer.');
-    }
-    remote.assertion(assertionURL, function(err, assertion) {
-      if (err.status !== 'success') {
-        logger.warn('failed grabbing assertion for URL '+ assertionURL);
-        logger.warn('reason: '+ JSON.stringify(err));
-        return redirect('There was a problem validating the badge! Contact your issuer.');
-      }
+  // get the url from the uploaded badge file
+  baker.urlFromUpload(tmpfile, function (err, assertionUrl, imagedata) {
+    if (err) return redirect(err);
+    
+    // grab the assertion data from the endpoint
+    remote.getHostedAssertion(assertionUrl, function (err, assertion) {
+      if (err) return redirect(err);
+
+      // bail if the badge wasn't issued to the logged in user
       if (assertion.recipient !== email) {
-        return redirect('This badge was not issued to you! Contact your issuer.');
+        err = new Error('This badge was not issued to you! Contact your issuer.');
+        err.name = 'InvalidRecipient';
+        return redirect(err);
       }
-      awardBadge(assertion, assertionURL, imagedata, function(err, badge) {
+      
+      // try to issue the badge 
+      awardBadge(assertion, assertionUrl, imagedata, function(err, badge) {
         if (err) {
-          logger.error('could not save badge: ' + err);
-          return redirect('There was a problem saving your badge!');
+          logger.warn('Could not save an uploaded badge: ');
+          logger.debug(err);
+          return redirect(new Error('There was a problem saving your badge!'));
         }
         return redirect();
       });
-    })
+    });
   });
-}
+};
 
 /**
  * Get user email from session.

@@ -22,7 +22,7 @@
       <form action="{{#reverse}}backpack.upload{{/reverse}}" method="post" enctype="multipart/form-data">
         <fieldset>
           <div class="clearfix">
-            <input type="hidden" name="csrf" value="{{csrf}}"></input>
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}"></input>
             <input id="userBadge" type="file" name="userBadge" accept="image/png"></input>
           </div>
         </fieldset>
