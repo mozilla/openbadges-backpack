@@ -7,12 +7,16 @@ var express = require('express')
   , logger = require('./lib/logging').logger
   , configuration = require('./lib/configuration')
   , router = require('./lib/router')
+  , hogan = require('hogan.js')
+  , hoganadapter = require('./lib/hogan-express.js')
 
 var app = express.createServer();
 app.logger = logger;
 app.config = configuration;
 
-app.set('view engine', 'coffee');
+// default view engine
+app.set('view engine', 'hogan.js');
+app.register('hogan.js', hoganadapter.init(hogan))
 app.register('.coffee', require('coffeekup').adapters.express)
 
 // View helpers. `user` and `badges` are set so we can use them in `if`
@@ -46,15 +50,21 @@ app.dynamicHelpers({
 // middleware used.
 app.use(express.static(path.join(__dirname, "static")));
 app.use(express.static(path.join(configuration.get('var_dir'), "badges")));
-app.use(express.bodyParser());
+app.use(express.bodyParser({uploadDir:configuration.get('badge_path')}));
 app.use(express.cookieParser());
 app.use(middleware.logRequests());
-app.use(middleware.formHandler());
 app.use(middleware.cookieSessions());
 app.use(middleware.noFrame([ '/share/.*' ]));
 app.use(middleware.csrf.check([ '/backpack/badge', '/backpack/authenticate' ]));
+// Allow everything to be used with CORS.
+// This should probably just be limited to badges
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  next();
+});
 
 router(app)
+  .get('/chris',                            'chris.chris')
   .get('/baker',                            'baker.baker')
   .get('/test',                             'test.issuer')
   .post('/test/award',                      'test.award')

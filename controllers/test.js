@@ -9,7 +9,7 @@ var protocol = configuration.get('protocol') || 'http'
 
 // Render the view for the test badge issuer.
 exports.issuer = function(req, res) {
-  res.render('issuer', {
+  res.render('issuer.coffee', {
     login: false,
     title: 'Test Issuer'
   });

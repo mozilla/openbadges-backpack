@@ -10,14 +10,14 @@ var request = require('request')
   , reverse = require('../lib/router').reverse
   , Badge = require('../models/badge')
 
-exports.param = {}
+exports.param = {};
 exports.param['badgeId'] = function(req, res, next, id) {
   Badge.findById(id, function(err, badge) {
     if (!badge) return res.send('could not find badge', 404);
     req.badge = badge;
     return next();
-  })
-}
+  });
+};
 
 exports.login = function(req, res) {
   // req.flash returns an array. Pass on the whole thing to the view and
@@ -40,7 +40,7 @@ exports.authenticate = function(req, res) {
   // express, which is what the main browserid server runs, will refuse to
   // populate req.body unless the proper content-type is set.
   var ident = configuration.get('identity');
-  var opts = {}
+  var opts = {};
   opts.uri = ident.protocol + '://' +  ident.server + ident.path;
   opts.body = qs.stringify({
     assertion: req.body['assertion'],
@@ -52,8 +52,8 @@ exports.authenticate = function(req, res) {
   };
 
   request.post(opts, function(err, resp, body){
-    var assertion = {}
-    var hostname = configuration.get('hostname')
+    var assertion = {};
+    var hostname = configuration.get('hostname');
 
     // We need to make sure:
     //
@@ -69,11 +69,11 @@ exports.authenticate = function(req, res) {
     // with a human-friendly message telling the user to try again.
     function goBackWithError(msg) {
       req.flash('error', (msg || 'There was a problem authenticating, please try again.'));
-      return res.redirect('back', 303)
+      return res.redirect('back', 303);
     }
     try {
       if (err) {
-        logger.error('could not make request to identity server')
+        logger.error('could not make request to identity server');
         logger.error('  err obj: ' + JSON.stringify(err));
         throw 'could not request';
       }
@@ -86,7 +86,7 @@ exports.authenticate = function(req, res) {
       try {
         assertion = JSON.parse(body);
       } catch (syntaxError) {
-        logger.warn('could not parse response from identity server: ' + body)
+        logger.warn('could not parse response from identity server: ' + body);
         throw 'invalid response';
       }
       if (assertion.status !== 'okay') {
@@ -104,10 +104,10 @@ exports.authenticate = function(req, res) {
 
     // Everything seems to be in order, store the user's email in the session
     // and redirect to the front page.
-    if (!req.session) res.session = {}
-    req.session.authenticated = [assertion.email]
+    if (!req.session) res.session = {};
+    req.session.authenticated = [assertion.email];
     return res.redirect(reverse('backpack.manage'), 303);
-  })
+  });
 };
 
 exports.signout = function(req, res) {
@@ -219,41 +219,37 @@ exports.upload = function(req, res) {
     if (err) req.flash('error', err);
     return res.redirect(reverse('backpack.manage'), 303);
   }
+ 
+  var filedata, assertionURL;
+  filedata = req.files.userBadge;
+
+  if (!filedata) return redirect();
+
+  if (filedata.size > (1024 * 256)) return redirect('Maximum badge size is 256kb! Contact your issuer.');
   
-  req.form.complete(function(err, fields, files) {
-    var filedata, assertionURL;
-    if (err) {
-      logger.warn(err);
-      return redirect('SNAP! There was a problem uploading your badge.');
+  fs.readFile(filedata.path, function(err, imagedata){
+    if (err) return redirect('SNAP! There was a problem reading uploaded badge.');
+    try {
+      assertionURL = baker.read(imagedata)
+    } catch (e) {
+      return redirect('Badge is malformed! Contact your issuer.');
     }
-    filedata = files['userBadge'];
-    if (!filedata) return redirect();
-    if (filedata.size > (1024 * 256)) return redirect('Maximum badge size is 256kb! Contact your issuer.');
-    
-    fs.readFile(filedata['path'], function(err, imagedata){
-      if (err) return redirect('SNAP! There was a problem reading uploaded badge.');
-      try {
-        assertionURL = baker.read(imagedata)
-      } catch (e) {
-        return redirect('Badge is malformed! Contact your issuer.');
+    remote.assertion(assertionURL, function(err, assertion) {
+      if (err.status !== 'success') {
+        logger.warn('failed grabbing assertion for URL '+ assertionURL);
+        logger.warn('reason: '+ JSON.stringify(err));
+        return redirect('There was a problem validating the badge! Contact your issuer.');
       }
-      remote.assertion(assertionURL, function(err, assertion) {
-        if (err.status !== 'success') {
-          logger.warn('failed grabbing assertion for URL '+ assertionURL);
-          logger.warn('reason: '+ JSON.stringify(err));
-          return redirect('There was a problem validating the badge! Contact your issuer.');
+      if (assertion.recipient !== email) {
+        return redirect('This badge was not issued to you! Contact your issuer.');
+      }
+      _award(assertion, assertionURL, imagedata, function(err, badge) {
+        if (err) {
+          logger.error('could not save badge: ' + err);
+          return redirect('There was a problem saving your badge!');
         }
-        if (assertion.recipient !== email) {
-          return redirect('This badge was not issued to you! Contact your issuer.');
-        }
-        _award(assertion, assertionURL, imagedata, function(err, badge) {
-          if (err) {
-            logger.error('could not save badge: ' + err);
-            return redirect('There was a problem saving your badge!');
-          }
-          return redirect();
-        });
-      })
+        return redirect();
+      });
     })
   });
 }

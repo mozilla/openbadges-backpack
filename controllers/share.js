@@ -31,7 +31,7 @@ exports.group = function(req, res) {
     res.setHeader('Content-Type', 'text/javascript');
     return res.send('document.write("<iframe frameborder=0 src=\''+ url.format(iframeurl) +'\'></iframe>")')
   }
-  res.render('share-frame', {
+  res.render('share-frame.coffee', {
     layout: false,
     badges: req.badges
   });
@@ -40,7 +40,7 @@ exports.group = function(req, res) {
 exports.badge = function(req, res) {
   var badge = req.badge
     , assertion = badge.data.body;
-  res.render('badge-details', {
+  res.render('badge-details.coffee', {
     layout: 'mini-details',
     recipient: assertion.recipient,
     image: badge.image_path,

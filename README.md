@@ -39,10 +39,22 @@ the body being a your `badge.image` with the assertion URL baked into it.
 
 ## Details
 
-Please [see the page on Assertions](https://github.com/brianlovesdata/openbadges/wiki/Assertions) to
-learn how to format your assertions, and [see the page on Badge Baking](https://github.com/brianlovesdata/openbadges/wiki/Badge-Baking) to
+Please [see the page on Assertions](https://github.com/mozilla/openbadges/wiki/Assertions) to
+learn how to format your assertions, and [see the page on Badge Baking](https://github.com/mozilla/openbadges/wiki/Badge-Baking) to
 learn more about how to use the baking API and what kind of responses to
 expect in case of error.
+
+## I want to play with the code, where do I start?
+
+Running the app in a development environment is easy:
+
+1. Install dependencies `npm install`
+
+2. Copy the `openbadges/lib/environments/local-dist.js` to `openbadges/lib/environments/local.js` and edit the configuration to match your local development environment.
+
+3. Start your server, `node run.js`
+
+4. Join the [Open Badges Google Group](https://groups.google.com/forum/#!forum/openbadges).
 
 
 ## Related Projects
