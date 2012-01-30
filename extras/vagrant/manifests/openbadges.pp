@@ -52,6 +52,13 @@ file { 'nginx-conf':
 }
 
 file { "/usr/local":
+  recurse => true,
+  group => "vagrant",
+  owner => "vagrant";
+}
+
+file { "/usr/local/src":
+  ensure => directory,
   group => "vagrant",
   owner => "vagrant";
 }
@@ -59,8 +66,6 @@ file { "/usr/local":
 define nodejs($version) {
   exec { "download_node":
     cwd => "/usr/local/src",
-    user => "vagrant",
-    group => "vagrant",
     command => "curl http://nodejs.org/dist/v$version/node-v$version.tar.gz | tar -xz",
     creates => "/usr/local/src/node-v$version",
     before => Exec["install_node"],
