@@ -54,3 +54,57 @@ exports.noFrame = function(whitelist) {
 exports.formHandler = function(){
   return form({keepExtensions: true});
 }
+
+
+// #FIXME: This was pulled from connect/lib/middleware/csrf.js
+//         The current version of the csrf middleware checks the token on
+//         HEAD requests and it shouldn't. Until issue #409 is resolved,
+//         we'll have to use this version.
+exports.csrf = function (options) {
+  var options = options || {}
+    , value = options.value || defaultValue;
+
+  return function(req, res, next){
+    var token = req.session._csrf || (req.session._csrf = utils.uid(24));
+    if ('GET' == req.method || 'HEAD' == req.method) return next();
+    var val = value(req);
+    if (val != token) return utils.forbidden(res);
+    next();
+  }
+};
+
+var utils = {}
+utils.forbidden = function(res) {
+  var body = 'Forbidden';
+  res.setHeader('Content-Type', 'text/plain');
+  res.setHeader('Content-Length', body.length);
+  res.statusCode = 403;
+  res.end(body);
+};
+
+utils.uid = function(len) {
+  var buf = []
+    , chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    , charlen = chars.length;
+  for (var i = 0; i < len; ++i) {
+    buf.push(chars[getRandomInt(0, charlen - 1)]);
+  }
+  return buf.join('');
+};
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+/**
+ * Default value function, checking the `req.body`
+ * and `req.query` for the CSRF token.
+ *
+ * @param {IncomingMessage} req
+ * @return {String}
+ * @api private
+ */
+function defaultValue(req) {
+  return (req.body && req.body._csrf)
+    || (req.query && req.query._csrf)
+    || (req.headers['x-csrf-token']);
+}

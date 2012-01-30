@@ -171,6 +171,7 @@ exports.details = function(req, res, next) {
     owner: (assertion.recipient === email),
     
     deleteRoute: reverse('backpack.deleteBadge', { badgeId: badge.data.body_hash }),
+    csrfToken: req.session._csrf,
     
     badge: badge,
     type: assertion.badge,

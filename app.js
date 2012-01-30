@@ -50,8 +50,9 @@ app.use(express.cookieParser());
 app.use(express.methodOverride());
 app.use(middleware.logRequests());
 app.use(middleware.cookieSessions());
-app.use(express.csrf());
 app.use(middleware.noFrame([ '/share/.*' ]));
+app.use(middleware.csrf());
+
 // Allow everything to be used with CORS.
 // This should probably just be limited to badges
 app.use(function(req, res, next) {

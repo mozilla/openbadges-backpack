@@ -11,7 +11,8 @@ var protocol = configuration.get('protocol') || 'http'
 exports.issuer = function(req, res) {
   res.render('issuer.coffee', {
     login: false,
-    title: 'Test Issuer'
+    title: 'Test Issuer',
+    csrfToken: req.session._csrf
   });
 }
 
