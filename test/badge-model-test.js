@@ -18,7 +18,7 @@ var ORIGINS = {
   bad: URLS.bad
 };
 var DATES = {
-  good: [Math.floor(Date.now()/1000), '2012-01-01'],
+  good: [Date.now()/1000 | 0, '2012-01-01'],
   bad: ['oiajsd09gjas;oj09', 'foreever ago', '@.com:90/', '2001-10-190-19', '901d1', '000000000000000000000']
 };                                                                                                             
 var VERSIONS = {
@@ -217,6 +217,28 @@ vows.describe('Badggesss').addBatch({
             assert.isObject(badge.data.body.badge);
             assert.isObject(badge.data.body.badge.issuer);
           },
+          'and then destroyed': {
+            topic: function (badge) {
+              badge._oldId = badge.data.id; 
+              badge.destroy(function (err, badge) {
+                if (err) return this.callback(err);
+                this.callback(null, badge);
+              }.bind(this));
+            },
+            'which removes the id': function (err, badge) {
+              assert.ifError(err);
+              assert.isUndefined(badge.data.id);
+            },
+            'and after being destroyed': {
+              topic: function (badge) {
+                Badge.findById(badge._oldId, this.callback);
+              },
+              'cannot be retrieve from the database': function (err, badge) {
+                assert.ifError(err);
+                assert.isUndefined(badge);
+              }
+            }
+          }
         }
       },
 

@@ -93,4 +93,16 @@ Base.prototype.save = function (callback) {
   client._upsert(table, data, parseResult.bind(this))
 };
 
+Base.prototype.destroy = function (callback) {
+  var self = this
+    , data = this.data
+    , table = this.getTableName()
+    , querySQL = 'DELETE FROM `'+table+'` WHERE `id` = ? LIMIT 1;'
+  client.query(querySQL, [data.id], function (err, resp) {
+    if (err) { return callback(err); }
+    delete data.id;
+    return callback(null, self);
+  });
+};
+
 module.exports = Base;
