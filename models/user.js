@@ -19,6 +19,7 @@ var User = function (data) {
   };
   
   this.checkPassword = function (given) {
+    if (!this.data.passwd) { return false; }
     var parts = this.data.passwd.split('$')
       , algo = parts.shift()
       , hash = parts.join('$');
@@ -32,6 +33,15 @@ var User = function (data) {
 Base.apply(User, 'user');
 
 User.makeSalt = function () { return crypto.randomBytes(16) + ''; } 
+
+User.findOrCreate = function (email, callback) {
+  var newUser = new User({email: email});
+  User.findOne({email: email}, function (err, user) {
+    if (err) { return callback(err); }
+    if (user) { return user; }
+    else { return newUser.save(callback); }
+  })
+}
 
 User.pw = {bcrypt: {
   hash: function (pw, salt) {

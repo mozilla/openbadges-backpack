@@ -123,6 +123,16 @@ vows.describe('Useeeerrrrrs').addBatch({
         user.changePassword(newpw);
         assert.isTrue(user.checkPassword(newpw));
       }
+    },
+    'User#findOrCreate': {
+      topic: function () {
+        var email = 'bad-dudes@example.com';
+        User.findOrCreate(email, this.callback);
+      },
+      'should create a user when given an unfound email': function (err, user) {
+        assert.ifError(err);
+        assert.equal(user.data.email, 'bad-dudes@example.com');
+      }
     }
   }
 }).export(module);
