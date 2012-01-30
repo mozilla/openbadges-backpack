@@ -6,6 +6,7 @@ var request = require('request')
   , configuration = require('../lib/configuration')
   , baker = require('../lib/baker')
   , remote = require('../lib/remote')
+  , browserid = require('../lib/browserid')
   , _award = require('../lib/award')
   , reverse = require('../lib/router').reverse
   , Badge = require('../models/badge')
@@ -36,77 +37,25 @@ exports.authenticate = function(req, res) {
     return res.redirect(reverse('backpack.login'), 303);
   }
 
-  // Setup the options and the post body for the verification request.
-  // nginx invariably 411s if it doesn't find a content-length header, and
-  // express, which is what the main browserid server runs, will refuse to
-  // populate req.body unless the proper content-type is set.
-  var ident = configuration.get('identity');
-  var opts = {};
-  opts.uri = ident.protocol + '://' +  ident.server + ident.path;
-  opts.body = qs.stringify({
-    assertion: req.body['assertion'],
-    audience: configuration.get('hostname')
-  });
-  opts.headers = {
-    'content-length': opts.body.length,
-    'content-type': 'application/x-www-form-urlencoded'
-  };
-
-  request.post(opts, function(err, resp, body){
-    var assertion = {};
-    var hostname = configuration.get('hostname');
-
-    // We need to make sure:
-    //
-    //   * the request could make it out of the system,
-    //   * the other side responded with the A-OK,
-    //   * with a valid JSON structure,
-    //   * and a status of 'okay'
-    //   * with the right hostname, matching this server
-    //   * and coming from the issuer we expect.
-    //
-    // If any of these tests fail, throw an error, catch that error at the
-    // bottom, and call `goBackWithError` to redirect to the previous page
-    // with a human-friendly message telling the user to try again.
-    function goBackWithError(msg) {
-      req.flash('error', (msg || 'There was a problem authenticating, please try again.'));
+  var ident = configuration.get('identity')
+    , uri = ident.protocol + '://' +  ident.server + ident.path
+    , assertion = req.body['assertion']
+    , audience = configuration.get('hostname');
+  
+  browserid(uri, assertion, audience, function (err, verifierResponse) {
+    if (err) {
+      logger.error('Failed browserID verification: ')
+      logger.debug('Type: ' + err.type + "; Body: " + err.body);
+      req.flash('error', "Could not verify with browserID!");
       return res.redirect('back', 303);
     }
-    try {
-      if (err) {
-        logger.error('could not make request to identity server');
-        logger.error('  err obj: ' + JSON.stringify(err));
-        throw 'could not request';
-      }
-      if (resp.statusCode != 200) {
-        logger.warn('identity server returned error');
-        logger.debug('  status code: ' + resp.statusCode);
-        logger.debug('  sent with these options: ' + JSON.stringify(options));
-        throw 'invalid http status';
-      }
-      try {
-        assertion = JSON.parse(body);
-      } catch (syntaxError) {
-        logger.warn('could not parse response from identity server: ' + body);
-        throw 'invalid response';
-      }
-      if (assertion.status !== 'okay') {
-        logger.warn('did not get an affirmative response from identity server:');
-        logger.warn(JSON.stringify(assertion));
-        throw 'unexpected status';
-      }
-      if (assertion.audience !== hostname) {
-        logger.warn('unexpected audience for this assertion, expecting ' + hostname +'; got ' + assertion.audience);
-        throw 'unexpected audience';
-      }
-    } catch (validationError) {
-      return goBackWithError();
-    }
-
-    // Everything seems to be in order, store the user's email in the session
-    // and redirect to the front page.
+    
     if (!req.session) res.session = {};
-    req.session.authenticated = [assertion.email];
+    
+    if (!req.session.emails) req.session.emails = []
+    
+    logger.debug('browserid verified, attempting to authenticate user');
+    req.session.emails.push(verifierResponse.email);
     return res.redirect(reverse('backpack.manage'), 303);
   });
 };
@@ -253,15 +202,26 @@ exports.upload = function(req, res) {
 }
 
 var emailFromSession = function(req) {
-  var session, userEmail, emailRe;
-  if (!req.session || !req.session.authenticated) return false;
-  session = req.session;
-  userEmail = session.authenticated[0];
-  emailRe = /^.+?\@.+?\.*$/;
+  var userEmail = '',
+      emailRe = /^.+?\@.+?\.*$/;
+  
+  if (!req.session) {
+    logger.debug('could not find session');
+    return false;
+  }
+  
+  if (!req.session.emails) {
+    logger.debug('could not find emails array in session');
+    return false;
+  }
+  
+  userEmail = req.session.emails[0];
+  
   if (!emailRe.test(userEmail)) {
-    logger.warn('session.authenticate does not contain valid user: ' + userEmail);
+    logger.warn('req.session.emails does not contain valid user: ' + userEmail);
     req.session = {};
     return false;
   }
+  
   return userEmail;
 }
