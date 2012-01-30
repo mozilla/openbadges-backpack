@@ -38,7 +38,9 @@ vows.describe('Collllleccctions').addBatch({
       topic: createCollection(),
       'can be saved': {
         topic: function (collection) {
-          collection.save(this.callback)
+          collection.save(function (err,collection) {
+            Collection.findById(collection.data.id, this.callback);
+          }.bind(this))
         },
         'without errors': function (err, collection) {
           assert.ifError(err);
@@ -46,18 +48,28 @@ vows.describe('Collllleccctions').addBatch({
         }
       }
     },
-    'A collection' : {
-      topic: createCollection(),
-      'can have badges added to it before saving': {
-        topic: function (collection) {
-          collection.data.badges = [1,2];
-          collection.save(function (err, collection) {
-            collection.getBadgeObjects(this.callback);
-          }.bind(this))
-        },
-        'and have them be there when retrieving': function (err, badges) {
-          assert.equal(badges.length, 2);
-        }
+    'Should be able to put badges into collection by id' : {
+      topic: function () {
+        var collection = createCollection()
+        collection.data.badges = [1,2];
+        collection.save(function (err, collection) {
+          collection.getBadgeObjects(this.callback);
+        }.bind(this))
+      },
+      'without error': function (err, badges) {
+        assert.equal(badges.length, 2);
+      }
+    },
+    'Should be able to put badges into collection by object' : {
+      topic: function () {
+        var collection = createCollection()
+        collection.data.badges = [{data:{id:1}}, {data:{id:2}}];
+        collection.save(function (err, collection) {
+          collection.getBadgeObjects(this.callback);
+        }.bind(this))
+      },
+      'without error': function (err, badges) {
+        assert.equal(badges.length, 2);
       }
     }
   }
