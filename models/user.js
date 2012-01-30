@@ -38,7 +38,7 @@ User.findOrCreate = function (email, callback) {
   var newUser = new User({email: email});
   User.findOne({email: email}, function (err, user) {
     if (err) { return callback(err); }
-    if (user) { return user; }
+    if (user) { return callback(null, user); }
     else { return newUser.save(callback); }
   })
 }
