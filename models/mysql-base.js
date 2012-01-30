@@ -1,6 +1,6 @@
 var client = require('../lib/mysql').client;
 
-var Base = function() { }
+var Base = function() { };
 
 Base.apply = function (Model, table) {
   Model.fromDbResult = function (data) {
@@ -14,7 +14,7 @@ Base.apply = function (Model, table) {
       }
     });
     return new Model(data);
-  }
+  };
   
   Model.find = function(criteria, callback) {
     var finders = Model.finders || {}
@@ -30,20 +30,24 @@ Base.apply = function (Model, table) {
       return Model.finders[firstKey](criteria[firstKey], parseResults)
     }
     client.query(qstring, values, parseResults);
-  }
+  };
   
-  Model.findById = function (id, callback) {
-    Model.find({id: id}, function (err, results) {
+  Model.findOne = function (criteria, callback) {
+    Model.find(criteria, function (err, results) {
       if (err) callback(err);
       callback(null, results.pop());
     })
-  }
+  };
+  
+  Model.findById = function (id, callback) {
+    Model.findOne({id: id}, callback);
+  };
   
   Model.prototype = new Base;
   Model.prototype.model = Model;
   Model.prototype.client = client;
   Model.prototype.getTableName = function () { return table };
-}
+};
   
 Base.prototype.validate = function (data) {
   var err = new Error('Invalid data')
@@ -57,7 +61,7 @@ Base.prototype.validate = function (data) {
   if (Object.keys(err.fields).length > 0) {
     return err;
   }
-}
+};
 
 Base.prototype.save = function (callback) {
   var data = this.data
@@ -87,6 +91,6 @@ Base.prototype.save = function (callback) {
   };
   
   client._upsert(table, data, parseResult.bind(this))
-}
+};
 
 module.exports = Base;

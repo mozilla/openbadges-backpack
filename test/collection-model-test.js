@@ -57,6 +57,15 @@ vows.describe('Collllleccctions').addBatch({
           'without changing the url': function (oldUrl, newUrl) {
             assert.equal(oldUrl, newUrl);
           }
+        },
+        'and looking up by url': {
+          topic: function (collection) {
+            Collection.findOne({url: collection.data.url}, this.callback);
+          },
+          'should retrieve same collection': function (err, collection) {
+            assert.ifError(err);
+            assert.equal(collection.data.name, 'radical');
+          }
         }
       }
     },
