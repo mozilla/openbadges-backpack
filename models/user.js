@@ -10,17 +10,21 @@ var User = function (data) {
     data.salt = User.makeSalt();
     data.passwd = User.pw[ALGO].hash(data.passwd, data.salt)
   }
+  
   this.data = data;
+  
   this.changePassword = function (newPassword) {
     var salt = this.data.salt = User.makeSalt();
     this.data.passwd = User.pw[ALGO].hash(newPassword, salt);
   };
+  
   this.checkPassword = function (given) {
     var parts = this.data.passwd.split('$')
       , algo = parts.shift()
       , hash = parts.join('$');
     return User.pw[algo].check(given, this.data.salt, hash);
   };
+  
   this.setLoginDate = function () {
     this.data.last_login = Math.floor(Date.now()/1000);
   };

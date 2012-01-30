@@ -63,17 +63,22 @@ Base.prototype.save = function (callback) {
   var data = this.data
     , table = this.getTableName()
     , err = this.validate(data)
-    , model = this.model;
+    , model = this.model
+    , prepMethods = (model.prepare || {})['in'] || {};
   
   callback = callback || function(){};
   if (err) { return callback(err, null); }
   
   Object.keys(data).forEach(function (key) {
-    var prep = (model.prepare || {})['in'] || {}
-    if (key in prep) {
-      data[key] = model.prepare.in[key](data[key]);
+    var prep = prepMethods[key]
+    if ( prep ) {
+      data[key] = prep(data[key], data);
     }
   });
+  
+  if ('function' === typeof this.presave) {
+    this.presave();
+  }
   
   var parseResult = function (err, result) {
     if (err) { return callback(err, null); }

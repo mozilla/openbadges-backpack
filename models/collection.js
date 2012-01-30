@@ -1,11 +1,25 @@
-var mysql = require('../lib/mysql'),
-    Badge = require('./badge'),
-    Base = require('./mysql-base.js');
+var mysql = require('../lib/mysql')
+  , crypto = require('crypto')
+  , Badge = require('./badge')
+  , Base = require('./mysql-base.js');
+
+var md5 = function (v) {
+  var sum = crypto.createHash('md5');
+  sum.update(v);
+  return sum.digest('hex');
+};
 
 var Collection = function (data) {
   this.data = data;
 };
+
 Base.apply(Collection, 'collection');
+
+Collection.prototype.updateUrl = function () {
+  var data = this.data;
+  data.url = md5('' + data.name + data.user_id + Date.now());  
+};
+
 Collection.prototype.getBadgeObjects = function (callback) {
   var badgeIds = this.data.badges.slice(0),
       values = badgeIds,
@@ -16,7 +30,12 @@ Collection.prototype.getBadgeObjects = function (callback) {
     if (err) { return callback(err); }
     callback(null, results.map(Badge.fromDbResult));
   });
+};
+
+Collection.prototype.presave = function () {
+  if (!this.data.id && !this.data.url) { this.updateUrl(); }
 }
+
 Collection.prepare = {
   in: {
     badges: function (value) {

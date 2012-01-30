@@ -2,7 +2,9 @@ var mysql = require('../lib/mysql')
   , regex = require('../lib/regex')
   , Base = require('./mysql-base')
 
-var Badge = function (data) { this.data = data; }
+var Badge = function (data) {
+  this.data = data;
+}
 Base.apply(Badge, 'badge');
 
 // Validators called by `save()` (see mysql-base) in preparation for saving.

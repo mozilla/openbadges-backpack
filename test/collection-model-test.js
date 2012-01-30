@@ -24,10 +24,10 @@ var createDbFixtures = function (callback) {
 var createCollection = function () {
   return new Collection({
     user_id: 1,
-    name: 'test collection',
-    url: genstring(64)
+    name: genstring(14)
   })
 };
+
 vows.describe('Collllleccctions').addBatch({
   'Collection testing:': {
     topic: function () {
@@ -45,6 +45,18 @@ vows.describe('Collllleccctions').addBatch({
         'without errors': function (err, collection) {
           assert.ifError(err);
           assert.isObject(collection);
+        },
+        'then resaved with new name': {
+          topic: function (collection) {
+            var oldUrl = collection.data.url
+            collection.data.name = 'radical';
+            collection.save(function (err, collection) {
+              this.callback(oldUrl, collection.data.url);
+            }.bind(this));
+          },
+          'without changing the url': function (oldUrl, newUrl) {
+            assert.equal(oldUrl, newUrl);
+          }
         }
       }
     },
