@@ -12,9 +12,9 @@ var request = require('request')
 
 exports.param = {}
 exports.param['badgeId'] = function(req, res, next, id) {
-  Badge.findById(id, function(err, doc) {
-    if (!doc) return res.send('could not find badge', 404);
-    req.badge = doc;
+  Badge.findById(id, function(err, badge) {
+    if (!badge) return res.send('could not find badge', 404);
+    req.badge = badge;
     return next();
   })
 }
@@ -125,7 +125,11 @@ exports.manage = function(req, res, next) {
   if (!email) return res.redirect(reverse('backpack.login'), 303);
   var error = req.flash('error')
     , success = req.flash('success')
-  Badge.organize(email, function(err, badges){
+  
+
+  // #TODO: replace below method with the new model methods.
+
+  Badge.find({email: email}, function(err, badges){
     if (err) return next(err);
     res.render('manage', {
       error: error,
@@ -143,29 +147,36 @@ exports.manage = function(req, res, next) {
       }
     });
   });
+
 };
 
 exports.details = function(req, res, next) {
   var badge = req.badge
     , email = emailFromSession(req)
+    , assertion = badge.data.body;
+  
   res.render('badge-details', {
     title: '',
-    user: (badge.recipient === email) ? email : null,
+    user: (assertion.recipient === email) ? email : null,
     
-    id: badge.id,
-    recipient: badge.recipient,
-    image: badge.meta.imagePath,
-    owner: (badge.recipient === email),
+    id: badge.data.id,
+    recipient: assertion.recipient,
+    image: badge.data.image_path,
+    owner: (assertion.recipient === email),
     
     badge: badge,
-    type: badge.badge,
-    meta: badge.meta,
+    type: assertion.badge,
+    meta: {}, // #TODO: remove.
     groups: [] // #TODO: replace with real grouping
   })
 }
 
+// #TODO: rethink the whole accept/reject thing. Rejecting badges should just
+// delete instead of having this different state for them.
+
 exports.apiAccept = function(req, res) {
-  var badge = req.badge, email = emailFromSession(req)
+  var badge = req.badge
+    , email = emailFromSession(req);
   if (!email || email !== badge.recipient) return res.send('forbidden', 403)
   badge.meta.accepted = true;
   badge.meta.rejected = false;
@@ -181,7 +192,7 @@ exports.apiGroups = function(req, res, next) {
     , fields = (req.body || {})
     , keep = (fields['group'] || {})
     , newGroup = (fields['newGroup'] || '').trim()
-    , updated = []
+    , updated = [];
   if (!email || email !== badge.recipient) return res.send('forbidden', 403);
     
   res.send('not implemented yet', 500);
@@ -199,6 +210,7 @@ exports.apiReject = function(req, res) {
   })
 }
 
+// #TODO: de-complicate this.
 exports.upload = function(req, res) {
   var email = emailFromSession(req);
   if (!email) return res.redirect(reverse('backpack.login'), 303);

@@ -1,30 +1,26 @@
 var User = require('../models/user')
   , Badge = require('../models/badge')
-  , ObjectID = require('mongoose').mongo.BSONPure.ObjectID
+  , Collection = require('../models/collection')
   , reverse = require('../lib/router').reverse
   , configuration = require('../lib/configuration')
   , url = require('url')
 
 exports.param = {}
 exports.param['groupId'] = function(req, res, next, id) {
-  var objId, badgeIds;
   if (req.url.match(/.js$/)) {
     req.query.js = true;
     id = id.replace(/.js$/, '');
   }
-  try { objId = ObjectID(id) }
-  catch(err) { return res.send('could not find group', 404) }
-  badgeIds = []
-  User.findOne({'groups': {'$elemMatch' : { _id : objId }}}, function(err, doc) {
-    if (!doc) return res.send('could not find group', 404);
-    badgeIds = doc.groups.id(objId).badges
-    Badge.find({'_id': {'$in' : badgeIds}}, function(err, docs) {
-      if (!docs.length) return res.send('could not find group', 404);
-      req.badges = docs;
+  Collection.findOne({url: id}, function (err, collection) {
+    // #TODO: better job of logging what happened on errors
+    if (err || !collection) { return res.send('Could not find group', 404); }
+    collection.getBadgeObjects(function (err, badges) {
+      if (err) { return res.send('Could not get badges', 500); }
+      req.badges = badges;
       req.groupId = id;
-      return next();
     })
   })
+  return next();
 }
 exports.group = function(req, res) {
   if (req.query && req.query.js) {
@@ -42,11 +38,12 @@ exports.group = function(req, res) {
 }
 
 exports.badge = function(req, res) {
-  var badge = req.badge;
+  var badge = req.badge
+    , assertion = badge.data.body;
   res.render('badge-details', {
     layout: 'mini-details',
-    recipient: badge.recipient,
-    image: badge.meta.imagePath,
-    type: badge.badge
-  })
+    recipient: assertion.recipient,
+    image: badge.image_path,
+    type: assertion.badge
+  });
 }

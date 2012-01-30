@@ -31,7 +31,7 @@ exports.test_badge = function(req, res) {
   var title = req.query.title || 'Test Badge'
     , image = req.query.image || '/images/test-badge.png'
     , desc = req.query.desc || 'For rocking in the free world'
-    , recp = req.query.recp || 'me@example.com'
+    , recp = req.query.recp || 'me@example.com';
 
   // Use a timer to fake latency.
   setTimeout(function(){
