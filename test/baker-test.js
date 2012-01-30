@@ -19,7 +19,7 @@ vows.describe('bake some badges').addBatch({
     topic: function(){
       return baker.prepare(PNGFILE, 'https://location-of-badge');
     },
-    'should fail if another is given': function(buf){
+    'should fail if it tries to get baked again': function(buf){
       assert.throws(function(){ baker.prepare(buf, 'new-stuff') }, Error);
     }
   }
