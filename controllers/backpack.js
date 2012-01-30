@@ -7,18 +7,31 @@ var request = require('request')
   , baker = require('../lib/baker')
   , remote = require('../lib/remote')
   , browserid = require('../lib/browserid')
-  , _award = require('../lib/award')
+  , awardBadge = require('../lib/award')
   , reverse = require('../lib/router').reverse
   , Badge = require('../models/badge')
 
 exports.param = {};
-exports.param['badgeId'] = function(req, res, next, id) {
-  Badge.findOne({body_hash: id}, function(err, badge) {
+
+/**
+ * Route param pre-condition for finding a badge when a badgeId is present.
+ * If the badge cannot be found, immediately return HTTP 404.
+ *
+ * @param {String} hash is the `body_hash` of the badge to look up.
+ */
+
+exports.param['badgeId'] = function(req, res, next, hash) {
+  Badge.findOne({body_hash: hash}, function(err, badge) {
     if (!badge) return res.send('could not find badge', 404);
     req.badge = badge;
     return next();
   });
 };
+
+
+/**
+ * Render the login page.
+ */
 
 exports.login = function(req, res) {
   // req.flash returns an array. Pass on the whole thing to the view and
@@ -29,10 +42,17 @@ exports.login = function(req, res) {
   });
 };
 
+
+/**
+ * Authenticate the user using a browserID assertion.
+ *
+ * @param {String} assertion returned by `navigator.id.getVerifiedEmail`
+ * @return {HTTP 303}
+ *   on error: redirect one page back
+ *   on success: redirect to `backpack.manage`
+ */
+
 exports.authenticate = function(req, res) {
-  // If `assertion` wasn't posted in, the user has no business here.
-  // We could return 403 or redirect to login page. It's more polite
-  // to just redirect to the login page.
   if (!req.body || !req.body['assertion']) {
     return res.redirect(reverse('backpack.login'), 303);
   }
@@ -60,15 +80,24 @@ exports.authenticate = function(req, res) {
   });
 };
 
+
+/**
+ * Wipe the user's session and send back to the login page.
+ *
+ * @return {HTTP 303} redirect user to login page
+ */
+
 exports.signout = function(req, res) {
-  var session = req.session;
-  if (session) {
-    Object.keys(session).forEach(function(k) {
-      if (k !== 'csrf') delete session[k];
-    });
-  }
+  req.session = {};
   res.redirect(reverse('backpack.login'), 303);
 };
+
+
+/**
+ * Render the management page for logged in users.
+ *
+ * @return {HTTP 303} redirect user to login page
+ */
 
 exports.manage = function(req, res, next) {
   var email = emailFromSession(req);
@@ -104,7 +133,12 @@ exports.manage = function(req, res, next) {
   });
 };
 
-exports.details = function(req, res, next) {
+
+/**
+ * Render a badge details page.
+ */
+
+exports.details = function(req, res) {
   var badge = req.badge
     , email = emailFromSession(req)
     , assertion = badge.data.body;
@@ -128,17 +162,15 @@ exports.details = function(req, res, next) {
   })
 }
 
-exports.addBadgeToGroup = function(req, res, next) {
-  var badge = req.badge
-    , assertion = badge.data.body
-    , email = emailFromSession(req);
-  if (email !== assertion.recipient) return res.send('forbidden', 403);
-  res.send('Not implemented yet', 500);
-};
 
-exports.createGroup = function(req, res, next) {
-  res.send('Not implemented yet', 500);
-};
+/**
+ * Completely delete a badge from the user's account.
+ *
+ * @return {HTTP 500|403|303}
+ *   user doesn't own the badge -> 403.
+ *   error calling `Badge#destroy` -> 500
+ *   success -> 303 to `backpack.manage`
+ */
 
 exports.deleteBadge = function (req, res) {
   var badge = req.badge
@@ -156,6 +188,8 @@ exports.deleteBadge = function (req, res) {
     return res.redirect(reverse('backpack.manage'), 303);
   })
 };
+
+
 
 // #TODO: de-complicate this.
 exports.upload = function(req, res) {
@@ -190,7 +224,7 @@ exports.upload = function(req, res) {
       if (assertion.recipient !== email) {
         return redirect('This badge was not issued to you! Contact your issuer.');
       }
-      _award(assertion, assertionURL, imagedata, function(err, badge) {
+      awardBadge(assertion, assertionURL, imagedata, function(err, badge) {
         if (err) {
           logger.error('could not save badge: ' + err);
           return redirect('There was a problem saving your badge!');
@@ -200,6 +234,14 @@ exports.upload = function(req, res) {
     })
   });
 }
+
+/**
+ * Get user email from session.
+ * TODO: support multiple email addresses for the same user.
+ *
+ * @param {Request} req is the whole request object.
+ * @return {Boolean|String} `false` if no/invalid email address.
+ */
 
 var emailFromSession = function(req) {
   var userEmail = '',
