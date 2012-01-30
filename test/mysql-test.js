@@ -27,7 +27,7 @@ vows.describe('Testing database').addBatch({
         var tables = extractFirstValues(results);
         assert.equal(mysql.schemas.length, tables.length);
         // #TODO: should not hardcode these.
-        ['badge', 'user', 'collection', 'collection_badge'].forEach(function (t) {
+        ['badge', 'user', 'collection' ].forEach(function (t) {
           assert.includes(tables, t);
         })
       }
