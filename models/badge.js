@@ -1,11 +1,27 @@
 var mysql = require('../lib/mysql')
   , regex = require('../lib/regex')
-  , Base = require('./mysql-base')
+  , crypto = require('crypto')
+  , Base = require('./mysql-base');
+
+var sha256 = function (value) {
+  var sum = crypto.createHash('sha256')
+  sum.update(value);
+  return sum.digest('hex');
+};
 
 var Badge = function (data) {
   this.data = data;
-}
+};
+
 Base.apply(Badge, 'badge');
+
+
+// #TODO: write test for this guy.
+Badge.prototype.presave = function () {
+  if (!this.data.id) {
+    this.data.body_hash = sha256(this.data.body);
+  }
+}
 
 // Validators called by `save()` (see mysql-base) in preparation for saving.
 // A valid pass returns nothing (or a falsy value); an invalid pass returns a

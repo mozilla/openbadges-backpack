@@ -19,9 +19,11 @@ exports.issuer = function(req, res) {
 exports.award = function(req, res) {
   var assertionURL = encodeURIComponent([ORIGIN + '/test/badge.json', qs.stringify(req.body)].join('?'))
     , bakeURL = ORIGIN + '/baker?award=true&assertion=' + assertionURL;
+  
   request({url: bakeURL, encoding:'binary'},  function(err, resp, body) {
     res.send(Buffer(body, 'binary'), {'content-type': 'image/png'});
   });
+
 }
 
 // Create a test badge. Optionally override default values by providing GET

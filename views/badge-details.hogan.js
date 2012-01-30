@@ -16,11 +16,11 @@
       <dd><a href="{{{type.criteria}}}">{{type.criteria}}</a></dd>
 
       <dt>Issuer</dt>
-      <dd>{{{type.issuer.name}}} (<a href="{{{type.issuer.origin}}}">{{type.issuer.origin</a>)</dd>
+      <dd>{{{type.issuer.name}}} (<a href="{{{type.issuer.origin}}}">{{type.issuer.origin}}</a>)</dd>
 
       {{#type.issuer.org}}
       <dt>Organization</dt>
-      <dd>{{{type.issuer.org}}}</dd>
+      <dd> {{{type.issuer.org}}} </dd>
       {{/type.issuer.org}}
     </dl>
   </div>
@@ -30,11 +30,11 @@
 
     <div class="accept-reject">
       <h2>Keep this badge?</h2>
-      <form action="{{#reverse}}backpack.apiAccept id{{/reverse}}" method="post" style="display: inline">
+      <form action="" method="post" style="display: inline">
         <input type="hidden" name="csrf" value="{{csrf}}"></input>
         <input class="btn primary" type="submit" value="Accept Badge"></input>
       </form>
-      <form action="{{#reverse}}backpack.apiReject id{{/reverse}}" method="post" style="display: inline">
+      <form action="" method="post" style="display: inline">
         <input type="hidden" name="csrf" value="{{csrf}}"></input>
         <input class="btn danger" type="submit" value="Reject Badge"></input>
       </form>
@@ -42,7 +42,7 @@
 
     <div class="groups">
       <h2>Manage Groups</h2>
-      <form action="{{#reverse}}backpack.apiGroups id{{/reverse}}" method="post">
+      <form action="" method="post">
         <input type="hidden" name="csrf" value="{{csrf}}"></input>
 
         {{#groups}}
@@ -66,6 +66,7 @@
       </form>
     </div>
   </div>
+  {{/owner}}
 </div>
 
 <script type="text/javascript">

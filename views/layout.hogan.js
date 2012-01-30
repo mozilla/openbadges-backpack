@@ -15,7 +15,7 @@
     <div class="topbar">
       <div class="topbar-inner">
         <div class="container" style="position: relative;">
-          <h3><a href="#">Open Badge Backpack hogan.js</a></h3>
+          <h3><a href="/">Open Badge Backpack</a></h3>
           <a id="moztab" href="http://mozilla.org">a mozilla.org joint</a>
           <ul class="nav">
             <li><a href="{{#reverse}}backpack.manage{{/reverse}}">Home</a></li>

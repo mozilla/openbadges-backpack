@@ -12,7 +12,7 @@ var request = require('request')
 
 exports.param = {};
 exports.param['badgeId'] = function(req, res, next, id) {
-  Badge.findById(id, function(err, badge) {
+  Badge.findOne({body_hash: id}, function(err, badge) {
     if (!badge) return res.send('could not find badge', 404);
     req.badge = badge;
     return next();
@@ -128,9 +128,15 @@ exports.manage = function(req, res, next) {
   
 
   // #TODO: replace below method with the new model methods.
-
   Badge.find({email: email}, function(err, badges){
     if (err) return next(err);
+    
+    badges.forEach(function (b) {
+      console.dir(b);
+      b.detailsUrl = reverse('backpack.details', { badgeId: b.data.body_hash })
+      return b;
+    })
+    
     res.render('manage', {
       error: error,
       success: success,
@@ -147,7 +153,6 @@ exports.manage = function(req, res, next) {
       }
     });
   });
-
 };
 
 exports.details = function(req, res, next) {
