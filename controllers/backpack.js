@@ -22,7 +22,6 @@ exports.param['badgeId'] = function(req, res, next, id) {
 exports.login = function(req, res) {
   // req.flash returns an array. Pass on the whole thing to the view and
   // decide there if we want to display all of them or just the first one.
-  console.dir(req.session);
   res.render('login', {
     error: req.flash('error'),
     csrfToken: req.session._csrf
