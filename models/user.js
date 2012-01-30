@@ -6,12 +6,12 @@ var crypto = require('crypto'),
 
 var User = function (data) {
   var ALGO = 'bcrypt';
-  if (!data.id) {
+  this.data = data;
+  
+  if (!data.id && data.passwd) {
     data.salt = User.makeSalt();
     data.passwd = User.pw[ALGO].hash(data.passwd, data.salt)
   }
-  
-  this.data = data;
   
   this.changePassword = function (newPassword) {
     var salt = this.data.salt = User.makeSalt();
