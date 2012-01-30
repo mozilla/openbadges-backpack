@@ -3,7 +3,7 @@ var vows = require('vows')
   , baker = require('../lib/baker')
   , path = require('path')
 
-var PNGFILE = path.join(__dirname, 'no-badge-data.png');
+var PNGFILE = path.join(__dirname, '/utils/images/no-badge-data.png')
 vows.describe('bake some badges').addBatch({
   'A clean PNG': {
     'should fail if not given data': function(){
