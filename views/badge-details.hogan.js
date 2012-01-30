@@ -7,20 +7,20 @@
       <dd>{{recipient}}</dd>
 
       <dt>Name</dt>
-      <dd>{{{type.name}}}</dd>
+      <dd>{{type.name}}</dd>
 
       <dt>Description</dt>
-      <dd>{{{type.description}}}</dd>
+      <dd>{{type.description}}</dd>
 
       <dt>Criteria</dt>
-      <dd><a href="{{{type.criteria}}}">{{type.criteria}}</a></dd>
+      <dd><a href="{{type.criteria}}">{{type.criteria}}</a></dd>
 
       <dt>Issuer</dt>
-      <dd>{{{type.issuer.name}}} (<a href="{{{type.issuer.origin}}}">{{type.issuer.origin}}</a>)</dd>
+      <dd>{{type.issuer.name}} (<a href="{{type.issuer.origin}}">{{type.issuer.origin}}</a>)</dd>
 
       {{#type.issuer.org}}
       <dt>Organization</dt>
-      <dd> {{{type.issuer.org}}} </dd>
+      <dd> {{type.issuer.org}} </dd>
       {{/type.issuer.org}}
     </dl>
   </div>
@@ -31,7 +31,7 @@
     <div class="accept-reject">
       <h2>Keep this badge?</h2>
       <form action="{{ deleteRoute }}" method="post" style="display: inline">
-        <input type="hidden" name="csrf" value="{{csrf}}"></input>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}"></input>
         <input type="hidden" name="_method" value="delete"></input>
         <input class="btn danger" type="submit" value="No, delete this badge."></input>
       </form>
@@ -40,7 +40,7 @@
     <div class="groups">
       <h2>Manage Groups</h2>
       <form action="" method="post">
-        <input type="hidden" name="csrf" value="{{csrf}}"></input>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}"></input>
 
         {{#groups}}
         <div class="clearfix">
