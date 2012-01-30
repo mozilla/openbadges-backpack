@@ -15,13 +15,15 @@ var Badge = function (data) {
 
 Base.apply(Badge, 'badge');
 
-
-// #TODO: write test for this guy.
 Badge.prototype.presave = function () {
   if (!this.data.id) {
     this.data.body_hash = sha256(this.data.body);
   }
-}
+};
+
+Badge.prototype.checkHash = function () {
+  return sha256(JSON.stringify(this.data.body)) === this.data.body_hash;
+};
 
 // Validators called by `save()` (see mysql-base) in preparation for saving.
 // A valid pass returns nothing (or a falsy value); an invalid pass returns a

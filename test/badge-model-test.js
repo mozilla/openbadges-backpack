@@ -3,6 +3,7 @@ var vows = require('vows')
   , assert = require('assert')
   , makeAssertion = require('./utils').fixture
   , genstring = require('./utils').genstring
+  , crypto = require('crypto')
   , Badge = require('../models/badge')
 
 var EMAILS = {
@@ -24,6 +25,12 @@ var DATES = {
 var VERSIONS = {
   good: ['0.1.1', '2.0.1', '1.2.3', 'v1.2.1'],
   bad: ['v100', '50', 'v10.1alpha', '1.2.x']
+};
+
+var sha256 = function (value) {
+  var sum = crypto.createHash('sha256')
+  sum.update(value);
+  return sum.digest('hex');
 };
 
 var makeBadge = function () {
@@ -201,14 +208,14 @@ vows.describe('Badggesss').addBatch({
         }
       }
     },
-    'Trying to save': {
+    'After saving': {
       'a valid hosted assertion': {
         topic: makeBadgeAndSave(),
         'saves badge into the database and gives an id': function (err, badge) {
           assert.ifError(err);
           assert.isNumber(badge.data.id);
         },
-        'can be retrieved once saved': {
+        'can be retrieved': {
           topic: function (badge) {
             Badge.findById(badge.data.id, this.callback);
           },
@@ -216,6 +223,13 @@ vows.describe('Badggesss').addBatch({
             assert.isObject(badge.data.body);
             assert.isObject(badge.data.body.badge);
             assert.isObject(badge.data.body.badge.issuer);
+          },
+          'and the hash is set and correct': function (err, badge) {
+            // sha256 hashes are 64 bytes
+            assert.equal(badge.data.body_hash.length, 64);
+            assert.isTrue(badge.checkHash());
+            badge.data.body_hash = 'wut';
+            assert.isFalse(badge.checkHash());
           },
           'and then destroyed': {
             topic: function (badge) {
