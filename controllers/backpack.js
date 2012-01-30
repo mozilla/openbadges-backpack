@@ -169,26 +169,13 @@ exports.details = function(req, res, next) {
     image: badge.data.image_path,
     owner: (assertion.recipient === email),
     
+    deleteRoute: reverse('backpack.deleteBadge', { badgeId: badge.data.body_hash }),
+    
     badge: badge,
     type: assertion.badge,
     meta: {}, // #TODO: remove.
     groups: [] // #TODO: replace with real grouping
   })
-}
-
-// #TODO: rethink the whole accept/reject thing. Rejecting badges should just
-// delete instead of having this different state for them.
-
-exports.apiAccept = function(req, res) {
-  var badge = req.badge
-    , email = emailFromSession(req);
-  if (!email || email !== badge.recipient) return res.send('forbidden', 403)
-  badge.meta.accepted = true;
-  badge.meta.rejected = false;
-  badge.save(function(err, badge){
-    if (err) req.flash('error', err);
-    return res.redirect(reverse('backpack.manage'), 303);
-  })  
 }
 
 exports.apiGroups = function(req, res, next) {
@@ -201,19 +188,19 @@ exports.apiGroups = function(req, res, next) {
   if (!email || email !== badge.recipient) return res.send('forbidden', 403);
     
   res.send('not implemented yet', 500);
-}
+};
 
-exports.apiReject = function(req, res) {
-  var badge = req.badge, email = emailFromSession(req);
-  if (!email || email !== badge.recipient)
-    return res.send('forbidden', 403);
-  badge.meta.accepted = false;
-  badge.meta.rejected = true;
-  badge.save(function(err, badge){
-    if (err) next(err)
+exports.deleteBadge = function (req, res) {
+  var badge = req.badge;
+  badge.destroy(function (err, badge) {
+    if (err) {
+      logger.warn('Failed to delete badge');
+      logger.warn(err);
+      return res.send('Could not delete badge. This error has been logged', 500);
+    }
     return res.redirect(reverse('backpack.manage'), 303);
   })
-}
+};
 
 // #TODO: de-complicate this.
 exports.upload = function(req, res) {

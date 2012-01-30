@@ -30,13 +30,10 @@
 
     <div class="accept-reject">
       <h2>Keep this badge?</h2>
-      <form action="" method="post" style="display: inline">
+      <form action="{{ deleteRoute }}" method="post" style="display: inline">
         <input type="hidden" name="csrf" value="{{csrf}}"></input>
-        <input class="btn primary" type="submit" value="Accept Badge"></input>
-      </form>
-      <form action="" method="post" style="display: inline">
-        <input type="hidden" name="csrf" value="{{csrf}}"></input>
-        <input class="btn danger" type="submit" value="Reject Badge"></input>
+        <input type="hidden" name="_method" value="delete"></input>
+        <input class="btn danger" type="submit" value="No, delete this badge."></input>
       </form>
     </div>
 

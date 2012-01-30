@@ -52,6 +52,7 @@ app.use(express.static(path.join(__dirname, "static")));
 app.use(express.static(path.join(configuration.get('var_dir'), "badges")));
 app.use(express.bodyParser({uploadDir:configuration.get('badge_path')}));
 app.use(express.cookieParser());
+app.use(express.methodOverride());
 app.use(middleware.logRequests());
 app.use(middleware.cookieSessions());
 app.use(middleware.noFrame([ '/share/.*' ]));
@@ -75,8 +76,7 @@ router(app)
   .get('/backpack/signout',                 'backpack.signout')
   .post('/backpack/badge',                  'backpack.upload')
   .get('/backpack/badge/:badgeId',          'backpack.details')
-  .post('/backpack/badge/:badgeId/accept',  'backpack.apiAccept')
-  .post('/backpack/badge/:badgeId/reject',  'backpack.apiReject')
+  .delete('/backpack/badge/:badgeId',       'backpack.deleteBadge')
   .post('/backpack/badge/:badgeId/groups',  'backpack.apiGroups')
   .get('/backpack',                         'backpack.manage')
   .get('/share/g/:groupId',                 'share.group')
