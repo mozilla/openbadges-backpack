@@ -3,7 +3,7 @@ Vagrant::Config.run do |config|
   
   config.vm.box_url = "http://files.vagrantup.com/lucid32.box"
   
-  config.vm.share_folder "srv", "/home/vagrant/openbadges", "../../"
+  config.vm.share_folder "srv", "/home/vagrant/openbadges", "."
   
   config.vm.network :hostonly,  '33.33.33.11'
   
