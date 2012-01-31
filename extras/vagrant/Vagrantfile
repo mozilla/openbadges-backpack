@@ -1,6 +1,6 @@
 Vagrant::Config.run do |config|
   config.vm.box = "base"
-  config.vm.share_folder "srv", "/srv/openbadges", "../../"
+  config.vm.share_folder "srv", "/home/vagrant/openbadges", "../../"
   config.vm.network :hostonly,  '33.33.33.11'
   config.vm.forward_port 22, 2229
   config.vm.forward_port 80, 8888
