@@ -15,3 +15,20 @@ class openbadges::db {
   }  
 }
 
+class openbadges::app {
+  file { "node-modules": 
+    path => "/home/vagrant/.node_modules",
+    ensure => directory,
+  }
+  file { "node-modules-link":
+    path => "/home/vagrant/.node_modules",
+    target => "/home/vagrant/openbadges/node_modules",
+    ensure => link,
+    require => File['node-modules'],
+  }
+  exec { "npm-install-packages":
+    cwd => "/home/vagrant/openbadges",
+    command => "npm install .",
+    require => File["node-modules-link"],
+  }
+}
