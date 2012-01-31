@@ -11,7 +11,7 @@
 /lib/environments/local.js
 /wiki
 
-/extras/vagrat/.vagrant
+/extras/vagrant/.vagrant
 
 /var/*
 !/var/.gitkeep

@@ -56,6 +56,12 @@ file { 'nginx-conf':
   source => "/vagrant/manifests/openbadges.nginx",
 }
 
+file { 'prepare-environment':
+  path => "/usr/local/bin/prepare-environment",
+  source => "/vagrant/manifests/prepare-environment",
+  mode => 0755;
+}
+
 file { "/usr/local":
   recurse => true,
   group => "vagrant",
