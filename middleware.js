@@ -1,6 +1,4 @@
 var express = require('express')
-  , sessions = require('connect-cookie-session')
-  , form = require('connect-form')
   , secrets = require('./lib/secrets')
   , configuration = require('./lib/configuration')
   , logger = require('./lib/logging').logger
@@ -15,7 +13,7 @@ var COOKIE_KEY = 'openbadges_state';
 // Store sessions in cookies. The session structure is base64 encoded, a
 // salty hash is created with `COOKIE_SECRET` to prevent clientside tampering.
 exports.cookieSessions = function(){
-  return sessions({
+  return express.session({
     secret: COOKIE_SECRET,
     key: COOKIE_KEY,
     cookie: {
@@ -49,11 +47,6 @@ exports.noFrame = function(whitelist) {
     next();
   };
 };
-
-// #TODO: use a form handler that supports HTML5 multiple for files.
-exports.formHandler = function(){
-  return form({keepExtensions: true});
-}
 
 
 // #FIXME: This was pulled from connect/lib/middleware/csrf.js

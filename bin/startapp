@@ -1,2 +1,0 @@
-#!/bin/bash
-sudo node $ROOT/run.js

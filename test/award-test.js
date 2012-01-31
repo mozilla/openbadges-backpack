@@ -9,7 +9,7 @@ var vows = require('vows')
   , configuration = require('../lib/configuration')
   , badgeDir = configuration.get('badge_path')
 
-var PNGFILE = path.join(__dirname, 'no-badge-data.png')
+var PNGFILE = path.join(__dirname, '/utils/images/no-badge-data.png')
   , PNGDATA = fs.readFileSync(PNGFILE)
 
 vows.describe('Awarding Badges').addBatch({
