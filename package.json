@@ -11,8 +11,6 @@
   , "winston": "0.3.x"
   , "hogan.js": "1.0.x"
   , "coffeekup": "0.3.x"
-  , "connect-cookie-session" : "0.0.x"
-  , "connect-form": "0.2.x"
   , "request": "2.9.x"
   , "commander": "0.5.x"
   , "metapng": "git+https://github.com/brianloveswords/metapng.js.git"
