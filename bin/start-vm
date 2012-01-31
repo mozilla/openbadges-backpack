@@ -1,3 +1,0 @@
-cd extras/vagrant &&\
-   vagrant up &&\
-   vagrant ssh
