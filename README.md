@@ -48,13 +48,17 @@ expect in case of error.
 
 Running the app in a development environment is easy:
 
-1. Install dependencies `npm install`
+1. Install dependencies: `npm install --dev`
 
 2. Copy the `openbadges/lib/environments/local-dist.js` to `openbadges/lib/environments/local.js` and edit the configuration to match your local development environment.
 
-3. Start your server, `node run.js`
+3. Setup your MySQL database. Create a database and a user with full privileges on that db `openbadges/lib/environments/local.js`.
 
-4. Join the [Open Badges Google Group](https://groups.google.com/forum/#!forum/openbadges).
+4. Run the test suite: `npm test`
+
+5. Start your server: `node run.js`
+
+6. Join the [Open Badges Google Group](https://groups.google.com/forum/#!forum/openbadges).
 
 
 ## Related Projects

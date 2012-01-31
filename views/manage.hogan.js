@@ -19,10 +19,10 @@
     <div class="upload">
       <h4>Upload Badges</h4>
       <p>If you have badges you've been awarded, you can upload them manually</p>
-      <form action="{{#reverse}}backpack.upload{{/reverse}}" method="post" enctype="multipart/form-data">
+      <form action="{{#reverse}}backpack.userBadgeUpload{{/reverse}}" method="post" enctype="multipart/form-data">
         <fieldset>
           <div class="clearfix">
-            <input type="hidden" name="csrf" value="{{csrf}}"></input>
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}"></input>
             <input id="userBadge" type="file" name="userBadge" accept="image/png"></input>
           </div>
         </fieldset>

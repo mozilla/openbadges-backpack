@@ -6,18 +6,32 @@ var request = require('request')
   , configuration = require('../lib/configuration')
   , baker = require('../lib/baker')
   , remote = require('../lib/remote')
-  , _award = require('../lib/award')
+  , browserid = require('../lib/browserid')
+  , awardBadge = require('../lib/award')
   , reverse = require('../lib/router').reverse
   , Badge = require('../models/badge')
 
 exports.param = {};
-exports.param['badgeId'] = function(req, res, next, id) {
-  Badge.findOne({body_hash: id}, function(err, badge) {
+
+/**
+ * Route param pre-condition for finding a badge when a badgeId is present.
+ * If the badge cannot be found, immediately return HTTP 404.
+ *
+ * @param {String} hash is the `body_hash` of the badge to look up.
+ */
+
+exports.param['badgeId'] = function(req, res, next, hash) {
+  Badge.findOne({body_hash: hash}, function(err, badge) {
     if (!badge) return res.send('could not find badge', 404);
     req.badge = badge;
     return next();
   });
 };
+
+
+/**
+ * Render the login page.
+ */
 
 exports.login = function(req, res) {
   // req.flash returns an array. Pass on the whole thing to the view and
@@ -28,98 +42,62 @@ exports.login = function(req, res) {
   });
 };
 
+
+/**
+ * Authenticate the user using a browserID assertion.
+ *
+ * @param {String} assertion returned by `navigator.id.getVerifiedEmail`
+ * @return {HTTP 303}
+ *   on error: redirect one page back
+ *   on success: redirect to `backpack.manage`
+ */
+
 exports.authenticate = function(req, res) {
-  // If `assertion` wasn't posted in, the user has no business here.
-  // We could return 403 or redirect to login page. It's more polite
-  // to just redirect to the login page.
   if (!req.body || !req.body['assertion']) {
     return res.redirect(reverse('backpack.login'), 303);
   }
 
-  // Setup the options and the post body for the verification request.
-  // nginx invariably 411s if it doesn't find a content-length header, and
-  // express, which is what the main browserid server runs, will refuse to
-  // populate req.body unless the proper content-type is set.
-  var ident = configuration.get('identity');
-  var opts = {};
-  opts.uri = ident.protocol + '://' +  ident.server + ident.path;
-  opts.body = qs.stringify({
-    assertion: req.body['assertion'],
-    audience: configuration.get('hostname')
-  });
-  opts.headers = {
-    'content-length': opts.body.length,
-    'content-type': 'application/x-www-form-urlencoded'
-  };
-
-  request.post(opts, function(err, resp, body){
-    var assertion = {};
-    var hostname = configuration.get('hostname');
-
-    // We need to make sure:
-    //
-    //   * the request could make it out of the system,
-    //   * the other side responded with the A-OK,
-    //   * with a valid JSON structure,
-    //   * and a status of 'okay'
-    //   * with the right hostname, matching this server
-    //   * and coming from the issuer we expect.
-    //
-    // If any of these tests fail, throw an error, catch that error at the
-    // bottom, and call `goBackWithError` to redirect to the previous page
-    // with a human-friendly message telling the user to try again.
-    function goBackWithError(msg) {
-      req.flash('error', (msg || 'There was a problem authenticating, please try again.'));
+  var ident = configuration.get('identity')
+    , uri = ident.protocol + '://' +  ident.server + ident.path
+    , assertion = req.body['assertion']
+    , audience = configuration.get('hostname');
+  
+  browserid(uri, assertion, audience, function (err, verifierResponse) {
+    if (err) {
+      logger.error('Failed browserID verification: ')
+      logger.debug('Type: ' + err.type + "; Body: " + err.body);
+      req.flash('error', "Could not verify with browserID!");
       return res.redirect('back', 303);
     }
-    try {
-      if (err) {
-        logger.error('could not make request to identity server');
-        logger.error('  err obj: ' + JSON.stringify(err));
-        throw 'could not request';
-      }
-      if (resp.statusCode != 200) {
-        logger.warn('identity server returned error');
-        logger.debug('  status code: ' + resp.statusCode);
-        logger.debug('  sent with these options: ' + JSON.stringify(options));
-        throw 'invalid http status';
-      }
-      try {
-        assertion = JSON.parse(body);
-      } catch (syntaxError) {
-        logger.warn('could not parse response from identity server: ' + body);
-        throw 'invalid response';
-      }
-      if (assertion.status !== 'okay') {
-        logger.warn('did not get an affirmative response from identity server:');
-        logger.warn(JSON.stringify(assertion));
-        throw 'unexpected status';
-      }
-      if (assertion.audience !== hostname) {
-        logger.warn('unexpected audience for this assertion, expecting ' + hostname +'; got ' + assertion.audience);
-        throw 'unexpected audience';
-      }
-    } catch (validationError) {
-      return goBackWithError();
-    }
-
-    // Everything seems to be in order, store the user's email in the session
-    // and redirect to the front page.
+    
     if (!req.session) res.session = {};
-    req.session.authenticated = [assertion.email];
+    
+    if (!req.session.emails) req.session.emails = []
+    
+    logger.debug('browserid verified, attempting to authenticate user');
+    req.session.emails.push(verifierResponse.email);
     return res.redirect(reverse('backpack.manage'), 303);
   });
 };
 
+
+/**
+ * Wipe the user's session and send back to the login page.
+ *
+ * @return {HTTP 303} redirect user to login page
+ */
+
 exports.signout = function(req, res) {
-  var session = req.session;
-  if (session) {
-    Object.keys(session).forEach(function(k) {
-      if (k !== 'csrf') delete session[k];
-    });
-  }
+  req.session = {};
   res.redirect(reverse('backpack.login'), 303);
 };
+
+
+/**
+ * Render the management page for logged in users.
+ *
+ * @return {HTTP 303} redirect user to login page
+ */
 
 exports.manage = function(req, res, next) {
   var email = emailFromSession(req);
@@ -127,8 +105,6 @@ exports.manage = function(req, res, next) {
   var error = req.flash('error')
     , success = req.flash('success')
   
-
-  // #TODO: replace below method with the new model methods.
   Badge.find({email: email}, function(err, badges){
     if (err) return next(err);
     
@@ -142,6 +118,7 @@ exports.manage = function(req, res, next) {
       success: success,
       user: email,
       badges: badges,
+      csrfToken: req.session._csrf,
       groups: [], // #TODO: replace with real grouping
       fqrev: function(p, o){
         var u = url.parse(reverse(p, o))
@@ -155,7 +132,12 @@ exports.manage = function(req, res, next) {
   });
 };
 
-exports.details = function(req, res, next) {
+
+/**
+ * Render a badge details page.
+ */
+
+exports.details = function(req, res) {
   var badge = req.badge
     , email = emailFromSession(req)
     , assertion = badge.data.body;
@@ -179,17 +161,15 @@ exports.details = function(req, res, next) {
   })
 }
 
-exports.addBadgeToGroup = function(req, res, next) {
-  var badge = req.badge
-    , assertion = badge.data.body
-    , email = emailFromSession(req);
-  if (email !== assertion.recipient) return res.send('forbidden', 403);
-  res.send('Not implemented yet', 500);
-};
 
-exports.createGroup = function(req, res, next) {
-  res.send('Not implemented yet', 500);
-};
+/**
+ * Completely delete a badge from the user's account.
+ *
+ * @return {HTTP 500|403|303}
+ *   user doesn't own the badge -> 403.
+ *   error calling `Badge#destroy` -> 500
+ *   success -> 303 to `backpack.manage`
+ */
 
 exports.deleteBadge = function (req, res) {
   var badge = req.badge
@@ -208,60 +188,90 @@ exports.deleteBadge = function (req, res) {
   })
 };
 
-// #TODO: de-complicate this.
-exports.upload = function(req, res) {
-  var email = emailFromSession(req);
-  if (!email) return res.redirect(reverse('backpack.login'), 303);
 
+/**
+ * Handle upload of a badge from a user's filesystem. Gets embedded data from
+ * uploaded PNG with `urlFromUpload` from lib/baker, retrieves the assertion
+ * using `getHostedAssertion` from lib/remote and finally awards the badge
+ * using `award` from lib/award.
+ *
+ * @param {File} userBadge uploaded badge from user (from request)
+ * @return {HTTP 303} redirects to manage (with error, if necessary)
+ */
+
+exports.userBadgeUpload = function(req, res) {
+  var email = emailFromSession(req)
+    , tmpfile = req.files.userBadge;
+  if (!email) return res.redirect(reverse('backpack.login'), 303);
+  if (!tmpfile) return redirect();
+  
+  // go back to the manage page and potentially show an error
   var redirect = function(err) {
-    if (err) req.flash('error', err);
+    if (err) {
+      logger.warn('There was an error uploading a badge');
+      logger.debug(err);
+      req.flash('error', err.message);
+    }
     return res.redirect(reverse('backpack.manage'), 303);
   }
- 
-  var filedata, assertionURL;
-  filedata = req.files.userBadge;
-
-  if (!filedata) return redirect();
-
-  if (filedata.size > (1024 * 256)) return redirect('Maximum badge size is 256kb! Contact your issuer.');
   
-  fs.readFile(filedata.path, function(err, imagedata){
-    if (err) return redirect('SNAP! There was a problem reading uploaded badge.');
-    try {
-      assertionURL = baker.read(imagedata)
-    } catch (e) {
-      return redirect('Badge is malformed! Contact your issuer.');
-    }
-    remote.assertion(assertionURL, function(err, assertion) {
-      if (err.status !== 'success') {
-        logger.warn('failed grabbing assertion for URL '+ assertionURL);
-        logger.warn('reason: '+ JSON.stringify(err));
-        return redirect('There was a problem validating the badge! Contact your issuer.');
-      }
+  // get the url from the uploaded badge file
+  baker.urlFromUpload(tmpfile, function (err, assertionUrl, imagedata) {
+    if (err) return redirect(err);
+    
+    // grab the assertion data from the endpoint
+    remote.getHostedAssertion(assertionUrl, function (err, assertion) {
+      if (err) return redirect(err);
+
+      // bail if the badge wasn't issued to the logged in user
       if (assertion.recipient !== email) {
-        return redirect('This badge was not issued to you! Contact your issuer.');
+        err = new Error('This badge was not issued to you! Contact your issuer.');
+        err.name = 'InvalidRecipient';
+        return redirect(err);
       }
-      _award(assertion, assertionURL, imagedata, function(err, badge) {
+      
+      // try to issue the badge 
+      awardBadge(assertion, assertionUrl, imagedata, function(err, badge) {
         if (err) {
-          logger.error('could not save badge: ' + err);
-          return redirect('There was a problem saving your badge!');
+          logger.warn('Could not save an uploaded badge: ');
+          logger.debug(err);
+          return redirect(new Error('There was a problem saving your badge!'));
         }
         return redirect();
       });
-    })
+    });
   });
-}
+};
+
+/**
+ * Get user email from session.
+ * TODO: support multiple email addresses for the same user.
+ *
+ * @param {Request} req is the whole request object.
+ * @return {Boolean|String} `false` if no/invalid email address.
+ */
 
 var emailFromSession = function(req) {
-  var session, userEmail, emailRe;
-  if (!req.session || !req.session.authenticated) return false;
-  session = req.session;
-  userEmail = session.authenticated[0];
-  emailRe = /^.+?\@.+?\.*$/;
+  var userEmail = '',
+      emailRe = /^.+?\@.+?\.*$/;
+  
+  if (!req.session) {
+    logger.debug('could not find session');
+    return false;
+  }
+  
+  if (!req.session.emails) {
+    logger.debug('could not find emails array in session');
+    return false;
+  }
+  
+  userEmail = req.session.emails[0];
+  
   if (!emailRe.test(userEmail)) {
-    logger.warn('session.authenticate does not contain valid user: ' + userEmail);
+    logger.warn('req.session.emails does not contain valid user: ' + userEmail);
     req.session = {};
     return false;
   }
+  
   return userEmail;
 }
