@@ -1,7 +1,0 @@
-#!/bin/bash
-cp -r $ROOT/static/validator/index.html \
-      $ROOT/static/validator/ace        \
-      $ROOT/static/css                  \
-      $ROOT/lib/validator.js                $ROOT/docs/validator
-
-cd $ROOT/docs && git add . && git commit -a -m"Updating validator on `date`" && git push origin
