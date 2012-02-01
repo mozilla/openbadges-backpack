@@ -9,7 +9,7 @@ class openbadges::db {
     user => "badgemaker",
     password => "secret",
   }  
-  mysqldb { "openbadges_testing":
+  mysqldb { "openbadges_test":
     user => "badgemaker",
     password => "secret",
   }  
