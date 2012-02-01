@@ -26,8 +26,8 @@ class openbadges::app {
   
   exec { "npm-install-packages":
     cwd => "/home/vagrant/",
-    command => "npm install",
-    before => File['copy-packages'],
+    command => "npm install .",
+    require => Package['npm'],
   }
   
   file { "copy-local-dist":
