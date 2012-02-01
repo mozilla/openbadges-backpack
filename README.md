@@ -69,6 +69,14 @@ No matter which way you choose, you should join the
 [Open Badges Google Group](https://groups.google.com/forum/#!forum/openbadges). If
 you have any problems setting up the environment, feel free to post a message to the list.
 
+### Optional: A real hostname
+
+I like to be able to use http://openbadges.local for accessing the
+project. Assuming you used vagrant, you can change the hostname in `local.js`
+and do `sudo echo "33.33.33.11 openbadges.local" >> /etc/hosts` to make it
+happen. If you're on OS X, you can also use
+[Gas Mask](http://code.google.com/p/gmask/) for temporary hosts file switching
+rather than having to manually edit /etc/hosts
 
 ## Related Projects
 * https://github.com/lmorchard/django-badger -- Issuing app for Django
