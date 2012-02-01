@@ -46,9 +46,16 @@ expect in case of error.
 
 ## I want to play with the code, where do I start?
 
-Running the app in a development environment is easy:
+### The easy way
 
-1. Install dependencies: `npm install --dev`
+[Use Vagrant](http://vagrantup/). `vagrant up` in the project root will spin
+up a fully provisioned VM (it'll take about two or three minutes, longer if you don't have a `lucid32` box), `vagrant
+ssh` to get into the VM, then `cd openbadges && ./run.js` will start up the
+server at [http://localhost:8888](http://localhost:8888)
+
+### The hard way
+
+1. Install dependencies: `npm install`
 
 2. Copy the `openbadges/lib/environments/local-dist.js` to `openbadges/lib/environments/local.js` and edit the configuration to match your local development environment.
 
@@ -58,7 +65,9 @@ Running the app in a development environment is easy:
 
 5. Start your server: `node run.js`
 
-6. Join the [Open Badges Google Group](https://groups.google.com/forum/#!forum/openbadges).
+No matter which way you choose, you should join the
+[Open Badges Google Group](https://groups.google.com/forum/#!forum/openbadges). If
+you have any problems setting up the environment, feel free to post a message to the list.
 
 
 ## Related Projects
