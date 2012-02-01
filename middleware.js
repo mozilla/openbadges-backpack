@@ -1,5 +1,6 @@
 var express = require('express')
   , secrets = require('./lib/secrets')
+  , session = require('connect-cookie-session')
   , configuration = require('./lib/configuration')
   , logger = require('./lib/logging').logger
   , crypto = require('crypto')
@@ -13,7 +14,7 @@ var COOKIE_KEY = 'openbadges_state';
 // Store sessions in cookies. The session structure is base64 encoded, a
 // salty hash is created with `COOKIE_SECRET` to prevent clientside tampering.
 exports.cookieSessions = function(){
-  return express.session({
+  return session({
     secret: COOKIE_SECRET,
     key: COOKIE_KEY,
     cookie: {

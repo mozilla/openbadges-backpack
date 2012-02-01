@@ -12,6 +12,7 @@
   , "hogan.js": "1.0.x"
   , "coffeekup": "0.3.x"
   , "request": "2.9.x"
+  , "connect-cookie-session": "0.x.x"
   , "commander": "0.5.x"
   , "metapng": "git+https://github.com/brianloveswords/metapng.js.git"
   , "bcrypt": "0.5.x"
