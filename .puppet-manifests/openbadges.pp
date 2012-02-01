@@ -42,9 +42,10 @@ class openbadges::app {
     require => Package['npm'],
   }
   
-  file { "copy-local-dist":
-    path => "/home/vagrant/openbadges/lib/environments/local.js",
-    source => "/home/vagrant/openbadges/lib/environments/local-dist.js",
+  exec { "copy-local-dist":
+    cwd => "/home/vagrant/openbadges/lib/environments",
+    command => "cp local-dist.js local.js",
+    creates => "/home/vagrant/openbadges/lib/environments/local.js",
   }
   
   file { "/usr/bin/start-server":
