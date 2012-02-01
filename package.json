@@ -3,7 +3,7 @@
 , "version": "0.5.0"
 , "private": true
 , "scripts" :
-  { "test" : "node ./node_modules/vows/bin/vows --spec --isolate" }
+  { "test" : "vows --spec --isolate" }
 , "dependencies":
   { "express": "2.5.x"
   , "formidable": "1.0.x"
