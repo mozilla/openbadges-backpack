@@ -16,19 +16,22 @@ class openbadges::db {
 }
 
 class openbadges::app {
-  file { "node-modules": 
-    path => "/home/vagrant/.node_modules",
-    ensure => directory,
+  Exec { path => ['/usr/local/bin','/usr/local/sbin','/usr/bin/','/usr/sbin','/bin','/sbin'], }
+  
+  file { "package.json":
+    path => "/home/vagrant/package.json",
+    source => "/home/vagrant/openbadges/package.json",
+    before => Exec['npm-install-packages'],
   }
-  file { "node-modules-link":
-    path => "/home/vagrant/.node_modules",
-    target => "/home/vagrant/openbadges/node_modules",
-    ensure => link,
-    require => File['node-modules'],
-  }
+  
   exec { "npm-install-packages":
-    cwd => "/home/vagrant/openbadges",
-    command => "npm install .",
-    require => File["node-modules-link"],
+    cwd => "/home/vagrant/",
+    command => "npm install",
+    before => File['copy-packages'],
+  }
+  
+  file { "copy-local-dist":
+    path => "/home/vagrant/openbadges/lib/environments/local.js",
+    source => "/home/vagrant/openbadges/lib/environments/local-dist.js",
   }
 }
