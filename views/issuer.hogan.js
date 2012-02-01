@@ -1,4 +1,4 @@
-<form action="{{#reverse}}test.award{{/reverse}}" method="post">
+<form action="{{#reverse}}demo.award{{/reverse}}" method="post">
   <input type="hidden" name="_csrf" value="{{ csrfToken }}">
   <fieldset>
     <div class="clearfix">

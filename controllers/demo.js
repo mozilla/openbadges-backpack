@@ -9,7 +9,7 @@ var protocol = configuration.get('protocol') || 'http'
 
 // Render the view for the test badge issuer.
 exports.issuer = function(req, res) {
-  res.render('issuer.coffee', {
+  res.render('issuer', {
     login: false,
     title: 'Test Issuer',
     csrfToken: req.session._csrf
@@ -18,7 +18,7 @@ exports.issuer = function(req, res) {
 
 // Bake & award a test badge. Uses `test_badge` below to generate a proper assertion.
 exports.award = function(req, res) {
-  var assertionURL = encodeURIComponent([ORIGIN + '/test/badge.json', qs.stringify(req.body)].join('?'))
+  var assertionURL = encodeURIComponent([ORIGIN + '/demo/badge.json', qs.stringify(req.body)].join('?'))
     , bakeURL = ORIGIN + '/baker?award=true&assertion=' + assertionURL;
   
   request({url: bakeURL, encoding:'binary'},  function(err, resp, body) {
@@ -41,7 +41,7 @@ exports.test_badge = function(req, res) {
     res.setHeader('Content-Type', 'application/json');
     res.send(JSON.stringify({
       recipient: recp,
-      evidence: '/test/evidence',
+      evidence: '/demo/evidence',
       expires: '2040-08-13',
       issued_on: '2011-08-23',
       badge: {
@@ -49,7 +49,7 @@ exports.test_badge = function(req, res) {
         name: 'TEST: ' + title,
         description: desc,
         image: image,
-        criteria: '/test/criteria',
+        criteria: '/demo/criteria',
         issuer: {
           name: 'Open Badges Test',
           origin: ORIGIN
