@@ -81,7 +81,7 @@ router(app)
 
 if (!module.parent) {
   var start_server = function(app) {  
-    var port = app.config.get('internal_port')
+    var port = app.config.get('port')
       , pid = process.pid.toString()
       , pidfile = path.join(app.config.get('var_path'), 'server.pid')
 

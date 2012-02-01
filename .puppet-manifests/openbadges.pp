@@ -46,4 +46,9 @@ class openbadges::app {
     path => "/home/vagrant/openbadges/lib/environments/local.js",
     source => "/home/vagrant/openbadges/lib/environments/local-dist.js",
   }
+  
+  file { "/usr/bin/start-server":
+    source => "/tmp/vagrant-puppet/manifests/files/start-server.sh",
+    mode => 0755;
+  }
 }

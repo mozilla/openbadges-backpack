@@ -49,21 +49,25 @@ expect in case of error.
 ### The easy way
 
 [Use Vagrant](http://vagrantup/). `vagrant up` in the project root will spin
-up a fully provisioned VM (it'll take about two or three minutes, longer if you don't have a `lucid32` box), `vagrant
-ssh` to get into the VM, then `cd openbadges && ./run.js` will start up the
-server at [http://localhost:8888](http://localhost:8888)
+up a fully provisioned VM (it'll take about two or three minutes, longer if
+you don't have a `lucid32` box), `vagrant ssh` to get into the VM, then
+`start-server` will start up the server at
+[http://localhost:8888](http://localhost:8888). The server will also watch for
+changes, so you don't have to manually reload it.
 
 ### The hard way
 
-1. Install dependencies: `npm install`
+1. Copy the `openbadges/lib/environments/local-dist.js` to `openbadges/lib/environments/local.js` and edit the configuration to match your local development environment.
 
-2. Copy the `openbadges/lib/environments/local-dist.js` to `openbadges/lib/environments/local.js` and edit the configuration to match your local development environment.
+2. Setup your MySQL database. Create a database and a user with full privileges on that db `openbadges/lib/environments/local.js`.
 
-3. Setup your MySQL database. Create a database and a user with full privileges on that db `openbadges/lib/environments/local.js`.
+3. Install local dependencies: `npm install`
+ 
+4. Install global dependencies: `npm install -g up vows`
 
-4. Run the test suite: `npm test`
+5. Run the test suite: `vows -i`
 
-5. Start your server: `node run.js`
+6. Start your server: `up -w -p 8888 app.js`
 
 No matter which way you choose, you should join the
 [Open Badges Google Group](https://groups.google.com/forum/#!forum/openbadges). If

@@ -18,6 +18,7 @@
   , "mysql": "0.9.x"      
   , "colors": "*"
   , "vows": "0.6.x"
+  , "up": "0.1.x"
   }
 , "engines":
   { "node":  "*" }
