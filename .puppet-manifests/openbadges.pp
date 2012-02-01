@@ -18,6 +18,18 @@ class openbadges::db {
 class openbadges::app {
   Exec { path => ['/usr/local/bin','/usr/local/sbin','/usr/bin/','/usr/sbin','/bin','/sbin'], }
   
+  define npm( $directory=true ) {
+    exec { "install-${name}-npm-package":
+      unless => "test -d $directory/$name",
+      command => "npm install -g $name",
+      require => Package['npm'],
+    }
+  }
+  
+  npm { "vows": }
+  
+  npm { "up": }
+  
   file { "package.json":
     path => "/home/vagrant/package.json",
     source => "/home/vagrant/openbadges/package.json",
