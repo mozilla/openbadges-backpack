@@ -3,6 +3,7 @@
 *~
 *#*
 .vagrant
+.DS_Store
 
 /docs
 /node_modules
