@@ -206,10 +206,6 @@ exports.userBadgeUpload = function(req, res) {
   var user = req.user
     , tmpfile = req.files.userBadge;
   
-  if (!user) return res.redirect(reverse('backpack.login'), 303);
-  
-  if (!tmpfile.size) return redirect();
-  
   // go back to the manage page and potentially show an error
   var redirect = function(err) {
     if (err) {
@@ -219,6 +215,10 @@ exports.userBadgeUpload = function(req, res) {
     }
     return res.redirect(reverse('backpack.manage'), 303);
   }
+  
+  if (!user) return res.redirect(reverse('backpack.login'), 303);
+  
+  if (!tmpfile.size) return redirect(new Error('You must choose a badge to upload.'));
   
   // get the url from the uploaded badge file
   baker.urlFromUpload(tmpfile, function (err, assertionUrl, imagedata) {
