@@ -93,6 +93,7 @@ a.badgeLink:active {
   -ms-transition: all 0.4s ease;
   -o-transition: all 0.4s ease;
   font-size: 1.5em;
+  height: 1.3em;
   font-weight: bold;
   position: absolute;
   top: 0;
@@ -100,6 +101,7 @@ a.badgeLink:active {
   margin: 4px 0 0 4px;
   background: transparent;
   border: 1px solid transparent;
+  text-shadow: #eee 1px 1px;
   display: none;
 }
 .group input.groupName:hover, .group input.groupName.hover {
@@ -128,7 +130,9 @@ a.badgeLink:active {
   text-align: center;
   border: 1px dotted #000;
   border-radius: 5px;
-  background: rgba(188,188,188,0.5);
+  background: url('/images/texturetastic_gray.png');
+  overflow: hidden;
+  box-shadow: 2px 2px 5px 3px #ddd;
   
   -webkit-transition: all 0.25s ease;
   -moz-transition: all 0.25s ease;
@@ -143,7 +147,6 @@ a.badgeLink:active {
   -ms-transition: all 0.25s ease;
   -o-transition: all 0.25s ease;
   transition: all 0.25s ease;
-  background: rgba(0,188,0,0.5);
   -webkit-box-shadow: 2px 2px 5px 3px #afa;
   box-shadow: 2px 2px 5px 3px #afa;
 }
