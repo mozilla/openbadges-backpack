@@ -3,13 +3,13 @@
 <p>By the way, <a href="http://p2pu.org">P2PU</a> would be a great place to start
 {{/badges.length}}
 
-<div class="row">
+<div class="row" style="position: relative;">
   <div class="span-one-third column">
     {{#badges.length}}
     <h1>Badges</h1>
     <div id="badges" class="js-badges">
       {{#badges}}
-      <a href="{{detailsUrl}}" draggable="true" class="badgeLink" id="{{data.body_hash}}">
+      <a href="{{detailsUrl}}" draggable="true" class="badgeLink" id="{{data.body_hash}}" data-hash="{{data.body_hash}}">
         <img src="{{data.image_path}}" width="64px"/>
       </a>
       {{/badges}}
@@ -37,8 +37,9 @@
     <div class="span-two-thirds column groups">
       <h1>Groups</h1>
       
-      <div class='newGroup'>
-        <h3 class='groupName'>Drop a badge here to make a new group</h3>
+      <div class='group new'>
+        <input class='groupName' type='text' value='New Group'>
+        <h3 class='groupName'>Drag a Badge Here</h3>
       </div>
       
       {{#groups}}

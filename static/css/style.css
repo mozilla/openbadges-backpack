@@ -87,7 +87,42 @@ a.badgeLink:active {
   outline: none;
 }
 
-.newGroup {
+.group input.groupName {
+  -webkit-transition: all 0.4s ease;
+  -moz-transition: all 0.4s ease;
+  -ms-transition: all 0.4s ease;
+  -o-transition: all 0.4s ease;
+  font-size: 1.5em;
+  font-weight: bold;
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 4px 0 0 4px;
+  background: transparent;
+  border: 1px solid transparent;
+  display: none;
+}
+.group input.groupName:hover, .group input.groupName.hover {
+  -webkit-transition: all 0.4s ease;
+  -moz-transition: all 0.4s ease;
+  -ms-transition: all 0.4s ease;
+  -o-transition: all 0.4s ease;
+  border: 1px solid #ccc;
+  background: rgba(255,255,255,0.2);
+  color: #444;
+}
+
+.group input.groupName:focus {
+  -webkit-transition: all 0.4s ease;
+  -moz-transition: all 0.4s ease;
+  -ms-transition: all 0.4s ease;
+  -o-transition: all 0.4s ease;
+  background: rgba(255,255,255,0.6);
+  color: #222;
+}
+  
+.group {
+  position: relative;
   margin: 20px 0 0 0;
   padding: 20px;
   text-align: center;
@@ -102,17 +137,40 @@ a.badgeLink:active {
   transition: all 0.25s ease;
 }
 
-.newGroup h3 {
-  pointer-events: none
-}
-
-.newGroup.hovering {
+.group.hovering {
   -webkit-transition: all 0.25s ease;
   -moz-transition: all 0.25s ease;
   -ms-transition: all 0.25s ease;
   -o-transition: all 0.25s ease;
   transition: all 0.25s ease;
   background: rgba(0,188,0,0.5);
+  -webkit-box-shadow: 2px 2px 5px 3px #afa;
+  box-shadow: 2px 2px 5px 3px #afa;
+}
+.group h3 {
+  -webkit-transition: all 0.25s ease;
+  -moz-transition: all 0.25s ease;
+  -ms-transition: all 0.25s ease;
+  -o-transition: all 0.25s ease;
+  transition: all 0.25s ease;
+  font-size: 3em;
+  color: #444;
+  height: 1.2em;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+.group h3 {
+  pointer-events: none;
+}
+
+.group.hovering h3 {
+  -webkit-transition: all 0.25s ease;
+  -moz-transition: all 0.25s ease;
+  -ms-transition: all 0.25s ease;
+  -o-transition: all 0.25s ease;
+  transition: all 0.25s ease;
 }
 
 [draggable=true] {

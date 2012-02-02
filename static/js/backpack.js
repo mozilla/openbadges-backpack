@@ -72,50 +72,106 @@ function cancel (event) {
   if (event.preventDefault) event.preventDefault();
   return false;
 }
-
-$('.newGroup')
-  .live('dragover', cancel)
+function enterFn() { $(this).addClass('hovering'); }
+function leaveFn() { $(this).removeClass('hovering'); }
+function dropFn(jqEvent) {
+  var event = jqEvent.originalEvent
+    , id = event.dataTransfer.getData('Text')
+    , $el = $(this)
+    , $parent = $el.parent()
+    , $original = $('#' + id)
+    , height = $original.height()
+    , width = $original.width()
+    , $badge = null
+    , $exists = $el.find('[id|=' + $original.data('hash') + ']')
   
-  .live('dragenter', function () {
-    $(this).addClass('hovering');
-  })
+  if (event.preventDefault) event.preventDefault();
   
-  .live('dragleave', function () {
-    $(this).removeClass('hovering');
-  })
+  if (event.stopPropagation) event.stopPropagation();
   
-  .live('drop', function (jqEvent) {
-    var event = jqEvent.originalEvent
-        , $el = $(this)
-        , $original = $('#' + event.dataTransfer.getData('Text'))
-        , $badge = $original.clone();
-    if (event.preventDefault) event.preventDefault();
+  $el.removeClass('hovering');
+  
+  if ($exists.length) {
+    $exists
+      .animate({opacity: 0})
+      .animate({opacity: 1})
+    return;
+  }
+  
+  if ($el.hasClass('new')) {
+    var $new = $el.clone()
     
+    $el.find('h3')
+      .css({opacity: 0.9})
+      .animate({opacity: 0})
+      .animate({height: '10px'})
+    
+    $new
+      .hide()
+      .appendTo($parent)
+      .fadeIn()
+    
+    setupForDragging($new);
+    
+    $el.removeClass('new');
+    
+    setTimeout(function () {
+      
+      $el.find('input').fadeIn()
+      
+      setTimeout(function () {
+        $el.find('input').addClass('hover');
+      }, 1000)
+
+      setTimeout(function () {
+        $el.find('input').removeClass('hover');
+      }, 4000);
+      
+    }, 50);
+  }
+  
+  var addBadge = function () {
+    $el.append($badge);
+    $badge
+      .animate({height: height, width: width})
+      .animate({opacity: 1})
+  }
+  
+  if ($original.data('fromGroup')) {
+    $badge = $original;
+    $badge
+      .animate({opacity: 0})
+      .animate({height: 0, width: 0}, null, addBadge);
+
+  } else {
+    $badge = $original.clone();
     $badge
       .data('fromGroup', true)
-      .attr('id', $badge.attr('id')+'_'+Date.now())
-      .css({opacity: 0, height: '0px', width: '0px'});
-    
-    $el.removeClass('hovering');
-    $el.append(
-      $badge
-        .animate({height: $original.height(), width: $original.width()})
-        .animate({opacity: 1})
-    );
-    return false;
-  });
+      .attr('id', $badge.attr('id')+'-'+Date.now())
+      .css({opacity: 0, height: 0, width: 0})
+    addBadge();
+  }
+  
+  return false;
+}
+
+function setupForDragging(element) {
+  $(element)
+    .bind('dragover', cancel)
+    .bind('dragenter', enterFn)
+    .bind('dragleave', leaveFn)
+    .bind('drop', dropFn);
+}
+
+setupForDragging($('.group'));
 
 $('body')
   .bind('dragover', cancel)
-  
   .bind('dragenter', cancel)
-  
   .bind('drop', function (jqEvent) {
     var event = jqEvent.originalEvent
         , $badge = $('#' + event.dataTransfer.getData('Text'));
-    
     if (event.preventDefault) event.preventDefault();
-    
     if ($badge.data('fromGroup')) {
       $badge
         .animate({opacity: 0})
