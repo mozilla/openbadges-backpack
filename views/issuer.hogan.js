@@ -4,7 +4,7 @@
     <div class="clearfix">
       <label for="recp">Recipient</label>
       <div class="input">
-        <input id="recp" type="text" name="recp"></input>
+        <input id="recp" type="text" name="recipient"></input>
       </div>
     </div>
 
