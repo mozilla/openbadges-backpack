@@ -42,8 +42,6 @@
 
         <script type="text/javascript" src="/js/backpack.js"></script>
         <script type="text/javascript">
-(function() {
-
   window.modal = {
     main: $('.modal'),
     blanker: $('.blanker'),
@@ -72,7 +70,7 @@
       });
       return modal;
     }
-}).call(this);
+    }
         </script>
 
         <div class="modal" style="position: relative, top: auto, left: auto, margin: 0 auto; z-index: 10">

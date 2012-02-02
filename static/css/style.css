@@ -77,3 +77,48 @@ form.baker #assertion {
 .modal {
   display: none;
 }
+
+a.badgeLink {
+  display: inline-block;
+  overflow: hidden;
+}
+
+a.badgeLink:active {
+  outline: none;
+}
+
+.newGroup {
+  margin: 20px 0 0 0;
+  padding: 20px;
+  text-align: center;
+  border: 1px dotted #000;
+  border-radius: 5px;
+  background: rgba(188,188,188,0.5);
+  
+  -webkit-transition: all 0.25s ease;
+  -moz-transition: all 0.25s ease;
+  -ms-transition: all 0.25s ease;
+  -o-transition: all 0.25s ease;
+  transition: all 0.25s ease;
+}
+
+.newGroup h3 {
+  pointer-events: none
+}
+
+.newGroup.hovering {
+  -webkit-transition: all 0.25s ease;
+  -moz-transition: all 0.25s ease;
+  -ms-transition: all 0.25s ease;
+  -o-transition: all 0.25s ease;
+  transition: all 0.25s ease;
+  background: rgba(0,188,0,0.5);
+}
+
+[draggable=true] {
+  -khtml-user-drag: element;
+}
+
+body {
+  cursor: default;
+}

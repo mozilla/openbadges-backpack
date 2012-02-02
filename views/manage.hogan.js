@@ -9,8 +9,8 @@
     <h1>Badges</h1>
     <div id="badges" class="js-badges">
       {{#badges}}
-      <a href="{{detailsUrl}}">
-        <img id="id.{{data.id}}" src="{{data.image_path}}" width="64px"/>
+      <a href="{{detailsUrl}}" draggable="true" class="badgeLink" id="{{data.body_hash}}">
+        <img src="{{data.image_path}}" width="64px"/>
       </a>
       {{/badges}}
     </div>
@@ -36,35 +36,25 @@
   {{#badges.length}}
     <div class="span-two-thirds column groups">
       <h1>Groups</h1>
-      {{^groups.length}}
-      <h2>
-        You haven't made any groups yet.<br/>
-        <form action='' method='post'>
-          <input class='btn primary' type='submit' value="Create a new group">
-        </form>
-      </h2>
-      {{/groups.length}}
-      {{#groups}}
-      <h3>{{name}}</h3>
-      <div class="well" style="position:relative">
-        <!-- todo - pull this from coffee -->
+      
+      <div class='newGroup'>
+        <h3 class='groupName'>Drop a badge here to make a new group</h3>
       </div>
+      
+      {{#groups}}
+      
       {{/groups}}
     </div>
   {{/badges.length}}
 
   <script type="text/javascript">
-    (function() {
-    coffeescript(function() {
-    return $('.embed').bind('click', function(event) {
+    $('.embed').bind('click', function(event) {
       var script, self;
       self = $(this);
       script = self.siblings('input').first().val();
       modal.show('Copy and paste this into a web page', "<div><textarea style='width:98%'; height:75px'>" + script + "</textarea></div>");
       return false;
     });
-  });
-}).call(this);
 </script>
 
 </div>
