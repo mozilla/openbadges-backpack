@@ -117,11 +117,13 @@ exports.manage = function(req, res, next) {
   var modifyCollections = function (collections) {
     collections.forEach(function (collection) {
       collection.url = collection.data.url;
-      collection.data.badges = (collection.data.badges || [])
-      collection.data.badgeObjs = collection.data.badges.map(function (badgeId) {
+      collection.data.badges = (collection.data.badges || []);
+      collection.data.badgeObjs = [];
+      collection.data.badges.forEach(function (badgeId) {
         var badge = badgeIndex[badgeId];
-        return badge;
+        if (badge) collection.data.badgeObjs.push(badge);
       });
+      collection.data.badges = collection.data.badgeObjs.map(function (b) { return b.data.id });
     })
   };
   var getCollections = function () {

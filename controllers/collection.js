@@ -2,9 +2,9 @@ var Collection = require('../models/collection')
   , logger = require('../lib/logging').logger;
 
 exports.create = function (req, res) {
-  if (!req.user) res.send('nope', 400);
-  if (!req.body) res.send('nope', 400);
-  if (!req.body.badges) res.send('nope', 400);
+  if (!req.user) return res.send('nope', 400);
+  if (!req.body) return res.send('nope', 400);
+  if (!req.body.badges) return res.send('nope', 400);
   
   var col = new Collection({
     badges: req.body.badges,
@@ -26,13 +26,9 @@ exports.create = function (req, res) {
 };
 
 exports.update = function (req, res) {
-  if (!req.user) res.send('nope', 400);
-  if (!req.body) res.send('nope', 400);
-  if (!req.body.badges) res.send('nope', 400);
-
-  console.dir(req.body);
-
-
+  if (!req.user) return res.send('nope', 400);
+  if (!req.body) return res.send('nope', 400);
+  
   Collection.findById(req.body.id, function (err, collection) {
     if (err) return res.send('nope', 500);
     if (!collection) return res.send('nope', 404);

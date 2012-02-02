@@ -69,7 +69,6 @@ $('[draggable=true]').live('dragstart', function (jqEvent) {
   event.dataTransfer.setData('Text', this.id);
 });
 
-
 $('.group input').live('focus', function () {
   var $el = $(this);
   $el.data('previously', $el.val());
@@ -105,6 +104,7 @@ function removeFromGroup($group, id, callback) {
   $group.data('badges', badges);
   updateGroup($group);
 }
+
 function addToGroup($group, id, callback) {
   callback = callback || function(){}
   var badges = $group.data('badges');
@@ -112,11 +112,11 @@ function addToGroup($group, id, callback) {
   updateGroup($group);
 }
 
-function createGroup(badges, callback) {
+function createGroup($group, callback) {
   callback = callback || function(){};
   jQuery.post("/collection", {
     _csrf: CSRF,
-    badges: badges,
+    badges: $group.data('badges'),
     name: 'New Group'
   }, callback)
 }
@@ -163,11 +163,14 @@ function dropFn(jqEvent) {
   }
   
   if ($group.hasClass('new')) {
-    var $newGroup = $group.clone()
+    var $newDropTarget = $group.clone()
     
-    createGroup([$badge.data('id')], function (data) {
-      $newGroup.data('url', data['url']);
-      $newGroup.data('id', data['id']);
+    $group.data('badges', [$badge.data('id')]);
+
+    createGroup($group, function (data) {
+      $group.data('url', data['url']);
+      $group.data('id', data['id']);
+      $group.data('badges', [$badge.data('id')]);
     });
     
     $group.find('h3')
@@ -175,12 +178,10 @@ function dropFn(jqEvent) {
       .animate({opacity: 0})
       .animate({height: '10px'})
     
-    $newGroup
+    $newDropTarget
       .hide()
       .appendTo($parent)
       .fadeIn()
-    
-    setupForDragging($newGroup);
     
     $group.removeClass('new');
     
@@ -198,7 +199,7 @@ function dropFn(jqEvent) {
       
     }, 50);
   } else {
-    addToGroup($group, $(this).data('id'));
+    addToGroup($group, $badge.data('id'));
   }
   
   var addBadge = function () {
