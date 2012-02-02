@@ -114,10 +114,14 @@ exports.manage = function(req, res, next) {
       badge.detailsUrl = reverse('backpack.details', { badgeId: badge.data.body_hash });
     })
   };
-  var badgeFromIndex = function (badgeId) {return badgeIndex[badgeId]; };
   var modifyCollections = function (collections) {
-    collections = collections.map(function (collection) {
-      collection.data.badges = collection.data.badges.map(badgeFromIndex)
+    collections.forEach(function (collection) {
+      collection.url = collection.data.url;
+      collection.data.badges = (collection.data.badges || [])
+      collection.data.badgeObjs = collection.data.badges.map(function (badgeId) {
+        var badge = badgeIndex[badgeId];
+        return badge;
+      });
     })
   };
   var getCollections = function () {

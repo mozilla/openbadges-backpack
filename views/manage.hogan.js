@@ -37,13 +37,13 @@
     <div class="span-two-thirds column groups">
       <h1>Groups</h1>
       {{#groups}}
-        <div class='group' data-id="{{data.id}}">
+        <div class='group' data-badges="[{{data.badges}}]" data-id="{{data.id}}" id="{{data.url}}">
           <input class='groupName' type='text' value='{{data.name}}' style='display: block'>
-          {{#data.badges}}
-            <a href="{{detailsUrl}}" draggable="true" class="badgeLink" id="{{data.body_hash}}" data-hash="{{data.body_hash}}" data-id="{{data.id}}">
+          {{#data.badgeObjs}}
+            <a href="{{detailsUrl}}" draggable="true" class="badgeLink" id="{{data.body_hash}}-{{url}}" data-hash="{{data.body_hash}}" data-id="{{data.id}}" data-grouped="{{url}}">
               <img src="{{data.image_path}}" width="64px"/>
             </a>
-          {{/data.badges}}
+          {{/data.badgeObjs}}
         </div>
       {{/groups}}
       <div class='group new'>

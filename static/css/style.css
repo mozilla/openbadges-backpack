@@ -1,8 +1,10 @@
 html {
   background: #fff url('/images/stripes.png') repeat-x;
+  height: 100%;
 }
 body {
   background: transparent;
+  height: 101%;
 }
 #body {
   padding-top: 60px;

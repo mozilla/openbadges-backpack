@@ -70,6 +70,48 @@ $('[draggable=true]').live('dragstart', function (jqEvent) {
 });
 
 
+$('.group input').live('focus', function () {
+  var $el = $(this);
+  $el.data('previously', $el.val());
+});
+$('.group input').live('blur', function () {
+  var $el = $(this)
+    , $group = $el.closest('.group')
+  if ($el.val() === $el.data('previously')) return;
+  updateGroup($group);
+});
+
+$('.group input').live('keyup', function (event) {
+  var $el = $(this);
+  switch (event.keyCode) {
+   case 13:
+    $el.trigger('blur');
+    break;
+   
+   case 27:
+    $el.val($el.data('previously'));
+    $el.trigger('blur');
+    break;
+  }
+});
+
+function removeFromGroup($group, id, callback) {
+  callback = callback || function(){}
+  var badges = [];
+  $group.data('badges').forEach(function (bid) {
+    if (bid === id) return;
+    badges.push(bid);
+  });
+  $group.data('badges', badges);
+  updateGroup($group);
+}
+function addToGroup($group, id, callback) {
+  callback = callback || function(){}
+  var badges = $group.data('badges');
+  badges.push(id);
+  updateGroup($group);
+}
+
 function createGroup(badges, callback) {
   callback = callback || function(){};
   jQuery.post("/collection", {
@@ -79,14 +121,14 @@ function createGroup(badges, callback) {
   }, callback)
 }
 
-function updateGroup(group, badges, callback) {
+function updateGroup($group, callback) {
   callback = callback || function(){};
   jQuery.post("/collection", {
     _method: 'put',    
     _csrf: CSRF,
-    badges: badges,
-    id: group.data('id'),
-    name: group.find('input').val()
+    badges: $group.data('badges'),
+    id: $group.data('id'),
+    name: $group.find('input').val()
   }, callback)
 }
 
@@ -156,15 +198,7 @@ function dropFn(jqEvent) {
       
     }, 50);
   } else {
-    var badgeIds = [$badge.data('id')]
-    $group.find('a.badgeLink').each(function (badge) {
-      badgeIds.push($(this).data('id'));
-    })
-    console.dir(badgeIds);
-    
-    updateGroup($group, badgeIds, function (data) {
-      console.dir(data)
-    });
+    addToGroup($group, $(this).data('id'));
   }
   
   var addBadge = function () {
@@ -174,16 +208,17 @@ function dropFn(jqEvent) {
       .animate({opacity: 1})
   }
   
-  if ($original.data('fromGroup')) {
+  if ($original.data('grouped')) {
+    removeFromGroup($original.closest('.group'), $original.data('id'));
+    
     $badge = $original;
     $badge
       .animate({opacity: 0})
       .animate({height: 0, width: 0}, null, addBadge);
-
   } else {
     $badge = $original.clone();
     $badge
-      .data('fromGroup', true)
+      .data('grouped', true)
       .attr('id', $badge.attr('id')+'-'+Date.now())
       .css({opacity: 0, height: 0, width: 0})
     addBadge();
@@ -207,13 +242,17 @@ $('body')
   .bind('dragenter', cancel)
   .bind('drop', function (jqEvent) {
     var event = jqEvent.originalEvent
-        , $badge = $('#' + event.dataTransfer.getData('Text'));
+      , $badge = $('#' + event.dataTransfer.getData('Text'))
+      , $group = $badge.closest('.group')
+      , badges = $group.data('badges');
     if (event.preventDefault) event.preventDefault();
-    if ($badge.data('fromGroup')) {
-      $badge
-        .animate({opacity: 0})
-        .animate({width: 0, height: 0}, null, function () {
-          $badge.remove();
-        })
-    }
-  });
+    
+    removeFromGroup($group, $badge.data('id'));
+    
+    $badge
+      .animate({opacity: 0})
+      .animate({width: 0, height: 0}, null, function () {
+        $badge.remove();
+      })
+  })
+
