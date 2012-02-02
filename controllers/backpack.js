@@ -10,6 +10,7 @@ var request = require('request')
   , awardBadge = require('../lib/award')
   , reverse = require('../lib/router').reverse
   , Badge = require('../models/badge')
+  , Collection = require('../models/collection')
 
 exports.param = {};
 
@@ -102,34 +103,51 @@ exports.signout = function(req, res) {
 exports.manage = function(req, res, next) {
   var user = req.user
     , error = req.flash('error')
-    , success = req.flash('success');
-  
+    , success = req.flash('success')
+    , collections = []
+    , badgeIndex = {};
   if (!user) return res.redirect(reverse('backpack.login'), 303);
   
-  Badge.find({email: user.data.email}, function(err, badges){
-    if (err) return next(err);
-    
-    badges.forEach(function (b) {
-      b.detailsUrl = reverse('backpack.details', { badgeId: b.data.body_hash })
-      return b;
+  var prepareBadges = function (badges) {
+    badges.forEach(function (badge) {
+      badgeIndex[badge.data.id] = badge;
+      badge.detailsUrl = reverse('backpack.details', { badgeId: badge.data.body_hash });
     })
-    
+  };
+  var modifyCollections = function (collections) {
+    collections.forEach(function (collection) {
+      collection.url = collection.data.url;
+      collection.data.badges = (collection.data.badges || []);
+      collection.data.badgeObjs = [];
+      collection.data.badges.forEach(function (badgeId) {
+        var badge = badgeIndex[badgeId];
+        if (badge) collection.data.badgeObjs.push(badge);
+      });
+      collection.data.badges = collection.data.badgeObjs.map(function (b) { return b.data.id });
+    })
+  };
+  var getCollections = function () {
+    Collection.find({user_id: user.data.id}, getBadges);
+  };
+  var getBadges = function (err, data) {
+    if (err) return next(err);
+    collections = data;
+    Badge.find({email: user.data.email}, makeResponse)
+  };
+  var makeResponse = function (err, badges) {
+    if (err) return next(err);
+    prepareBadges(badges);
+    modifyCollections(collections);
     res.render('manage', {
       error: error,
       success: success,
       badges: badges,
       csrfToken: req.session._csrf,
-      groups: [], // #TODO: replace with real grouping
-      fqrev: function(p, o){
-        var u = url.parse(reverse(p, o))
-        u.hostname = configuration.get('hostname');
-        u.protocol = configuration.get('protocol');
-        u.port = configuration.get('external_port');
-        u.port = '80' ? null : u.port;
-        return url.format(u);
-      }
-    });
-  });
+      groups: collections
+    })
+  };
+  var startResponse = getCollections;
+  return startResponse();
 };
 
 

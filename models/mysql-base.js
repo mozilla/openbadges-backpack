@@ -16,6 +16,13 @@ Base.apply = function (Model, table) {
     return new Model(data);
   };
   
+  Model.findAll = function(callback) {
+    client.query('SELECT * FROM ' + table, function (err, results) {
+      if (err) { callback(err); }
+      else callback(null, results.map(Model.fromDbResult));
+    });
+  };
+  
   Model.find = function(criteria, callback) {
     var finders = Model.finders || {}
       , keys = Object.keys(criteria)
