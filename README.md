@@ -7,7 +7,6 @@ and use however they like.
 For (a lot) more information, check out http://openbadges.org
 
 ## I'm an Issuer, how do I use this?
-*Note: we're in rapid development mode now, but we're aiming for a usable beta on Sept 12th.*
 
 Requirements:
 
@@ -48,7 +47,7 @@ expect in case of error.
 
 ### The easy way
 
-[Use Vagrant](http://vagrantup/). `vagrant up` in the project root will spin
+[Use Vagrant](http://vagrantup.com/). `vagrant up` in the project root will spin
 up a fully provisioned VM (it'll take about two or three minutes, longer if
 you don't have a `lucid32` box), `vagrant ssh` to get into the VM, then
 `start-server` will start up the server at
