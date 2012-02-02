@@ -24,7 +24,8 @@ var createDbFixtures = function (callback) {
 var createCollection = function () {
   return new Collection({
     user_id: 1,
-    name: genstring(14)
+    name: genstring(14),
+    badges: [1,2]
   })
 };
 
@@ -45,6 +46,11 @@ vows.describe('Collection Model').addBatch({
         'without errors': function (err, collection) {
           assert.ifError(err);
           assert.isObject(collection);
+        },
+        'without mangling the badges': function (err, collection) {
+          assert.isArray(collection.data.badges);
+          assert.includes(collection.data.badges, 1);
+          assert.includes(collection.data.badges, 2);
         },
         'then resaved with new name': {
           topic: function (collection) {
