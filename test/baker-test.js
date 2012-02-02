@@ -11,7 +11,7 @@ vows.describe('bake some badges').addBatch({
     },
     'can be a prepared with badge data': function(){
       var badge = baker.prepare(PNGFILE, 'https://location-of-badge');
-      var data = baker.read(badge);
+      var data = baker.getDataFromImage(badge);
       assert.equal(data, 'https://location-of-badge');
     },
   },

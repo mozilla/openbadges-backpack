@@ -51,6 +51,7 @@ app.use(express.methodOverride());
 app.use(middleware.logRequests());
 app.use(middleware.cookieSessions());
 app.use(middleware.noFrame([ '/share/.*' ]));
+app.use(middleware.userFromSession());
 app.use(middleware.csrf());
 
 // Allow everything to be used with CORS.
@@ -63,18 +64,22 @@ app.use(function(req, res, next) {
 router(app)
   .get('/chris',                            'chris.chris')
   .get('/baker',                            'baker.baker')
-  .get('/test',                             'test.issuer')
-  .post('/test/award',                      'test.award')
-  .get('/test/badge.json',                  'test.test_badge')
-  .get('/test/invalid.json',                'test.bad_badge')
+  
+  .get('/demo',                             'demo.issuer')
+  .get('/demo/ballertime',                  'demo.massAward')
+  .get('/demo/badge.json',                  'demo.testBadge')
+  .get('/demo/invalid.json',                'demo.badBadge')
+  .post('/demo/award',                      'demo.award')
+  
   .get('/backpack/login',                   'backpack.login')
-  .post('/backpack/authenticate',           'backpack.authenticate')
   .get('/backpack/signout',                 'backpack.signout')
-  .post('/backpack/badge',                  'backpack.userBadgeUpload')
   .get('/backpack/badge/:badgeId',          'backpack.details')
-  .delete('/backpack/badge/:badgeId',       'backpack.deleteBadge')
-  .post('/backpack/badge/:badgeId/groups',  'backpack.apiGroups')
   .get('/backpack',                         'backpack.manage')
+  .post('/backpack/badge',                  'backpack.userBadgeUpload')
+  .post('/backpack/authenticate',           'backpack.authenticate')
+  .post('/backpack/badge/:badgeId/groups',  'backpack.apiGroups')
+  .delete('/backpack/badge/:badgeId',       'backpack.deleteBadge')
+  
   .get('/share/g/:groupId',                 'share.group')
   .get('/share/b/:badgeId',                 'share.badge')
   .get('/',                                 'backpack.manage')

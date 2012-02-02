@@ -4,7 +4,9 @@ var express = require('express')
   , configuration = require('./lib/configuration')
   , logger = require('./lib/logging').logger
   , crypto = require('crypto')
-
+  , User = require('./models/User')
+    
+    
 // `COOKIE_SECRET` is randomly generated on the first run of the server,
 // then stored to a file and looked up on restart to maintain state.
 // See the `secrets.js` for more information.
@@ -34,6 +36,40 @@ exports.logRequests = function(){
       }
     }
   });
+};
+
+exports.userFromSession = function (opts) {
+  return function (req, res, next) {
+    var email = '',
+        emailRe = /^.+?\@.+?\.*$/;
+    
+    if (!req.session) {
+      logger.debug('could not find session');
+      return next();
+    }
+    
+    if (!req.session.emails) {
+      logger.debug('could not find emails array in session');
+      return next();
+    }
+    
+    email = req.session.emails[0];
+    
+    if (!emailRe.test(email)) {
+      logger.warn('req.session.emails does not contain valid user: ' + email);
+      req.session = {};
+      return req.next();
+    }
+    
+    User.findOrCreate(email, function (err, user) {
+      if (err) {
+        logger.error("Problem finding/creating user:")
+        logger.error(err);
+      }
+      req.user = user;
+      return next();
+    })
+  }
 };
 
 exports.noFrame = function(whitelist) {
