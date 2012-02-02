@@ -100,12 +100,13 @@ exports.signout = function(req, res) {
  */
 
 exports.manage = function(req, res, next) {
-  var email = emailFromSession(req);
-  if (!email) return res.redirect(reverse('backpack.login'), 303);
-  var error = req.flash('error')
-    , success = req.flash('success')
+  var user = req.user
+    , error = req.flash('error')
+    , success = req.flash('success');
   
-  Badge.find({email: email}, function(err, badges){
+  if (!user) return res.redirect(reverse('backpack.login'), 303);
+  
+  Badge.find({email: user.data.email}, function(err, badges){
     if (err) return next(err);
     
     badges.forEach(function (b) {
@@ -116,7 +117,6 @@ exports.manage = function(req, res, next) {
     res.render('manage', {
       error: error,
       success: success,
-      user: email,
       badges: badges,
       csrfToken: req.session._csrf,
       groups: [], // #TODO: replace with real grouping
@@ -139,7 +139,8 @@ exports.manage = function(req, res, next) {
 
 exports.details = function(req, res) {
   var badge = req.badge
-    , email = emailFromSession(req)
+    , user = req.user
+    , email = user ? user.data.email : null
     , assertion = badge.data.body;
   
   res.render('badge-details', {
@@ -173,10 +174,12 @@ exports.details = function(req, res) {
 
 exports.deleteBadge = function (req, res) {
   var badge = req.badge
+    , user = req.user
     , assertion = badge.data.body
-    , email = emailFromSession(req);
+    , failNow = function () { return res.send("Cannot delete a badge you don't own", 403) }
+  if (!user) return failNow()
   
-  if (assertion.recipient !== email) { return res.send("Cannot delete a badge you don't own", 403); }
+  if (assertion.recipient !== user.data.email) return failNow()
   
   badge.destroy(function (err, badge) {
     if (err) {
@@ -200,10 +203,12 @@ exports.deleteBadge = function (req, res) {
  */
 
 exports.userBadgeUpload = function(req, res) {
-  var email = emailFromSession(req)
+  var user = req.user
     , tmpfile = req.files.userBadge;
-  if (!email) return res.redirect(reverse('backpack.login'), 303);
-  if (!tmpfile) return redirect();
+  
+  if (!user) return res.redirect(reverse('backpack.login'), 303);
+  
+  if (!tmpfile.size) return redirect();
   
   // go back to the manage page and potentially show an error
   var redirect = function(err) {
@@ -224,7 +229,7 @@ exports.userBadgeUpload = function(req, res) {
       if (err) return redirect(err);
 
       // bail if the badge wasn't issued to the logged in user
-      if (assertion.recipient !== email) {
+      if (assertion.recipient !== user.data.email) {
         err = new Error('This badge was not issued to you! Contact your issuer.');
         err.name = 'InvalidRecipient';
         return redirect(err);
@@ -242,36 +247,3 @@ exports.userBadgeUpload = function(req, res) {
     });
   });
 };
-
-/**
- * Get user email from session.
- * TODO: support multiple email addresses for the same user.
- *
- * @param {Request} req is the whole request object.
- * @return {Boolean|String} `false` if no/invalid email address.
- */
-
-var emailFromSession = function(req) {
-  var userEmail = '',
-      emailRe = /^.+?\@.+?\.*$/;
-  
-  if (!req.session) {
-    logger.debug('could not find session');
-    return false;
-  }
-  
-  if (!req.session.emails) {
-    logger.debug('could not find emails array in session');
-    return false;
-  }
-  
-  userEmail = req.session.emails[0];
-  
-  if (!emailRe.test(userEmail)) {
-    logger.warn('req.session.emails does not contain valid user: ' + userEmail);
-    req.session = {};
-    return false;
-  }
-  
-  return userEmail;
-}

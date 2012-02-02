@@ -51,6 +51,7 @@ app.use(express.methodOverride());
 app.use(middleware.logRequests());
 app.use(middleware.cookieSessions());
 app.use(middleware.noFrame([ '/share/.*' ]));
+app.use(middleware.userFromSession());
 app.use(middleware.csrf());
 
 // Allow everything to be used with CORS.
