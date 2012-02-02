@@ -183,6 +183,8 @@ function dropFn(jqEvent) {
       .appendTo($parent)
       .fadeIn()
     
+    setupForDragging($newDropTarget);
+    
     $group.removeClass('new');
     
     setTimeout(function () {
@@ -211,18 +213,21 @@ function dropFn(jqEvent) {
   
   if ($original.data('grouped')) {
     removeFromGroup($original.closest('.group'), $original.data('id'));
-    
     $badge = $original;
     $badge
       .animate({opacity: 0})
       .animate({height: 0, width: 0}, null, addBadge);
-  } else {
+  }
+  
+  else {
     $badge = $original.clone();
     $badge
       .data('grouped', true)
       .attr('id', $badge.attr('id')+'-'+Date.now())
       .css({opacity: 0, height: 0, width: 0})
     addBadge();
+
+    console.dir($original.data('grouped'));
   }
   
   return false;
@@ -248,7 +253,7 @@ $('body')
       , badges = $group.data('badges');
     if (event.preventDefault) event.preventDefault();
     
-    removeFromGroup($group, $badge.data('id'));
+    if ($group.length) removeFromGroup($group, $badge.data('id'));
     
     $badge
       .animate({opacity: 0})
