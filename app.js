@@ -80,6 +80,7 @@ router(app)
   .delete('/backpack/badge/:badgeId',       'backpack.deleteBadge')
   
   .post('/collection',                      'collection.create')
+  .put('/collection',                       'collection.update')
   
   .get('/share/g/:groupId',                 'share.group')
   .get('/share/b/:badgeId',                 'share.badge')

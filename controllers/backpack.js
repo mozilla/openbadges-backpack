@@ -114,14 +114,12 @@ exports.manage = function(req, res, next) {
       badge.detailsUrl = reverse('backpack.details', { badgeId: badge.data.body_hash });
     })
   };
-  
   var badgeFromIndex = function (badgeId) {return badgeIndex[badgeId]; };
   var modifyCollections = function (collections) {
     collections = collections.map(function (collection) {
       collection.data.badges = collection.data.badges.map(badgeFromIndex)
     })
   };
-  
   var getCollections = function () {
     Collection.find({user_id: user.data.id}, getBadges);
   };
@@ -139,15 +137,7 @@ exports.manage = function(req, res, next) {
       success: success,
       badges: badges,
       csrfToken: req.session._csrf,
-      groups: collections,
-      fqrev: function(p, o){
-        var u = url.parse(reverse(p, o))
-        u.hostname = configuration.get('hostname');
-        u.protocol = configuration.get('protocol');
-        u.port = configuration.get('external_port');
-        u.port = '80' ? null : u.port;
-        return url.format(u);
-      }
+      groups: collections
     })
   };
   var startResponse = getCollections;

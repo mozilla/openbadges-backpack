@@ -37,7 +37,7 @@
     <div class="span-two-thirds column groups">
       <h1>Groups</h1>
       {{#groups}}
-        <div class='group'>
+        <div class='group' data-id="{{data.id}}">
           <input class='groupName' type='text' value='{{data.name}}' style='display: block'>
           {{#data.badges}}
             <a href="{{detailsUrl}}" draggable="true" class="badgeLink" id="{{data.body_hash}}" data-hash="{{data.body_hash}}" data-id="{{data.id}}">

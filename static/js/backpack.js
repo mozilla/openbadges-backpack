@@ -74,7 +74,19 @@ function createGroup(badges, callback) {
   callback = callback || function(){};
   jQuery.post("/collection", {
     _csrf: CSRF,
-    badges: badges
+    badges: badges,
+    name: 'New Group'
+  }, callback)
+}
+
+function updateGroup(group, badges, callback) {
+  callback = callback || function(){};
+  jQuery.post("/collection", {
+    _method: 'put',    
+    _csrf: CSRF,
+    badges: badges,
+    id: group.data('id'),
+    name: group.find('input').val()
   }, callback)
 }
 
@@ -92,7 +104,7 @@ function dropFn(jqEvent) {
     , $original = $('#' + id)
     , height = $original.height()
     , width = $original.width()
-    , $badge = null
+    , $badge = $original
     , $exists = $group.find('[id|=' + $original.data('hash') + ']')
   
   if (event.preventDefault) event.preventDefault();
@@ -111,9 +123,9 @@ function dropFn(jqEvent) {
   if ($group.hasClass('new')) {
     var $newGroup = $group.clone()
     
-    createGroup([$original.data('id')], function (data) {
+    createGroup([$badge.data('id')], function (data) {
       $newGroup.data('url', data['url']);
-      $newGroup.data('id', data['url']);
+      $newGroup.data('id', data['id']);
     });
     
     $group.find('h3')
@@ -143,6 +155,16 @@ function dropFn(jqEvent) {
       }, 4000);
       
     }, 50);
+  } else {
+    var badgeIds = [$badge.data('id')]
+    $group.find('a.badgeLink').each(function (badge) {
+      badgeIds.push($(this).data('id'));
+    })
+    console.dir(badgeIds);
+    
+    updateGroup($group, badgeIds, function (data) {
+      console.dir(data)
+    });
   }
   
   var addBadge = function () {
