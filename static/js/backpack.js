@@ -1,3 +1,5 @@
+var CSRF = $("input[name='_csrf']").val();
+
 (function($){
   // Used for indicating CSS classes are important for functionality, see
   // below.
@@ -68,6 +70,14 @@ $('[draggable=true]').live('dragstart', function (jqEvent) {
 });
 
 
+function createGroup(badges, callback) {
+  callback = callback || function(){};
+  jQuery.post("/collection", {
+    _csrf: CSRF,
+    badges: badges
+  }, callback)
+}
+
 function cancel (event) {
   if (event.preventDefault) event.preventDefault();
   return false;
@@ -77,19 +87,19 @@ function leaveFn() { $(this).removeClass('hovering'); }
 function dropFn(jqEvent) {
   var event = jqEvent.originalEvent
     , id = event.dataTransfer.getData('Text')
-    , $el = $(this)
-    , $parent = $el.parent()
+    , $group = $(this)
+    , $parent = $group.parent()
     , $original = $('#' + id)
     , height = $original.height()
     , width = $original.width()
     , $badge = null
-    , $exists = $el.find('[id|=' + $original.data('hash') + ']')
+    , $exists = $group.find('[id|=' + $original.data('hash') + ']')
   
   if (event.preventDefault) event.preventDefault();
   
   if (event.stopPropagation) event.stopPropagation();
   
-  $el.removeClass('hovering');
+  $group.removeClass('hovering');
   
   if ($exists.length) {
     $exists
@@ -98,40 +108,45 @@ function dropFn(jqEvent) {
     return;
   }
   
-  if ($el.hasClass('new')) {
-    var $new = $el.clone()
+  if ($group.hasClass('new')) {
+    var $newGroup = $group.clone()
     
-    $el.find('h3')
+    createGroup([$original.data('id')], function (data) {
+      $newGroup.data('url', data['url']);
+      $newGroup.data('id', data['url']);
+    });
+    
+    $group.find('h3')
       .css({opacity: 0.9})
       .animate({opacity: 0})
       .animate({height: '10px'})
     
-    $new
+    $newGroup
       .hide()
       .appendTo($parent)
       .fadeIn()
     
-    setupForDragging($new);
+    setupForDragging($newGroup);
     
-    $el.removeClass('new');
+    $group.removeClass('new');
     
     setTimeout(function () {
       
-      $el.find('input').fadeIn()
+      $group.find('input').fadeIn()
       
       setTimeout(function () {
-        $el.find('input').addClass('hover');
+        $group.find('input').addClass('hover');
       }, 1000)
 
       setTimeout(function () {
-        $el.find('input').removeClass('hover');
+        $group.find('input').removeClass('hover');
       }, 4000);
       
     }, 50);
   }
   
   var addBadge = function () {
-    $el.append($badge);
+    $group.append($badge);
     $badge
       .animate({height: height, width: width})
       .animate({opacity: 1})

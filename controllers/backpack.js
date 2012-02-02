@@ -10,6 +10,7 @@ var request = require('request')
   , awardBadge = require('../lib/award')
   , reverse = require('../lib/router').reverse
   , Badge = require('../models/badge')
+  , Collection = require('../models/collection')
 
 exports.param = {};
 
@@ -102,24 +103,43 @@ exports.signout = function(req, res) {
 exports.manage = function(req, res, next) {
   var user = req.user
     , error = req.flash('error')
-    , success = req.flash('success');
-  
+    , success = req.flash('success')
+    , collections = []
+    , badgeIndex = {};
   if (!user) return res.redirect(reverse('backpack.login'), 303);
   
-  Badge.find({email: user.data.email}, function(err, badges){
-    if (err) return next(err);
-    
-    badges.forEach(function (b) {
-      b.detailsUrl = reverse('backpack.details', { badgeId: b.data.body_hash })
-      return b;
+  var prepareBadges = function (badges) {
+    badges.forEach(function (badge) {
+      badgeIndex[badge.data.id] = badge;
+      badge.detailsUrl = reverse('backpack.details', { badgeId: badge.data.body_hash });
     })
-    
+  };
+  
+  var badgeFromIndex = function (badgeId) {return badgeIndex[badgeId]; };
+  var modifyCollections = function (collections) {
+    collections = collections.map(function (collection) {
+      collection.data.badges = collection.data.badges.map(badgeFromIndex)
+    })
+  };
+  
+  var getCollections = function () {
+    Collection.find({user_id: user.data.id}, getBadges);
+  };
+  var getBadges = function (err, data) {
+    if (err) return next(err);
+    collections = data;
+    Badge.find({email: user.data.email}, makeResponse)
+  };
+  var makeResponse = function (err, badges) {
+    if (err) return next(err);
+    prepareBadges(badges);
+    modifyCollections(collections);
     res.render('manage', {
       error: error,
       success: success,
       badges: badges,
       csrfToken: req.session._csrf,
-      groups: [], // #TODO: replace with real grouping
+      groups: collections,
       fqrev: function(p, o){
         var u = url.parse(reverse(p, o))
         u.hostname = configuration.get('hostname');
@@ -128,8 +148,10 @@ exports.manage = function(req, res, next) {
         u.port = '80' ? null : u.port;
         return url.format(u);
       }
-    });
-  });
+    })
+  };
+  var startResponse = getCollections;
+  return startResponse();
 };
 
 
