@@ -1,98 +1,65 @@
 var CSRF = $("input[name='_csrf']").val();
 
-(function($){
-  // Used for indicating CSS classes are important for functionality, see
-  // below.
-  var __CLASS_PREFIX = 'js';
-  
-  $.fn.slideUpAndFadeOut = function(delay, fn) {
-    return $(this).animate({
-      opacity: 'hide',
-      height: 'hide',
-      marginTop: 'hide',
-      marginBottom: 'hide',
-      paddingTop: 'hide',
-      paddingBottom: 'hide'
-    }, delay, fn)
-  };
-  
-  // Build a limited selector based on a prefix and classname. The suffix will
-  // usually be named after the thing being selected. Doing this helps
-  // slightly with separation of concerns -- classes that begin with the
-  // prefix indicate they are functional and should not be hooked or changed
-  // for style.
-  function __scopeTo(className) {
-    return function(suffix){
-      return $('.' + [__CLASS_PREFIX, className, suffix].join('-'));
-    };
-  }
-  
+(function initialize($){
   // For yet to be logged in users, bind signin button. Depends on
   // navigator.id.getVerifiedEmail, which is currently provided by
   // https://browserid.org/include.js
-  function bindSignIn(className) {
-    var $$ = __scopeTo(className);
-    $$('link').bind('click', function(){
-      navigator.id.getVerifiedEmail(function(assertion) {
-        if (assertion) {
-          $$('input').val(assertion);
-          $$('form').trigger('submit');
-        }
-      });
+  function browserId() {
+    function launchBrowserId(callback) {
+      return function() { navigator.id.getVerifiedEmail(callback); }
+    }
+    function handleResponse(assertion) {
+      if (!assertion) return false;
+      $('.js-browserid-input').val(assertion);
+      $('.js-browserid-form').trigger('submit');
+    }
+    $('.js-browserid-link').bind('click', launchBrowserId(handleResponse));
+  }
+  
+  function draggables() {
+    $('[draggable=true]').live('dragstart', function (jqEvent) {
+      var event = jqEvent.originalEvent;
+      event.dataTransfer.setData('Text', this.id);
     });
   }
   
-  // For logged in users, activate dropdown on click.
-  function bindUserMenu(className) {
-    var $$ = __scopeTo(className);
-    $$('link').bind('click', function(){ $$('dropdown').toggle(); });
-  }
+  function groupInputs() {
+    var focus = function () {
+      var $el = $(this);
+      $el.data('previously', $el.val())
+    }
 
-  // Activate the close button on error boxes.
-  function bindAlertClose(className) {
-    var $$ = __scopeTo(className);
-    $$('close').bind('click', function() {
-      $$('container').slideUpAndFadeOut();
-    })
+    var blur = function () {
+      var $el = $(this)
+        , $group = $el.closest('.group');
+      if ($el.val() === $el.data('previously')) return;
+      updateGroup($group);
+    }
+    
+    var keyup = function (event) {
+      var $el = $(this);
+      switch (event.keyCode) {
+       case 13:
+        $el.trigger('blur');
+        break;
+        
+       case 27:
+        $el.val($el.data('previously'));
+        $el.trigger('blur');
+        break;
+      }
+    }
+    
+    $('.group input')
+      .live('focus', focus)
+      .live('blur', blur)
+      .live('keyup', keyup);
   }
   
-  bindSignIn('browserid');
-  bindUserMenu('usermenu');
-  bindAlertClose('alert');
+  groupInputs();
+  draggables();
+  browserId();
 })(jQuery);
-
-
-
-
-$('[draggable=true]').live('dragstart', function (jqEvent) {
-  var event = jqEvent.originalEvent;
-  event.dataTransfer.setData('Text', this.id);
-});
-
-$('.group input').live('focus', function () {
-  var $el = $(this);
-  $el.data('previously', $el.val());
-});
-$('.group input').live('blur', function () {
-  var $el = $(this)
-    , $group = $el.closest('.group')
-  if ($el.val() === $el.data('previously')) return;
-  updateGroup($group);
-});
-
-$('.group input').live('keyup', function (event) {
-  var $el = $(this);
-  switch (event.keyCode) {
-   case 13:
-    $el.trigger('blur');
-    break;
-   
-   case 27:
-    $el.val($el.data('previously'));
-    $el.trigger('blur');
-    break;
-  }
-});
 
 function removeFromGroup($group, id, callback) {
   callback = callback || function(){}
@@ -126,8 +93,8 @@ function updateGroup($group, callback) {
   jQuery.post("/collection", {
     _method: 'put',    
     _csrf: CSRF,
-    badges: $group.data('badges'),
     id: $group.data('id'),
+    badges: $group.data('badges'),
     name: $group.find('input').val()
   }, callback)
 }

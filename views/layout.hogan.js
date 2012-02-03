@@ -40,7 +40,7 @@
 
       <script type="text/javascript" src="https://browserid.org/include.js"></script>
       <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-      <script type="text/javascript" src="/js/ICanHaz.js"></script>
+      <script type="text/javascript" src="/js/ICanHaz.min.js"></script>
       <script type="text/javascript" src="/js/underscore-min.js"></script>
       <script type="text/javascript" src="/js/backbone-min.js"></script>
       <script type="text/javascript" src="/js/backbonepack.js"></script>

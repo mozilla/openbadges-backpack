@@ -9,7 +9,7 @@
     <h1>Badges</h1>
     <div id="badges" class="js-badges">
       {{#badges}}
-      <a href="{{detailsUrl}}" draggable="true" class="badgeLink" id="{{data.body_hash}}" data-hash="{{data.body_hash}}" data-id="{{data.id}}">
+      <a href="{{detailsUrl}}" draggable="true" class="badge" id="{{data.body_hash}}" data-hash="{{data.body_hash}}" data-id="{{data.id}}">
         <img src="{{data.image_path}}" width="64px"/>
       </a>
       {{/badges}}
@@ -34,13 +34,13 @@
   </div>
 
   {{#badges.length}}
-    <div class="span-two-thirds column groups">
+    <div id='groups' class="span-two-thirds column">
       <h1>Groups</h1>
       {{#groups}}
         <div class='group' data-badges="[{{data.badges}}]" data-id="{{data.id}}" id="{{data.url}}">
           <input class='groupName' type='text' value='{{data.name}}' style='display: block'>
           {{#data.badgeObjs}}
-            <a href="{{detailsUrl}}" draggable="true" class="badgeLink" id="{{data.body_hash}}-{{url}}" data-hash="{{data.body_hash}}" data-id="{{data.id}}" data-grouped="{{url}}">
+            <a href="{{detailsUrl}}" draggable="true" class="badge" id="{{data.body_hash}}-{{url}}" data-hash="{{data.body_hash}}" data-id="{{data.id}}" data-grouped="{{url}}">
               <img src="{{data.image_path}}" width="64px"/>
             </a>
           {{/data.badgeObjs}}
@@ -57,7 +57,7 @@
 
 
 {{=|| ||=}} <!-- need to change delimeter so hogan doesn't parse these --->
-<script type='text/html' id='group'>
+<script type='text/html' id='groupTpl'>
   <div class='group'>
     <input class='groupName' type='text' value='{{name}}' {{^isNew}}style='display: block'{{/isNew}}>
     
@@ -71,8 +71,8 @@
   </div>
 </script>
 
-<script type='text/html' class='partial' id='badge'>
-  <a href="{{url}}" draggable="true" class="badgeLink">
+<script type='text/html' class='partial' id='badgeTpl'>
+  <a href="{{url}}" draggable="true" class="badge">
     <img src="{{image}}" width="64px"/>
   </a>
 </script>
