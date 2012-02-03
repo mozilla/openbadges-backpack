@@ -53,15 +53,26 @@
       
     </div>
   {{/badges.length}}
+</div>
 
-  <script type="text/javascript">
-    $('.embed').bind('click', function(event) {
-      var script, self;
-      self = $(this);
-      script = self.siblings('input').first().val();
-      modal.show('Copy and paste this into a web page', "<div><textarea style='width:98%'; height:75px'>" + script + "</textarea></div>");
-      return false;
-    });
+
+{{=|| ||=}} <!-- need to change delimeter so hogan doesn't parse these --->
+<script type='text/html' id='group'>
+  <div class='group'>
+    <input class='groupName' type='text' value='{{name}}' {{^isNew}}style='display: block'{{/isNew}}>
+    
+    {{#isNew}}
+      <h3 class='groupName'>Drag a Badge Here</h3>
+    {{/isNew}}
+    
+    {{#badges}}
+      {{>badgeTemplate}}
+    {{/badges}}
+  </div>
 </script>
 
-</div>
+<script type='text/html' class='partial' id='badge'>
+  <a href="{{url}}" draggable="true" class="badgeLink">
+    <img src="{{image}}" width="64px"/>
+  </a>
+</script>

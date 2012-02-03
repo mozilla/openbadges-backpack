@@ -7,8 +7,6 @@
     <link rel="stylesheet" href="/css/bootstrap-1.2.0.min.css" />
     <link rel="stylesheet" href="/css/style.css" type="text/css" media="all" />
     <title dir="ltr">Open Badge Backpack</title>
-    <script type="text/javascript" src="https://browserid.org/include.js"></script>
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
     <script type="text/javascript" src="/js/modernizr.js"></script>
   </head>
   <body>
@@ -40,8 +38,13 @@
              
       {{{body}}}
 
-        <script type="text/javascript" src="/js/backpack.js"></script>
-        <script type="text/javascript">
+      <script type="text/javascript" src="https://browserid.org/include.js"></script>
+      <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+      <script type="text/javascript" src="/js/ICanHaz.js"></script>
+      <script type="text/javascript" src="/js/underscore-min.js"></script>
+      <script type="text/javascript" src="/js/backbone-min.js"></script>
+      <script type="text/javascript" src="/js/backbonepack.js"></script>
+      <script type="text/javascript">
   window.modal = {
     main: $('.modal'),
     blanker: $('.blanker'),
