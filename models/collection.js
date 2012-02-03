@@ -1,7 +1,8 @@
 var mysql = require('../lib/mysql')
   , crypto = require('crypto')
   , Badge = require('./badge')
-  , Base = require('./mysql-base.js');
+  , Base = require('./mysql-base.js')
+  , _ = require('underscore');
 
 var md5 = function (v) {
   var sum = crypto.createHash('md5');

@@ -1,8 +1,24 @@
 ich.refresh();
 
+!function setup () {
+/** begin setup **/
 
-!!function initialize (){
-/** begin scope **/
+var CSRF = $("input[name='_csrf']").val();
+$.ajaxSetup({
+  beforeSend: function (xhr, settings) {
+    if (settings.crossDomain)
+      return; 
+    if (settings.type == "GET")
+      return;
+    xhr.setRequestHeader('X-CSRF-Token', CSRF)
+  }
+})
+
+}()
+
+
+!!function appInitialize (){
+/** begin app **/
 
 var Group = Backbone.Model.extend({
   defaults: {
@@ -11,10 +27,6 @@ var Group = Backbone.Model.extend({
     "public": false
   }
 });
-
-Group.prototype.on('change:name', function () {
-  this.save();
-})  
 
 Group.fromElement = function (element) {
   var $el = $(element)
@@ -33,7 +45,7 @@ var Groups = Backbone.Collection.extend({
 })
 var AllGroups = new Groups();
 
-var Badge = Backbone.Model.extend();
+var Badge = Backbone.Model.extend({});
 Badge.fromElement = function (element) {
   var $badge = $(element);
   return new Badge({
@@ -89,6 +101,14 @@ var GroupView = Backbone.View.extend({
       return;
     
     this.model.set({ name: newName });
+    
+    console.log('savvvvvving?');
+    this.model.save({
+      error: function () {
+        console.log(':(');
+        console.dir(this);
+      }
+    })
   },
   
   render: function () {
