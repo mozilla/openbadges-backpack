@@ -22,12 +22,11 @@ $.ajaxSetup({
 var dragging = false;
 
 
-
 /** define: models **/ 
-var Badge = Backbone.Model.extend({
+var BadgeModel = Backbone.Model.extend({
   // no defaults
 });
-var Group = Backbone.Model.extend({
+var GroupModel = Backbone.Model.extend({
   defaults: {
     name: "New Group",
     badges: function () { new Groups() },
@@ -39,12 +38,12 @@ var Group = Backbone.Model.extend({
 
 /** define: collections **/
 var Badges = Backbone.Collection.extend({
-  model: Badge,
+  model: BadgeModel,
   belogsTo: null
 })
 var Groups = Backbone.Collection.extend({
   url: '/collection',
-  model: Group
+  model: GroupModel
 })
 
 Badges.prototype.on('add', function (badge) {
@@ -134,7 +133,7 @@ var GroupView = Backbone.View.extend({
   },
   
   addNew: function (event, badge) {
-    var newBadge = new Badge(badge.attributes)
+    var newBadge = new BadgeModel(badge.attributes)
       , newView = new BadgeView({model: newBadge})
       , collection = this.model.get('badges');
     collection.add(newBadge);
@@ -250,9 +249,9 @@ var AllGroups = new Groups();
  * page and attach models to views.
  */
 
-Badge.fromElement = function (element) {
+BadgeModel.fromElement = function (element) {
   var $el = $(element)
-    , model = new Badge({
+    , model = new BadgeModel({
       id: $el.data('id'),
       image: $el.find('img').attr('src')
     })
@@ -264,11 +263,11 @@ Badge.fromElement = function (element) {
  * Create models from bootstrapped page and attach models to views.
  */
 
-Group.fromElement = function (element) {
+GroupModel.fromElement = function (element) {
   var $el = $(element)
     , badgeElements = $el.find('.badge')
-    , groupBadges = new Badges(_.map(badgeElements, Badge.fromElement))
-    , model = new Group({
+    , groupBadges = new Badges(_.map(badgeElements, BadgeModel.fromElement))
+    , model = new GroupModel({
       id: $el.data('id'),
       name: $el.find('input').val(),
       badges: groupBadges
@@ -282,8 +281,8 @@ Group.fromElement = function (element) {
 
 var existingBadges = $('#badges').find('.badge')
   , existingGroups = $('#groups').find('.group');
-_.each(existingBadges, Badge.fromElement);
-_.each(existingGroups, Group.fromElement);
+_.each(existingBadges, BadgeModel.fromElement);
+_.each(existingGroups, GroupModel.fromElement);
 
 !!function browserId() {
   function launchBrowserId(callback) {
