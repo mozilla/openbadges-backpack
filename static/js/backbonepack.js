@@ -1,5 +1,40 @@
 ich.refresh();
 
+$.fn.sync = function (methodList) {
+  var self = this
+    , i = methodList.length
+    , gogogo
+    , methods
+    , callback
+    , fx = ['fadeIn', 'fadeOut', 'fadeTo', 'slideUp', 'slideDown', 'slideToggle', 'animate']
+    , callbackify = function (method, opts) {
+      var self = this;
+      return function (callback) { 
+        callback(null, method.apply(this, opts));
+      }
+    }
+  methodList = [].slice.call(arguments);
+  methods = _.map(methodList, function (opts) {
+    var methodName =  opts.shift()
+      , method = self[methodName];
+
+    if (_.include(fx, methodName)) {
+      var startsWith = _.bind(method, self);
+      return _.foldl(opts, function (fn, arg) { return _.bind(fn, self, arg); }, startsWith);
+    } else {
+      return _.bind(callbackify(self[methodName], opts), self);
+    }
+  });
+  
+  gogogo = methods[methods.length - 1];
+  for (i; methods[i]; i--) {
+    gogogo = _.wrap(gogogo, (methods[i-1] || function(f){f()}));
+  }
+  gogogo();
+}
+
+
+
 !function setup () {
 /** begin setup **/
 
@@ -21,33 +56,61 @@ $.ajaxSetup({
 /** begin app **/
 var dragging = false;
 
+
+
+/** define: models **/ 
+var Badge = Backbone.Model.extend({
+  // no defaults
+});
 var Group = Backbone.Model.extend({
   defaults: {
     name: "New Group",
-    badges: Array(),
+    badges: function () { new Groups() },
     "public": false
   }
 });
 
+
+
+/** define: collections **/
+var Badges = Backbone.Collection.extend({
+  model: Badge,
+  belogsTo: null
+})
 var Groups = Backbone.Collection.extend({
   url: '/collection',
   model: Group
 })
 
-var AllGroups = new Groups();
+Badges.prototype.on('add', function (badge) {
+  this.belongsTo.save(null, {
+    error: function () {
+      console.log(':(');
+      console.dir(this);
+    },
+    success: function (a, b, c) {
+      console.log(':D');
+      console.dir(this);
+    }
+  });
+});
 
-var Badge = Backbone.Model.extend({});
+Badges.prototype.on('remove', function (badge) {
+  this.belongsTo.save({
+    error: function () {
+      console.log(':(');
+      console.dir(this);
+    },
+    success: function () {
+      console.log(':D');
+      console.dir(this);
+    }
+  });
+});
 
-var Badges = Backbone.Collection.extend({
-  url: '/badge',
-  model: Badge,
-  parent: null
-})
-Badges.prototype.on("remove", function (event) {
-  console.log('event y');
-  console.dir(event);
-})
 
+
+/** define: views **/
 var GroupView = Backbone.View.extend({
   parent: $('#groups'),
   
@@ -58,7 +121,8 @@ var GroupView = Backbone.View.extend({
   events: {
     'keyup input': 'checkDone',
     'focus input': 'storeCurrent',
-    'blur input': 'maybeUpdate'
+    'blur input': 'maybeUpdate',
+    'drop': 'badgeDrop'
   },
   
   storeCurrent: function (event) {
@@ -92,12 +156,47 @@ var GroupView = Backbone.View.extend({
     this.model.set({ name: newName });
     
     // #TODO: some real error doing ons.
-    this.model.save({
+    this.model.save(null, {
       error: function () {
         console.log(':(');
         console.dir(this);
+      },
+      success: function () {
+        console.log(':D');
+        console.dir(this);
       }
     })
+  },
+  
+  addNew: function (event, badge) {
+    var newBadge = badge.clone()
+      , newView = new BadgeView({model: newBadge})
+      , collection = this.model.get('badges');
+    collection.add(newBadge);
+    newView.render();
+    newView.addToGroup(this);
+  },
+
+  moveExisting: function (event, badge) {
+    var badgeView = dragging;
+    badge.collection.remove(badge);
+    this.model.get('badges').add(badge);
+    badgeView.addToGroup(this);
+  },
+
+  badgeDrop: function (event) {
+    var view = dragging
+      , badge = view.model
+      , self = this;
+    event.stopPropagation();
+    
+    if (this.model.get('badges').get(badge)) {
+      return;
+    }
+    if (!badge.collection) {
+      return this.addNew(event, badge);
+    }
+    return this.moveExisting(event, badge);
   },
   
   render: function () {
@@ -111,35 +210,51 @@ var GroupView = Backbone.View.extend({
 
 var BadgeView = Backbone.View.extend({
   tagName: "a",
-  
   className: "badge",
-
   events: {
-    'dragstart' : 'start',
-    'dragstop' : 'stop'
+    'dragstart' : 'start'
   },
-
   start : function (event) {
-    console.log('starting to drag');
     dragging = this;
+    console.log('drag starting');
   },
-  
-  stop : function (event) {
+  addToGroup: function (groupView) {
+    var $el = this.$el
+      , $groupEl = groupView.$el
+      , isNew = (0 === $groupEl.find('.badge').length)
+    
+    function doIt () {
+      $el.sync(
+        ['fadeOut', 2000],
+        ['appendTo', $groupEl],
+        ['fadeIn', null]
+      );
+      
+      // $el.fadeOut('fast', function () {
+      //   $el.appendTo(groupView.$el)
+      //   $el.fadeIn('fast')
+      // });
+    }
+    
+    if (isNew) {
+      $groupEl.find('.instructions').fadeOut('linear', doIt);
+    } else {
+      doIt();
+    }
   },
-  
-  destroy: function () {
-    this.$el.css({background: 'red'});
-  },
-  
-  render: function (where) {
+  render: function () {
     this.el = ich.badgeTpl(this.model.attributes);
-    this.$el = $(this.el)
-      .hide()
-      .appendTo(where)
-      .fadeIn();
+    this.$el = $(this.el);
+    this.$el.data('view', this);
   }
 });
 
+
+/**
+ * Create a new collection for all of the groups to live in.
+ */
+
+var AllGroups = new Groups();
 
 /**
  * Create a view for the body so we can drop badges onto it.
@@ -154,14 +269,15 @@ var BadgeView = Backbone.View.extend({
     event.preventDefault();
   },
   maybeRemoveBadge: function (event) {
-    var view = dragging
-      , model = view.model;
+    var badgeView = dragging
+      , badge = badgeView.model;
     
-    if (view.model.collection) {
-      view.remove();
-      model.collection.remove(model);
-    } else {
-      console.log('new badge, sir');
+    if (event.target.className === 'group')
+      return;
+    
+    if (badge.collection) {
+      badgeView.remove();
+      badge.collection.remove(badge);
     }
   }
 }))).setElement($('body'));;
@@ -189,20 +305,18 @@ Badge.fromElement = function (element) {
 Group.fromElement = function (element) {
   var $el = $(element)
     , badgeElements = $el.find('.badge')
-    , groupBadges = new Groups(_.map(badgeElements, Badge.fromElement))
+    , groupBadges = new Badges(_.map(badgeElements, Badge.fromElement))
     , model = new Group({
       id: $el.data('id'),
       name: $el.find('input').val(),
       badges: groupBadges
     });
+  groupBadges.belongsTo = model;
   AllGroups.add(model);
-  
-  groupBadges.on("remove", function (badge) {
-    model.save();
-  })
   
   new GroupView({ model: model }).setElement($el);
 };
+
 
 var existingBadges = $('#badges').find('.badge')
   , existingGroups = $('#groups').find('.group');
