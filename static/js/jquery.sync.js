@@ -3,6 +3,13 @@
  * Perform a number of actions synchronously. Useful for doing animated DOM
  * manipulation.
  *
+ * Example usage:
+ *   $("#widget").sync(
+ *     ['fadeOut', 1000],
+ *     ['appendTo', $('#widgetContainer')]
+ *     ['fadeIn', 'fast']
+ *   );
+ *     
  * @param {Array...} a list of method descriptions:
  *    [methodName, arg1, arg2, ..., argN]
  *    - methodName will be used to find the method on the jQuery object
