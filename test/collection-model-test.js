@@ -1,7 +1,7 @@
 var vows = require('vows'),
     assert = require('assert'),
     mysql = require('../lib/mysql'),
-    genstring = require('./utils').genstring,
+    genstring = require('../lib/utils').genstring,
     Collection = require('../models/collection');
 
 var createDbFixtures = function (callback) {

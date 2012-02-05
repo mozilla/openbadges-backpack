@@ -1,8 +1,8 @@
 var vows = require('vows')
+  , makeAssertion = require('../lib/utils').fixture
+  , genstring = require('../lib/utils').genstring
   , mysql = require('../lib/mysql')
   , assert = require('assert')
-  , makeAssertion = require('./utils').fixture
-  , genstring = require('./utils').genstring
   , crypto = require('crypto')
   , Badge = require('../models/badge')
 
