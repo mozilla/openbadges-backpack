@@ -86,7 +86,9 @@ var GroupView = Backbone.View.extend({
     'keyup input': 'checkDone',
     'focus input': 'storeCurrent',
     'blur input': 'maybeUpdate',
-    'drop': 'badgeDrop'
+    'drop': 'badgeDrop',
+    'mousedown .delete': 'preventDefault',
+    'click .delete': 'destroy'
   },
   
   storeCurrent: function (event) {
@@ -107,6 +109,20 @@ var GroupView = Backbone.View.extend({
       $el.trigger('blur');
       break;
     }
+  },
+  
+  destroy: function (event, a,b,c) {
+    var group = this.model
+      , allGroups = group.collection;
+    allGroups.remove(group);
+    this.$el.addClass('dying');
+    this.$el.animate({opacity: 0});
+    this.$el.slideUp(null, this.remove.bind(this));
+  },
+  
+  preventDefault: function (event, a,b,c) {
+    event.preventDefault();
+    return false;
   },
   
   maybeUpdate: function (event) {
@@ -214,8 +230,10 @@ var BadgeView = Backbone.View.extend({
 /**
  * Create a new collection for all of the groups to live in.
  */
-
 var AllGroups = new GroupCollection();
+AllGroups.on('remove', function (group) {
+  group.destroy();
+});
 
 /**
  * Create a view for the body so we can drop badges onto it.
@@ -274,7 +292,6 @@ GroupModel.fromElement = function (element) {
     });
   groupBadges.belongsTo = model;
   AllGroups.add(model);
-  
   new GroupView({ model: model }).setElement($el);
 };
 
