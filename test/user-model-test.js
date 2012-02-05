@@ -69,21 +69,21 @@ vows.describe('User model').addBatch({
         },
         'and an id is given back': function (err, user) {
           assert.ifError(err);
-          assert.isNumber(user.data.id);
+          assert.isNumber(user.get('id'));
         },
         'and retrieved': {
           topic: function (user) {
-            User.findById(user.data.id, this.callback);
+            User.findById(user.get('id'), this.callback);
           },
           'without getting mangled data': function (err, user) {
-            assert.equal(user.data.email, 'brian@example.com');
+            assert.equal(user.get('email'), 'brian@example.com');
           },
           'with a salt being created': function (err, user) {
-            assert.isString(user.data.salt);
-            assert.ok(user.data.salt.length > 5);
+            assert.isString(user.get('salt'));
+            assert.ok(user.get('salt').length > 5);
           },
           'and the password should have been hashed': function (err, user) {
-            assert.notEqual(user.data.passwd, 'secret');
+            assert.notEqual(user.get('passwd'), 'secret');
           },
           'and the password can be checked accurately': function (err, user) {
             assert.isTrue(user.checkPassword('secret'));
@@ -104,11 +104,11 @@ vows.describe('User model').addBatch({
       },
       'and when retrieved again': {
         topic: function (user) {
-          User.findById(user.data.id, this.callback);
+          User.findById(user.get('id'), this.callback);
         },
         'the login date is something reasonable': function (err, user) {
-          assert.isNumber(user.data.last_login);
-          assert.greater(user.data.last_login, 0);
+          assert.isNumber(user.get('last_login'));
+          assert.greater(user.get('last_login'), 0);
         }
       }
     },
@@ -131,7 +131,7 @@ vows.describe('User model').addBatch({
       },
       'should create a user when given an unfound email': function (err, user) {
         assert.ifError(err);
-        assert.equal(user.data.email, 'bad-dudes@example.com');
+        assert.equal(user.get('email'), 'bad-dudes@example.com');
       }
     }
   }

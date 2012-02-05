@@ -40,7 +40,7 @@ vows.describe('Collection Model').addBatch({
       'can be saved': {
         topic: function (collection) {
           collection.save(function (err,collection) {
-            Collection.findById(collection.data.id, this.callback);
+            Collection.findById(collection.get('id'), this.callback);
           }.bind(this))
         },
         'without errors': function (err, collection) {
@@ -48,16 +48,17 @@ vows.describe('Collection Model').addBatch({
           assert.isObject(collection);
         },
         'without mangling the badges': function (err, collection) {
-          assert.isArray(collection.data.badges);
-          assert.includes(collection.data.badges, 1);
-          assert.includes(collection.data.badges, 2);
+          var badges = collection.get('badges')
+          assert.isArray(badges);
+          assert.includes(badges, 1);
+          assert.includes(badges, 2);
         },
         'then resaved with new name': {
           topic: function (collection) {
-            var oldUrl = collection.data.url
-            collection.data.name = 'radical';
+            var oldUrl = collection.get('url')
+            collection.set('name', 'radical');
             collection.save(function (err, collection) {
-              this.callback(oldUrl, collection.data.url);
+              this.callback(oldUrl, collection.get('url'));
             }.bind(this));
           },
           'without changing the url': function (oldUrl, newUrl) {
@@ -66,19 +67,21 @@ vows.describe('Collection Model').addBatch({
         },
         'and looking up by url': {
           topic: function (collection) {
-            Collection.findOne({url: collection.data.url}, this.callback);
+            Collection.findOne({url: collection.get('url')}, this.callback);
           },
           'should retrieve same collection': function (err, collection) {
             assert.ifError(err);
-            assert.equal(collection.data.name, 'radical');
+            assert.equal(collection.get('name'), 'radical');
           }
         }
       }
     },
+    
     'Should be able to put badges into collection by id' : {
       topic: function () {
         var collection = createCollection()
-        collection.data.badges = [1,2];
+        collection.set('badges', [1,2]);
+        
         collection.save(function (err, collection) {
           collection.getBadgeObjects(this.callback);
         }.bind(this))
@@ -87,10 +90,11 @@ vows.describe('Collection Model').addBatch({
         assert.equal(badges.length, 2);
       }
     },
+    
     'Should be able to put badges into collection by object' : {
       topic: function () {
         var collection = createCollection()
-        collection.data.badges = [{data:{id:1}}, {data:{id:2}}];
+        collection.set('badges', [{attributes:{id:1}}, {attributes:{id:2}}]);
         collection.save(function (err, collection) {
           collection.getBadgeObjects(this.callback);
         }.bind(this))

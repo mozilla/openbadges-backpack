@@ -36,7 +36,7 @@ vows.describe('Awarding Badges').addBatch({
         },
         'and has expected imagePath': function(err, badges) {
           var path = badgeDir.replace(/^.*?static/, '');
-          assert.ok(badges[0].data.image_path.match(path));
+          assert.ok(badges[0].get('image_path').match(path));
         }
       }
     }
