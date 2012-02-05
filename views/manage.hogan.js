@@ -47,7 +47,7 @@
           {{/attributes.badgeObjects}}
         </div>
       {{/groups}}
-      <div class='group new'>
+      <div class='group isNew'>
         <input class='groupName' type='text' value='New Group'>
         <h3 class='instructions'>Drag a Badge Here</h3>
       </div>
@@ -59,11 +59,11 @@
 
 {{=|| ||=}} <!-- need to change delimeter so hogan doesn't parse these --->
 <script type='text/html' id='groupTpl'>
-  <div class='group'>
-    <input class='groupName' type='text' value='{{name}}' {{#attributes.id}}style='display: block'{{/attributes.id}}>
+  <div class='group {{^attributes.id}}isNew{{/attributes.id}}'>
+    <input class='groupName' type='text' value='{{name}}'>
     
     {{^attributes.id}}
-      <h3 class=instructions'>Drag a Badge Here</h3>
+      <h3 class='instructions'>Drag a Badge Here</h3>
     {{/attributes.id}}
     
     {{#badges}}

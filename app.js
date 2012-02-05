@@ -81,6 +81,7 @@ router(app)
   
   .post('/collection',                      'collection.create')
   .put('/collection/:id',                   'collection.update')
+  .delete('/collection/:id',                'collection.destroy')
   
   .get('/share/g/:groupId',                 'share.group')
   .get('/share/b/:badgeId',                 'share.badge')

@@ -34,8 +34,6 @@ var GroupModel = Backbone.Model.extend({
   }
 });
 
-
-
 /** define: collections **/
 var BadgeCollection = Backbone.Collection.extend({
   model: BadgeModel,
@@ -46,7 +44,7 @@ var GroupCollection = Backbone.Collection.extend({
   model: GroupModel
 })
 
-BadgeCollection.prototype.on('add', function (badge) {
+function saveParentGroup (badge) {
   this.belongsTo.save(null, {
     error: function () {
       console.log(':(');
@@ -57,21 +55,10 @@ BadgeCollection.prototype.on('add', function (badge) {
       console.dir(this);
     }
   });
-});
+}
 
-BadgeCollection.prototype.on('remove', function (badge) {
-  this.belongsTo.save({
-    error: function () {
-      console.log(':(');
-      console.dir(this);
-    },
-    success: function () {
-      console.log(':D');
-      console.dir(this);
-    }
-  });
-});
-
+BadgeCollection.prototype.on('add', saveParentGroup)
+BadgeCollection.prototype.on('remove', saveParentGroup)
 
 
 /** define: views **/
@@ -167,10 +154,10 @@ var GroupView = Backbone.View.extend({
   badgeDrop: function (event) {
     var view = dragging
       , badge = view.model
-      , self = this;
+      , collection = this.model.get('badges');
     event.stopPropagation();
     
-    if (this.model.get('badges').get(badge)) {
+    if (collection.get(badge)) {
       return;
     } 
     
@@ -204,6 +191,8 @@ var BadgeView = Backbone.View.extend({
       , $groupEl = groupView.$el
       , isNew = (0 === $groupEl.find('.badge').length)
     
+    $groupEl.removeClass('isNew');
+    
     function doIt () {
       $el.sync(
         ['fadeOut', 'fast'],
@@ -214,6 +203,7 @@ var BadgeView = Backbone.View.extend({
     
     if (isNew) {
       $groupEl.find('.instructions').fadeOut('linear', doIt);
+      (new GroupView({model: new GroupModel({})})).render()
     } else {
       doIt();
     }

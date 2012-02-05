@@ -40,6 +40,10 @@ exports.create = function (req, res) {
       logger.error(err);
       return res.send('internal server error', 500);
     }
+    
+    col.set('badges', badges.map(makeNewBadge))
+    console.dir(col);
+    
     res.contentType('json');
     res.send(JSON.stringify(col.attributes));
   })
@@ -52,7 +56,7 @@ exports.update = function (req, res) {
     , body = req.body
     , saferName = body.name.replace('<', '&lt;').replace('>', '&gt;');
   
-  function makeNewBadge(attribs) { return new Badge(attribs); }
+  function makeNewBadge(attributes) { return new Badge(attributes); }
   collection.set('name', saferName);
   collection.set('badges', body.badges.map(makeNewBadge));
   collection.save(function (err, col) {
@@ -61,4 +65,14 @@ exports.update = function (req, res) {
     res.contentType('json');
     res.send(JSON.stringify(col.attributes));
   })
-}
+};
+
+exports.destroy = function (req, res) {
+  if (!req.user) return res.send('nope', 400);
+  var collection = req.collection
+  collection.destroy(function (err) {
+    if (err) return res.send('nope', 500);
+    res.contentType('json');
+    res.send(JSON.stringify({success: true}));
+  })
+};
