@@ -54,6 +54,8 @@ Base.apply = function (Model, table) {
   Model.prototype.model = Model;
   Model.prototype.client = client;
   Model.prototype.getTableName = function () { return table };
+  Model.prototype.set = function (key, value) { this.data[key] = value; return this; };
+  Model.prototype.get = function (key) { return this.data[key]; };
 };
   
 Base.prototype.validate = function (data) {
