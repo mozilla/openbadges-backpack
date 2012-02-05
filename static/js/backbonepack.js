@@ -1,33 +1,5 @@
 ich.refresh();
 
-$.fn.sync = function (methodList) {
-  var self = this
-    , start
-    , methods
-    , fx = ['fadeIn', 'fadeOut', 'fadeTo', 'slideUp', 'slideDown', 'slideToggle', 'animate']
-    , callbackify = function (method, opts) {
-      var self = this;
-      return function (callback) { 
-        callback(null, method.apply(this, opts));
-      }
-    }
-  methodList = [].slice.call(arguments);
-  methods = _.map(methodList, function (opts) {
-    var methodName =  opts.shift()
-      , method = self[methodName];
-
-    if (_.include(fx, methodName)) {
-      var startsWith = _.bind(method, self);
-      return _.foldl(opts, function (fn, arg) { return _.bind(fn, self, arg); }, startsWith);
-    } else {
-      return _.bind(callbackify(self[methodName], opts), self);
-    }
-  });
-  (_.foldr(methods, _.wrap, methods.pop()))();
-}
-
-
-
 !function setup () {
 /** begin setup **/
 
@@ -162,7 +134,7 @@ var GroupView = Backbone.View.extend({
   },
   
   addNew: function (event, badge) {
-    var newBadge = badge.clone()
+    var newBadge = new Badge(badge.attributes)
       , newView = new BadgeView({model: newBadge})
       , collection = this.model.get('badges');
     collection.add(newBadge);
@@ -185,7 +157,8 @@ var GroupView = Backbone.View.extend({
     
     if (this.model.get('badges').get(badge)) {
       return;
-    }
+    } 
+    
     if (!badge.collection) {
       return this.addNew(event, badge);
     }
@@ -209,8 +182,8 @@ var BadgeView = Backbone.View.extend({
   },
   start : function (event) {
     dragging = this;
-    console.log('drag starting');
   },
+  
   addToGroup: function (groupView) {
     var $el = this.$el
       , $groupEl = groupView.$el
@@ -218,15 +191,10 @@ var BadgeView = Backbone.View.extend({
     
     function doIt () {
       $el.sync(
-        ['fadeOut', 2000],
+        ['fadeOut', 'fast'],
         ['appendTo', $groupEl],
-        ['fadeIn', null]
+        ['fadeIn', 'fast']
       );
-      
-      // $el.fadeOut('fast', function () {
-      //   $el.appendTo(groupView.$el)
-      //   $el.fadeIn('fast')
-      // });
     }
     
     if (isNew) {
@@ -235,6 +203,7 @@ var BadgeView = Backbone.View.extend({
       doIt();
     }
   },
+  
   render: function () {
     this.el = ich.badgeTpl(this.model.attributes);
     this.$el = $(this.el);
