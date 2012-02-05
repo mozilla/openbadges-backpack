@@ -29,7 +29,7 @@ var BadgeModel = Backbone.Model.extend({
 var GroupModel = Backbone.Model.extend({
   defaults: {
     name: "New Group",
-    badges: function () { new Groups() },
+    badges: function () { new GroupCollection() },
     "public": false
   }
 });
@@ -37,16 +37,16 @@ var GroupModel = Backbone.Model.extend({
 
 
 /** define: collections **/
-var Badges = Backbone.Collection.extend({
+var BadgeCollection = Backbone.Collection.extend({
   model: BadgeModel,
   belogsTo: null
 })
-var Groups = Backbone.Collection.extend({
+var GroupCollection = Backbone.Collection.extend({
   url: '/collection',
   model: GroupModel
 })
 
-Badges.prototype.on('add', function (badge) {
+BadgeCollection.prototype.on('add', function (badge) {
   this.belongsTo.save(null, {
     error: function () {
       console.log(':(');
@@ -59,7 +59,7 @@ Badges.prototype.on('add', function (badge) {
   });
 });
 
-Badges.prototype.on('remove', function (badge) {
+BadgeCollection.prototype.on('remove', function (badge) {
   this.belongsTo.save({
     error: function () {
       console.log(':(');
@@ -215,7 +215,7 @@ var BadgeView = Backbone.View.extend({
  * Create a new collection for all of the groups to live in.
  */
 
-var AllGroups = new Groups();
+var AllGroups = new GroupCollection();
 
 /**
  * Create a view for the body so we can drop badges onto it.
@@ -266,7 +266,7 @@ BadgeModel.fromElement = function (element) {
 GroupModel.fromElement = function (element) {
   var $el = $(element)
     , badgeElements = $el.find('.badge')
-    , groupBadges = new Badges(_.map(badgeElements, BadgeModel.fromElement))
+    , groupBadges = new BadgeCollection(_.map(badgeElements, BadgeModel.fromElement))
     , model = new GroupModel({
       id: $el.data('id'),
       name: $el.find('input').val(),
