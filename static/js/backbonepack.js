@@ -2,10 +2,8 @@ ich.refresh();
 
 $.fn.sync = function (methodList) {
   var self = this
-    , i = methodList.length
-    , gogogo
+    , start
     , methods
-    , callback
     , fx = ['fadeIn', 'fadeOut', 'fadeTo', 'slideUp', 'slideDown', 'slideToggle', 'animate']
     , callbackify = function (method, opts) {
       var self = this;
@@ -25,12 +23,7 @@ $.fn.sync = function (methodList) {
       return _.bind(callbackify(self[methodName], opts), self);
     }
   });
-  
-  gogogo = methods[methods.length - 1];
-  for (i; methods[i]; i--) {
-    gogogo = _.wrap(gogogo, (methods[i-1] || function(f){f()}));
-  }
-  gogogo();
+  (_.foldr(methods, _.wrap, methods.pop()))();
 }
 
 
