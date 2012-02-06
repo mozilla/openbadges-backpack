@@ -1,4 +1,5 @@
 var request = require('request')
+  , _ = require('underscore')
   , qs = require('querystring')
   , fs = require('fs')
   , logger = require('../lib/logging').logger
@@ -10,7 +11,7 @@ var request = require('request')
   , awardBadge = require('../lib/award')
   , reverse = require('../lib/router').reverse
   , Badge = require('../models/badge')
-  , Collection = require('../models/collection')
+  , Group = require('../models/group')
 
 exports.param = {};
 
@@ -104,49 +105,66 @@ exports.manage = function(req, res, next) {
   var user = req.user
     , error = req.flash('error')
     , success = req.flash('success')
-    , collections = []
+    , groups = []
     , badgeIndex = {};
   if (!user) return res.redirect(reverse('backpack.login'), 303);
   
   var prepareBadges = function (badges) {
     badges.forEach(function (badge) {
-      badgeIndex[badge.data.id] = badge;
-      badge.detailsUrl = reverse('backpack.details', { badgeId: badge.data.body_hash });
-    })
+      badgeIndex[badge.get('id')] = badge;
+      badge.detailsUrl = reverse('backpack.details', { badgeId: badge.get('body_hash') });
+    });
   };
-  var modifyCollections = function (collections) {
-    collections.forEach(function (collection) {
-      collection.url = collection.data.url;
-      collection.data.badges = (collection.data.badges || []);
-      collection.data.badgeObjs = [];
-      collection.data.badges.forEach(function (badgeId) {
-        var badge = badgeIndex[badgeId];
-        if (badge) collection.data.badgeObjs.push(badge);
-      });
-      collection.data.badges = collection.data.badgeObjs.map(function (b) { return b.data.id });
-    })
+  
+  var getGroups = function () {
+    Group.find({user_id: user.get('id')}, getBadges);
   };
-  var getCollections = function () {
-    Collection.find({user_id: user.data.id}, getBadges);
-  };
-  var getBadges = function (err, data) {
+  
+  var getBadges = function (err, results) {
     if (err) return next(err);
-    collections = data;
-    Badge.find({email: user.data.email}, makeResponse)
+    groups = results;
+    Badge.find({email: user.get('email')}, makeResponse)
   };
+  
+  var modifyGroups = function (groups) {
+    groups.forEach(function (group) {
+      var badgeObjects = []
+        , badgeIds = group.get('badges');
+      
+      function badgeFromIndex (id) { return badgeIndex[id]; }
+      
+      // copy URL from attributes to main namespace.
+      group.url = group.get('url');
+      
+      // fail early if there aren't any badges associated with this group
+      if (!group.get('badges')) return;
+      
+      // strip out all of the ids which aren't in the index of user owned badges
+      badgeIds = _.filter(badgeIds, badgeFromIndex);
+      
+      // get badge objects from the list of remaining good ids
+      badgeObjects = badgeIds.map(badgeFromIndex);
+    
+      
+      group.set('badges', badgeIds);
+      group.set('badgeObjects', badgeObjects);
+    });
+  };
+  
   var makeResponse = function (err, badges) {
     if (err) return next(err);
     prepareBadges(badges);
-    modifyCollections(collections);
+    modifyGroups(groups);
     res.render('manage', {
       error: error,
       success: success,
       badges: badges,
       csrfToken: req.session._csrf,
-      groups: collections
+      groups: groups
     })
   };
-  var startResponse = getCollections;
+  
+  var startResponse = getGroups;
   return startResponse();
 };
 
@@ -158,19 +176,19 @@ exports.manage = function(req, res, next) {
 exports.details = function(req, res) {
   var badge = req.badge
     , user = req.user
-    , email = user ? user.data.email : null
-    , assertion = badge.data.body;
+    , email = user ? user.get('email') : null
+    , assertion = badge.get('body');
   
   res.render('badge-details', {
     title: '',
     user: (assertion.recipient === email) ? email : null,
     
-    id: badge.data.id,
+    id: badge.get('id'),
     recipient: assertion.recipient,
-    image: badge.data.image_path,
+    image: badge.get('image_path'),
     owner: (assertion.recipient === email),
     
-    deleteRoute: reverse('backpack.deleteBadge', { badgeId: badge.data.body_hash }),
+    deleteRoute: reverse('backpack.deleteBadge', { badgeId: badge.get('body_hash') }),
     csrfToken: req.session._csrf,
     
     badge: badge,
@@ -193,11 +211,11 @@ exports.details = function(req, res) {
 exports.deleteBadge = function (req, res) {
   var badge = req.badge
     , user = req.user
-    , assertion = badge.data.body
+    , assertion = badge.get('body')
     , failNow = function () { return res.send("Cannot delete a badge you don't own", 403) }
   if (!user) return failNow()
   
-  if (assertion.recipient !== user.data.email) return failNow()
+  if (assertion.recipient !== user.get('email')) return failNow()
   
   badge.destroy(function (err, badge) {
     if (err) {
@@ -247,7 +265,7 @@ exports.userBadgeUpload = function(req, res) {
       if (err) return redirect(err);
 
       // bail if the badge wasn't issued to the logged in user
-      if (assertion.recipient !== user.data.email) {
+      if (assertion.recipient !== user.get('email')) {
         err = new Error('This badge was not issued to you! Contact your issuer.');
         err.name = 'InvalidRecipient';
         return redirect(err);

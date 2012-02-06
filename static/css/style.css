@@ -88,8 +88,13 @@ a.badge:active {
   background: transparent;
   border: 1px solid transparent;
   text-shadow: #eee 1px 1px;
-  display: none;
+  opacity: 1;
 }
+
+.group.isNew input.groupName {
+  opacity: 0;
+}
+
 .group input.groupName:hover, .group input.groupName.hover {
   -webkit-transition: all 0.4s ease;
   -moz-transition: all 0.4s ease;
@@ -119,12 +124,76 @@ a.badge:active {
   background: url('/images/texturetastic_gray.png');
   overflow: hidden;
   box-shadow: 2px 2px 5px 3px #ddd;
-  
   -webkit-transition: all 0.25s ease;
   -moz-transition: all 0.25s ease;
   -ms-transition: all 0.25s ease;
   -o-transition: all 0.25s ease;
   transition: all 0.25s ease;
+}
+
+.group.dying {
+  -webkit-transition: none;
+  -moz-transition: none;
+  -ms-transition: none;
+  -o-transition: none;
+  transition: none;
+}
+
+.group .icon {
+  position: absolute;
+  font-size: 3em;
+  font-weight: bold;
+  height: 24px;
+  width: 24px;
+  text-shadow: #fff -1px -1px 2px;
+  color: #bbb;
+  padding: 0;
+  margin: 0;
+  opacity: 1;
+  right: 8px;
+}
+ 
+
+.group .delete {
+  -webkit-transition: opacity,color,text-shadow 0.25s ease;
+  -moz-transition: opacity,color,text-shadow 0.25s ease;
+  -ms-transition: opacity,color,text-shadow 0.25s ease;
+  -o-transition: opacity,color,text-shadow 0.25s ease;
+  transition: opacity,color,text-shadow 0.25s ease;
+  top: 6px;
+}
+.group.isNew .icon {
+  opacity: 0;
+}
+
+.group .icon:hover {
+  -webkit-transition: color,text-shadow 0.25s ease;
+  -moz-transition: color,text-shadow 0.25s ease;
+  -ms-transition: color,text-shadow 0.25s ease;
+  -o-transition: color,text-shadow 0.25s ease;
+  transition: color,text-shadow 0.25s ease;
+  cursor: pointer;
+  color: #c00;
+  text-shadow: #aaa 1px 1px 2px;
+}
+
+.group .delete:active {
+  text-shadow: #aaa -1px -1px 2px;
+  top: 8px;
+  right: 6px;
+}
+
+.group .config {
+  bottom: 10px;
+}
+
+.group .config:hover {
+  color: #333;
+}
+.group .config:active {
+  text-shadow: #aaa -1px -1px 2px;
+  bottom: 8px;
+  right: 6px;
 }
 
 .group.hovering {
@@ -137,11 +206,6 @@ a.badge:active {
   box-shadow: 2px 2px 5px 3px #afa;
 }
 .group h3 {
-  -webkit-transition: all 0.25s ease;
-  -moz-transition: all 0.25s ease;
-  -ms-transition: all 0.25s ease;
-  -o-transition: all 0.25s ease;
-  transition: all 0.25s ease;
   font-size: 3em;
   color: #444;
   height: 1.2em;

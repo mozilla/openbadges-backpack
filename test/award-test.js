@@ -4,7 +4,7 @@ var vows = require('vows')
   , award = require('../lib/award')
   , fs = require('fs')
   , path = require('path')
-  , assertion = require('./utils').fixture()
+  , assertion = require('../lib/utils').fixture()
   , Badge = require('../models/badge')
   , configuration = require('../lib/configuration')
   , badgeDir = configuration.get('badge_path')
@@ -36,7 +36,7 @@ vows.describe('Awarding Badges').addBatch({
         },
         'and has expected imagePath': function(err, badges) {
           var path = badgeDir.replace(/^.*?static/, '');
-          assert.ok(badges[0].data.image_path.match(path));
+          assert.ok(badges[0].get('image_path').match(path));
         }
       }
     }

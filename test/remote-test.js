@@ -1,7 +1,7 @@
 var vows = require('vows')
   , assert = require('assert')
   , remote = require('../lib/remote')
-  , genstring = require('./utils').genstring
+  , genstring = require('../lib/utils').genstring
   , configuration = require('../lib/configuration');
 
 var TOO_BIG = remote.MAX_RESPONSE_SIZE + 1;

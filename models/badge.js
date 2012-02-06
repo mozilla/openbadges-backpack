@@ -9,53 +9,53 @@ var sha256 = function (value) {
   return sum.digest('hex');
 };
 
-var Badge = function (data) {
-  this.data = data;
+var Badge = function (attributes) {
+  this.attributes = attributes;
 };
 
 Base.apply(Badge, 'badge');
 
 Badge.prototype.presave = function () {
-  if (!this.data.id) {
-    this.data.body_hash = sha256(this.data.body);
+  if (!this.get('id')) {
+    this.set('body_hash', sha256(this.get('body')));
   }
 };
 
 Badge.prototype.checkHash = function () {
-  return sha256(JSON.stringify(this.data.body)) === this.data.body_hash;
+  return sha256(JSON.stringify(this.get('body'))) === this.get('body_hash');
 };
 
 // Validators called by `save()` (see mysql-base) in preparation for saving.
 // A valid pass returns nothing (or a falsy value); an invalid pass returns a
 // message about why a thing was invalid.
 Badge.validators = {
-  type: function (value, data) {
+  type: function (value, attributes) {
     var valid = ['signed', 'hosted'];
     if (valid.indexOf(value) === -1) {
       return "Unknown type: " + value;
     }
-    if (value === 'hosted' && !data.endpoint) {
+    if (value === 'hosted' && !attributes.endpoint) {
       return "If type is hosted, endpoint must be set";
     }
-    if (value === 'signed' && !data.jwt) {
+    if (value === 'signed' && !attributes.jwt) {
       return "If type is signed, jwt must be set";
     }
-    if (value === 'signed' && !data.public_key) {
+    if (value === 'signed' && !attributes.public_key) {
       return "If type is signed, public_key must be set";
     }
   },
-  endpoint: function (value, data) {
-    if (!value && data.type === 'hosted') {
+  endpoint: function (value, attributes) {
+    if (!value && attributes.type === 'hosted') {
       return "If type is hosted, endpoint must be set";
     }
   },
-  jwt: function (value, data) {
-    if (!value && data.type === 'signed') {
+  jwt: function (value, attributes) {
+    if (!value && attributes.type === 'signed') {
       return "If type is signed, jwt must be set";
     }
   },
-  public_key: function (value, data) {
-    if (!value && data.type === 'signed') {
+  public_key: function (value, attributes) {
+    if (!value && attributes.type === 'signed') {
       return "If type is signed, public_key must be set";
     }
   },

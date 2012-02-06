@@ -1,8 +1,8 @@
 var vows = require('vows')
+  , makeAssertion = require('../lib/utils').fixture
+  , genstring = require('../lib/utils').genstring
   , mysql = require('../lib/mysql')
   , assert = require('assert')
-  , makeAssertion = require('./utils').fixture
-  , genstring = require('./utils').genstring
   , crypto = require('crypto')
   , Badge = require('../models/badge')
 
@@ -47,8 +47,8 @@ var makeBadgeAndSave = function (changes) {
   var badge = makeBadge();
   changes = changes || {};
   Object.keys(changes).forEach(function (k) {
-    if (changes[k] === null) { delete badge.data[k]; }
-    else { badge.data[k] = changes[k]; }
+    if (changes[k] === null) { delete badge.attributes[k]; }
+    else { badge.attributes[k] = changes[k]; }
   })
   return function () { 
     badge.save(this.callback);
@@ -122,7 +122,7 @@ var assertFixtureBadge = function (err, results) {
   assert.ifError(err);
   assert.isArray(results);
   badge = results.pop();
-  assert.equal(badge.data.body_hash, 'sha256$lol');
+  assert.equal(badge.get('body_hash'), 'sha256$lol');
 };
 
 
@@ -213,27 +213,28 @@ vows.describe('Badge model').addBatch({
         topic: makeBadgeAndSave(),
         'saves badge into the database and gives an id': function (err, badge) {
           assert.ifError(err);
-          assert.isNumber(badge.data.id);
+          assert.isNumber(badge.get('id'));
         },
         'can be retrieved': {
           topic: function (badge) {
-            Badge.findById(badge.data.id, this.callback);
+            Badge.findById(badge.get('id'), this.callback);
           },
           'and the body data is unmangled': function (err, badge) {
-            assert.isObject(badge.data.body);
-            assert.isObject(badge.data.body.badge);
-            assert.isObject(badge.data.body.badge.issuer);
+            var body = badge.get('body')
+            assert.isObject(body);
+            assert.isObject(body.badge);
+            assert.isObject(body.badge.issuer);
           },
           'and the hash is set and correct': function (err, badge) {
             // sha256 hashes are 64 bytes
-            assert.equal(badge.data.body_hash.length, 64);
+            assert.equal(badge.get('body_hash').length, 64);
             assert.isTrue(badge.checkHash());
-            badge.data.body_hash = 'wut';
+            badge.set('body_hash', 'wut');
             assert.isFalse(badge.checkHash());
           },
           'and then destroyed': {
             topic: function (badge) {
-              badge._oldId = badge.data.id; 
+              badge._oldId = badge.get('id'); 
               badge.destroy(function (err, badge) {
                 if (err) return this.callback(err);
                 this.callback(null, badge);
@@ -241,7 +242,7 @@ vows.describe('Badge model').addBatch({
             },
             'which removes the id': function (err, badge) {
               assert.ifError(err);
-              assert.isUndefined(badge.data.id);
+              assert.isUndefined(badge.get('id'));
             },
             'and after being destroyed': {
               topic: function (badge) {
