@@ -1,5 +1,4 @@
-!function setup () {
-/** begin setup **/
+!!function setup () {
 
 var CSRF = $("input[name='_csrf']").val();
 $.ajaxSetup({
@@ -12,19 +11,38 @@ $.ajaxSetup({
   }
 })
 
-}()
+}(/*end setup*/)
 
 
 !!function appInitialize (){
-/** begin app **/
-var dragging = false;
 
+var global = {
+  dragging: false
+}
 
-/** define: models **/ 
-var BadgeModel = Backbone.Model.extend({
-  // no defaults
-});
-var GroupModel = Backbone.Model.extend({
+var Badge = {}
+  , Group = {}
+  , Message = {}
+
+// Helper functions
+// ----------------------
+/**
+ * Handle Backbone.sync errors.
+ * 
+ * @param {Model} model the model attempting to be saved
+ * @param {XHRObject} xhr the xhr request object.
+ */
+var errHandler = function (model, xhr) {
+  new Message.View().render({
+    type: 'error',
+    message:'There was a problem syncing your changes. Please refresh the page before making any new changes.'
+  });
+}
+
+// Model Definitions
+// ----------------------
+Badge.Model = Backbone.Model.extend();
+Group.Model = Backbone.Model.extend({
   urlRoot: '/group',
   defaults: {
     name: "New Group",
@@ -32,33 +50,35 @@ var GroupModel = Backbone.Model.extend({
   }
 });
 
-/** define: collections **/
-var BadgeCollection = Backbone.Collection.extend({
-  model: BadgeModel,
-  belogsTo: null
+// Collection definitions
+// ----------------------
+Badge.Collection = Backbone.Collection.extend({
+  model: Badge.Model,
+  belongsTo: null
 })
-var GroupCollection = Backbone.Collection.extend({
-  model: GroupModel
+Group.Collection = Backbone.Collection.extend({
+  model: Group.Model
 })
 
-function saveParentGroup (badge) {
-  this.belongsTo.save(null, {
-    error: function (group, xhr) {
-      new MessageView().render({
-        type: 'error',
-        message:'There was a problem syncing your changes. Please refresh the page before making any new changes.'
-      });
-    },
-    success: function (group, response) { }
-  });
+/**
+ * Save the group that this badge collection belongs to.
+ * If there's an error, create a new message telling the user to refresh
+ * the page before doing anything else.
+ *
+ * @see errHandler
+ */
+Badge.Collection.saveParentGroup = function () {
+  this.belongsTo.save(null, { error: errHandler });
 }
 
-BadgeCollection.prototype.on('add', saveParentGroup)
+Badge.Collection.prototype.on('add', Badge.Collection.saveParentGroup)
 
-BadgeCollection.prototype.on('remove', saveParentGroup)
+Badge.Collection.prototype.on('remove', Badge.Collection.saveParentGroup)
 
-/** define: views **/
-var MessageView = Backbone.View.extend({
+
+// View Definitions
+// ----------------------
+Message.View = Backbone.View.extend({
   parent: $('#message-container'),
   tagName: 'div',
   className: 'message',
@@ -74,35 +94,57 @@ var MessageView = Backbone.View.extend({
       .animate({opacity: 1}, {queue: false, duration: 'slow'})
       .slideDown('slow');
     this.setElement($element);
+    return this;
   }
 })
 
-var GroupView = Backbone.View.extend({
+Group.View = Backbone.View.extend({
   parent: $('#groups'),
   tagName: "div",
   className: "group",
   events: {
     'keyup input': 'checkDone',
     'focus input': 'storeCurrent',
-    'blur input': 'maybeUpdate',
+    'blur input': 'saveName',
     'drop': 'badgeDrop',
     'mousedown .delete': 'preventDefault',
     'click .delete': 'destroy'
   },
   
+  preventDefault: function (event) {
+    event.preventDefault();
+    return false;
+  },
+  
+  
+  /**
+   * Store the name of the group at the beginning of the editing session so
+   * we can either revert it if the user cancels or skip hitting the server if
+   * the user tries to save the same name.
+   *
+   * @param {Event} event
+   */
   storeCurrent: function (event) {
     var $el = $(event.currentTarget);
     $el.data('previously', $el.val());
   },
   
+  
+  /**
+   * Monitor keypresses to see if the user is done editing.
+   *
+   * @param {Event} event
+   */
   checkDone: function (event) {
     var $el = $(event.currentTarget);
     
     switch (event.keyCode) {
+      // enter key, user wants to save
      case 13:
       $el.trigger('blur');
       break;
       
+      // escape key, user wants to revert changes
      case 27:
       $el.val($el.data('previously'));
       $el.trigger('blur');
@@ -110,7 +152,13 @@ var GroupView = Backbone.View.extend({
     }
   },
   
-  destroy: function (event, a,b,c) {
+  
+  /**
+   * Destroy this view (with style).
+   *
+   * @param {Event} event
+   */
+  destroy: function (event) {
     var group = this.model
       , allGroups = group.collection;
     allGroups.remove(group);
@@ -119,69 +167,72 @@ var GroupView = Backbone.View.extend({
     this.$el.slideUp(null, this.remove.bind(this));
   },
   
-  preventDefault: function (event, a,b,c) {
-    event.preventDefault();
-    return false;
-  },
   
-  maybeUpdate: function (event) {
+  /**
+   * Save the new name of the group model associated with this view.
+   * Doesn't hit the server if the name didn't actually change.
+   *
+   * @param {Event} event
+   */
+  saveName: function (event) {
     var $el = $(event.currentTarget)
       , newName = $el.val()
       , oldName = $el.data('previously')
     
-    if (newName === oldName)
-      return;
+    // Bail early if the name didn't change.
+    if (newName === oldName) return;
     
     this.model.set({ name: newName });
-    
-    // #TODO: some real error doing ons.
-    this.model.save(null, {
-      error: function () {
-        console.log(':(');
-        console.dir(this);
-      },
-      success: function () {
-        console.log(':D');
-        console.dir(this);
-      }
-    })
+    this.model.save(null, { error: errHandler });
   },
+  
   
   /**
    * Copies a badge from the master list to this group.
    * 
    * @param {Event} event
    * @param {Model} badge model to be copied.
+   *
+   * @see Badge.View#addToGroup
    */
   addNew: function (event, badge) {
-    var newBadge = new BadgeModel(badge.attributes)
-      , newView = new BadgeView({model: newBadge})
+    var newBadge = new Badge.Model(badge.attributes)
+      , newView = new Badge.View({model: newBadge})
       , collection = this.model.get('badges');
     collection.add(newBadge);
     newView.render();
     newView.addToGroup(this);
   },
 
+  
   /**
    * Move badge from existing group to this group.
    * 
    * @param {Event} event
    * @param {Model} badge model to be moved.
+   * 
+   * @see Badge.View#addToGroup
    */
   moveExisting: function (event, badge) {
-    var badgeView = dragging;
+    var badgeView = global.dragging;
     badge.collection.remove(badge);
     this.model.get('badges').add(badge);
     badgeView.addToGroup(this);
   },
 
+  
   /**
    * Figure out what to do with the badge that has been dropped here.
    * If the badge is from an existing group, move it. If it's from
    * the master badge list, copy it.
+   *
+   * @param {Event} event
+   *
+   * @see Group.View#addToGroup
+   * @see Group.View#moveExisting
    */
   badgeDrop: function (event) {
-    var view = dragging
+    var view = global.dragging
       , badge = view.model
       , collection = this.model.get('badges');
     event.stopPropagation();
@@ -195,6 +246,7 @@ var GroupView = Backbone.View.extend({
     }
     return this.moveExisting(event, badge);
   },
+  
   
   /**
    * Render this sucker. Uses ICanHaz.js to find a template with the
@@ -211,7 +263,8 @@ var GroupView = Backbone.View.extend({
   }
 });
 
-var BadgeView = Backbone.View.extend({
+
+Badge.View = Backbone.View.extend({
   tagName: "a",
   className: "badge",
   events: {
@@ -221,10 +274,11 @@ var BadgeView = Backbone.View.extend({
   /**
    * Store this view in a semi-global variable (closed-over) variable
    * so we can look it up later on drops.
+   *
+   * @param {Event} event
    */
   start : function (event) {
-    console.log('starting to drag');
-    dragging = this;
+    global.dragging = this;
   },
   
   
@@ -250,9 +304,9 @@ var BadgeView = Backbone.View.extend({
     
     if (isNew) {
       // first create a new group to use as a drop target
-      var newBadgeCollection = new BadgeCollection([])
-        , newGroupModel = new GroupModel({badges: newBadgeCollection})
-        , newGroupView = new GroupView({model: newGroupModel});
+      var newBadgeCollection = new Badge.Collection([])
+        , newGroupModel = new Group.Model({badges: newBadgeCollection})
+        , newGroupView = new Group.View({model: newGroupModel});
       newBadgeCollection.belongsTo = newGroupModel;
       newGroupView.render();
       
@@ -279,7 +333,7 @@ var BadgeView = Backbone.View.extend({
 /**
  * Create a new collection for all of the groups to live in.
  */
-var AllGroups = new GroupCollection();
+var AllGroups = new Group.Collection();
 AllGroups.on('remove', function (group) {
   group.destroy();
 });
@@ -297,7 +351,7 @@ AllGroups.on('remove', function (group) {
     event.preventDefault();
   },
   maybeRemoveBadge: function (event) {
-    var badgeView = dragging
+    var badgeView = global.dragging
       , badge = badgeView.model;
     
     if (event.target.className === 'group')
@@ -312,55 +366,45 @@ AllGroups.on('remove', function (group) {
 
 
 /**
- * Create badge models *only for the non-grouped badges*, from bootstrapped
- * page and attach models to views.
- */
-
-BadgeModel.fromElement = function (element) {
-  var $el = $(element)
-    , model = new BadgeModel({
-      id: $el.data('id'),
-      image: $el.find('img').attr('src')
-    })
-  new BadgeView({ model: model }).setElement($el);
-  return model;
-};
-
-/**
  * Create models from bootstrapped page and attach models to views.
+ *
+ * @param {HTMLElement} element
  */
-
-GroupModel.fromElement = function (element) {
+Group.fromElement = function (element) {
   var $el = $(element)
     , badgeElements = $el.find('.badge')
-    , groupBadges = new BadgeCollection(_.map(badgeElements, BadgeModel.fromElement))
-    , model = new GroupModel({
+    , groupBadges = new Badge.Collection(_.map(badgeElements, Badge.fromElement))
+    , model = new Group.Model({
       id: $el.data('id'),
       name: $el.find('input').val(),
       badges: groupBadges
     });
   groupBadges.belongsTo = model;
   AllGroups.add(model);
-  new GroupView({ model: model }).setElement($el);
+  new Group.View({ model: model }).setElement($el);
 };
 
+/**
+ * Create badge models *only for the non-grouped badges*, from bootstrapped
+ * page and attach models to views.
+ *
+ * @param {HTMLElement} element
+ */
+Badge.fromElement = function (element) {
+  var $el = $(element)
+    , model = new Badge.Model({
+      id: $el.data('id'),
+      image: $el.find('img').attr('src')
+    })
+  new Badge.View({ model: model }).setElement($el);
+  return model;
+};
 
+// creating models from html on the page
 var existingBadges = $('#badges').find('.badge')
   , existingGroups = $('#groups').find('.group');
-_.each(existingBadges, BadgeModel.fromElement);
-_.each(existingGroups, GroupModel.fromElement);
+_.each(existingBadges, Badge.fromElement);
+_.each(existingGroups, Group.fromElement);
 
-!!function browserId() {
-  function launchBrowserId(callback) {
-    return function() { navigator.id.getVerifiedEmail(callback); }
-  }
-  function handleResponse(assertion) {
-    if (!assertion) return false;
-    $('.js-browserid-input').val(assertion);
-    $('.js-browserid-form').trigger('submit');
-  }
-  $('.js-browserid-link').bind('click', launchBrowserId(handleResponse));
-}();
-
-/*end scope*/
+//end app scope
 }()

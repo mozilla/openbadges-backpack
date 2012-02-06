@@ -9,3 +9,21 @@
 <div style="padding-top: 10px">
   <a class="js-browserid-link" href="#"><img src="https://browserid.org/i/sign_in_green.png"/></a>
 </div>
+
+<script type="text/javascript">
+!!function loginHandler () {
+//begin login handler
+  
+  function launchBrowserId(callback) {
+    return function() { navigator.id.getVerifiedEmail(callback); }
+  }
+  function handleResponse(assertion) {
+    if (!assertion) return false;
+    $('.js-browserid-input').val(assertion);
+    $('.js-browserid-form').trigger('submit');
+  }
+  $('.js-browserid-link').bind('click', launchBrowserId(handleResponse));
+
+//begin login handler scope
+}();
+</script>

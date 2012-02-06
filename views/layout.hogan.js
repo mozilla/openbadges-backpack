@@ -7,7 +7,10 @@
     <link rel="stylesheet" href="/css/bootstrap-1.2.0.min.css" />
     <link rel="stylesheet" href="/css/style.css" type="text/css" media="all" />
     <title dir="ltr">Open Badge Backpack</title>
+    
     <script type="text/javascript" src="/js/modernizr.js"></script>
+    <script type="text/javascript" src="https://browserid.org/include.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
   </head>
   <body>
     <div class="topbar">
@@ -51,8 +54,6 @@
     
       
       <!-- third party -->
-      <script type="text/javascript" src="https://browserid.org/include.js"></script>
-      <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
       <script type="text/javascript" src="/js/ICanHaz.js"></script>
       <script type="text/javascript" src="/js/underscore.js"></script>
       <script type="text/javascript" src="/js/backbone.js"></script>
