@@ -4,30 +4,30 @@ var crypto = require('crypto'),
     mysql = require('../lib/mysql'),
     Base = require('./mysql-base');
 
-var User = function (data) {
+var User = function (attributes) {
   var ALGO = 'bcrypt';
-  this.data = data;
+  this.attributes = attributes;
   
-  if (!data.id && data.passwd) {
-    data.salt = User.makeSalt();
-    data.passwd = User.pw[ALGO].hash(data.passwd, data.salt)
+  if (!attributes.id && attributes.passwd) {
+    attributes.salt = User.makeSalt();
+    attributes.passwd = User.pw[ALGO].hash(attributes.passwd, attributes.salt)
   }
   
   this.changePassword = function (newPassword) {
-    var salt = this.data.salt = User.makeSalt();
-    this.data.passwd = User.pw[ALGO].hash(newPassword, salt);
+    var salt = this.attributes.salt = User.makeSalt();
+    this.set('passwd', User.pw[ALGO].hash(newPassword, salt));
   };
   
   this.checkPassword = function (given) {
-    if (!this.data.passwd) { return false; }
-    var parts = this.data.passwd.split('$')
+    if (!this.attributes.passwd) { return false; }
+    var parts = this.get('passwd').split('$')
       , algo = parts.shift()
       , hash = parts.join('$');
-    return User.pw[algo].check(given, this.data.salt, hash);
+    return User.pw[algo].check(given, this.get('salt'), hash);
   };
   
   this.setLoginDate = function () {
-    this.data.last_login = Math.floor(Date.now()/1000);
+    this.set('last_login', Math.floor(Date.now()/1000));
   };
 }
 Base.apply(User, 'user');

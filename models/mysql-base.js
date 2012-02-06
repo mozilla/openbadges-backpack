@@ -3,17 +3,19 @@ var client = require('../lib/mysql').client;
 var Base = function() { };
 
 Base.apply = function (Model, table) {
-  Model.fromDbResult = function (data) {
-    if (data === undefined) {
+  Model.fromDbResult = function (attributes) {
+    if (attributes === undefined) {
       return null;
     }
-    Object.keys(data).forEach(function (key) {
+    
+    Object.keys(attributes).forEach(function (key) {
       var prep = (Model.prepare || {})['out'] || {}
       if (key in prep) {
-        data[key] = Model.prepare.out[key](data[key]);
+        attributes[key] = Model.prepare.out[key](attributes[key]);
       }
     });
-    return new Model(data);
+    
+    return new Model(attributes);
   };
   
   Model.findAll = function(callback) {
@@ -54,17 +56,17 @@ Base.apply = function (Model, table) {
   Model.prototype.model = Model;
   Model.prototype.client = client;
   Model.prototype.getTableName = function () { return table };
-  Model.prototype.set = function (key, value) { this.data[key] = value; return this; };
-  Model.prototype.get = function (key) { return this.data[key]; };
+  Model.prototype.set = function (key, value) { this.attributes[key] = value; return this; };
+  Model.prototype.get = function (key) { return this.attributes[key]; };
 };
   
-Base.prototype.validate = function (data) {
-  var err = new Error('Invalid data')
+Base.prototype.validate = function (attributes) {
+  var err = new Error('Invalid attribute data')
     , validators = this.model.validators || {};
-  data = (data || this.data);
+  attributes = (attributes || this.attributes);
   err.fields = {};
   Object.keys(validators).forEach(function (field) {
-    var msg = validators[field](data[field], data);
+    var msg = validators[field](attributes[field], attributes);
     if (msg) { err.fields[field] = msg; } 
   })
   if (Object.keys(err.fields).length > 0) {
@@ -73,19 +75,19 @@ Base.prototype.validate = function (data) {
 };
 
 Base.prototype.save = function (callback) {
-  var data = this.data
+  var attributes = this.attributes
     , table = this.getTableName()
-    , err = this.validate(data)
+    , err = this.validate(attributes)
     , model = this.model
     , prepMethods = (model.prepare || {})['in'] || {};
   
   callback = callback || function(){};
   if (err) { return callback(err, null); }
   
-  Object.keys(data).forEach(function (key) {
+  Object.keys(attributes).forEach(function (key) {
     var prep = prepMethods[key]
     if ( prep ) {
-      data[key] = prep(data[key], data);
+      attributes[key] = prep(attributes[key], attributes);
     }
   });
   
@@ -95,21 +97,21 @@ Base.prototype.save = function (callback) {
   
   var parseResult = function (err, result) {
     if (err) { return callback(err, null); }
-    if (!data.id && result.insertId) { data.id = result.insertId ; }
+    if (!attributes.id && result.insertId) { attributes.id = result.insertId ; }
     return callback(null, this);
   };
   
-  client._upsert(table, data, parseResult.bind(this))
+  client._upsert(table, attributes, parseResult.bind(this))
 };
 
 Base.prototype.destroy = function (callback) {
   var self = this
-    , data = this.data
+    , attributes = this.attributes
     , table = this.getTableName()
     , querySQL = 'DELETE FROM `'+table+'` WHERE `id` = ? LIMIT 1;'
-  client.query(querySQL, [data.id], function (err, resp) {
+  client.query(querySQL, [attributes.id], function (err, resp) {
     if (err) { return callback(err); }
-    delete data.id;
+    delete attributes.id;
     return callback(null, self);
   });
 };

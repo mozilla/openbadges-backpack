@@ -137,8 +137,6 @@ function getRandomInt(min, max) {
  * @api private
  */
 function defaultValue(req) {
-  console.dir(req.body);
-  
   return (req.body && req.body._csrf)
     || (req.query && req.query._csrf)
     || (req.headers['x-csrf-token']);

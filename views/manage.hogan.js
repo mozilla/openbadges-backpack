@@ -9,8 +9,8 @@
     <h1>Badges</h1>
     <div id="badges" class="js-badges">
       {{#badges}}
-      <a href="{{detailsUrl}}" draggable="true" class="badge" id="{{data.body_hash}}" data-hash="{{data.body_hash}}" data-id="{{data.id}}">
-        <img src="{{data.image_path}}" width="64px"/>
+      <a href="{{detailsUrl}}" draggable="true" class="badge" id="{{attributes.body_hash}}" data-hash="{{attributes.body_hash}}" data-id="{{attributes.id}}">
+        <img src="{{attributes.image_path}}" width="64px"/>
       </a>
       {{/badges}}
     </div>
@@ -37,17 +37,24 @@
     <div id='groups' class="span-two-thirds column">
       <h1>Groups</h1>
       {{#groups}}
-        <div class='group' data-badges="[{{data.badges}}]" data-id="{{data.id}}" id="{{data.url}}">
-          <input class='groupName' type='text' value='{{data.name}}' style='display: block'>
-          {{#data.badgeObjs}}
-            <a href="{{detailsUrl}}" draggable="true" class="badge" id="{{data.body_hash}}-{{url}}" data-hash="{{data.body_hash}}" data-id="{{data.id}}" data-grouped="{{url}}">
-              <img src="{{data.image_path}}" width="64px"/>
+        <div class='group' data-badges="[{{attributes.badges}}]" data-id="{{attributes.id}}" id="{{attributes.url}}">
+          <input class='groupName' type='text' value='{{attributes.name}}' style='display: block'>
+        <span class='icon delete'>&times;</span>
+        <span class='icon config'>&#x2699;</span>
+          
+          {{#attributes.badgeObjects}}
+            <a href="{{detailsUrl}}" draggable="true" class="badge" id="{{attributes.body_hash}}-{{url}}" data-hash="{{attributes.body_hash}}" data-id="{{attributes.id}}" data-grouped="{{url}}">
+              <img src="{{attributes.image_path}}" width="64px"/>
             </a>
-          {{/data.badgeObjs}}
+          {{/attributes.badgeObjects}}
         </div>
       {{/groups}}
-      <div class='group new'>
+      
+      <div class='group isNew'>
         <input class='groupName' type='text' value='New Group'>
+        <span class='icon delete'>&times;</span>
+        <span class='icon config'>&#x2699;</span>
+        
         <h3 class='instructions'>Drag a Badge Here</h3>
       </div>
       
@@ -58,16 +65,18 @@
 
 {{=|| ||=}} <!-- need to change delimeter so hogan doesn't parse these --->
 <script type='text/html' id='groupTpl'>
-  <div class='group'>
-    <input class='groupName' type='text' value='{{name}}' {{#attributes.id}}style='display: block'{{/attributes.id}}>
+  <div class='group {{^attributes.id}}isNew{{/attributes.id}}'>
+    <input class='groupName' type='text' value='{{name}}'>
+        <span class='icon delete'>&times;</span>
+        <span class='icon config'>&#x2699;</span>
     
     {{^attributes.id}}
-      <h3 class=instructions'>Drag a Badge Here</h3>
+      <h3 class='instructions'>Drag a Badge Here</h3>
     {{/attributes.id}}
     
-    {{#badges}}
+    {{#badges.length}}
       {{>badgeTemplate}}
-    {{/badges}}
+    {{/badges.length}}
   </div>
 </script>
 

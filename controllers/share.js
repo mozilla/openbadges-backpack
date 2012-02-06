@@ -1,6 +1,6 @@
 var User = require('../models/user')
   , Badge = require('../models/badge')
-  , Collection = require('../models/collection')
+  , Group = require('../models/group')
   , reverse = require('../lib/router').reverse
   , configuration = require('../lib/configuration')
   , url = require('url')
@@ -11,10 +11,10 @@ exports.param['groupId'] = function(req, res, next, id) {
     req.query.js = true;
     id = id.replace(/.js$/, '');
   }
-  Collection.findOne({url: id}, function (err, collection) {
+  Group.findOne({url: id}, function (err, group) {
     // #TODO: better job of logging what happened on errors
-    if (err || !collection) { return res.send('Could not find group', 404); }
-    collection.getBadgeObjects(function (err, badges) {
+    if (err || !group) { return res.send('Could not find group', 404); }
+    group.getBadgeObjects(function (err, badges) {
       if (err) { return res.send('Could not get badges', 500); }
       req.badges = badges;
       req.groupId = id;
