@@ -1,9 +1,9 @@
-var vows = require('./setup')
+var vows = require('vows')
   , assert = require('assert')
   , baker = require('../lib/baker')
   , path = require('path')
 
-var PNGFILE = path.join(__dirname, 'no-badge-data.png');
+var PNGFILE = path.join(__dirname, '/utils/images/no-badge-data.png')
 vows.describe('bake some badges').addBatch({
   'A clean PNG': {
     'should fail if not given data': function(){
@@ -11,7 +11,7 @@ vows.describe('bake some badges').addBatch({
     },
     'can be a prepared with badge data': function(){
       var badge = baker.prepare(PNGFILE, 'https://location-of-badge');
-      var data = baker.read(badge);
+      var data = baker.getDataFromImage(badge);
       assert.equal(data, 'https://location-of-badge');
     },
   },
@@ -19,7 +19,7 @@ vows.describe('bake some badges').addBatch({
     topic: function(){
       return baker.prepare(PNGFILE, 'https://location-of-badge');
     },
-    'should fail if another is given': function(buf){
+    'should fail if it tries to get baked again': function(buf){
       assert.throws(function(){ baker.prepare(buf, 'new-stuff') }, Error);
     }
   }

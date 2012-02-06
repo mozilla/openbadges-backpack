@@ -1,67 +1,64 @@
-// #TODO: un-insane this. This is relational data and should be stored in a
-// relational database (sqlite, postgre or mysql), not in mongo (or any other
-// nosql database).
-//
-// This needs to be fixed before doing display API or facebook integration.
-var mongoose = require('mongoose')
-  , conf = require('../lib/configuration').get('database')
-  , Badge = require('./badge')
-var Schema = mongoose.Schema
-  , ObjectId = Schema.ObjectId
+var crypto = require('crypto'),
+    bcrypt = require('bcrypt'),
+    regex = require('../lib/regex'),
+    mysql = require('../lib/mysql'),
+    Base = require('./mysql-base');
 
-mongoose.connect(conf.host, conf.name, conf.port);
-
-var Group = new Schema(
-  { name: { type: String }
-  , badges: [ObjectId]
-  }
-)
-var User = new Schema(
-  { email: { type: String }
-  , groups: [Group]
-  }
-)
-var UserModel = module.exports = mongoose.model('User', User);
-UserModel.prototype.populateGroups = function(callback) {
-  if (!this.groups.length) return callback();
-  var times = {}
-  times.amount = this.groups.length;
-  times.hit = function() {
-    times.amount -= 1;
-    if (!times.amount) callback()
+var User = function (attributes) {
+  var ALGO = 'bcrypt';
+  this.attributes = attributes;
+  
+  if (!attributes.id && attributes.passwd) {
+    attributes.salt = User.makeSalt();
+    attributes.passwd = User.pw[ALGO].hash(attributes.passwd, attributes.salt)
   }
   
-  this.groups.forEach(function(g) {
-    Badge.find({'_id': {'$in': g.badges}}, function(err, docs) {
-      if (err) return callback(err)
-      g.realBadges = docs;
-      return times.hit();
-    })
+  this.changePassword = function (newPassword) {
+    var salt = this.attributes.salt = User.makeSalt();
+    this.set('passwd', User.pw[ALGO].hash(newPassword, salt));
+  };
+  
+  this.checkPassword = function (given) {
+    if (!this.attributes.passwd) { return false; }
+    var parts = this.get('passwd').split('$')
+      , algo = parts.shift()
+      , hash = parts.join('$');
+    return User.pw[algo].check(given, this.get('salt'), hash);
+  };
+  
+  this.setLoginDate = function () {
+    this.set('last_login', Math.floor(Date.now()/1000));
+  };
+}
+Base.apply(User, 'user');
+
+User.makeSalt = function () { return crypto.randomBytes(16) + ''; } 
+
+User.findOrCreate = function (email, callback) {
+  var newUser = new User({email: email});
+  User.findOne({email: email}, function (err, user) {
+    if (err) { return callback(err); }
+    if (user) { return callback(null, user); }
+    else { return newUser.save(callback); }
   })
 }
-UserModel.prototype.groupExists = function(name) {
-  return this.groups.some(function(g){ return g.name.toLowerCase() === name.toLowerCase() })
-}
-UserModel.prototype.updateBadgeGroups = function(badge, keep, newGroup, callback) {
-  var updated = [];
-  this.groups.forEach(function(g){
-    if (!(g.id in keep)) {
-      g.badges = g.badges.filter(function(b){ return b.toString() !== badge.id; });
-      if (g.badges.length) updated.push(g);
-    } else {
-      if (g.badges.indexOf(badge.id) === -1) g.badges.push(badge.id);
-      updated.push(g);
-    }
-  })
-  if (newGroup) {
-    var exists = this.groups.map(function(g){ return g.name.toLowerCase(); }).indexOf(newGroup.toLowerCase()) !== -1
-    if (!exists) {
-      this.groups.push({
-        name: newGroup,
-        badges: [ badge.id ]
-      })
-      updated.push(this.groups.pop());
-    }
+
+User.pw = {bcrypt: {
+  hash: function (pw, salt) {
+    var rounds = 10;
+    var saltedpw = pw + salt;
+    return 'bcrypt$' + bcrypt.hashSync(saltedpw, bcrypt.genSaltSync(rounds));
+  },
+  check: function (pw, salt, hash) {
+    var saltedpw = pw + salt;
+    return bcrypt.compareSync(saltedpw, hash);
   }
-  UserModel.update({_id: this.id}, {'$set': {'groups': updated}}, callback)
+}};
+
+User.validators = {
+  email: function (value) {
+    if (!regex.email.test(value)) { return "invalid value for required field `email`"; }
+  }
 }
+
+module.exports = User;

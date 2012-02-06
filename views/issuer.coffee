@@ -1,5 +1,5 @@
-form action: @reverse('test.award'), method: 'post', ->
-  input type: 'hidden', name: 'csrf', value: @csrf
+form action: @reverse('demo.award'), method: 'post', ->
+  input type: 'hidden', name: '_csrf', value: @csrfToken
   fieldset ->
     div '.clearfix', ->
       label for: 'recp', -> 'Recipient'

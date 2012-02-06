@@ -1,0 +1,17 @@
+#!/bin/bash
+
+ACTION=$1
+cd extras/vagrant 
+case "$ACTION" in
+    start)
+        vagrant up && vagrant ssh
+        ;;
+    stop)
+        vagrant halt
+        ;;
+    destroy)
+        vagrant destroy
+        ;;
+    *)
+        echo "I don't know how to do: $ACTION"
+esac

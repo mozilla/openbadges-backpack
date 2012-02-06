@@ -1,18 +1,21 @@
 // Configure & start express.
 var express = require('express')
-  , csrf = require('express-csrf')
   , fs = require('fs')
   , path = require('path')
   , middleware = require('./middleware')
   , logger = require('./lib/logging').logger
   , configuration = require('./lib/configuration')
   , router = require('./lib/router')
+  , hogan = require('hogan.js')
+  , hoganadapter = require('./lib/hogan-express.js')
 
 var app = express.createServer();
 app.logger = logger;
 app.config = configuration;
 
-app.set('view engine', 'coffee');
+// default view engine
+app.set('view engine', 'hogan.js');
+app.register('hogan.js', hoganadapter.init(hogan))
 app.register('.coffee', require('coffeekup').adapters.express)
 
 // View helpers. `user` and `badges` are set so we can use them in `if`
@@ -38,21 +41,19 @@ app.helpers({
     }
   }
 });
-app.dynamicHelpers({
-  csrf: middleware.csrf.token
-});
-
 // Middleware. See `middleware.js` for more information on the custom
 // middleware used.
 app.use(express.static(path.join(__dirname, "static")));
 app.use(express.static(path.join(configuration.get('var_dir'), "badges")));
-app.use(express.bodyParser());
+app.use(express.bodyParser({ uploadDir:configuration.get('badge_path') }));
 app.use(express.cookieParser());
+app.use(express.methodOverride());
 app.use(middleware.logRequests());
-app.use(middleware.formHandler());
 app.use(middleware.cookieSessions());
 app.use(middleware.noFrame([ '/share/.*' ]));
-app.use(middleware.csrf.check([ '/backpack/badge', '/backpack/authenticate' ]));
+app.use(middleware.userFromSession());
+app.use(middleware.csrf());
+
 // Allow everything to be used with CORS.
 // This should probably just be limited to badges
 app.use(function(req, res, next) {
@@ -61,27 +62,34 @@ app.use(function(req, res, next) {
 });
 
 router(app)
+  .get('/chris',                            'chris.chris')
   .get('/baker',                            'baker.baker')
-  .get('/test',                             'test.issuer')
-  .post('/test/award',                      'test.award')
-  .get('/test/badge.json',                  'test.test_badge')
-  .get('/test/invalid.json',                'test.bad_badge')
+  
+  .get('/demo',                             'demo.issuer')
+  .get('/demo/ballertime',                  'demo.massAward')
+  .get('/demo/badge.json',                  'demo.testBadge')
+  .get('/demo/invalid.json',                'demo.badBadge')
+  .post('/demo/award',                      'demo.award')
+  
   .get('/backpack/login',                   'backpack.login')
-  .post('/backpack/authenticate',           'backpack.authenticate')
   .get('/backpack/signout',                 'backpack.signout')
-  .post('/backpack/badge',                  'backpack.upload')
   .get('/backpack/badge/:badgeId',          'backpack.details')
-  .post('/backpack/badge/:badgeId/accept',  'backpack.apiAccept')
-  .post('/backpack/badge/:badgeId/reject',  'backpack.apiReject')
-  .post('/backpack/badge/:badgeId/groups',  'backpack.apiGroups')
   .get('/backpack',                         'backpack.manage')
+  .post('/backpack/badge',                  'backpack.userBadgeUpload')
+  .post('/backpack/authenticate',           'backpack.authenticate')
+  .delete('/backpack/badge/:badgeId',       'backpack.deleteBadge')
+  
+  .post('/group',                           'group.create')
+  .put('/group/:id',                        'group.update')
+  .delete('/group/:id',                     'group.destroy')
+  
   .get('/share/g/:groupId',                 'share.group')
   .get('/share/b/:badgeId',                 'share.badge')
   .get('/',                                 'backpack.manage')
 
 if (!module.parent) {
   var start_server = function(app) {  
-    var port = app.config.get('internal_port')
+    var port = app.config.get('port')
       , pid = process.pid.toString()
       , pidfile = path.join(app.config.get('var_path'), 'server.pid')
 

@@ -1,146 +1,162 @@
-var mongoose = require('mongoose')
-  , conf = require('../lib/configuration').get('database')
-  , url = require('url')
-var Schema = mongoose.Schema
-  , ObjectId = Schema.ObjectId
-  , urlre = /(^(https?):\/\/[^\s\/$.?#].[^\s]*$)|(^\/\S+$)/
-  , emailre = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
-  , originre = /^(https?):\/\/[^\s\/$.?#].[^\s\/]*$/
-  , versionre = /^v?\d+\.\d+\.\d+$/
+var mysql = require('../lib/mysql')
+  , regex = require('../lib/regex')
+  , crypto = require('crypto')
+  , Base = require('./mysql-base');
 
-mongoose.connect(conf.host, conf.name, conf.port);
-
-// validators and getters. Consider moving to its own file.
-var maxlen = function(len){
-  return function(v){ return (v||'').length < len }
-}
-var slashTrim = function(v){
-  return v.replace(/\/*$/, '');
-}
-var isodate = function(){}
-isodate.re = /\d{4}-\d{2}-\d{2}/;
-isodate.set = function(input) {
-  if (!isodate.re.test(input)) return false;
-  var pieces = input.split('-')
-    , year = parseInt(pieces[0], 10)
-    , month = parseInt(pieces[1], 10)
-    , day = parseInt(pieces[2], 10)
-  if (month > 12 || month < 1) return false;
-  if (day > 31 || day < 1) return false;
-  return input;
+var sha256 = function (value) {
+  var sum = crypto.createHash('sha256')
+  sum.update(value);
+  return sum.digest('hex');
 };
-isodate.validate = function(v) {
-  return v === null || v.match(isodate.re) ;
-}
-var fqUrl = function(v){
-  if (!v) return v;
-  var baseurl = url.parse(v)
-    , origin
-  if (!baseurl.hostname) {
-    origin = url.parse(this.meta.pingback || this.badge.issuer.origin)
-    baseurl.host = origin.host;
-    baseurl.port = origin.port;
-    baseurl.slashes = origin.slashes;
-    baseurl.protocol = origin.protocol;
-    baseurl.hostname = origin.hostname;
-  }
-  return url.format(baseurl);
-}
 
-var BadgeSchema = new Schema(
-  { meta:
-    { pingback  : { type: String }
-    , publicKey : { type: String }
-    , imagePath : { type: String }
-    , imageData : { type: String } //expected base64
-    , accepted : { type: Boolean, default: false }
-    , rejected : { type: Boolean, default: false }
-    , groups : { type: [ObjectId], default: [] }
+var Badge = function (attributes) {
+  this.attributes = attributes;
+};
+
+Base.apply(Badge, 'badge');
+
+Badge.prototype.presave = function () {
+  if (!this.get('id')) {
+    this.set('body_hash', sha256(this.get('body')));
+  }
+};
+
+Badge.prototype.checkHash = function () {
+  return sha256(JSON.stringify(this.get('body'))) === this.get('body_hash');
+};
+
+// Validators called by `save()` (see mysql-base) in preparation for saving.
+// A valid pass returns nothing (or a falsy value); an invalid pass returns a
+// message about why a thing was invalid.
+Badge.validators = {
+  type: function (value, attributes) {
+    var valid = ['signed', 'hosted'];
+    if (valid.indexOf(value) === -1) {
+      return "Unknown type: " + value;
     }
-  , recipient : { type: String, required: true, match: emailre, index: true }
-  , evidence  : { type: String, match: urlre, get: fqUrl}
-  , expires   : { type: String, set: isodate.set, validate: [isodate.validate, 'isodate'] }
-  , issued_on : { type: String, set: isodate.set, validate: [isodate.validate, 'isodate'] }
-  , badge:
-    { version     : { type: String, required: true, match: versionre }
-    , name        : { type: String, required: true, validate: [maxlen(128), 'maxlen'] }
-    , description : { type: String, required: true, validate: [maxlen(128), 'maxlen'] }
-    , image       : { type: String, required: true, match: urlre, get: fqUrl }
-    , criteria    : { type: String, required: true, match: urlre, get: fqUrl }
-    , issuer:
-      { origin  : { type: String, required: true, match: originre, set: slashTrim }
-      , name    : { type: String, required: true, validate: [maxlen(128), 'maxlen'] }
-      , org     : { type: String, validate: [maxlen(128), 'maxlen'] }
-      , contact : { type: String, match: emailre, index: true }
+    if (value === 'hosted' && !attributes.endpoint) {
+      return "If type is hosted, endpoint must be set";
+    }
+    if (value === 'signed' && !attributes.jwt) {
+      return "If type is signed, jwt must be set";
+    }
+    if (value === 'signed' && !attributes.public_key) {
+      return "If type is signed, public_key must be set";
+    }
+  },
+  endpoint: function (value, attributes) {
+    if (!value && attributes.type === 'hosted') {
+      return "If type is hosted, endpoint must be set";
+    }
+  },
+  jwt: function (value, attributes) {
+    if (!value && attributes.type === 'signed') {
+      return "If type is signed, jwt must be set";
+    }
+  },
+  public_key: function (value, attributes) {
+    if (!value && attributes.type === 'signed') {
+      return "If type is signed, public_key must be set";
+    }
+  },
+  image_path: function (value) {
+    if (!value) { return "Must have an image_path."; }
+  },
+  body: function (value) {
+    if (!value) { return "Must have a body."; }
+    if (String(value) !== '[object Object]') { return "body must be an object"; }
+    if (Badge.validateBody(value) instanceof Error) { return "invalid body"; }
+  }
+};
+
+// Prepare a field as it goes into or comes out of the database.
+Badge.prepare = {
+  in: { body: function (value) { return JSON.stringify(value); } },
+  out: { body: function (value) { return JSON.parse(value); } }
+};
+
+// Virtual finders. By default, `find()` will take the keys of the criteria
+// and create WHERE statements based on those. This object provides more
+// nuanced control over how the query is formed and also allows creation
+// of finders that don't map directly to a column name.
+Badge.finders = {
+  email: function (value, callback) {
+    var query = "SELECT * FROM `badge` WHERE `user_id` = (SELECT `id` FROM `user` WHERE `email` = ?)";
+    mysql.client.query(query, [value], callback);
+  }
+};
+
+// Validate the structure and values of the body field, which contains the 
+// badge assertion as received from the issuer. Returns an error object with a
+// `fields` attribute describing the errors if invalid, and `undefined` if
+// valid.
+Badge.validateBody = function (body) {
+  var err = new Error('Invalid badge assertion');
+  err.fields = {};
+  
+  var fieldFromDottedString = function (str, obj) {
+    var fields = str.split('.')
+      , current = obj
+      , previous = null;
+    fields.forEach(function (f) {
+      previous = current;
+      current = current[f];
+    })
+    return previous[fields.pop()];
+  };
+  
+  var test = {
+    missing: function (fieldStr) {
+      var field = fieldFromDottedString(fieldStr, body);
+      if (!field) {
+        err.fields[fieldStr] = 'missing email address for `' + fieldStr + '`';
+      }
+    },
+    regexp: function (fieldStr, type) {
+      var field = fieldFromDottedString(fieldStr, body);
+      if (field && !regex[type].test(field)) {
+        err.fields[fieldStr] = 'invalid ' + type + ' for `' + fieldStr + '`';
+      }
+    },
+    length: function (fieldStr, maxlength) {
+      var field = fieldFromDottedString(fieldStr, body);
+      if (field && field.length > maxlength) {
+        err.fields[fieldStr] = 'invalid value for `' + fieldStr + '`: too long, maximum length should be ' + maxlength;
       }
     }
-  }
-)
-
-var BadgeModel = module.exports = mongoose.model('Badge', BadgeSchema);
-
-BadgeModel.prototype.upsert = function(callback) {
-  var self = this
-    , query = {recipient: this.recipient, 'meta.pingback': this.meta.pingback}
-  BadgeModel.findOne(query, function(err, doc) {
-    var id;
-    if (doc) {
-      self._doc._id = doc._doc._id;
-      doc._doc = self._doc;
-      doc.save(callback);
+  };
+  
+  // begin tests
+  test.missing('recipient');
+  test.regexp('recipient', 'email');
+  test.regexp('evidence', 'url');
+  test.regexp('expires', 'date');
+  test.regexp('issued_on', 'date');
+  if (!body.badge) {
+    err.fields['badge'] = 'missing required field `badge`';
+  } else {
+    test.missing('badge.version');
+    test.missing('badge.name');
+    test.missing('badge.description');
+    test.missing('badge.criteria');
+    test.missing('badge.image');
+    test.regexp('badge.version', 'version');
+    test.regexp('badge.image', 'url');
+    test.regexp('badge.criteria', 'url');
+    test.length('badge.name', 128);
+    test.length('badge.description', 128);
+    if (!body.badge.issuer) {
+      err.fields['badge.issuer'] = 'missing required field `badge.issuer`';
     } else {
-      self.save(callback);
+      test.missing('badge.issuer.origin');
+      test.missing('badge.issuer.name');
+      test.regexp('badge.issuer.origin', 'url');
+      test.regexp('badge.issuer.contact', 'email');
+      test.length('badge.issuer.org', 128);
+      test.length('badge.issuer.name', 128);
     }
-  })
+  }
+  if (Object.keys(err.fields).length) { return err; }
+  return null;
 }
-BadgeModel.groups = function(badges) {
-  var groups = {}
-  badges.forEach(function(badge){
-    (badge.meta.groups||[]).forEach(function(group) {
-      var g = groups[group] = (groups[group] || []);
-      g.push(badge);
-    })
-  })
-  return groups;
-}
-BadgeModel.organize = function(user, callback) {
-  BadgeModel.find({recipient: user}, function(err, badges){
-    if (err) return callback(err);
-    badges = badges||[]
-    var o =
-      { pending: []
-      , accepted: []
-      , rejected: []
-      , groups: BadgeModel.groups(badges)
-      , issuers: {}
-      , howMany: badges.length + (badges.length === 1 ? " badge" : " badges")
-      }
-
-    badges.forEach(function(badge){
-      if (badge.meta.rejected)
-        return o.rejected.push(badge)
-      if (badge.meta.accepted)
-        return o.accepted.push(badge)
-      return o.pending.push(badge)
-    })
-    return callback(null, o);
-  })
-}
-BadgeModel.userGroups = function(user, callback) {
-  BadgeModel.find({recipient: user}, ['meta.groups'], function(err, docs) {
-    if (err) return callback(err)
-    return callback(err, BadgeModel.groups(docs))
-  })
-}
-BadgeModel.prototype.group = function(name) {
-  var g = this.meta.groups || []
-  if (g.indexOf(name) === -1) g.push(name);
-  this.meta.groups = g;
-}
-BadgeModel.prototype.degroup = function(name) {
-  this.meta.groups = this.get('meta.groups').filter(function(v){ return v !== name });
-  return this;
-}
-BadgeModel.prototype.inGroup = function(name) {
-  return (this.meta.groups||[]).indexOf(name) !== -1
-}
+module.exports = Badge;

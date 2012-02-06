@@ -45,9 +45,9 @@ else
     div '.span-two-thirds.column.groups', ->
       h1 -> "Groups"
 
-      if not @user.groups.length
+      if not @groups
         h2 -> "You haven't made any groups yet."
-      for group in @user.groups
+      for group in @groups
         h3 -> group.name
 
         div '.well', style: 'position: relative', ->
