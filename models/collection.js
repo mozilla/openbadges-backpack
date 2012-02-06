@@ -1,7 +1,8 @@
 var mysql = require('../lib/mysql')
   , crypto = require('crypto')
   , Badge = require('./badge')
-  , Base = require('./mysql-base.js');
+  , Base = require('./mysql-base.js')
+  , _ = require('underscore');
 
 var md5 = function (v) {
   var sum = crypto.createHash('md5');
@@ -21,7 +22,7 @@ Collection.prototype.updateUrl = function () {
 };
 
 Collection.prototype.getBadgeObjects = function (callback) {
-  var badgeIds = this.data.badges.slice(0),
+  var badgeIds = (typeof this.data.badges === "string" ? JSON.parse(this.data.badges) : this.data.badges),
       values = badgeIds,
       placeholders = badgeIds.map(function(){return '?';}).join(','),
       query = 'SELECT * FROM `badge` WHERE `id` IN (' + placeholders + ') AND `user_id` = ?';
@@ -40,10 +41,16 @@ Collection.prepare = {
   in: {
     badges: function (value) {
       // Assume this is an array of badge items if it's an array of objects.
+      if (!value) { return; }
       if (value.toString().match('[object Object]')) {
-        return value.map(function (v) { return v.data.id });
+        return JSON.stringify(value.map(function (v) { return v.data.id }));
       }
-      return value;
+      return JSON.stringify(value);
+    }
+  },
+  out: {
+    badges: function (value) {
+      if (value) { return JSON.parse(value) }
     }
   }
 };

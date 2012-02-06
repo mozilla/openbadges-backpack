@@ -16,6 +16,13 @@ Base.apply = function (Model, table) {
     return new Model(data);
   };
   
+  Model.findAll = function(callback) {
+    client.query('SELECT * FROM ' + table, function (err, results) {
+      if (err) { callback(err); }
+      else callback(null, results.map(Model.fromDbResult));
+    });
+  };
+  
   Model.find = function(criteria, callback) {
     var finders = Model.finders || {}
       , keys = Object.keys(criteria)
@@ -47,6 +54,8 @@ Base.apply = function (Model, table) {
   Model.prototype.model = Model;
   Model.prototype.client = client;
   Model.prototype.getTableName = function () { return table };
+  Model.prototype.set = function (key, value) { this.data[key] = value; return this; };
+  Model.prototype.get = function (key) { return this.data[key]; };
 };
   
 Base.prototype.validate = function (data) {

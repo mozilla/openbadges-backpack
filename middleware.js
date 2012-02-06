@@ -1,9 +1,12 @@
 var express = require('express')
   , secrets = require('./lib/secrets')
+  , session = require('connect-cookie-session')
   , configuration = require('./lib/configuration')
   , logger = require('./lib/logging').logger
   , crypto = require('crypto')
-
+  , User = require('./models/user')
+    
+    
 // `COOKIE_SECRET` is randomly generated on the first run of the server,
 // then stored to a file and looked up on restart to maintain state.
 // See the `secrets.js` for more information.
@@ -13,7 +16,7 @@ var COOKIE_KEY = 'openbadges_state';
 // Store sessions in cookies. The session structure is base64 encoded, a
 // salty hash is created with `COOKIE_SECRET` to prevent clientside tampering.
 exports.cookieSessions = function(){
-  return express.session({
+  return session({
     secret: COOKIE_SECRET,
     key: COOKIE_KEY,
     cookie: {
@@ -33,6 +36,40 @@ exports.logRequests = function(){
       }
     }
   });
+};
+
+exports.userFromSession = function (opts) {
+  return function (req, res, next) {
+    var email = '',
+        emailRe = /^.+?\@.+?\.*$/;
+    
+    if (!req.session) {
+      logger.debug('could not find session');
+      return next();
+    }
+    
+    if (!req.session.emails) {
+      logger.debug('could not find emails array in session');
+      return next();
+    }
+    
+    email = req.session.emails[0];
+    
+    if (!emailRe.test(email)) {
+      logger.warn('req.session.emails does not contain valid user: ' + email);
+      req.session = {};
+      return req.next();
+    }
+    
+    User.findOrCreate(email, function (err, user) {
+      if (err) {
+        logger.error("Problem finding/creating user:")
+        logger.error(err);
+      }
+      req.user = user;
+      return next();
+    })
+  }
 };
 
 exports.noFrame = function(whitelist) {
@@ -61,7 +98,10 @@ exports.csrf = function (options) {
     var token = req.session._csrf || (req.session._csrf = utils.uid(24));
     if ('GET' == req.method || 'HEAD' == req.method) return next();
     var val = value(req);
-    if (val != token) return utils.forbidden(res);
+    if (val != token) {
+      logger.debug("CSRF token failure");
+      return utils.forbidden(res);
+    }
     next();
   }
 };
@@ -97,6 +137,8 @@ function getRandomInt(min, max) {
  * @api private
  */
 function defaultValue(req) {
+  console.dir(req.body);
+  
   return (req.body && req.body._csrf)
     || (req.query && req.query._csrf)
     || (req.headers['x-csrf-token']);

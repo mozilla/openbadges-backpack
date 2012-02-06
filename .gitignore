@@ -2,6 +2,8 @@
 *log
 *~
 *#*
+.vagrant
+.DS_Store
 
 /docs
 /node_modules
@@ -10,8 +12,6 @@
 /.project
 /lib/environments/local.js
 /wiki
-
-/extras/vagrant/.vagrant
 
 /var/*
 !/var/.gitkeep
