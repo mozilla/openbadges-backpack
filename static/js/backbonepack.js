@@ -189,7 +189,7 @@ var BadgeView = Backbone.View.extend({
   addToGroup: function (groupView) {
     var $el = this.$el
       , $groupEl = groupView.$el
-      , isNew = (0 === $groupEl.find('.badge').length)
+      , isNew = $groupEl.hasClass('isNew')
     
     $groupEl.removeClass('isNew');
     
@@ -202,8 +202,13 @@ var BadgeView = Backbone.View.extend({
     }
     
     if (isNew) {
+      // first create a new droptarget
+      var newModel = new GroupModel({})
+        , newView = new GroupView({model: newModel});
+      newView.render();
+      
+      // then add the badge view to old group drop target
       $groupEl.find('.instructions').fadeOut('linear', doIt);
-      (new GroupView({model: new GroupModel({})})).render()
     } else {
       doIt();
     }
