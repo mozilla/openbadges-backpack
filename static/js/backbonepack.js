@@ -1,5 +1,3 @@
-ich.refresh();
-
 !function setup () {
 /** begin setup **/
 
@@ -45,29 +43,44 @@ var GroupCollection = Backbone.Collection.extend({
 
 function saveParentGroup (badge) {
   this.belongsTo.save(null, {
-    error: function () {
-      console.log(':(');
-      console.dir(this);
+    error: function (group, xhr) {
+      new MessageView().render({
+        type: 'error',
+        message:'There was a problem syncing your changes. Please refresh the page before making any new changes.'
+      });
     },
-    success: function (a, b, c) {
-      console.log(':D');
-      console.dir(this);
-    }
+    success: function (group, response) { }
   });
 }
 
 BadgeCollection.prototype.on('add', saveParentGroup)
+
 BadgeCollection.prototype.on('remove', saveParentGroup)
 
-
 /** define: views **/
+var MessageView = Backbone.View.extend({
+  parent: $('#message-container'),
+  tagName: 'div',
+  className: 'message',
+  events: {},
+  render: function (attributes) {
+    console.dir(ich);
+    var $element = ich.messageTpl(attributes);
+    this.parent.empty();
+    $element
+      .hide()
+      .css({opacity: 0})
+      .appendTo(this.parent)
+      .animate({opacity: 1}, {queue: false, duration: 'slow'})
+      .slideDown('slow');
+    this.setElement($element);
+  }
+})
+
 var GroupView = Backbone.View.extend({
   parent: $('#groups'),
-  
   tagName: "div",
-  
   className: "group",
-  
   events: {
     'keyup input': 'checkDone',
     'focus input': 'storeCurrent',
