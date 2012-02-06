@@ -139,30 +139,34 @@ a.badge:active {
   transition: none;
 }
 
+.group .icon {
+  position: absolute;
+  font-size: 3em;
+  font-weight: bold;
+  height: 24px;
+  width: 24px;
+  text-shadow: #fff -1px -1px 2px;
+  color: #bbb;
+  padding: 0;
+  margin: 0;
+  opacity: 1;
+  right: 8px;
+}
+ 
+
 .group .delete {
   -webkit-transition: opacity,color,text-shadow 0.25s ease;
   -moz-transition: opacity,color,text-shadow 0.25s ease;
   -ms-transition: opacity,color,text-shadow 0.25s ease;
   -o-transition: opacity,color,text-shadow 0.25s ease;
   transition: opacity,color,text-shadow 0.25s ease;
-  position: absolute;
   top: 6px;
-  right: 8px;
-  font-size: 3em;
-  font-weight: bold;
-  padding: 0;
-  margin: 0;
-  height: 24px;
-  width: 24px;
-  text-shadow: #fff -1px -1px 2px;
-  color: #bbb;
-  opacity: 1;
 }
-.group.isNew .delete {
+.group.isNew .icon {
   opacity: 0;
 }
 
-.group .delete:hover {
+.group .icon:hover {
   -webkit-transition: color,text-shadow 0.25s ease;
   -moz-transition: color,text-shadow 0.25s ease;
   -ms-transition: color,text-shadow 0.25s ease;
@@ -172,9 +176,23 @@ a.badge:active {
   color: #c00;
   text-shadow: #aaa 1px 1px 2px;
 }
+
 .group .delete:active {
   text-shadow: #aaa -1px -1px 2px;
   top: 8px;
+  right: 6px;
+}
+
+.group .config {
+  bottom: 10px;
+}
+
+.group .config:hover {
+  color: #333;
+}
+.group .config:active {
+  text-shadow: #aaa -1px -1px 2px;
+  bottom: 8px;
   right: 6px;
 }
 

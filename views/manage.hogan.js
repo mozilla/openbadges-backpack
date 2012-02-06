@@ -39,7 +39,9 @@
       {{#groups}}
         <div class='group' data-badges="[{{attributes.badges}}]" data-id="{{attributes.id}}" id="{{attributes.url}}">
           <input class='groupName' type='text' value='{{attributes.name}}' style='display: block'>
-          <span class='delete'>&times;</span>
+        <span class='icon delete'>&times;</span>
+        <span class='icon config'>&#x2699;</span>
+          
           {{#attributes.badgeObjects}}
             <a href="{{detailsUrl}}" draggable="true" class="badge" id="{{attributes.body_hash}}-{{url}}" data-hash="{{attributes.body_hash}}" data-id="{{attributes.id}}" data-grouped="{{url}}">
               <img src="{{attributes.image_path}}" width="64px"/>
@@ -50,7 +52,9 @@
       
       <div class='group isNew'>
         <input class='groupName' type='text' value='New Group'>
-        <span class='delete'>&times;</span>
+        <span class='icon delete'>&times;</span>
+        <span class='icon config'>&#x2699;</span>
+        
         <h3 class='instructions'>Drag a Badge Here</h3>
       </div>
       
@@ -63,7 +67,8 @@
 <script type='text/html' id='groupTpl'>
   <div class='group {{^attributes.id}}isNew{{/attributes.id}}'>
     <input class='groupName' type='text' value='{{name}}'>
-    <span class='delete'>&times;</span>
+        <span class='icon delete'>&times;</span>
+        <span class='icon config'>&#x2699;</span>
     
     {{^attributes.id}}
       <h3 class='instructions'>Drag a Badge Here</h3>
