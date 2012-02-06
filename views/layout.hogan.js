@@ -60,7 +60,7 @@
       
       <!-- my libraries -->
       <script type="text/javascript" src="/js/jquery.sync.js"></script>
-      <script type="text/javascript" src="/js/backbonepack.js"></script>
+      <script type="text/javascript" src="/js/backpack.js"></script>
       
   </body>
 </html>
