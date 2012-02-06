@@ -27,9 +27,9 @@ var BadgeModel = Backbone.Model.extend({
   // no defaults
 });
 var GroupModel = Backbone.Model.extend({
+  urlRoot: '/group',
   defaults: {
     name: "New Group",
-    badges: function () { new GroupCollection() },
     "public": false
   }
 });
@@ -40,7 +40,6 @@ var BadgeCollection = Backbone.Collection.extend({
   belogsTo: null
 })
 var GroupCollection = Backbone.Collection.extend({
-  url: '/collection',
   model: GroupModel
 })
 
@@ -135,6 +134,12 @@ var GroupView = Backbone.View.extend({
     })
   },
   
+  /**
+   * Copies a badge from the master list to this group.
+   * 
+   * @param {Event} event
+   * @param {Model} badge model to be copied.
+   */
   addNew: function (event, badge) {
     var newBadge = new BadgeModel(badge.attributes)
       , newView = new BadgeView({model: newBadge})
@@ -144,6 +149,12 @@ var GroupView = Backbone.View.extend({
     newView.addToGroup(this);
   },
 
+  /**
+   * Move badge from existing group to this group.
+   * 
+   * @param {Event} event
+   * @param {Model} badge model to be moved.
+   */
   moveExisting: function (event, badge) {
     var badgeView = dragging;
     badge.collection.remove(badge);
@@ -151,6 +162,11 @@ var GroupView = Backbone.View.extend({
     badgeView.addToGroup(this);
   },
 
+  /**
+   * Figure out what to do with the badge that has been dropped here.
+   * If the badge is from an existing group, move it. If it's from
+   * the master badge list, copy it.
+   */
   badgeDrop: function (event) {
     var view = dragging
       , badge = view.model
@@ -167,12 +183,18 @@ var GroupView = Backbone.View.extend({
     return this.moveExisting(event, badge);
   },
   
+  /**
+   * Render this sucker. Uses ICanHaz.js to find a template with the
+   * id "#groupTpl"
+   */
   render: function () {
     this.el = ich.groupTpl(this.model.attributes);
-    this.$el = $(this.el)
+    this.setElement($(this.el));
+    this.$el
       .hide()
       .appendTo(this.parent)
       .fadeIn();
+    return this;
   }
 });
 
@@ -182,10 +204,22 @@ var BadgeView = Backbone.View.extend({
   events: {
     'dragstart' : 'start'
   },
+  
+  /**
+   * Store this view in a semi-global variable (closed-over) variable
+   * so we can look it up later on drops.
+   */
   start : function (event) {
+    console.log('starting to drag');
     dragging = this;
   },
   
+  
+  /**
+   * Add this badge view to a group view. Do some fancy fx during the dom transition.
+   * 
+   * @param {View} groupView the view to add this badge to.
+   */
   addToGroup: function (groupView) {
     var $el = this.$el
       , $groupEl = groupView.$el
@@ -202,10 +236,12 @@ var BadgeView = Backbone.View.extend({
     }
     
     if (isNew) {
-      // first create a new droptarget
-      var newModel = new GroupModel({})
-        , newView = new GroupView({model: newModel});
-      newView.render();
+      // first create a new group to use as a drop target
+      var newBadgeCollection = new BadgeCollection([])
+        , newGroupModel = new GroupModel({badges: newBadgeCollection})
+        , newGroupView = new GroupView({model: newGroupModel});
+      newBadgeCollection.belongsTo = newGroupModel;
+      newGroupView.render();
       
       // then add the badge view to old group drop target
       $groupEl.find('.instructions').fadeOut('linear', doIt);
@@ -214,10 +250,15 @@ var BadgeView = Backbone.View.extend({
     }
   },
   
+  /**
+   * Render this sucker. Uses ICanHaz.js to find a template with the
+   * id "#badgeTpl"
+   */
   render: function () {
     this.el = ich.badgeTpl(this.model.attributes);
-    this.$el = $(this.el);
     this.$el.data('view', this);
+    this.setElement($(this.el));
+    return this;
   }
 });
 

@@ -11,7 +11,7 @@ var request = require('request')
   , awardBadge = require('../lib/award')
   , reverse = require('../lib/router').reverse
   , Badge = require('../models/badge')
-  , Collection = require('../models/collection')
+  , Group = require('../models/group')
 
 exports.param = {};
 
@@ -105,7 +105,7 @@ exports.manage = function(req, res, next) {
   var user = req.user
     , error = req.flash('error')
     , success = req.flash('success')
-    , collections = []
+    , groups = []
     , badgeIndex = {};
   if (!user) return res.redirect(reverse('backpack.login'), 303);
   
@@ -116,28 +116,28 @@ exports.manage = function(req, res, next) {
     });
   };
   
-  var getCollections = function () {
-    Collection.find({user_id: user.get('id')}, getBadges);
+  var getGroups = function () {
+    Group.find({user_id: user.get('id')}, getBadges);
   };
   
   var getBadges = function (err, results) {
     if (err) return next(err);
-    collections = results;
+    groups = results;
     Badge.find({email: user.get('email')}, makeResponse)
   };
   
-  var modifyCollections = function (collections) {
-    collections.forEach(function (col) {
+  var modifyGroups = function (groups) {
+    groups.forEach(function (group) {
       var badgeObjects = []
-        , badgeIds = col.get('badges');
+        , badgeIds = group.get('badges');
       
       function badgeFromIndex (id) { return badgeIndex[id]; }
       
       // copy URL from attributes to main namespace.
-      col.url = col.get('url');
+      group.url = group.get('url');
       
-      // fail early if there aren't any badges associated with this collection
-      if (!col.get('badges')) return;
+      // fail early if there aren't any badges associated with this group
+      if (!group.get('badges')) return;
       
       // strip out all of the ids which aren't in the index of user owned badges
       badgeIds = _.filter(badgeIds, badgeFromIndex);
@@ -146,25 +146,25 @@ exports.manage = function(req, res, next) {
       badgeObjects = badgeIds.map(badgeFromIndex);
     
       
-      col.set('badges', badgeIds);
-      col.set('badgeObjects', badgeObjects);
+      group.set('badges', badgeIds);
+      group.set('badgeObjects', badgeObjects);
     });
   };
   
   var makeResponse = function (err, badges) {
     if (err) return next(err);
     prepareBadges(badges);
-    modifyCollections(collections);
+    modifyGroups(groups);
     res.render('manage', {
       error: error,
       success: success,
       badges: badges,
       csrfToken: req.session._csrf,
-      groups: collections
+      groups: groups
     })
   };
   
-  var startResponse = getCollections;
+  var startResponse = getGroups;
   return startResponse();
 };
 

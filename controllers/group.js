@@ -1,21 +1,21 @@
-var Collection = require('../models/collection')
-  , Badge = require('../models/collection')
+var Group = require('../models/group')
+  , Badge = require('../models/badge')
   , logger = require('../lib/logging').logger
   , _ = require('underscore');
 
 exports.param = {
   id: function(req, res, next, id) {
-    Collection.findById(id, function(err, col) {
+    Group.findById(id, function(err, group) {
       if (err) {
-        logger.error("Error pulling collection: " + err);
-        return res.send('Error pulling collection', 500);
+        logger.error("Error pulling group: " + err);
+        return res.send('Error pulling group', 500);
       }
       
-      if (!col) {
-        return res.send('Could not find collection', 404);
+      if (!group) {
+        return res.send('Could not find group', 404);
       }
       
-      req.collection = col;
+      req.group = group;
       return next();
     });
   }
@@ -27,28 +27,30 @@ exports.create = function (req, res) {
   if (!req.body.badges) return res.send('nope', 400);
   var user = req.user
     , body = req.body
+    , badges = body.badges
+    , group
   function makeNewBadge(attributes) { return new Badge(attributes); }
-  var col = new Collection({
+  group = new Group({
     user_id: user.get('id'),
     name: body.name,
-    badges: body.badges.map(makeNewBadge)
+    badges: badges.map(makeNewBadge)
   }); 
 
-  col.save(function (err) {
+  group.save(function (err, group) {
     res.contentType('json');
-    res.send({status: 'okay'});
+    res.send({id: group.get('id')});
   })
 };
 
 exports.update = function (req, res) {
   if (!req.user) return res.send('nope', 403);
-  var col = req.collection
+  var group = req.group
     , body = req.body
     , saferName = body.name.replace('<', '&lt;').replace('>', '&gt;');
   function makeNewBadge(attributes) { return new Badge(attributes); }
-  col.set('name', saferName);
-  col.set('badges', body.badges.map(makeNewBadge));
-  col.save(function (err) {
+  group.set('name', saferName);
+  group.set('badges', body.badges.map(makeNewBadge));
+  group.save(function (err) {
     if (err) return res.send('nope', 500);
     res.contentType('json');
     res.send({status: 'okay'});
@@ -57,8 +59,8 @@ exports.update = function (req, res) {
 
 exports.destroy = function (req, res) {
   if (!req.user) return res.send('nope', 400);
-  var collection = req.collection
-  collection.destroy(function (err) {
+  var group = req.group
+  group.destroy(function (err) {
     if (err) return res.send('nope', 500);
     res.contentType('json');
     res.send(JSON.stringify({success: true}));

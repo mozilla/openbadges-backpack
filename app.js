@@ -79,9 +79,9 @@ router(app)
   .post('/backpack/authenticate',           'backpack.authenticate')
   .delete('/backpack/badge/:badgeId',       'backpack.deleteBadge')
   
-  .post('/collection',                      'collection.create')
-  .put('/collection/:id',                   'collection.update')
-  .delete('/collection/:id',                'collection.destroy')
+  .post('/group',                           'group.create')
+  .put('/group/:id',                        'group.update')
+  .delete('/group/:id',                     'group.destroy')
   
   .get('/share/g/:groupId',                 'share.group')
   .get('/share/b/:badgeId',                 'share.badge')

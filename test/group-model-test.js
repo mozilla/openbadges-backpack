@@ -2,7 +2,7 @@ var vows = require('vows'),
     assert = require('assert'),
     mysql = require('../lib/mysql'),
     genstring = require('../lib/utils').genstring,
-    Collection = require('../models/collection');
+    Group = require('../models/group');
 
 var createDbFixtures = function (callback) {
   var addUser = "INSERT INTO `user` (email) VALUES ('brian@example.com')";
@@ -21,44 +21,44 @@ var createDbFixtures = function (callback) {
   mysql.client.query(addBadge2, callback);
 };
 
-var createCollection = function () {
-  return new Collection({
+var createGroup = function () {
+  return new Group({
     user_id: 1,
     name: genstring(14),
     badges: [1,2]
   })
 };
 
-vows.describe('Collection Model').addBatch({
-  'Collection testing:': {
+vows.describe('Group Model').addBatch({
+  'Group testing:': {
     topic: function () {
       mysql.prepareTesting();
       createDbFixtures(this.callback);
     },
-    'A valid new collection': {
-      topic: createCollection(),
+    'A valid new group': {
+      topic: createGroup(),
       'can be saved': {
-        topic: function (collection) {
-          collection.save(function (err,collection) {
-            Collection.findById(collection.get('id'), this.callback);
+        topic: function (group) {
+          group.save(function (err,group) {
+            Group.findById(group.get('id'), this.callback);
           }.bind(this))
         },
-        'without errors': function (err, collection) {
+        'without errors': function (err, group) {
           assert.ifError(err);
-          assert.isObject(collection);
+          assert.isObject(group);
         },
-        'without mangling the badges': function (err, collection) {
-          var badges = collection.get('badges')
+        'without mangling the badges': function (err, group) {
+          var badges = group.get('badges')
           assert.isArray(badges);
           assert.includes(badges, 1);
           assert.includes(badges, 2);
         },
         'then resaved with new name': {
-          topic: function (collection) {
-            var oldUrl = collection.get('url')
-            collection.set('name', 'radical');
-            collection.save(function (err, collection) {
-              this.callback(oldUrl, collection.get('url'));
+          topic: function (group) {
+            var oldUrl = group.get('url')
+            group.set('name', 'radical');
+            group.save(function (err, group) {
+              this.callback(oldUrl, group.get('url'));
             }.bind(this));
           },
           'without changing the url': function (oldUrl, newUrl) {
@@ -66,40 +66,44 @@ vows.describe('Collection Model').addBatch({
           }
         },
         'and looking up by url': {
-          topic: function (collection) {
-            Collection.findOne({url: collection.get('url')}, this.callback);
+          topic: function (group) {
+            Group.findOne({url: group.get('url')}, this.callback);
           },
-          'should retrieve same collection': function (err, collection) {
+          'should retrieve same group': function (err, group) {
             assert.ifError(err);
-            assert.equal(collection.get('name'), 'radical');
+            assert.equal(group.get('name'), 'radical');
           }
         }
       }
     },
     
-    'Should be able to put badges into collection by id' : {
+    'Should be able to put badges into group by id' : {
       topic: function () {
-        var collection = createCollection()
-        collection.set('badges', [1,2]);
+        var group = createGroup()
+        group.set('badges', [1,2]);
         
-        collection.save(function (err, collection) {
-          collection.getBadgeObjects(this.callback);
+        group.save(function (err, group) {
+          if(err) return this.callback(err)
+          group.getBadgeObjects(this.callback);
         }.bind(this))
       },
       'without error': function (err, badges) {
+        assert.ifError(err);
         assert.equal(badges.length, 2);
       }
     },
     
-    'Should be able to put badges into collection by object' : {
+    'Should be able to put badges into group by object' : {
       topic: function () {
-        var collection = createCollection()
-        collection.set('badges', [{attributes:{id:1}}, {attributes:{id:2}}]);
-        collection.save(function (err, collection) {
-          collection.getBadgeObjects(this.callback);
+        var group = createGroup()
+        group.set('badges', [{attributes:{id:1}}, {attributes:{id:2}}]);
+        group.save(function (err, group) {
+          if(err) return this.callback(err)
+          group.getBadgeObjects(this.callback);
         }.bind(this))
       },
       'without error': function (err, badges) {
+        assert.ifError(err);
         assert.equal(badges.length, 2);
       }
     }

@@ -47,8 +47,10 @@
           {{/attributes.badgeObjects}}
         </div>
       {{/groups}}
+      
       <div class='group isNew'>
         <input class='groupName' type='text' value='New Group'>
+        <span class='delete'>&times;</span>
         <h3 class='instructions'>Drag a Badge Here</h3>
       </div>
       
@@ -61,14 +63,15 @@
 <script type='text/html' id='groupTpl'>
   <div class='group {{^attributes.id}}isNew{{/attributes.id}}'>
     <input class='groupName' type='text' value='{{name}}'>
+    <span class='delete'>&times;</span>
     
     {{^attributes.id}}
       <h3 class='instructions'>Drag a Badge Here</h3>
     {{/attributes.id}}
     
-    {{#badges}}
+    {{#badges.length}}
       {{>badgeTemplate}}
-    {{/badges}}
+    {{/badges.length}}
   </div>
 </script>
 

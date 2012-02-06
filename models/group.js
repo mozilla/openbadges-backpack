@@ -10,17 +10,17 @@ var md5 = function (v) {
   return sum.digest('hex');
 };
 
-var Collection = function (attributes) {
+var Group = function (attributes) {
   this.attributes = attributes;
 };
 
-Base.apply(Collection, 'collection');
+Base.apply(Group, 'group');
 
-Collection.prototype.updateUrl = function () {
+Group.prototype.updateUrl = function () {
   this.set('url', md5('' + this.get('name') + this.get('user_id') + Date.now()));
 };
 
-Collection.prototype.getBadgeObjects = function (callback) {
+Group.prototype.getBadgeObjects = function (callback) {
   var badges = this.get('badges')
     , badgeIds = (typeof badges === "string" ? JSON.parse(badges) : badges)
     , values = badgeIds
@@ -33,11 +33,11 @@ Collection.prototype.getBadgeObjects = function (callback) {
   });
 };
 
-Collection.prototype.presave = function () {
+Group.prototype.presave = function () {
   if (!this.attributes.id && !this.attributes.url) { this.updateUrl(); }
 }
 
-Collection.prepare = {
+Group.prepare = {
   in: {
     badges: function (value) {
       // Assume this is an array of badge items if it's an array of objects.
@@ -55,4 +55,4 @@ Collection.prepare = {
   }
 };
 
-module.exports = Collection;
+module.exports = Group;
