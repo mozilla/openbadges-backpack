@@ -36,32 +36,6 @@
         <input class="btn danger" type="submit" value="No, delete this badge."></input>
       </form>
     </div>
-
-    <div class="groups">
-      <h2>Manage Groups</h2>
-      <form action="" method="post">
-        <input type="hidden" name="_csrf" value="{{ csrfToken }}"></input>
-
-        {{#groups}}
-        <div class="clearfix">
-          <div class="input-append">
-            <input class="mini" maxlength:32 type:"text" value="{{name}}" disabled=true></input>
-          </div>
-        </div>
-        {{/groups}}
-
-        <div class="clearfix">
-          <div class="input-append">
-            <input id="new-group" clas="mini" maxlength=32 type="text" ame="newGroup" placeholder="New group"></input>
-            <label class="add-on">
-              <input type="checkbox"></input>
-            </label>
-          </div>
-        </div>
-        
-        <input class="btn primary" type="submit" value="Manage Groups"></input>
-      </form>
-    </div>
   </div>
   {{/owner}}
 </div>
