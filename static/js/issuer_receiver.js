@@ -1,4 +1,7 @@
 WinChan.onOpen(function(origin, args, cb) {
-  alert("yo!" + args);
-  $("#test").text(JSON.stringify(args, null, "    "));
+  $("#test").text(args['badges'][0]);
+  _.each(args['badges'], 
+         function(assertion) {
+           // post the assertion...one at a time?
+         });
 });

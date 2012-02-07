@@ -19,3 +19,9 @@ exports.issuerBadgeAdd = function(req, res, next) {
 };
    
 
+exports.issuerBadgeAddFromAssertion = function(req, res, next) {
+  // handles the adding of a badge via assertion url called
+  // from issuerBadgeAdd
+  // called as an ajax call.
+};
+
