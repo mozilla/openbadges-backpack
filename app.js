@@ -64,7 +64,9 @@ app.use(function(req, res, next) {
 router(app)
   .get('/chris',                            'chris.chris')
   .get('/baker',                            'baker.baker')
-  
+
+  .get('/api/issuer',                       'issuer.issuerBadgeAdd')
+
   .get('/demo',                             'demo.issuer')
   .get('/demo/ballertime',                  'demo.massAward')
   .get('/demo/badge.json',                  'demo.demoBadge')

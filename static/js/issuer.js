@@ -2,7 +2,7 @@ function issuerApi() {
   $(".btn").on("click", function() {
     var window_opts = "menubar=0,location=1,resizable=0,scrollbars=0,status=0,dialog=1,width=700,height=375";
     w = WinChan.open({
-      url: "http://localhost:8888/html/test.html",
+      url: "http://localhost:8888/api/issuer",
       relay_url: "http://localhost:8888/html/relay.html",
       window_features: window_opts,
       params: {

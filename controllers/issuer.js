@@ -1,0 +1,21 @@
+var request = require('request')
+  , logger = require('../lib/logging').logger
+  , reverse = require('../lib/router').reverse
+ 
+
+exports.issuerBadgeAdd = function(req, res, next) {
+  var user = req.user
+    , error = req.flash('error')
+    , success = req.flash('success');
+
+  if (!user) return res.redirect(reverse('backpack.login'), 303);
+
+  res.render('issuerBadgeAdd', {
+    error: error,
+    success: success,
+    layout: 'smallLayout'
+    // todo: need to add csrf here
+    })
+};
+   
+
