@@ -36,7 +36,7 @@ exports.award = function(req, res) {
 exports.massAward = function (req, res) {
   if (!req.user) return res.send('nope');
   var demoBadgeDir = path.join(process.cwd(), 'static', '_demo')
-    , email = req.user.data.email;  
+    , email = req.user.get('email');  
   
   fs.readdirSync(demoBadgeDir)
     .map(function (f) {

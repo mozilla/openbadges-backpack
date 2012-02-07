@@ -185,6 +185,7 @@ a.badge:active {
 
 .group .config {
   bottom: 10px;
+  display: none;
 }
 
 .group .config:hover {
