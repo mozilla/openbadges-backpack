@@ -1,12 +1,13 @@
 function issuerApi() {
   $(".btn").on("click", function() {
-    var window_opts = "menubar=0,location=1,resizable=0,scrollbars=0,status=0,dialog=1,width=700,height=375";
+    var badge_assertion = $(this).attr("assert");
+    var window_opts = "menubar=0,location=1,resizable=0,scrollbars=0,status=0,dialog=0,width=700,height=700";
     w = WinChan.open({
       url: "http://localhost:8888/api/issuer",
       relay_url: "http://localhost:8888/html/relay.html",
       window_features: window_opts,
       params: {
-        badges: [1,2,3,4,5]
+        badges: [badge_assertion]
       }},
       function(err, r) {
         alert("there was an error " + err);

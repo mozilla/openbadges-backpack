@@ -99,6 +99,7 @@ exports.csrf = function (options) {
     if ('GET' == req.method || 'HEAD' == req.method) return next();
     var val = value(req);
     if (val != token) {
+      debugger;
       logger.debug("CSRF token failure");
       return utils.forbidden(res);
     }
