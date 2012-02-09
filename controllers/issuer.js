@@ -1,7 +1,8 @@
 var request = require('request')
   , logger = require('../lib/logging').logger
   , reverse = require('../lib/router').reverse
- 
+  , awardBadge = require('../lib/award')
+  , remote = require('../lib/remote') 
 
 exports.issuerBadgeAdd = function(req, res, next) {
   var user = req.user
@@ -24,8 +25,20 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
   // handles the adding of a badge via assertion url called
   // from issuerBadgeAdd
   // called as an ajax call.
-  debugger;
+  var assertionUrl = req.body['assertion']
+  remote.getHostedAssertion(assertionUrl, function(err, assertion) {
+    debugger;
+    if (err) {/*todo: figure out returning an ajax error*/}
+    if (assertion.recipient !== user.get('email')) {/*another error*/}
+    
+    awardBadge(assertion, assertionUrl, imagedata, function(err, badge) {
+      if (err) {
+        /* again, another error */
+      }
+    })
+    console.debug(assertion);
+    return(assertion);
+  })
   logger.debug(req.body['assertion']);
-  return('success');
 };
 
