@@ -28,16 +28,23 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
   var assertionUrl = req.body['assertion'];
   var user = req.user;
   remote.getHostedAssertion(assertionUrl, function(err, assertion) {
-    if (err) {/*todo: figure out returning an ajax error*/}
-    if (assertion.recipient !== user.get('email')) {debugger;/*another error*/}
+    if (err) {
+      logger.error("assertion error "+err);
+      /*todo: figure out returning an ajax error*/
+    }
+    if (assertion.recipient !== user.get('email')) {
+      /*todo another error*/
+    }
     remote.badgeImage(assertion.badge.image, function(err, imagedata) {
       awardBadge(assertion, assertionUrl, imagedata, function(err, badge) {
         if (err) {
-          /* again, another error */
+          /* todo again, another error */
+          logger.error("badge error " + assertionUrl);
         }
+        else { logger.debug("badge added " + assertionUrl); }
       })
     })
-    console.debug(assertion);
+    logger.debug(assertion);
     return(assertion);
   })
   logger.debug(req.body['assertion']);

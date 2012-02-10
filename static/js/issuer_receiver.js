@@ -11,6 +11,10 @@ function postFail(e) {
 }
 
 WinChan.onOpen(function(origin, args, cb) {
+  $("#closer").on('click', function() { 
+    cb({thanks:'you are cool'});
+    window.close();
+  })
   $("#test").text(args['badges'][0]);
   _.each(args['badges'], 
          function(assertion) {
