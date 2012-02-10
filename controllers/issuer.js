@@ -25,16 +25,17 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
   // handles the adding of a badge via assertion url called
   // from issuerBadgeAdd
   // called as an ajax call.
-  var assertionUrl = req.body['assertion']
+  var assertionUrl = req.body['assertion'];
+  var user = req.user;
   remote.getHostedAssertion(assertionUrl, function(err, assertion) {
-    debugger;
     if (err) {/*todo: figure out returning an ajax error*/}
-    if (assertion.recipient !== user.get('email')) {/*another error*/}
-    
-    awardBadge(assertion, assertionUrl, imagedata, function(err, badge) {
-      if (err) {
-        /* again, another error */
-      }
+    if (assertion.recipient !== user.get('email')) {debugger;/*another error*/}
+    remote.badgeImage(assertion.badge.image, function(err, imagedata) {
+      awardBadge(assertion, assertionUrl, imagedata, function(err, badge) {
+        if (err) {
+          /* again, another error */
+        }
+      })
     })
     console.debug(assertion);
     return(assertion);
