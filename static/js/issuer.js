@@ -1,9 +1,8 @@
-(
-//assume that issuers.js is included from openbadges.org, 
-//but then allows the user to send the badge to wherever 
-//their backpack is configured.
+var issuer = (function() {
 
-function sendIt(badgeAssertion, apiHost) {
+issuer.sendIt = function (badgeAssertion, apiHost) {
+  var window_opts = "menubar=0,location=1,resizable=0,scrollbars=0,status=0,dialog=0,width=700,height=700";
+
   if (! $.isArray(badgeAssertion)) {
     badgeAssertion = [badgeAssertion];
   }
@@ -21,21 +20,6 @@ function sendIt(badgeAssertion, apiHost) {
                          }
                        });
 }
-
-function issuerApi(apiHost, badgeSelector) {
-  if (!badgeSelector) {
-    var badgeSelector = '.badge';
-  }
-  $(badgeSelector).on("click", function() {
-    var badgeAssertion = $(this).data("assert");
-    var window_opts = "menubar=0,location=1,resizable=0,scrollbars=0,status=0,dialog=0,width=700,height=700";
-    sendIt(badgeAssertion, apiHost);
-    /* todo: what if they've misconfigured the api on their end...need errors */
-  })
-
-}
-
-
 
 (WinChan = (function() {
   var RELAY_FRAME_NAME = "__winchan_relay_frame";
@@ -265,4 +249,6 @@ function issuerApi(apiHost, badgeSelector) {
       }
     };
   }
-})();)
+})();
+
+});
