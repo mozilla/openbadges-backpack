@@ -1,22 +1,37 @@
-function issuerApi() {
-  $(".btn").on("click", function() {
-    var badge_assertion = $(this).attr("assert");
+//assume that issuers.js is included from openbadges.org, 
+//but then allows the user to send the badge to wherever 
+//their backpack is configured.
+
+function sendIt(badgeAssertion, apiHost) {
+  if (! $.isArray(badgeAssertion)) {
+    badgeAssertion = [badgeAssertion];
+  }
+    
+  var w = WinChan.open({
+    url: apiHost + "/api/issuer",
+    relay_url: apiHost + "/html/relay.html",
+    window_features: window_opts,
+    params: {
+      badges: badgeAssertion
+    }},
+                       function(err, r) {
+                         if (err) {
+                           alert("there was an error " + err + JSON.stringify(r));
+                         }
+                       });
+}
+
+function issuerApi(apiHost, badgeSelector) {
+  if (!badgeSelector) {
+    var badgeSelector = '.badge';
+  }
+  $(badgeSelector).on("click", function() {
+    var badgeAssertion = $(this).data("assert");
     var window_opts = "menubar=0,location=1,resizable=0,scrollbars=0,status=0,dialog=0,width=700,height=700";
+    sendIt(badgeAssertion, apiHost);
     /* todo: what if they've misconfigured the api on their end...need errors */
-    w = WinChan.open({
-      url: "http://localhost:8888/api/issuer",
-      relay_url: "http://localhost:8888/html/relay.html",
-      window_features: window_opts,
-      params: {
-        badges: [badge_assertion]
-      }},
-      function(err, r) {
-        if (err) {
-          alert("there was an error " + err + JSON.stringify(r));
-        }
-      }
-    );
-  });
+  })
+
 }
 
 /*! jQuery v1.7.1 jquery.com | jquery.org/license */
