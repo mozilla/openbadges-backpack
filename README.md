@@ -56,17 +56,32 @@ changes, so you don't have to manually reload it.
 
 ### The hard way
 
-1. Copy the `openbadges/lib/environments/local-dist.js` to `openbadges/lib/environments/local.js` and edit the configuration to match your local development environment.
+1. Setup a MySQL database. Create a database and a user with full privileges on
+   that db. For example:
 
-2. Setup your MySQL database. Create a database and a user with full privileges on that db `openbadges/lib/environments/local.js`.
+        CREATE DATABASE openbadges;
+        GRANT ALL PRIVILEGES ON openbadges.* TO badgemaker@localhost IDENTIFIED BY 'secret';
+        CREATE DATABASE openbadges_test;
+        GRANT ALL PRIVILEGES ON openbadges_test.* to badgemaker@localhost IDENTIFIED BY 'secret';
+
+2. Copy the `openbadges/lib/environments/local-dist.js` to
+   `openbadges/lib/environments/local.js` and edit the configuration to match
+   your local development environment. The MySQL database credentials should
+   match step #1. For example:
+
+        database: {
+          driver: 'mysql',
+          host: '127.0.0.1',
+          user: 'badgemaker',
+          password: 'secret',
+          database: 'openbadges'
+        },
 
 3. Install local dependencies: `npm install`
- 
-4. Install global dependencies: `npm install -g up vows`
 
-5. Run the test suite: `vows -i`
+4. Run the test suite: `./node_modules/.bin/vows -i`
 
-6. Start your server: `up -w -p 8888 app.js`
+5. Start your server: `./node_modules/.bin/up -w -p 8888 app.js`
 
 No matter which way you choose, you should join the
 [Open Badges Google Group](https://groups.google.com/forum/#!forum/openbadges). If
