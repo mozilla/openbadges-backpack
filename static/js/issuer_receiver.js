@@ -15,6 +15,7 @@ var issuer_reciever = (function(){
   var childChannel = Channel.build({window: window.parent,
                                     origin: "*",
                                     scope: "badgeScope",
+                                    debugOutput: true,
                                     onReady: function() { console.log("channel ahoy!"); }
                                    });
 
