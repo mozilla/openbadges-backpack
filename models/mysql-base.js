@@ -63,6 +63,7 @@ Base.apply = function (Model, table) {
 Base.prototype.validate = function (attributes) {
   var err = new Error('Invalid attribute data')
     , validators = this.model.validators || {};
+  console.dir(attributes);
   attributes = (attributes || this.attributes);
   err.fields = {};
   Object.keys(validators).forEach(function (field) {
