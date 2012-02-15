@@ -23,7 +23,8 @@ var issuer_reciever = (function(){
     console.log("badges on the receiver " + badges);
     _.each(badges, 
            function(assertion) {
-             if (typeof(assertion_) == object) {
+             console.log("ASSERTION IS", assertion, typeof(assertion));
+             if (typeof(assertion) == "object") {
                assertion = assertion.assertion;
              }
              $.post('/api/issuer', 
@@ -36,7 +37,7 @@ var issuer_reciever = (function(){
 
 
   childChannel.bind("loadAsserts", function(trans, badges) { 
-    console.log("channel called " + badges);
+    console.log("channel called " + badges, typeof(badges));
     return postBadges(badges);
   });
 })();
