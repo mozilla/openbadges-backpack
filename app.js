@@ -50,7 +50,8 @@ app.use(express.cookieParser());
 app.use(express.methodOverride());
 app.use(middleware.logRequests());
 app.use(middleware.cookieSessions());
-app.use(middleware.noFrame([ '/share/.*' ]));
+//todo make this work!
+//app.use(middleware.noFrame([ '/api/issuer' ]));
 app.use(middleware.userFromSession());
 app.use(middleware.csrf());
 

@@ -1,24 +1,41 @@
-var l = $("#added_badges");
-var csrf = $("#csrf").attr("value");
+var issuer_reciever = (function(){
+  console.log("the receiver is starting");
+  var l = $("#added_badges");
+  var csrf = $("#csrf").attr("value");
 
-function postSuccessful(response) {
-  l.append("<li>"+response+"</li>");
-}
+  function postSuccessful(response) {
+    l.append("<li>"+response+"</li>");
+  }
 
-function postFail(e) {
-  // hmmm
-  l.append("<li>some error happened</li>");  
-}
+  function postFail(e) {
+    // hmmm
+    l.append("<li>some error happened</li>");  
+  }
 
-WinChan.onOpen(function(origin, args, cb) {
-  $("#closer").on('click', function() { 
-    cb({thanks:'you are cool'});
-    window.close();
-  })
-  $("#test").text(args['badges'][0]);
-  _.each(args['badges'], 
-         function(assertion) {
-           // reverse issuer.issuerBadgeAddFromAssertion
-           $.post('/api/issuer', { assertion:assertion, _csrf:csrf }, postSuccessful, postFail);
-         });
-});
+  var childChannel = Channel.build({window: window.parent,
+                                    origin: "*",
+                                    scope: "badgeScope",
+                                    onReady: function() { console.log("channel ahoy!"); }
+                                   });
+
+  function postBadges(badges) {
+    console.log("badges on the receiver " + badges);
+    _.each(badges, 
+           function(assertion) {
+             if (typeof(assertion_) == object) {
+               assertion = assertion.assertion;
+             }
+             $.post('/api/issuer', 
+                    { assertion:assertion, _csrf:csrf }, 
+                    postSuccessful, 
+                    postFail);
+           });
+    return "success?";
+  }
+
+
+  childChannel.bind("loadAsserts", function(trans, badges) { 
+    console.log("channel called " + badges);
+    return postBadges(badges);
+  });
+})();
