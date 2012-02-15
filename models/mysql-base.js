@@ -71,6 +71,7 @@ Base.prototype.validate = function (attributes) {
     if (msg) { err.fields[field] = msg; } 
   })
   if (Object.keys(err.fields).length > 0) {
+    console.dir(err);
     return err;
   }
 };
