@@ -224,8 +224,8 @@ a.badge:active {
   -khtml-user-drag: element;
 }
 
-.blanker {
-  position: absolute;
+.lightbox {
+  position: fixed;
   background: rgba(0, 0, 0, 0.3);
   z-index: 10;
   top: 0;
@@ -233,13 +233,77 @@ a.badge:active {
   width: 100%;
   height: 100%;
 }
-.blanker .contents {
-  width: 400px;
-  height: 600px;
-  margin: auto;
-  border: 1px solid red;
+
+.lightbox .contents {
+  width: 700px;
+  margin: 88px auto;
   border-radius: 5px;
   background: #eee;
+  box-shadow: 1px 1px 5px 5px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  background: #444;
+  border: 3px solid #444;
+}
+
+.lightbox .contents header {
+  padding: 2px 20px;
+  color: #eee;
+}
+
+.lightbox .contents h2 {
+  color: #fff;
+  text-shadow: 1px 1px 1px #222;
+}
+
+.lightbox table td {
+  border: 0;
+  padding: 4px 12px;
+}
+
+.lightbox table td.label {
+  width: 128px;
+  font-weight: bold;
+  text-align: right;
+}
+.lightbox table td.label:after {
+  position: absolute;
+  margin-left: 4px;
+  margin-top: 1px;
+  content: "—";
+  font-weight: normal;
+  color: #bbb;
+}
+
+.lightbox table td.section-head {
+  color: #999;
+  border-bottom: 1px solid #ccc;
+  line-height: 1.5em;
+  padding-left: 0;
+}
+
+.lightbox .contents .body {
+  height: 100%;
+  background: #f4f4f4;
+  border-radius: 3px;
+  padding: 10px 20px;
+  text-shadow: 1px 1px 1px #fff;
+  box-shadow: 0px 1px 2px 2px rgba(0, 0, 0, 0.4);
+}
+
+.lightbox .contents .information .image {
+  text-align: center;
+  width: 148px;
+}
+
+.lightbox .contents .information img {
+  max-height: 128px;
+  max-width: 128px;
+  display: block;
+  margin: auto;
+}
+
+.lightbox .contents .information button {
+  margin-top: 16px;
 }
 
 body {
