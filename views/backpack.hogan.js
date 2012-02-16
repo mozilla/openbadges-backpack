@@ -9,9 +9,9 @@
     <h1>Badges</h1>
     <div id="badges" class="js-badges">
       {{#badges}}
-      <a href="{{detailsUrl}}" draggable="true" class="badge" id="{{attributes.body_hash}}" data-hash="{{attributes.body_hash}}" data-id="{{attributes.id}}">
-        <img src="{{attributes.image_path}}" width="64px"/>
-      </a>
+        <a href="#" draggable="true" class="badge" data-id="{{attributes.id}}">
+          <img src="{{attributes.image_path}}" width="64px"/>
+        </a>
       {{/badges}}
     </div>
     {{/badges.length}}
@@ -37,13 +37,13 @@
     <div id='groups' class="span-two-thirds column">
       <h1>Groups</h1>
       {{#groups}}
-        <div class='group' data-badges="[{{attributes.badges}}]" data-id="{{attributes.id}}" id="{{attributes.url}}">
+        <div class='group' data-id="{{attributes.id}}">
           <input class='groupName' type='text' value='{{attributes.name}}' style='display: block'>
         <span class='icon delete'>&times;</span>
         <span class='icon config'>&#x2699;</span>
           
           {{#attributes.badgeObjects}}
-            <a href="{{detailsUrl}}" draggable="true" class="badge" id="{{attributes.body_hash}}-{{url}}" data-hash="{{attributes.body_hash}}" data-id="{{attributes.id}}" data-grouped="{{url}}">
+            <a href="#" draggable="true" class="badge" data-id="{{attributes.id}}">
               <img src="{{attributes.image_path}}" width="64px"/>
             </a>
           {{/attributes.badgeObjects}}
@@ -63,6 +63,18 @@
 </div>
 
 
+<div class='blanker'>
+  <div class='contents badge-details'>
+    <header>
+      <h2>Details</h2>
+    </header>
+  
+  </div>
+</div>
+
+
+
+
 {{=|| ||=}} <!-- need to change delimeter so hogan doesn't parse these --->
 <script type='text/html' id='groupTpl'>
   <div class='group {{^attributes.id}}isNew{{/attributes.id}}'>
@@ -73,10 +85,6 @@
     {{^attributes.id}}
       <h3 class='instructions'>Drag a Badge Here</h3>
     {{/attributes.id}}
-    
-    {{#badges.length}}
-      {{>badgeTemplate}}
-    {{/badges.length}}
   </div>
 </script>
 

@@ -109,11 +109,10 @@ exports.manage = function(req, res, next) {
     , badgeIndex = {};
   if (!user) return res.redirect(reverse('backpack.login'), 303);
   
-  var prepareBadges = function (badges) {
-    badges.forEach(function (badge) {
-      badgeIndex[badge.get('id')] = badge;
-      badge.detailsUrl = reverse('backpack.details', { badgeId: badge.get('body_hash') });
-    });
+  res.header('Cache-Control', 'no-cache, must-revalidate');
+  
+  var prepareBadgeIndex = function (badges) {
+    badges.forEach(function (badge) { badgeIndex[badge.get('id')] = badge; });
   };
   
   var getGroups = function () {
@@ -153,9 +152,9 @@ exports.manage = function(req, res, next) {
   
   var makeResponse = function (err, badges) {
     if (err) return next(err);
-    prepareBadges(badges);
+    prepareBadgeIndex(badges);
     modifyGroups(groups);
-    res.render('manage', {
+    res.render('backpack', {
       error: error,
       success: success,
       badges: badges,

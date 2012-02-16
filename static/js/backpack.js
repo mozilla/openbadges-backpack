@@ -282,6 +282,7 @@ Badge.View = Backbone.View.extend({
    */
   start : function (event) {
     global.dragging = this;
+    event.stopPropagation();
   },
   
   
@@ -410,4 +411,4 @@ _.each(existingBadges, Badge.fromElement);
 _.each(existingGroups, Group.fromElement);
 
 //end app scope
-}()
+}();
