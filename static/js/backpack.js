@@ -235,6 +235,9 @@ Group.View = Backbone.View.extend({
     var view = global.dragging
       , badge = view.model
       , collection = this.model.get('badges');
+    
+    // prevent bug in firefox: https://bugzilla.mozilla.org/show_bug.cgi?id=727844
+    event.preventDefault();
     event.stopPropagation();
     
     if (collection.get(badge)) {
