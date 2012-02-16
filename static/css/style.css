@@ -255,6 +255,15 @@ a.badge:active {
   text-shadow: 1px 1px 1px #222;
 }
 
+.lightbox .contents .body {
+  position: relative;
+  height: 100%;
+  background: #f4f4f4;
+  border-radius: 3px;
+  text-shadow: 1px 1px 1px #fff;
+  box-shadow: 0px 1px 2px 2px rgba(0, 0, 0, 0.4);
+}
+
 .lightbox table td {
   border: 0;
   padding: 4px 12px;
@@ -272,6 +281,7 @@ a.badge:active {
   content: "—";
   font-weight: normal;
   color: #bbb;
+  z-index: 5;
 }
 
 .lightbox table td.section-head {
@@ -281,13 +291,9 @@ a.badge:active {
   padding-left: 0;
 }
 
-.lightbox .contents .body {
-  height: 100%;
-  background: #f4f4f4;
-  border-radius: 3px;
-  padding: 10px 20px;
-  text-shadow: 1px 1px 1px #fff;
-  box-shadow: 0px 1px 2px 2px rgba(0, 0, 0, 0.4);
+
+.lightbox .contents .information {
+  padding: 10px 3px;
 }
 
 .lightbox .contents .information .image {
@@ -304,6 +310,39 @@ a.badge:active {
 
 .lightbox .contents .information button {
   margin-top: 16px;
+}
+
+.lightbox .confirm-disown {
+  display: none;
+  padding: 10px 20px;
+  background: #fee;
+  position: absolute;
+  height: 100%;
+  z-index: 18;
+  border-radius: 5px;
+}
+
+.lightbox .confirm-disown p {
+  margin: 30px auto;
+  font-size: 1.3em;
+  line-height: 1.4em;
+  width: 80%;
+}
+
+.lightbox .confirm-disown .buttons {
+  margin: 20px auto;
+  padding: 30px 0;
+  border-top: 1px solid #dcc;
+  width: 80%;
+}
+
+.lightbox .confirm-disown .btn {
+  font-size: 1.0em;
+}
+
+.lightbox .confirm-disown .danger {
+  float: right;
+  font-weight: bold;
 }
 
 body {

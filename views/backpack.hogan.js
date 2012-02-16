@@ -70,6 +70,21 @@
       <h2>Awesome Badge of Awesomeitudiness</h2>
     </header>
     <div class='body'>
+      
+      <div class='confirm-disown'>
+        <p>
+          This will remove the badge from your account. It will also be
+          removed from all groups. The only way to get this badge back will be
+          to go to the place where it was issued (<a href='http://p2pu.org'>P2PU</a>)
+          and get it re-issued.
+        </p>
+      
+        <div class='buttons'>
+          <button class='btn'>Nevermind, I want to keep this badge</button>
+          <button class='btn danger'>Yes, remove this badge</button>
+        </div>
+      </div>
+      
       <table class='information'>
         
         <tr>
