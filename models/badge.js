@@ -28,6 +28,9 @@ Badge.prototype.checkHash = function () {
 // Validators called by `save()` (see mysql-base) in preparation for saving.
 // A valid pass returns nothing (or a falsy value); an invalid pass returns a
 // message about why a thing was invalid.
+
+// #TODO: return either null or Error objects with more information about
+// what's going on.
 Badge.validators = {
   type: function (value, attributes) {
     var valid = ['signed', 'hosted'];
