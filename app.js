@@ -45,12 +45,12 @@ app.helpers({
 // middleware used.
 app.use(express.static(path.join(__dirname, "static")));
 app.use(express.static(path.join(configuration.get('var_dir'), "badges")));
+app.use(middleware.noFrame({ whitelist: [ '/', '/chris', '/share/.*' ] }));
 app.use(express.bodyParser({ uploadDir:configuration.get('badge_path') }));
 app.use(express.cookieParser());
 app.use(express.methodOverride());
 app.use(middleware.logRequests());
 app.use(middleware.cookieSessions());
-app.use(middleware.noFrame([ '/share/.*' ]));
 app.use(middleware.userFromSession());
 app.use(middleware.csrf());
 
