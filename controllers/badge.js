@@ -28,7 +28,6 @@ exports.param['badgeId'] = function(req, res, next, id) {
  */
 
 exports.destroy = function (req, res) {
-  console.dir('what');
   var badge = req.badge
     , user = req.user
     , assertion = badge.get('body')
