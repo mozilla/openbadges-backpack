@@ -23,6 +23,7 @@ var global = {
 var Badge = {}
   , Group = {}
   , Message = {}
+  , Details = {}
 
 // Helper functions
 // ----------------------
@@ -41,7 +42,10 @@ var errHandler = function (model, xhr) {
 
 // Model Definitions
 // ----------------------
-Badge.Model = Backbone.Model.extend();
+Badge.Model = Backbone.Model.extend({
+  urlRoot: '/badge'
+});
+
 Group.Model = Backbone.Model.extend({
   urlRoot: '/group',
   defaults: {
@@ -68,6 +72,7 @@ Group.Collection = Backbone.Collection.extend({
  * @see errHandler
  */
 Badge.Collection.saveParentGroup = function () {
+  if (!this.belongsTo) return;
   this.belongsTo.save(null, { error: errHandler });
 }
 
@@ -84,7 +89,6 @@ Message.View = Backbone.View.extend({
   className: 'message',
   events: {},
   render: function (attributes) {
-    console.dir(ich);
     var $element = ich.messageTpl(attributes);
     this.parent.empty();
     $element
@@ -244,7 +248,7 @@ Group.View = Backbone.View.extend({
       return;
     } 
     
-    if (!badge.collection) {
+    if (!badge.collection || badge.collection === AllBadges) {
       return this.addNew(event, badge);
     }
     return this.moveExisting(event, badge);
@@ -266,12 +270,85 @@ Group.View = Backbone.View.extend({
   }
 });
 
+Details.View = Backbone.View.extend({
+  badgeView: null,
+  events: {
+    'click .close': 'hide',
+    'mousedown .close': 'nothing',
+    'click .disown': 'showConfirmation',
+    'click .confirm-disown .nope': 'hideConfirmation',
+    'click .confirm-disown .yep': 'destroyBadge'
+  },
+  
+  showConfirmation: function () {
+    this.$el.find('.confirm-disown').fadeIn('fast');
+  },
+  
+  hideConfirmation: function () {
+    this.$el.find('.confirm-disown').fadeOut('fast');
+  },
+  
+  destroyBadge: function () {
+    var badge = this.model;
+    _.each(AllGroups.models, function (group) {
+      var collection = group.get('badges');
+      if (collection.get(badge)) {
+        collection.remove(badge);
+      }
+    });
+    _.each(Badge.View.all, function (view) {
+      if (view.model.id === badge.id) view.$el.fadeOut('fast');
+    });
+    badge.destroy();
+    this.hide();
+  },
+  
+  nothing: function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  },
+  
+  hide: function() {
+    this.$el
+      .stop()
+      .fadeOut('fast', function () {
+        $(this).detach()
+      });
+    this.hideConfirmation();
+    return false;
+  },
+  
+  show: function () {
+    this.$el
+      .hide()
+      .appendTo($(body))
+      .fadeIn('fast');
+  },
+  
+  render: function () {
+    ich.grabTemplates();
+    this.el = ich.detailsTpl(this.model.attributes);
+    this.setElement(this.el);
+    this.$el.data('view', this);
+    return this;
+  }
+});
 
 Badge.View = Backbone.View.extend({
   tagName: "a",
   className: "badge",
+  detailsView: null,
   events: {
+    'click' : 'showDetails',
     'dragstart' : 'start'
+  },
+  
+  initialize: function () {
+    Badge.View.all.push(this);
+  },
+  
+  showDetails: function (event) {
+    this.detailsView.show();
   },
   
   /**
@@ -329,15 +406,25 @@ Badge.View = Backbone.View.extend({
     this.el = ich.badgeTpl(this.model.attributes);
     this.$el.data('view', this);
     this.setElement($(this.el));
+    this.attachToExisting($(this.el));
     return this;
-  }
+  },
+
+  attachToExisting: function (el) {
+    this.detailsView = new Details.View({ model: this.model });
+    this.detailsView.render();
+    this.setElement($(el));
+    return this;
+  },
 });
 
+Badge.View.all = [];
 
 /**
  * Create a new collection for all of the groups to live in.
  */
 var AllGroups = new Group.Collection();
+var AllBadges = new Badge.Collection();
 AllGroups.on('remove', function (group) {
   group.destroy();
 });
@@ -347,9 +434,15 @@ AllGroups.on('remove', function (group) {
  */
 (new (Backbone.View.extend({
   events: {
+    'keyup': 'keys',
     'dragover': 'nothing',
     'dragenter': 'nothing',
     'drop': 'maybeRemoveBadge'
+  },
+  keys: function (event) {
+    if (event.keyCode === 27) {
+      $('.lightbox').data('view').hide();
+    }
   },
   nothing: function (event) {
     event.preventDefault();
@@ -361,7 +454,7 @@ AllGroups.on('remove', function (group) {
     if (event.target.className === 'group')
       return;
     
-    if (badge.collection) {
+    if (badge.collection && badge.collection !== AllBadges) {
       badgeView.remove();
       badge.collection.remove(badge);
     }
@@ -396,11 +489,9 @@ Group.fromElement = function (element) {
  */
 Badge.fromElement = function (element) {
   var $el = $(element)
-    , model = new Badge.Model({
-      id: $el.data('id'),
-      image: $el.find('img').attr('src')
-    })
-  new Badge.View({ model: model }).setElement($el);
+    , model = new Badge.Model(window.badgeData[$el.data('id')])
+  new Badge.View({ model: model }).attachToExisting($el);
+  if (!AllBadges.get(model.id)) AllBadges.add(model);
   return model;
 };
 

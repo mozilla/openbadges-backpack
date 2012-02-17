@@ -13,24 +13,6 @@ var request = require('request')
   , Badge = require('../models/badge')
   , Group = require('../models/group')
 
-exports.param = {};
-
-/**
- * Route param pre-condition for finding a badge when a badgeId is present.
- * If the badge cannot be found, immediately return HTTP 404.
- *
- * @param {String} hash is the `body_hash` of the badge to look up.
- */
-
-exports.param['badgeId'] = function(req, res, next, hash) {
-  Badge.findOne({body_hash: hash}, function(err, badge) {
-    if (!badge) return res.send('could not find badge', 404);
-    req.badge = badge;
-    return next();
-  });
-};
-
-
 /**
  * Render the login page.
  */
@@ -112,7 +94,11 @@ exports.manage = function(req, res, next) {
   res.header('Cache-Control', 'no-cache, must-revalidate');
   
   var prepareBadgeIndex = function (badges) {
-    badges.forEach(function (badge) { badgeIndex[badge.get('id')] = badge; });
+    badges.forEach(function (badge) {
+      badgeIndex[badge.get('id')] = badge;
+      badge.serializedAttributes = JSON.stringify(badge.attributes);
+    });
+    
   };
   
   var getGroups = function () {
@@ -165,65 +151,6 @@ exports.manage = function(req, res, next) {
   
   var startResponse = getGroups;
   return startResponse();
-};
-
-
-/**
- * Render a badge details page.
- */
-
-exports.details = function(req, res) {
-  var badge = req.badge
-    , user = req.user
-    , email = user ? user.get('email') : null
-    , assertion = badge.get('body');
-  
-  res.render('badge-details', {
-    title: '',
-    user: (assertion.recipient === email) ? email : null,
-    
-    id: badge.get('id'),
-    recipient: assertion.recipient,
-    image: badge.get('image_path'),
-    owner: (assertion.recipient === email),
-    
-    deleteRoute: reverse('backpack.deleteBadge', { badgeId: badge.get('body_hash') }),
-    csrfToken: req.session._csrf,
-    
-    badge: badge,
-    type: assertion.badge,
-    meta: {}, // #TODO: remove.
-    groups: [] // #TODO: replace with real grouping
-  })
-}
-
-
-/**
- * Completely delete a badge from the user's account.
- *
- * @return {HTTP 500|403|303}
- *   user doesn't own the badge -> 403.
- *   error calling `Badge#destroy` -> 500
- *   success -> 303 to `backpack.manage`
- */
-
-exports.deleteBadge = function (req, res) {
-  var badge = req.badge
-    , user = req.user
-    , assertion = badge.get('body')
-    , failNow = function () { return res.send("Cannot delete a badge you don't own", 403) }
-  if (!user) return failNow()
-  
-  if (assertion.recipient !== user.get('email')) return failNow()
-  
-  badge.destroy(function (err, badge) {
-    if (err) {
-      logger.warn('Failed to delete badge');
-      logger.warn(err);
-      return res.send('Could not delete badge. This error has been logged', 500);
-    }
-    return res.redirect(reverse('backpack.manage'), 303);
-  })
 };
 
 

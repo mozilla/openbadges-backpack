@@ -9,9 +9,9 @@
     <h1>Badges</h1>
     <div id="badges" class="js-badges">
       {{#badges}}
-        <a href="#" draggable="true" class="badge" data-id="{{attributes.id}}">
+        <span draggable="true" class="badge" data-id="{{attributes.id}}">
           <img src="{{attributes.image_path}}" width="64px"/>
-        </a>
+        </span>
       {{/badges}}
     </div>
     {{/badges.length}}
@@ -43,9 +43,9 @@
         <span class='icon config'>&#x2699;</span>
           
           {{#attributes.badgeObjects}}
-            <a href="#" draggable="true" class="badge" data-id="{{attributes.id}}">
+            <span draggable="true" class="badge" data-id="{{attributes.id}}">
               <img src="{{attributes.image_path}}" width="64px"/>
-            </a>
+            </span>
           {{/attributes.badgeObjects}}
         </div>
       {{/groups}}
@@ -62,93 +62,111 @@
   {{/badges.length}}
 </div>
 
+<script>
+  window.badgeData = {}
+  {{#badges}}
+    window.badgeData[{{attributes.id}}] = {{{serializedAttributes}}};
+  {{/badges}}
+</script>
+
 {{=|| ||=}} <!-- need to change delimeter so hogan doesn't parse these --->
 
-<div class='lightbox'>
-  <div class='contents badge-details'>
-    <header>
-      <h2>Awesome Badge of Awesomeitudiness</h2>
-    </header>
-    <div class='body'>
-      
-      <div class='confirm-disown'>
-        <p>
-          This will remove the badge from your account. It will also be
-          removed from all groups. The only way to get this badge back will be
-          to go to the place where it was issued (<a href='http://p2pu.org'>P2PU</a>)
-          and get it re-issued.
-        </p>
-      
-        <div class='buttons'>
-          <button class='btn'>Nevermind, I want to keep this badge</button>
-          <button class='btn danger'>Yes, remove this badge</button>
+<script type='text/html' id='detailsTpl'>
+  <div class='lightbox' data-id='{{id}}'>
+    <div class='contents badge-details'>
+      <header>
+        <h2>{{body.badge.name}}</h2>
+        <span class='close'>&times;</span>
+      </header>
+      <div class='body'>
+
+        <div class='confirm-disown'>
+          <p>
+            This will remove the badge from your account. It will also be
+            removed from all groups. The only way to get this badge back will be
+            to go to the place where it was issued
+            (<a href='{{body.badge.issuer.origin}}'>{{body.badge.issuer.name}}</a>)
+            and get it re-issued.
+          </p>
+
+          <div class='buttons'>
+            <button class='btn nope'>Nevermind, I want to keep this badge</button>
+            <button class='btn yep danger'>Yes, remove this badge</button>
+          </div>
         </div>
-      </div>
-      
-      <table class='information'>
-        
-        <tr>
-          <td rowspan="100" class='image'>
-            <img src="/_badges/6e20f188a75052fc5b6a573121e428fa.png">
-            <button class='btn danger'>Disown this Badge</button>
-          </td>
+
+        <table class='information'>
+          <tr>
+            <td rowspan="100" class='image'>
+              <img src="{{image_path}}">
+              <button class='btn danger disown'>Disown this Badge</button>
+            </td>
+
+            <td class='section-head' colspan='2'>Issuer Details</td>
+          </tr>
+          {{#body}}
+          <tr>
+            <td class='label issuer-name'>Name</td>
+            <td>{{badge.issuer.name}}</td>
+          </tr>
+          <tr>
+            <td class='label issuer-name'>URL</td>
+            <td><a href={{badge.issuer.origin}}'>{{badge.issuer.origin}}</a></td>
+          </tr>
+          {{#badge.issuer.org}}
+          <tr>
+            <td class='label issuer-name'>Organization</td>
+            <td>{{badge.issuer.org}}</td>
+          </tr>
+          {{/badge.issuer.org}}
+
+          <tr>
+            <td class='section-head' colspan='2'>Badge Details</td>
+          </tr>
+          <tr>
+            <td class='label'>Name</td>
+            <td>{{badge.name}}</td>
+          </tr>
+          <tr>
+            <td class='label'>Description</td>
+            <td>{{badge.description}}</td>
+          </tr>
+          <tr>
+            <td class='label'>Criteria</td>
+            <td><a href='{{badge.criteria}}'>{{badge.criteria}}</a></td>
+          </tr>
+
+          <tr>
+            <td class='section-head' colspan='2'>Issuance Details</td>
+          </tr>
+          <tr>
+            <td class='label recipient'>Recipient</td>
+            <td>{{recipient}}</td>
+          </tr>
+          <tr>
+            <td class='label evidence'>Evidence</td>
+            <td><a href='{{evidence}}'>{{evidence}}</a></td>
+          </tr>
+          {{#issued_on}}
+          <tr>
+            <td class='label'>Issued On</td>
+            <td>{{issued_on}}</td>
+          </tr>
+          {{/issued_on}}
           
-          <td class='section-head' colspan='2'>Issuer Details</td>
-        </tr>
-        <tr>
-          <td class='label issuer-name'>Name</td>
-          <td>P2PU</td>
-        </tr>
-        <tr>
-          <td class='label issuer-name'>URL</td>
-          <td><a href='http://p2pu.org'>http://p2pu.org</a></td>
-        </tr>
-        <tr>
-          <td class='label issuer-name'>Organization</td>
-          <td>School of Webcraft</td>
-        </tr>
-        
-        <tr>
-          <td class='section-head' colspan='2'>Badge Details</td>
-        </tr>
-        <tr>
-          <td class='label'>Name</td>
-          <td>Awesome Badge of Awesomeitudiness</td>
-        </tr>
-        <tr>
-          <td class='label'>Description</td>
-          <td>For keeping it real and rocking in the free world.</td>
-        </tr>
-        <tr>
-          <td class='label'>Criteria</td>
-          <td><a href='#'>http://example.com/awesome/</a></td>
-        </tr>
-        
-        <tr>
-          <td class='section-head' colspan='2'>Issuance Details</td>
-        </tr>
-        <tr>
-          <td class='label recipient'>Recipient</td>
-          <td>bimmy@example.com</td>
-        </tr>
-        <tr>
-          <td class='label evidence'>Evidence</td>
-          <td><a href='#'>http://example.com/what/</a></td>
-        </tr>
-        <tr>
-          <td class='label'>Issued On</td>
-          <td>January 1st, 2001</td>
-        </tr>
-        <tr>
-          <td class='label'>Expiration Date</td>
-          <td>January 1st, 2013</td>
-        </tr>
-      
-      </table>
+          {{#expires}}
+          <tr>
+            <td class='label'>Expiration Date</td>
+            <td>{{expires}}</td>
+          </tr>
+          {{/expires}}
+          
+          {{/body}}
+        </table>
+      </div>
     </div>
   </div>
-</div>
-
+</script>
 
 
 
@@ -165,7 +183,7 @@
 </script>
 
 <script type='text/html' class='partial' id='badgeTpl'>
-  <a href="{{url}}" draggable="true" class="badge">
-    <img src="{{image}}" width="64px"/>
-  </a>
+  <span draggable="true" class="badge">
+    <img src="{{image_path}}" width="64px"/>
+  </span>
 </script>
