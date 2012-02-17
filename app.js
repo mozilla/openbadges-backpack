@@ -62,30 +62,29 @@ app.use(function(req, res, next) {
 });
 
 router(app)
-  .get('/chris',                            'chris.chris')
-  .get('/baker',                            'baker.baker')
-  
-  .get('/demo',                             'demo.issuer')
-  .get('/demo/ballertime',                  'demo.massAward')
-  .get('/demo/badge.json',                  'demo.testBadge')
-  .get('/demo/invalid.json',                'demo.badBadge')
-  .post('/demo/award',                      'demo.award')
-  
-  .get('/backpack/login',                   'backpack.login')
-  .get('/backpack/signout',                 'backpack.signout')
-  .get('/backpack/badge/:badgeId',          'backpack.details')
-  .get('/backpack',                         'backpack.manage')
-  .post('/backpack/badge',                  'backpack.userBadgeUpload')
-  .post('/backpack/authenticate',           'backpack.authenticate')
-  .delete('/backpack/badge/:badgeId',       'backpack.deleteBadge')
-  
-  .post('/group',                           'group.create')
-  .put('/group/:id',                        'group.update')
-  .delete('/group/:id',                     'group.destroy')
-  
-  .get('/share/g/:groupId',                 'share.group')
-  .get('/share/b/:badgeId',                 'share.badge')
-  .get('/',                                 'backpack.manage')
+  .get('/chris',                   'chris.chris')
+  .get('/baker',                   'baker.baker')
+                                   
+  .get('/demo',                    'demo.issuer')
+  .get('/demo/ballertime',         'demo.massAward')
+  .get('/demo/badge.json',         'demo.testBadge')
+  .get('/demo/invalid.json',       'demo.badBadge')
+  .post('/demo/award',             'demo.award')
+                                   
+  .get('/backpack/login',          'backpack.login')
+  .get('/backpack/signout',        'backpack.signout')
+  .get('/',                        'backpack.manage')
+  .get('/backpack',                'backpack.manage')
+  .post('/backpack/badge',         'backpack.userBadgeUpload')
+  .post('/backpack/authenticate',  'backpack.authenticate')
+                                   
+  .post('/group',                  'group.create')
+  .delete('/group/:groupId',       'group.destroy')
+  .get('/group/:groupId',          'group.config')
+  .put('/group/:groupId',          'group.update')
+
+  .delete('/badge/:badgeId',       'badge.destroy')
+
 
 if (!module.parent) {
   var start_server = function(app) {  

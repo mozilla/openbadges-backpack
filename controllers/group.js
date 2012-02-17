@@ -4,7 +4,7 @@ var Group = require('../models/group')
   , _ = require('underscore');
 
 exports.param = {
-  id: function(req, res, next, id) {
+  groupId: function(req, res, next, id) {
     Group.findById(id, function(err, group) {
       if (err) {
         logger.error("Error pulling group: " + err);
