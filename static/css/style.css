@@ -60,7 +60,7 @@ form.baker #assertion {
 .badge {
   display: inline-block;
   overflow: hidden;
-  cursor: move;
+  cursor: pointer;
 }
 
 .badge:active {
