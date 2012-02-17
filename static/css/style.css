@@ -57,12 +57,13 @@ form.baker #assertion {
   display: none;
 }
 
-a.badge {
+.badge {
   display: inline-block;
   overflow: hidden;
+  cursor: move;
 }
 
-a.badge:active {
+.badge:active {
   outline: none;
 }
 
