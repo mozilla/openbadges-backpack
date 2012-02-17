@@ -98,7 +98,7 @@
         <table class='information'>
           <tr>
             <td rowspan="100" class='image'>
-              <img src="{{image_path}}">
+              <img src="{{image_path}}" class='badge-image'>
               <button class='btn danger disown'>Disown this Badge</button>
             </td>
 

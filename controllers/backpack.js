@@ -95,6 +95,13 @@ exports.manage = function(req, res, next) {
   
   var prepareBadgeIndex = function (badges) {
     badges.forEach(function (badge) {
+      var body = badge.get('body')
+        , origin = body.badge.issuer.origin
+        , criteria = body.badge.criteria
+        , evidence = body.evidence;
+      if (criteria[0] === '/') body.badge.criteria = origin + criteria;
+      if (evidence[0] === '/') body.evidence = origin + evidence;
+      
       badgeIndex[badge.get('id')] = badge;
       badge.serializedAttributes = JSON.stringify(badge.attributes);
     });
