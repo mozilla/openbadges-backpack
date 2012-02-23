@@ -84,7 +84,7 @@ router(app)
   .put('/group/:groupId',          'group.update')
 
   .delete('/badge/:badgeId',       'badge.destroy')
-
+  .get('/issuer\.js',               'issuer.generateScript')
 
 if (!module.parent) {
   var start_server = function(app) {  
