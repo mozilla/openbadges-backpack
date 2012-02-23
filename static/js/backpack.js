@@ -275,9 +275,14 @@ Details.View = Backbone.View.extend({
   events: {
     'click .close': 'hide',
     'mousedown .close': 'nothing',
+    'click .badge-image': 'debugBadge',
     'click .disown': 'showConfirmation',
     'click .confirm-disown .nope': 'hideConfirmation',
     'click .confirm-disown .yep': 'destroyBadge'
+  },
+  
+  debugBadge: function (event) {
+    console.dir(this.model.get('body'));
   },
   
   showConfirmation: function () {
@@ -321,7 +326,7 @@ Details.View = Backbone.View.extend({
   show: function () {
     this.$el
       .hide()
-      .appendTo($(body))
+      .appendTo($('body'))
       .fadeIn('fast');
   },
   

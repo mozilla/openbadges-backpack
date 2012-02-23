@@ -110,7 +110,8 @@ exports.csrf = function (options) {
   }
 };
 
-var utils = {}
+var utils = exports.utils = {};
+
 utils.forbidden = function(res) {
   var body = 'Forbidden';
   res.setHeader('Content-Type', 'text/plain');

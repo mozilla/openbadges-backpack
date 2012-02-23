@@ -46,7 +46,7 @@ exports.authenticate = function(req, res) {
     , assertion = req.body['assertion']
     , audience = configuration.get('hostname');
   
-  browserid(uri, assertion, audience, function (err, verifierResponse) {
+  browserid.verify(uri, assertion, audience, function (err, verifierResponse) {
     if (err) {
       logger.error('Failed browserID verification: ')
       logger.debug('Type: ' + err.type + "; Body: " + err.body);
@@ -95,6 +95,13 @@ exports.manage = function(req, res, next) {
   
   var prepareBadgeIndex = function (badges) {
     badges.forEach(function (badge) {
+      var body = badge.get('body')
+        , origin = body.badge.issuer.origin
+        , criteria = body.badge.criteria
+        , evidence = body.evidence;
+      if (criteria[0] === '/') body.badge.criteria = origin + criteria;
+      if (evidence && evidence[0] === '/') body.evidence = origin + evidence;
+      
       badgeIndex[badge.get('id')] = badge;
       badge.serializedAttributes = JSON.stringify(badge.attributes);
     });
