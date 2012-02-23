@@ -4,6 +4,26 @@ var loginUtils = require('./login-utils'),
 var app = loginUtils.startApp();
 var suite = loginUtils.suite('issuer api');
 
+const EXAMPLE_BADGE = {
+  "recipient": "example@example.com",
+  "evidence": "/badges/html5-basic/example",
+  "badge": {
+    "version": "0.5.0",
+    "name": "HTML5 Fundamental",
+    "image": "/_demo/cc.large.png",
+    "description": "Knows the difference between a <section> and an <article>",
+    "criteria": "/badges/html5-basic",
+    "issuer": {
+      "origin": "http://p2pu.org",
+      "name": "P2PU",
+      "org": "School of Webcraft",
+      "contact": "admin@p2pu.org"
+   }
+  }
+};
+
+const EXAMPLE_BADGE_URL = suite.url('/test/assertions/example.json');
+
 suite
   .discuss('when not logged in')
     .path('/issuer/assertion')
@@ -23,8 +43,34 @@ suite
         .postFormData({url: 'LOLOL'}).expect(400)
         .undiscuss()
       .discuss('and providing an unreachable url')
+        // TODO: Should these be returning 502 Bad Gateway instead?
         .get({url: suite.url('/does/not/exist')}).expect(404)
         .postFormData({url: suite.url('/does/not/exist')}).expect(400)
-        .undiscuss();
-
+        .undiscuss()
+      .discuss('and providing a valid url')
+        // Make sure the example badge isn't already in their backpack.
+        .delFormData({url: EXAMPLE_BADGE_URL}).next()
+        .discuss('that the user does not have in their backpack')
+          .get({url: EXAMPLE_BADGE_URL})
+            .expect(200, {
+              exists: false,
+              badge: EXAMPLE_BADGE
+            })
+          .postFormData({url: EXAMPLE_BADGE_URL})
+            .expect(200)
+            .next()
+          .undiscuss()
+        .discuss('that the user already has in their backpack')
+          .postFormData({url: EXAMPLE_BADGE_URL})
+            .expect(400)
+          .get({url: EXAMPLE_BADGE_URL})
+            .expect(200, {
+              exists: true,
+              badge: EXAMPLE_BADGE
+            })
+          .next()
+          .delFormData({url: EXAMPLE_BADGE_URL}).expect(200)
+          .next()
+          .undiscuss();
+          
 suite.export(module);
