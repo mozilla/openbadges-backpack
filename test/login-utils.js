@@ -38,14 +38,20 @@ module.exports = {
   suite: function(description) {
     var suite = APIeasy.describe(description);
     var port = this.PORT;
+    suite.url = function(path) {
+      return 'http://localhost:' + port + path;
+    };
     suite.expectRedirectTo = function(path) {
-      var url = 'http://localhost:' + port + path;
+      var url = this.url(path);
       return this.expect(303)
         .expect('redirects to ' + path, function(err, res) {
           assert.equal(res.headers['location'], url);
         });
     };
     suite.postFormData = function(data) {
+      data = data || {};
+      if (!('_csrf' in data))
+        data._csrf = module.exports.FAKE_UID;
       this.setHeader('Content-Type', 'application/x-www-form-urlencoded')
         .post(data);
       return this;
