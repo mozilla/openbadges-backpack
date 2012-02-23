@@ -38,6 +38,7 @@ module.exports = {
   suite: function(description) {
     var suite = APIeasy.describe(description);
     var port = this.PORT;
+    
     suite.url = function(path) {
       return 'http://localhost:' + port + path;
     };
@@ -48,13 +49,19 @@ module.exports = {
           assert.equal(res.headers['location'], url);
         });
     };
-    suite.postFormData = function(data) {
+    suite._requestFormData = function(method, data) {
       data = data || {};
       if (!('_csrf' in data))
         data._csrf = module.exports.FAKE_UID;
       this.setHeader('Content-Type', 'application/x-www-form-urlencoded')
-        .post(data);
+        [method](data);
       return this;
+    };
+    suite.delFormData = function(data) {
+      return this._requestFormData('del', data);
+    };
+    suite.postFormData = function(data) {
+      return this._requestFormData('post', data);
     };
     suite.postBackpackAuthentication = function(options) {
       options = options || {};
