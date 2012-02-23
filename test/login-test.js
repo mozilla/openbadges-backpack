@@ -16,14 +16,25 @@ suite
         assert.equal(match[1], '1234', "csrf exists in HTML");
       })
     .next().unpath()
-    .postBackpackAuthentication()
-      .expectRedirectTo('/')
-      .expect('sets a session cookie', function(err, res, body) {
-        assert.ok('set-cookie' in res.headers);
-        var cookie = res.headers['set-cookie'][0];
-        assert.equal(cookie.indexOf('openbadges_state'), 0);
-      })
-    .next().unpath().undiscuss()
+    .discuss('and using an invalid assertion')
+      .postBackpackAuthentication({assertion: 'invalid'})
+        .expectRedirectTo('/')
+        .next().unpath()
+        .path('/backpack/login')
+        .get().expect(200).expect('sends a page containing failure text',
+          function(err, res, body) {
+            assert(body.indexOf('Could not verify with browserID!') > 0);
+          })
+        .next().unpath().undiscuss()
+    .discuss('and using a valid assertion')
+      .postBackpackAuthentication()
+        .expectRedirectTo('/')
+        .expect('sets a session cookie', function(err, res, body) {
+          assert.ok('set-cookie' in res.headers);
+          var cookie = res.headers['set-cookie'][0];
+          assert.equal(cookie.indexOf('openbadges_state'), 0);
+        })
+      .next().unpath().undiscuss().undiscuss()
   .discuss('when logged in')
     .path('/')
       .get().expect(200)

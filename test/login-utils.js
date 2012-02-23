@@ -4,7 +4,13 @@ var browserid = require('../lib/browserid'),
     assert = require('assert');
 
 function fakeBrowseridVerify(uri, assertion, audience, cb) {
-  return cb(null, {email: module.exports.FAKE_EMAIL});
+  var expected = module.exports.FAKE_ASSERTION;
+  if (assertion == expected)
+    return cb(null, {email: module.exports.FAKE_EMAIL});
+  else
+    return cb({type: 'invalid assertion',
+               body: 'expected ' + JSON.stringify(expected) +
+                     ' but got ' + JSON.stringify(assertion)}, null);
 };
 
 function fakeUid() {
@@ -21,6 +27,7 @@ function maybeSwapInFakes() {
 module.exports = {
   PORT: 8889,
   FAKE_EMAIL: 'example@example.com',
+  FAKE_ASSERTION: 'yup, it is example@example.com.',
   FAKE_UID: '1234',
   startApp: function() {
     maybeSwapInFakes();
@@ -38,10 +45,13 @@ module.exports = {
           assert.equal(res.headers['location'], url);
         });
     };
-    suite.postBackpackAuthentication = function() {
+    suite.postBackpackAuthentication = function(options) {
+      options = options || {};
+      var csrf = options.csrf || module.exports.FAKE_UID;
+      var assertion = options.assertion || module.exports.FAKE_ASSERTION;
       this.path('/backpack/authenticate')
         .setHeader('Content-Type', 'application/x-www-form-urlencoded')
-        .post({'_csrf': module.exports.FAKE_UID, 'assertion': 'lol'});
+        .post({'_csrf': csrf, 'assertion': assertion});
       return this;
     };
     suite.login = function() {
