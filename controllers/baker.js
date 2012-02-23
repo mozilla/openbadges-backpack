@@ -24,7 +24,7 @@ exports.baker = function(req, res) {
   shouldAward = req.query.award === 'true';
   
   // #TODO: re-write this piece of garbage from scratch, jesus christ.
-  remote.assertion(query.assertion, function(err, assertion) {
+  remote.getHostedAssertion(query.assertion, function(err, assertion) {
     if (err) {
       logger.warn('failed grabbing assertion for URL '+ query.assertion);
       logger.warn('reason: '+ JSON.stringify(err));

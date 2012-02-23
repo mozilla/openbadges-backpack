@@ -27,6 +27,7 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
   // called as an ajax call.
   var assertionUrl = req.body['assertion'];
   var user = req.user;
+  debugger;
   remote.getHostedAssertion(assertionUrl, function(err, assertion) {
     if (err) {
       logger.error("assertion error "+err);

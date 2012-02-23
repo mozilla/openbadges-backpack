@@ -45,6 +45,7 @@ app.helpers({
 // middleware used.
 app.use(express.static(path.join(__dirname, "static")));
 app.use(express.static(path.join(configuration.get('var_dir'), "badges")));
+app.use(middleware.noFrame({ whitelist: [ '/', '/chris', '/share/.*' ] }));
 app.use(express.bodyParser({ uploadDir:configuration.get('badge_path') }));
 app.use(express.cookieParser());
 app.use(express.methodOverride());
@@ -70,7 +71,7 @@ router(app)
 
   .get('/demo',                             'demo.issuer')
   .get('/demo/ballertime',                  'demo.massAward')
-  .get('/demo/badge.json',                  'demo.demoBadge')
+  .get('/demo/badge.json',                  'demo.testBadge')
   .get('/demo/invalid.json',                'demo.badBadge')
   .post('/demo/award',                      'demo.award')
   
