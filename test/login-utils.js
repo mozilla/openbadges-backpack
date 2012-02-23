@@ -71,7 +71,10 @@ module.exports = {
                  .postFormData({'_csrf': csrf, 'assertion': assertion});
     };
     suite.login = function() {
-      return this.postBackpackAuthentication().next().unpath();
+      return this.postBackpackAuthentication()
+        .expect('sets a session cookie', function(err, res, body) {
+          assert.ok('set-cookie' in res.headers);
+        }).next().unpath();
     };
     suite.use('localhost', port).followRedirect(false);
     return suite;
