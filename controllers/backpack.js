@@ -46,7 +46,7 @@ exports.authenticate = function(req, res) {
     , assertion = req.body['assertion']
     , audience = configuration.get('hostname');
   
-  browserid(uri, assertion, audience, function (err, verifierResponse) {
+  browserid.verify(uri, assertion, audience, function (err, verifierResponse) {
     if (err) {
       logger.error('Failed browserID verification: ')
       logger.debug('Type: ' + err.type + "; Body: " + err.body);
