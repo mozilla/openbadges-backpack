@@ -1,28 +1,8 @@
-const PORT = 8889;
-
-var APIeasy = require('api-easy'),
+var loginUtils = require('./login-utils'),
     assert = require('assert');
 
-var suite = APIeasy.describe('issuer/api');
-
-suite.expectRedirectTo = function(path) {
-  var url = 'http://localhost:' + PORT + path;
-  return this.expect(303)
-    .expect('redirects to ' + path, function(err, res) {
-      assert.equal(res.headers['location'], url);
-    });
-};
-
-var app = require('../app');
-require('../lib/browserid').verify = function(uri, assertion, audience, cb) {
-  return cb(null, {email: 'example@example.com'});
-};
-require('../middleware').utils.uid = function() {
-  return '1234';
-};
-app.listen(PORT);
-
-suite.use('localhost', PORT).followRedirect(false);
+var app = loginUtils.startApp();
+var suite = loginUtils.suite('login');
 
 suite
   .discuss('when not logged in')
@@ -36,9 +16,7 @@ suite
         assert.equal(match[1], '1234', "csrf exists in HTML");
       })
     .next().unpath()
-    .path('/backpack/authenticate')
-      .setHeader('Content-Type', 'application/x-www-form-urlencoded')
-      .post({'_csrf': '1234', 'assertion': 'lol'})
+    .postBackpackAuthentication()
       .expectRedirectTo('/')
       .expect('sets a session cookie', function(err, res, body) {
         assert.ok('set-cookie' in res.headers);
