@@ -2,32 +2,30 @@ var request = require('request')
   , logger = require('../lib/logging').logger
   , reverse = require('../lib/router').reverse
   , awardBadge = require('../lib/award')
-  , remote = require('../lib/remote') 
+  , remote = require('../lib/remote')
 
-exports.issuerBadgeAdd = function(req, res, next) {
-  var user = req.user
-    , error = req.flash('error')
-    , success = req.flash('success');
-
-  if (!user) return res.redirect(reverse('backpack.login'), 303);
-
-  res.render('issuerBadgeAdd', {
-    error: error,
-    success: success,
-    layout: 'smallLayout',
-    csrfToken: req.session._csrf,
-    // todo: need to add csrf here
-    })
-};
-   
 
 exports.issuerBadgeAddFromAssertion = function(req, res, next) {
   // handles the adding of a badge via assertion url called
   // from issuerBadgeAdd
   // called as an ajax call.
-  var assertionUrl = req.body['assertion'];
-  var user = req.user;
   debugger;
+  var user = req.user
+    , error = req.flash('error')
+    , success = req.flash('success');
+
+  if (!user) return res.redirect(reverse('backpack.login'), 403);
+
+  // get the url param
+  var assertionUrl = req.param('url'); // GET
+  if (!assertionUrl) {
+    var assertionUrl = req.body['url'];
+  }
+
+  if (!assertionUrl) return res.render('error', 
+                                       { status: 400, 
+                                         message: 'Must include a url parameter'});
+
   remote.getHostedAssertion(assertionUrl, function(err, assertion) {
     if (err) {
       logger.error("assertion error "+err);

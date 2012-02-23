@@ -66,8 +66,8 @@ app.use(function(req, res, next) {
 router(app)
   .get('/baker',                            'baker.baker')
 
-  .get('/api/issuer',                       'issuer.issuerBadgeAdd')
-  .post('/api/issuer',                      'issuer.issuerBadgeAddFromAssertion')
+  .get('/issuer/assertion',                 'issuer.issuerBadgeAddFromAssertion')
+  .post('/issuer/assertion',                'issuer.issuerBadgeAddFromAssertion')
 
   .get('/demo',                             'demo.issuer')
   .get('/demo/ballertime',                  'demo.massAward')
