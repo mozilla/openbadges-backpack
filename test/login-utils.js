@@ -45,14 +45,17 @@ module.exports = {
           assert.equal(res.headers['location'], url);
         });
     };
+    suite.postFormData = function(data) {
+      this.setHeader('Content-Type', 'application/x-www-form-urlencoded')
+        .post(data);
+      return this;
+    };
     suite.postBackpackAuthentication = function(options) {
       options = options || {};
       var csrf = options.csrf || module.exports.FAKE_UID;
       var assertion = options.assertion || module.exports.FAKE_ASSERTION;
-      this.path('/backpack/authenticate')
-        .setHeader('Content-Type', 'application/x-www-form-urlencoded')
-        .post({'_csrf': csrf, 'assertion': assertion});
-      return this;
+      return this.path('/backpack/authenticate')
+                 .postFormData({'_csrf': csrf, 'assertion': assertion});
     };
     suite.login = function() {
       return this.postBackpackAuthentication().next().unpath();
