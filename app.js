@@ -80,6 +80,7 @@ router(app)
   .get('/backpack/login',                   'backpack.login')
   .get('/backpack/signout',                 'backpack.signout')
   .get('/backpack/badge/:badgeId',          'backpack.details')
+  .get('/',                                 'backpack.manage')
   .get('/backpack',                         'backpack.manage')
   .post('/backpack/badge',                  'backpack.userBadgeUpload')
   .post('/backpack/authenticate',           'backpack.authenticate')
@@ -91,7 +92,6 @@ router(app)
   
   .get('/share/g/:groupId',                 'share.group')
   .get('/share/b/:badgeId',                 'share.badge')
-  .get('/',                                 'backpack.manage')
 
 if (!module.parent) {
   var start_server = function(app) {  
