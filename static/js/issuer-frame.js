@@ -27,6 +27,7 @@ var Testing = (function setupTestingEnvironment() {
   var FAKE_XHR_DELAY = 10;
   var ASSERTIONS = [
     "http://foo.org/newbadge.json",
+    "http://foo.org/another_newbadge.json",
     "http://foo.org/nonexistent.json",
     "http://bar.org/oldbadge.json",
     "http://foo.org/makebackpackexplode.json"
@@ -63,6 +64,26 @@ var Testing = (function setupTestingEnvironment() {
           "image": "/_demo/cc.large.png",
           "description": "Knows the difference between a <section> and an <article>",
           "criteria": "/badges/html5-basic",
+          "issuer": {
+            "origin": "http://p2pu.org",
+            "name": "P2PU",
+            "org": "School of Webcraft",
+            "contact": "admin@p2pu.org"
+          }
+        }
+      }
+    },
+    "http://foo.org/another_newbadge.json": {
+      exists: false,
+      badge: {
+        "recipient": "example@example.com",
+        "evidence": "/badges/html6-basic/example",
+        "badge": {
+          "version": "0.5.0",
+          "name": "HTML6 Fundamental",
+          "image": "/_demo/cc.large.png",
+          "description": "Knows the difference between a <sprite> and a <hamster>",
+          "criteria": "/badges/html6-basic",
           "issuer": {
             "origin": "http://p2pu.org",
             "name": "P2PU",

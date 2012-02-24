@@ -31,7 +31,7 @@
   <div id="farewell" style="display: none">
     <h3 class="badges-0" style="display: none">You didn't add any badges to your backpack.</h3>
     <h3 class="badges-1" style="display: none">You added one badge to your backpack.</h3>
-    <h3 class="badges-many" style="display: none">You added <span class="badges-added"></span> badge(s) to your backpack.</h3>
+    <h3 class="badges-many" style="display: none">You added <span class="badges-added"></span> badges to your backpack.</h3>
     <p>If you ever want to manage or view your badges, just visit your
     <a href="/" target="_blank">Open Badge Backpack</a>.</p>
     <button class="next btn primary">Thanks.</button>
