@@ -27,7 +27,8 @@ exports.generateScript = function(req, res) {
 exports.frame = function(req, res) {
   res.render('issuer-frame', {
     layout: null,
-    foo: 'bar'
+    csrfToken: req.session._csrf,
+    email: req.session.emails && req.session.emails[0]
   });
 };
 
