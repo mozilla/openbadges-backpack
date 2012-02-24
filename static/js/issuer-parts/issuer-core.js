@@ -30,6 +30,7 @@ var OpenBadges = (function() {
               method: "issue",
               params: assertions,
               success: function(v) {
+                $(iframe).remove();
                 callback(v[0], v[1]);
               }
             });
