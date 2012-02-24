@@ -72,16 +72,20 @@ exports.userFromSession = function (opts) {
   }
 };
 
-exports.noFrame = function(whitelist) {
+exports.noFrame = function(opts) {
+  var list = opts.whitelist;
   var whitelisted = function(input){
-    for (var i = whitelist.length; i--; ) {
-      if (RegExp('^' + whitelist[i] + '$').test(input)) return true;
+    var pattern;
+    for (var i = list.length; i--; ) {
+      pattern = list[i];
+      if (RegExp('^' + list[i] + '$').test(input)) return true;
     }
     return false;
   }
+  
   return function(req, res, next){
     if (!whitelisted(req.url)) res.setHeader('x-frame-options', 'DENY');
-    next();
+    return next();
   };
 };
 
