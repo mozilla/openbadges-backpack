@@ -1,11 +1,16 @@
 var CSRF = $("meta[http-equiv='X-CSRF-Token']").attr("content");
 var currentUser = $("meta[http-equiv='X-Current-User']").attr("content");
 
-if (!currentUser) {
-  $(".logged-out").show();
-} else {
-  $(".logged-in").show();
+function showLogin() {
+  $(".logged-out, .logged-in").hide();
+  if (!currentUser) {
+    $(".logged-out").show();
+  } else {
+    $(".logged-in").show();
+  }
 }
+
+showLogin();
 
 $(".js-browserid-link").click(function() {
   navigator.id.getVerifiedEmail(function(assertion) {
@@ -18,12 +23,14 @@ $(".js-browserid-link").click(function() {
         assertion: assertion
       },
       success: function(data) {
-        console.log("woo", data);
+        currentUser = data.email;
+        showLogin();
       },
       error: function() {
         console.log("uhoh");
       }
     });
+    // TODO: Display a throbber or something.
   });
   return false;
 });
