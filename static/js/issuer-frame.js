@@ -1,3 +1,5 @@
+// TODO: Make sure we display the origin of the issuer (parent frame).
+
 _.templateSettings = {
   escape : /\[\[(.+?)\]\]/g
 };
