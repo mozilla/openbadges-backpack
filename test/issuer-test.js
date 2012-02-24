@@ -56,7 +56,7 @@ suite
         // Make sure the example badge isn't already in their backpack.
         .delFormData({url: EXAMPLE_BADGE_URL}).next()
         .discuss('that the user does not have in their backpack')
-          .get({url: EXAMPLE_BADGE_URL})
+          .get("?url=" + EXAMPLE_BADGE_URL)
             .expect(200, {
               exists: false,
               badge: EXAMPLE_BADGE
@@ -68,7 +68,7 @@ suite
         .discuss('that the user already has in their backpack')
           .postFormData({url: EXAMPLE_BADGE_URL})
             .expect(400)
-          .get({url: EXAMPLE_BADGE_URL})
+          .get("?url="+EXAMPLE_BADGE_URL)
             .expect(200, {
               exists: true,
               badge: EXAMPLE_BADGE

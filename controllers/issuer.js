@@ -115,10 +115,6 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
                                message: 'malformed url'});
   }
 
-  // everything wins!
-  //return res.render('error', { status:200, message: 'success i guess'});
-
-
   remote.getHostedAssertion(assertionUrl, function(err, assertion) {
     if (err) {
       var error_msg = "trying to grab url " + assertionUrl + " got error " + err;
