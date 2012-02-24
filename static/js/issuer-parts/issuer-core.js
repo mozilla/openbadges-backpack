@@ -17,12 +17,28 @@ var OpenBadges = (function() {
     // The final (undocumented) argument is used for testing.
     issue: function OpenBadges_issue(assertions, callback, hook) {
       var root = this.ROOT = findRoot();
+      var div = $('<div></div>');
+      div.css({
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 99999,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)'
+      }).appendTo(document.body);
       var iframe = document.createElement("iframe");
       iframe.setAttribute("src", root + "issuer/frame");
-      iframe.setAttribute("width", "640");
-      iframe.setAttribute("height", "480");
       iframe.setAttribute("scrolling", "no");
-      iframe.setAttribute("style", "border: none");
+      $(iframe).css({
+        border: "none",
+        position: "absolute",
+        top: "20%",
+        height: "60%",
+        width: "80%",
+        left: "10%",
+        right: "10%"
+      });
       if (!hook) hook = function() {};
       $(iframe).one("load", function() {
         hook("load", iframe);
@@ -36,12 +52,13 @@ var OpenBadges = (function() {
               params: assertions,
               success: function(v) {
                 $(iframe).remove();
+                div.remove();
                 callback(v[0], v[1]);
               }
             });
           }
         });
-      }).appendTo(document.body);
+      }).appendTo(div);
       hook("create", iframe);
     }
   };

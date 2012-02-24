@@ -52,7 +52,7 @@ asyncTest('cross-frame communication works', function() {
   function hook(event, iframe) {
     frame = iframe;
     if (event == "create") {
-      $(iframe).hide();
+      $(iframe.parentNode).hide();
       ok(true, "iframe is created");
     } else if (event == "load") {
       ok(true, "iframe loads");
