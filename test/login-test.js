@@ -54,15 +54,18 @@ suite
     .setHeader('accept', 'application/json')
     .discuss('and using an invalid assertion')
       .postBackpackAuthentication({assertion: 'invalid'})
+        .expect(400)
         .expect({status: 'error',
                  reason: 'browserID verification failed: invalid assertion'})
         .undiscuss()
     .discuss('and not sending an assertion')
       .postFormData()
+        .expect(400)
         .expect({status: 'error', reason: 'assertion expected'})
         .next().unpath().undiscuss()
     .discuss('and using a valid assertion')
       .postBackpackAuthentication()
+        .expect(200)
         .expect({status: 'ok', email: loginUtils.FAKE_EMAIL})
 
 suite.export(module);
