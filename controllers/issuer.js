@@ -80,6 +80,8 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
 
   if (!user) return res.redirect(reverse('backpack.login'), 403);
 
+  debugger;
+
   // get the url param
   var assertionUrl = req.param('url'); // GET
   if (!assertionUrl) {
