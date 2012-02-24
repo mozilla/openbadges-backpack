@@ -75,6 +75,8 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
   // handles the adding of a badge via assertion url called
   // from issuerBadgeAdd
   // called as an ajax call.
+
+  logger.debug("here's my full url " + req.originalUrl);
   var user = req.user
     , error = req.flash('error')
     , success = req.flash('success');
@@ -84,12 +86,22 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
   debugger;
 
   // get the url param
-  var assertionUrl = req.param('url'); // GET
+  var assertionUrl = req.query.url; // GET
   if (!assertionUrl) {
+    logger.debug("I'm doing a " + req.method); 
+    logger.debug("tried GET assertionUrl, didn't get anything " + req.param());
+    logger.debug("full query " + JSON.stringify(req.query));
     assertionUrl = req.body['url'];
+    logger.debug("POST attempt got " + assertionUrl);
+    if (!assertionUrl && req.method=='GET') {
+      logger.debug("GET is erroring this was the original url " + req.originalUrl);
+      logger.debug(JSON.stringify(req.body));
+      logger.debug(req);
+    }
   }
 
   if (!assertionUrl) {
+    logger.debug("didn't receive an assertionUrl returning 400");
     return res.render('error', { status:400, message: 'url is a required param'});
   }
 
@@ -98,17 +110,17 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
     check(assertionUrl).isUrl();
   } 
   catch (e) {                      
+    logger.debug("malformed url " + assertionUrl + " returning 400");
     return res.render('error', { status: 400,
                                message: 'malformed url'});
   }
 
-  // everything wins!
-  return res.render('error', { status:200, message: 'success i guess'});
-
-
   remote.getHostedAssertion(assertionUrl, function(err, assertion) {
     if (err) {
-      logger.error("assertion error "+err);
+      var error_msg = "trying to grab url " + assertionUrl + " got error " + err;
+      logger.error(error_msg);
+      return res.render('error', {status: 404,
+                                  message: error_msg}) 
       /*todo: figure out returning an ajax error*/
     }
     if (assertion.recipient !== user.get('email')) {
