@@ -17,6 +17,7 @@
 </div>
 
 <div id="body" class="container-fluid">
+  <div id="messages"></div>
   <div id="welcome" style="display: none">
     <p>Hi! You are about to submit a badge to the Mozilla Open Badge Backpack at <span class="host"></span>.</p>
     <div class="logged-in"><button class="next btn primary">Cool, let's go!</button> <button class="btn danger logout">I am not <span class="email"></span>.</button></div>
@@ -39,12 +40,25 @@
     <div class="log"></div>
   </div>
 </div>
-<div id="badge-ask-template" style="display: none">
-  <p>Wanna add this badge to your backpack?</p>
-  <p>[[ assertion.badge.name ]] from [[ hostname ]]</p>
-  <p>[[ assertion.badge.description ]]</p>
-  <button class="accept btn primary">Yup</button>
-  <button class="reject btn danger">Nope</button>
+<div id="templates" style="display: none">
+  <div id="accept-failure-template">
+    <div class="alert-message danger">
+      <strong>Sorry!</strong> An error occurred when trying to add the
+      <em>[[ assertion.badge.name ]]</em> badge to your backpack.
+    </div>
+  </div>
+  <div id="login-error-template">
+    <div class="alert-message danger">
+      <strong>Sorry!</strong> An error occurred when trying to log you in.
+    </div>
+  </div>
+  <div id="badge-ask-template" style="display: none">
+    <p>Wanna add this badge to your backpack?</p>
+    <p>[[ assertion.badge.name ]] from [[ hostname ]]</p>
+    <p>[[ assertion.badge.description ]]</p>
+    <button class="accept btn primary">Yup</button>
+    <button class="reject btn danger">Nope</button>
+  </div>
 </div>
 <script src="https://browserid.org/include.js"></script>
 <script src="/js/jquery.min.js"></script>
