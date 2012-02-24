@@ -90,6 +90,7 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
   }
 
   if (!assertionUrl) {
+    logger.debug("didn't receive an assertionUrl returning 400");
     return res.render('error', { status:400, message: 'url is a required param'});
   }
 
@@ -98,17 +99,21 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
     check(assertionUrl).isUrl();
   } 
   catch (e) {                      
+    logger.debug("malformed url " + assertionUrl + " returning 400");
     return res.render('error', { status: 400,
                                message: 'malformed url'});
   }
 
   // everything wins!
-  return res.render('error', { status:200, message: 'success i guess'});
+  //return res.render('error', { status:200, message: 'success i guess'});
 
 
   remote.getHostedAssertion(assertionUrl, function(err, assertion) {
     if (err) {
-      logger.error("assertion error "+err);
+      var error_msg = "trying to grab url " + assertionUrl + " got error " + err;
+      logger.error(error_msg);
+      return res.render('error', {status: 404,
+                                  message: error_msg}) 
       /*todo: figure out returning an ajax error*/
     }
     if (assertion.recipient !== user.get('email')) {

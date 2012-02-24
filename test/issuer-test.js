@@ -48,8 +48,8 @@ suite
         .undiscuss()
       .discuss('and providing an unreachable url')
         // TODO: Should these be returning 502 Bad Gateway instead?
-        .get({url: suite.url('http://notreal/does/not/exist')}).expect(404)
-        .postFormData({url: suite.url('http://notreal/does/not/exist')}).expect(400)
+        .get({url: suite.url('/does/not/exist')}).expect(404)
+        .postFormData({url: suite.url('/does/not/exist')}).expect(404)
         .undiscuss()
       .discuss('and providing a valid url')
         // Make sure the example badge isn't already in their backpack.
