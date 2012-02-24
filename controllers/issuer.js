@@ -75,6 +75,8 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
   // handles the adding of a badge via assertion url called
   // from issuerBadgeAdd
   // called as an ajax call.
+
+  logger.debug("here's my full url " + req.originalUrl);
   var user = req.user
     , error = req.flash('error')
     , success = req.flash('success');
@@ -84,9 +86,18 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
   debugger;
 
   // get the url param
-  var assertionUrl = req.param('url'); // GET
+  var assertionUrl = req.query.url; // GET
   if (!assertionUrl) {
+    logger.debug("I'm doing a " + req.method); 
+    logger.debug("tried GET assertionUrl, didn't get anything " + req.param());
+    logger.debug("full query " + JSON.stringify(req.query));
     assertionUrl = req.body['url'];
+    logger.debug("POST attempt got " + assertionUrl);
+    if (!assertionUrl && req.method=='GET') {
+      logger.debug("GET is erroring this was the original url " + req.originalUrl);
+      logger.debug(JSON.stringify(req.body));
+      logger.debug(req);
+    }
   }
 
   if (!assertionUrl) {

@@ -48,7 +48,8 @@ suite
         .undiscuss()
       .discuss('and providing an unreachable url')
         // TODO: Should these be returning 502 Bad Gateway instead?
-        .get({url: suite.url('/does/not/exist')}).expect(404)
+        // the .get test thing doesn't seem to want to include query string?
+        .get("?url=" + suite.url('/does/not/exist')).expect(404)
         .postFormData({url: suite.url('/does/not/exist')}).expect(404)
         .undiscuss()
       .discuss('and providing a valid url')
