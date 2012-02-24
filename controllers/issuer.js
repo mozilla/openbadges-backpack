@@ -140,6 +140,12 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
         else { logger.debug("badge added " + assertionUrl); }
       })
     })
-    return(assertion);
+
+    var response = {
+      exists: false,
+      assertion: assertion
+    };
+    res.json(response);
+
   })
 };
