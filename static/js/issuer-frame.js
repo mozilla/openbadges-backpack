@@ -183,10 +183,6 @@ $(window).ready(function() {
   // TODO: Also need to bind to login-error event.
   Session.on("login-complete", showBadges);
   $(".host").text(window.location.host);
-  $(".topbar .close").click(function() {
-    alert("TODO: Close window and send response to parent.");
-    return false;
-  });
   
   var channel = buildChannel();
 });
@@ -201,6 +197,9 @@ function issue(assertions, cb) {
   window.Assertions = {
     processNext: function() {
       if (assertions.length == 0) {
+        // We're on our way out. Disable all event handlers on the page,
+        // so the user can't do anything.
+        $("button, a").unbind();
         cb(errors, successes);
         return;
       }
@@ -269,6 +268,17 @@ function issue(assertions, cb) {
     }
   };
   var processNext = window.Assertions.processNext;
+  $(".topbar .close").click(function() {
+    assertions.forEach(function(assertion) {
+      errors.push({
+        url: assertion,
+        reason: 'DENIED'
+      });
+    });
+    assertions = [];
+    processNext();
+    return false;
+  });
 }
 
 function buildChannel() {
