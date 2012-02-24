@@ -31,7 +31,7 @@
   </div>
   <div id="test-info" style="display: none">
     <hr>
-    <p style="font-size: smaller">This page is operating in test mode. All data and network operations
+    <p style="font-size: smaller"><strong>This page is operating in test mode.</strong> All data and network operations
     are simulated. For information on the API used to communicate with this
     page, see the
     <a href="https://github.com/mozilla/openbadges/wiki/Issuer-API">Issuer
