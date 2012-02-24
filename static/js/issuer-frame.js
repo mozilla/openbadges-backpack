@@ -119,7 +119,8 @@ var Testing = (function setupTestingEnvironment() {
     });
     $('<hr>').appendTo("#body");
     show("This page is operating in test mode. All data and " +
-         "network operations are simulated.");
+         "network operations are simulated. The simulated assertions " +
+         "passed to this page are " + JSON.stringify(ASSERTIONS) + ".");
   });
   navigator.id.getVerifiedEmail = function(cb) {
     var email = "someone_else@example.com";
