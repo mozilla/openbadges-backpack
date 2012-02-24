@@ -42,6 +42,7 @@
 <div id="badge-ask-template" style="display: none">
   <p>Wanna add this badge to your backpack?</p>
   <p>[[ assertion.badge.name ]] from [[ hostname ]]</p>
+  <p>[[ assertion.badge.description ]]</p>
   <button class="accept btn primary">Yup</button>
   <button class="reject btn danger">Nope</button>
 </div>

@@ -18,9 +18,30 @@ var Testing = (function setupTestingEnvironment() {
   var ASSERTIONS = [
     "http://foo.org/newbadge.json",
     "http://foo.org/nonexistent.json",
-    "http://bar.org/oldbadge.json"
+    "http://bar.org/oldbadge.json",
+    "http://foo.org/makebackpackexpode.json"
   ];
   var RESPONSES = {
+    "http://foo.org/makebackpackexpode.json": {
+      exists: false,
+      badge: {
+        "recipient": "someone_else@example.com",
+        "evidence": "/badges/html9-basic/example",
+        "badge": {
+          "version": "0.5.0",
+          "name": "HTML9 Fundamental",
+          "image": "/_demo/cc.large.png",
+          "description": "Fetchable and validates fine client-side but not server-side",
+          "criteria": "/badges/html9-basic",
+          "issuer": {
+            "origin": "http://p2pu.org",
+            "name": "P2PU",
+            "org": "School of Webcraft",
+            "contact": "admin@p2pu.org"
+          }
+        }
+      }
+    },
     "http://foo.org/newbadge.json": {
       exists: false,
       badge: {
@@ -79,7 +100,10 @@ var Testing = (function setupTestingEnvironment() {
       });
     },
     "POST /issuer/assertion": function(options, cb) {
-      cb(200, 'OK');
+      if (options.data.url == "http://foo.org/makebackpackexpode.json")
+        cb(400, 'Bad Request');
+      else
+        cb(200, 'OK');
     },
     "GET /issuer/assertion": function(options, cb) {
       if (options.data.url in RESPONSES) {
