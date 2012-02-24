@@ -91,7 +91,7 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
     check(assertionUrl).isUrl();
   } 
   catch (e) {                      
-    return res.rend('error', { status: 400,
+    return res.render('error', { status: 400,
                                message: 'malformed url'});
   }
 
