@@ -256,10 +256,21 @@ function issue(assertions, cb) {
   window.Assertions = {
     processNext: function() {
       if (assertions.length == 0) {
-        // We're on our way out. Disable all event handlers on the page,
-        // so the user can't do anything.
-        $("button, a").unbind();
-        cb(errors, successes);
+        function exit() {
+          // We're on our way out. Disable all event handlers on the page,
+          // so the user can't do anything.
+          $("button, a").unbind();
+          cb(errors, successes);
+        }
+        if (successes.length < 2)
+          $("#farewell .badges-" + successes.length).show();
+        else {
+          $("#farewell .badges-many").show();
+          $("#farewell .badges-added").text(successes.length);
+        }
+        $("#farewell .next").click(exit);
+        $(".topbar .close").unbind().click(exit);
+        $("#farewell").fadeIn();
         return;
       }
       var url = assertions.pop();
