@@ -26,6 +26,10 @@ const EXAMPLE_BADGE_URL = suite.url('/test/assertions/example.json');
 
 suite
   .discuss('when not logged in')
+    .path('/issuer/frame')
+      .get().expect(200).unpath()
+    .path('/issuer.js')
+      .get().expect(200).unpath()
     .path('/issuer/assertion')
       .get().expect(403)
       .postFormData().expect(403)
