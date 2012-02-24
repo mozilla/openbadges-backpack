@@ -83,7 +83,11 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
   // get the url param
   var assertionUrl = req.param('url'); // GET
   if (!assertionUrl) {
-    var assertionUrl = req.body['url'];
+    assertionUrl = req.body['url'];
+  }
+
+  if (!assertionUrl) {
+    return res.render('error', { status:400, message: 'url is a required param'});
   }
 
   // check if the assertion url is malformed
