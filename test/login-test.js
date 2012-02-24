@@ -48,6 +48,21 @@ suite
     .next().undiscuss().unpath()
   .discuss('after logging out')
     .path('/')
-      .get().expectRedirectTo('/backpack/login');
-  
+      .get().expectRedirectTo('/backpack/login')
+    .next().undiscuss().unpath()
+  .discuss('when logged out and accepting json')
+    .setHeader('accept', 'application/json')
+    .discuss('and using an invalid assertion')
+      .postBackpackAuthentication({assertion: 'invalid'})
+        .expect({status: 'error',
+                 reason: 'browserID verification failed: invalid assertion'})
+        .undiscuss()
+    .discuss('and not sending an assertion')
+      .postFormData()
+        .expect({status: 'error', reason: 'assertion expected'})
+        .next().unpath().undiscuss()
+    .discuss('and using a valid assertion')
+      .postBackpackAuthentication()
+        .expect({status: 'ok', email: loginUtils.FAKE_EMAIL})
+
 suite.export(module);
