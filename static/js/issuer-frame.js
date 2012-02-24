@@ -283,6 +283,10 @@ function issue(assertions, cb) {
           $("button, a").unbind();
           cb(errors, successes);
         }
+        if ($("#welcome:visible").length) {
+          exit();
+          return;
+        }
         if (successes.length < 2)
           $("#farewell .badges-" + successes.length).show();
         else {

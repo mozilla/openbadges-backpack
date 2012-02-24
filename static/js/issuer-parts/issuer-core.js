@@ -19,6 +19,11 @@ var OpenBadges = (function() {
       var root = this.ROOT = findRoot();
       var iframe = document.createElement("iframe");
       iframe.setAttribute("src", root + "issuer/frame");
+      iframe.setAttribute("width", "640");
+      iframe.setAttribute("height", "480");
+      iframe.setAttribute("scrolling", "no");
+      iframe.setAttribute("style", "border: none");
+      if (!hook) hook = function() {};
       $(iframe).one("load", function() {
         hook("load", iframe);
         var channel = Channel.build({
