@@ -61,6 +61,13 @@ var Testing = (function setupTestingEnvironment() {
     }
   };
 
+  function show(text) {
+    var div = $('<pre style="whitespace: pre-wrap"></pre>');
+    div.text(text);
+    $("#body").append(div);
+    div.hide().slideDown();
+  }
+  
   var fakeResponseHandlers = {
     "POST /backpack/authenticate": function(options, cb) {
       cb(200, 'OK', {
@@ -104,12 +111,19 @@ var Testing = (function setupTestingEnvironment() {
   
   $(window).ready(function() {
     window.issue(ASSERTIONS, function(errors, successes) {
-      console.log("errors", errors, "successes", successes);
+      show("If this page were not in test mode, it would close now, " +
+           "and the following information would be passed back " +
+           "to the parent frame.\n\n" + 
+           "errors:\n\n" + JSON.stringify(errors, null, " ") +
+           "\n\nsuccesses:\n\n" + JSON.stringify(successes, null, " "));
     });
+    $('<hr>').appendTo("#body");
+    show("This page is operating in test mode. All data and " +
+         "network operations are simulated.");
   });
   navigator.id.getVerifiedEmail = function(cb) {
     var email = "someone_else@example.com";
-    console.log("Simulating BrowserID login of", email);
+    show("We just simulated a BrowserID login of " + email + ".");
     cb(email);
   };
   return null;
