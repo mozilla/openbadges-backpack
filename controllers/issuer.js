@@ -101,7 +101,7 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
   }
 
   if (!assertionUrl) {
-    logger.debug("didn't receive an assertionUrl returning 400");
+    logger.error("didn't receive an assertionUrl returning 400");
     return res.render('error', { status:400, message: 'url is a required param'});
   }
 
@@ -110,7 +110,7 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
     check(assertionUrl).isUrl();
   } 
   catch (e) {                      
-    logger.debug("malformed url " + assertionUrl + " returning 400");
+    logger.error("malformed url " + assertionUrl + " returning 400");
     return res.render('error', { status: 400,
                                message: 'malformed url'});
   }
@@ -124,19 +124,22 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
       /*todo: figure out returning an ajax error*/
     }
     if (assertion.recipient !== user.get('email')) {
-      /*todo another error*/
+      return res.render('error', 
+                        {status: 403, 
+                         message: "badge assertion is for a different user"})
     }
     remote.badgeImage(assertion.badge.image, function(err, imagedata) {
       awardBadge(assertion, assertionUrl, imagedata, function(err, badge) {
         if (err) {
-          /* todo again, another error */
-          logger.error("badge error " + assertionUrl);
+          var error_message = "badge error " + assertionUrl + err;
+          logger.error(error_message);
+          return res.render('error',
+                            {status: 404,
+                             message: error_message})
         }
         else { logger.debug("badge added " + assertionUrl); }
       })
     })
-    logger.debug(assertion);
     return(assertion);
   })
-  logger.debug(req.body['assertion']);
 };
