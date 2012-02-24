@@ -12,6 +12,7 @@ var Testing = (function setupTestingEnvironment() {
   if (window.parent !== window)
     return;
 
+  var FAKE_XHR_DELAY = 10;
   var ASSERTIONS = [
     "http://foo.org/badge.json",
     "http://foo.org/nonexistent.json",
@@ -61,6 +62,13 @@ var Testing = (function setupTestingEnvironment() {
   };
 
   var fakeResponseHandlers = {
+    "POST /backpack/authenticate": function(options, cb) {
+      cb(200, 'OK', {
+        json: {
+          email: options.data.assertion
+        }
+      });
+    },
     "POST /issuer/assertion": function(options, cb) {
       cb(200, 'OK');
     },
@@ -86,7 +94,7 @@ var Testing = (function setupTestingEnvironment() {
             completeCallback(404, 'Not Found');
           }
           //console.log("ajax", options.type, originalOptions.url, options, originalOptions, headers);
-        }, 10);
+        }, FAKE_XHR_DELAY);
       },
       abort: function() {
         throw new Error("abort() is not implemented!");
@@ -99,6 +107,11 @@ var Testing = (function setupTestingEnvironment() {
       console.log("errors", errors, "successes", successes);
     });
   });
+  navigator.id.getVerifiedEmail = function(cb) {
+    var email = "someone_else@example.com";
+    console.log("Simulating BrowserID login of", email);
+    cb(email);
+  };
   return null;
 })();
 
@@ -108,7 +121,7 @@ var Session = (function() {
     CSRF: jQuery.meta("X-CSRF-Token"),
     currentUser: jQuery.meta("X-Current-User"),
     login: function() {
-      if (!Session.currentUser && !loginStarted) {
+      if (!loginStarted) {
         navigator.id.getVerifiedEmail(function(assertion) {
           jQuery.ajax({
             url: '/backpack/authenticate',
@@ -152,7 +165,6 @@ function showBadges() {
 $(window).ready(function() {
   if (!Session.currentUser) {
     $(".logged-out").show();
-    Session.on("login-complete", showBadges);
     $(".logged-out .js-browserid-link").click(function() {
       Session.login();
       return false;
@@ -162,11 +174,14 @@ $(window).ready(function() {
     $(".logged-in .next").click(showBadges);
     $(".logged-in .email").text(Session.currentUser);
     $(".logged-in .logout").click(function() {
-      alert("TODO: Log out the user.");
+      $(".logged-in .next").unbind("click");
+      Session.login();
       return false;
     });
   }
 
+  // TODO: Also need to bind to login-error event.
+  Session.on("login-complete", showBadges);
   $(".host").text(window.location.host);
   $(".topbar .close").click(function() {
     alert("TODO: Close window and send response to parent.");
@@ -204,6 +219,7 @@ function issue(assertions, cb) {
             });
             processNext();
           } else {
+            // TODO: Check to see if it's issued to the current user?
             var template = _.template($("#badge-ask-template").html());
             var html = template({
               hostname: url,
