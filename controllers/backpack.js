@@ -39,7 +39,7 @@ exports.authenticate = function(req, res) {
   function response(to, apiError, humanReadableError) {
     if (jsonResponse) {
       if (apiError)
-        return res.send({status: 'error', reason: apiError});
+        return res.send({status: 'error', reason: apiError}, 400);
       else
         return res.send({status: 'ok', email: req.session.emails[0]});
     } else {
