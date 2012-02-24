@@ -1,3 +1,5 @@
+// TODO: Make sure we display the origin of the issuer (parent frame).
+
 _.templateSettings = {
   escape : /\[\[(.+?)\]\]/g
 };
@@ -14,12 +16,33 @@ var Testing = (function setupTestingEnvironment() {
 
   var FAKE_XHR_DELAY = 10;
   var ASSERTIONS = [
-    "http://foo.org/badge.json",
+    "http://foo.org/newbadge.json",
     "http://foo.org/nonexistent.json",
-    "http://bar.org/badge.json"
+    "http://bar.org/oldbadge.json",
+    "http://foo.org/makebackpackexpode.json"
   ];
   var RESPONSES = {
-    "http://foo.org/badge.json": {
+    "http://foo.org/makebackpackexpode.json": {
+      exists: false,
+      badge: {
+        "recipient": "someone_else@example.com",
+        "evidence": "/badges/html9-basic/example",
+        "badge": {
+          "version": "0.5.0",
+          "name": "HTML9 Fundamental",
+          "image": "/_demo/cc.large.png",
+          "description": "Fetchable and validates fine client-side but not server-side",
+          "criteria": "/badges/html9-basic",
+          "issuer": {
+            "origin": "http://p2pu.org",
+            "name": "P2PU",
+            "org": "School of Webcraft",
+            "contact": "admin@p2pu.org"
+          }
+        }
+      }
+    },
+    "http://foo.org/newbadge.json": {
       exists: false,
       badge: {
         "recipient": "example@example.com",
@@ -39,7 +62,7 @@ var Testing = (function setupTestingEnvironment() {
         }
       }
     },
-    "http://bar.org/badge.json": {
+    "http://bar.org/oldbadge.json": {
       exists: true,
       badge: {
         "recipient": "example@example.com",
@@ -64,7 +87,7 @@ var Testing = (function setupTestingEnvironment() {
   function show(text) {
     var div = $('<pre style="whitespace: pre-wrap"></pre>');
     div.text(text);
-    $("#body").append(div);
+    $("#test-info .log").prepend(div);
     div.hide().slideDown();
   }
   
@@ -77,7 +100,10 @@ var Testing = (function setupTestingEnvironment() {
       });
     },
     "POST /issuer/assertion": function(options, cb) {
-      cb(200, 'OK');
+      if (options.data.url == "http://foo.org/makebackpackexpode.json")
+        cb(400, 'Bad Request');
+      else
+        cb(200, 'OK');
     },
     "GET /issuer/assertion": function(options, cb) {
       if (options.data.url in RESPONSES) {
@@ -117,10 +143,9 @@ var Testing = (function setupTestingEnvironment() {
            "errors:\n\n" + JSON.stringify(errors, null, " ") +
            "\n\nsuccesses:\n\n" + JSON.stringify(successes, null, " "));
     });
-    $('<hr>').appendTo("#body");
-    show("This page is operating in test mode. All data and " +
-         "network operations are simulated. The simulated assertions " +
-         "passed to this page are " + JSON.stringify(ASSERTIONS) + ".");
+    $("#test-info").show();
+    show("The simulated assertions passed to this page are:\n\n " +
+         JSON.stringify(ASSERTIONS, null, " "));
   });
   navigator.id.getVerifiedEmail = function(cb) {
     var email = "someone_else@example.com";
@@ -232,8 +257,13 @@ function issue(assertions, cb) {
               reason: 'EXISTS'
             });
             processNext();
+          } else if (obj.badge.recipient != Session.currentUser) {
+            errors.push({
+              url: url,
+              reason: 'INVALID'
+            });
+            processNext();
           } else {
-            // TODO: Check to see if it's issued to the current user?
             var template = _.template($("#badge-ask-template").html());
             var html = template({
               hostname: url,
@@ -255,7 +285,7 @@ function issue(assertions, cb) {
                   errors.push({
                     url: url,
                     // TODO: Is this really the best reason?
-                    reason: 'INACCESSIBLE'
+                    reason: 'INVALID'
                   });
                 },
                 complete: function() {

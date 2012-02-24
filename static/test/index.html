@@ -38,6 +38,7 @@ module('OpenBadges.issue()');
 asyncTest('cross-frame communication works', function() {
   // Override the issuer-frame's global issue() function and
   // have it deliver canned results.
+  var frame;
   function cb(errors, successes) {
     ok(true, "callback is called");
     deepEqual(successes, [], "successes is empty");
@@ -45,14 +46,17 @@ asyncTest('cross-frame communication works', function() {
       url: "http://example.com/badge.json",
       reason: "DENIED"
     }], "errors contains all assertions denied");
+    ok(frame.parentNode === null, "frame has been removed from DOM");
     start();
   }
   function hook(event, iframe) {
+    frame = iframe;
     if (event == "create") {
       $(iframe).hide();
       ok(true, "iframe is created");
     } else if (event == "load") {
       ok(true, "iframe loads");
+      ok(frame.parentNode !== null, "frame is in the DOM");
       iframe.contentWindow.issue = function(assertions, cb) {
         var errors = assertions.map(function(url) {
           return {url: url, reason: "DENIED"};

@@ -29,10 +29,20 @@
   </div>
   <div id="badge-ask" style="display: none">
   </div>
+  <div id="test-info" style="display: none">
+    <hr>
+    <p style="font-size: smaller"><strong>This page is operating in test mode.</strong> All data and network operations
+    are simulated. For information on the API used to communicate with this
+    page, see the
+    <a href="https://github.com/mozilla/openbadges/wiki/Issuer-API">Issuer
+    API Documentation</a>.</p>
+    <div class="log"></div>
+  </div>
 </div>
 <div id="badge-ask-template" style="display: none">
   <p>Wanna add this badge to your backpack?</p>
   <p>[[ assertion.badge.name ]] from [[ hostname ]]</p>
+  <p>[[ assertion.badge.description ]]</p>
   <button class="accept btn primary">Yup</button>
   <button class="reject btn danger">Nope</button>
 </div>
