@@ -86,16 +86,18 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
     var assertionUrl = req.body['url'];
   }
 
-  if (!assertionUrl) return res.render('error', 
-                                       { status: 400, 
-                                         message: 'Must include a url parameter'});
-
   // check if the assertion url is malformed
-  if (!check(assertionUrl).isUrl()) return res.render('error',
-                                                      { status: 400,
-                                                        message: 'malformed url'});
+  try {
+    check(assertionUrl).isUrl();
+  } 
+  catch (e) {                      
+    return res.rend('error', { status: 400,
+                               message: 'malformed url'});
+  }
 
+  // everything wins!
   return res.render('error', { status:200, message: 'success i guess'});
+
 
   remote.getHostedAssertion(assertionUrl, function(err, assertion) {
     if (err) {
