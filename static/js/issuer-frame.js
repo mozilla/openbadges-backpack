@@ -29,10 +29,10 @@ var Testing = (function setupTestingEnvironment() {
     "http://foo.org/newbadge.json",
     "http://foo.org/nonexistent.json",
     "http://bar.org/oldbadge.json",
-    "http://foo.org/makebackpackexpode.json"
+    "http://foo.org/makebackpackexplode.json"
   ];
   var RESPONSES = {
-    "http://foo.org/makebackpackexpode.json": {
+    "http://foo.org/makebackpackexplode.json": {
       exists: false,
       badge: {
         "recipient": "someone_else@example.com",
@@ -113,7 +113,7 @@ var Testing = (function setupTestingEnvironment() {
         cb(400, 'Bad Request');
     },
     "POST /issuer/assertion": function(options, cb) {
-      if (options.data.url == "http://foo.org/makebackpackexpode.json")
+      if (options.data.url == "http://foo.org/makebackpackexplode.json")
         cb(400, 'Bad Request');
       else
         cb(200, 'OK');
