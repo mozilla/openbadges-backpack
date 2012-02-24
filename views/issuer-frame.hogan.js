@@ -29,7 +29,15 @@
   </div>
   <div id="badge-ask" style="display: none">
   </div>
-  <div id="test-info" style="display: none"><hr><div class="log"></div></div>
+  <div id="test-info" style="display: none">
+    <hr>
+    <p style="font-size: smaller">This page is operating in test mode. All data and network operations
+    are simulated. For information on the API used to communicate with this
+    page, see the
+    <a href="https://github.com/mozilla/openbadges/wiki/Issuer-API">Issuer
+    API Documentation</a>.</p>
+    <div class="log"></div>
+  </div>
 </div>
 <div id="badge-ask-template" style="display: none">
   <p>Wanna add this badge to your backpack?</p>

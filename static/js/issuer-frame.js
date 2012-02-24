@@ -118,9 +118,7 @@ var Testing = (function setupTestingEnvironment() {
            "\n\nsuccesses:\n\n" + JSON.stringify(successes, null, " "));
     });
     $("#test-info").show();
-    show("This page is operating in test mode. All data and " +
-         "network operations are simulated. The simulated assertions " +
-         "passed to this page are:\n\n " +
+    show("The simulated assertions passed to this page are:\n\n " +
          JSON.stringify(ASSERTIONS, null, " "));
   });
   navigator.id.getVerifiedEmail = function(cb) {
