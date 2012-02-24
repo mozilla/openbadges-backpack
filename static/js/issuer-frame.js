@@ -10,10 +10,20 @@ jQuery.extend({
   }
 });
 
+jQuery.fn.extend({
+  render: function(args) {
+    var template = _.template(this.html());
+    return $(template(args));
+  }
+});
+
 var Testing = (function setupTestingEnvironment() {
   if (window.parent !== window)
     return;
 
+  var Testing = {
+    browseridWorks: true
+  };
   var FAKE_XHR_DELAY = 10;
   var ASSERTIONS = [
     "http://foo.org/newbadge.json",
@@ -93,11 +103,14 @@ var Testing = (function setupTestingEnvironment() {
   
   var fakeResponseHandlers = {
     "POST /backpack/authenticate": function(options, cb) {
-      cb(200, 'OK', {
-        json: {
-          email: options.data.assertion
-        }
-      });
+      if (Testing.browseridWorks)
+        cb(200, 'OK', {
+          json: {
+            email: options.data.assertion
+          }
+        });
+      else
+        cb(400, 'Bad Request');
     },
     "POST /issuer/assertion": function(options, cb) {
       if (options.data.url == "http://foo.org/makebackpackexpode.json")
@@ -151,8 +164,8 @@ var Testing = (function setupTestingEnvironment() {
     var email = "someone_else@example.com";
     show("We just simulated a BrowserID login of " + email + ".");
     cb(email);
-  };
-  return null;
+  };  
+  return Testing;
 })();
 
 var Session = (function() {
@@ -220,12 +233,18 @@ $(window).ready(function() {
     });
   }
 
-  // TODO: Also need to bind to login-error event.
+  Session.on("login-error", function() {
+    showError("#login-error-template");
+  });
   Session.on("login-complete", showBadges);
   $(".host").text(window.location.host);
   
   var channel = buildChannel();
 });
+
+function showError(templateName, args) {
+  $(templateName).render(args).appendTo("#messages").hide().slideDown();
+}
 
 // This is the core issuing implementation; the response is proxied
 // back to the parent window. The function is global so it can be
@@ -264,12 +283,12 @@ function issue(assertions, cb) {
             });
             processNext();
           } else {
-            var template = _.template($("#badge-ask-template").html());
-            var html = template({
+            var templateArgs = {
               hostname: url,
               assertion: obj.badge
-            });
-            $("#badge-ask").html(html).fadeIn();
+            };
+            $("#badge-ask").empty()
+              .append($("#badge-ask-template").render(templateArgs)).fadeIn();
             $("#badge-ask .accept").click(function() {
               jQuery.ajax({
                 type: 'POST',
@@ -281,7 +300,7 @@ function issue(assertions, cb) {
                   successes.push(url);
                 },
                 error: function() {
-                  // TODO: Display an error to the user.
+                  showError("#accept-failure-template", templateArgs);
                   errors.push({
                     url: url,
                     // TODO: Is this really the best reason?
