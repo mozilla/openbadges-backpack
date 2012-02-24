@@ -1,10 +1,3 @@
-<!DOCTYPE html>
-<meta charset="utf-8">
-<title>Issuer Frame</title>
-<script src="../js/jquery.min.js"></script>
-<script src="../js/jschannel.js"></script>
-<p>Hello.</p>
-<script>
 var channel = Channel.build({
   window: window.parent,
   origin: "*",
@@ -29,4 +22,3 @@ channel.bind("issue", function(trans, s) {
   });
   trans.delayReturn(true);
 });
-</script>

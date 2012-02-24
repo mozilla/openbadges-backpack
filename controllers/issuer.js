@@ -24,6 +24,13 @@ exports.generateScript = function(req, res) {
   });
 };
 
+exports.frame = function(req, res) {
+  res.render('issuer-frame', {
+    layout: null,
+    foo: 'bar'
+  });
+};
+
 function concatenate(files, cb) {
   var completed = 0;
   var contents = [];

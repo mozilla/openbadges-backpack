@@ -45,7 +45,7 @@ app.helpers({
 // middleware used.
 app.use(express.static(path.join(__dirname, "static")));
 app.use(express.static(path.join(configuration.get('var_dir'), "badges")));
-app.use(middleware.noFrame({ whitelist: [ '/', '/chris', '/share/.*' ] }));
+app.use(middleware.noFrame({ whitelist: [ '/issuer/frame', '/', '/chris', '/share/.*' ] }));
 app.use(express.bodyParser({ uploadDir:configuration.get('badge_path') }));
 app.use(express.cookieParser());
 app.use(express.methodOverride());
@@ -84,7 +84,8 @@ router(app)
   .put('/group/:groupId',          'group.update')
 
   .delete('/badge/:badgeId',       'badge.destroy')
-  .get('/issuer\.js',               'issuer.generateScript')
+  .get('/issuer\.js',              'issuer.generateScript')
+  .get('/issuer/frame',            'issuer.frame')
 
 if (!module.parent) {
   var start_server = function(app) {  

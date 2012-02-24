@@ -18,7 +18,7 @@ var OpenBadges = (function() {
     issue: function OpenBadges_issue(assertions, callback, hook) {
       var root = this.ROOT = findRoot();
       var iframe = document.createElement("iframe");
-      iframe.setAttribute("src", root + "html/issuer-frame.html");
+      iframe.setAttribute("src", root + "issuer/frame");
       $(iframe).one("load", function() {
         hook("load", iframe);
         var channel = Channel.build({
