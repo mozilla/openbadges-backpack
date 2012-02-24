@@ -1,8 +1,112 @@
+_.templateSettings = {
+  escape : /\[\[(.+?)\]\]/g
+};
+
+jQuery.extend({
+  meta: function(name, value) {
+    return $("meta[http-equiv='" + name + "']").attr("content", value);
+  }
+});
+
+var Testing = (function setupTestingEnvironment() {
+  if (window.parent !== window)
+    return;
+
+  var ASSERTIONS = [
+    "http://foo.org/badge.json",
+    "http://foo.org/nonexistent.json",
+    "http://bar.org/badge.json"
+  ];
+  var RESPONSES = {
+    "http://foo.org/badge.json": {
+      exists: false,
+      badge: {
+        "recipient": "example@example.com",
+        "evidence": "/badges/html5-basic/example",
+        "badge": {
+          "version": "0.5.0",
+          "name": "HTML5 Fundamental",
+          "image": "/_demo/cc.large.png",
+          "description": "Knows the difference between a <section> and an <article>",
+          "criteria": "/badges/html5-basic",
+          "issuer": {
+            "origin": "http://p2pu.org",
+            "name": "P2PU",
+            "org": "School of Webcraft",
+            "contact": "admin@p2pu.org"
+          }
+        }
+      }
+    },
+    "http://bar.org/badge.json": {
+      exists: true,
+      badge: {
+        "recipient": "example@example.com",
+        "evidence": "/badges/html4-basic/example",
+        "badge": {
+          "version": "0.5.0",
+          "name": "HTML4 Fundamental",
+          "image": "/_demo/cc.large.png",
+          "description": "Knows the difference between a <p> and an <b>",
+          "criteria": "/badges/html4-basic",
+          "issuer": {
+            "origin": "http://p2pu.org",
+            "name": "P2PU",
+            "org": "School of Webcraft",
+            "contact": "admin@p2pu.org"
+          }
+        }
+      }
+    }
+  };
+
+  var fakeResponseHandlers = {
+    "POST /issuer/assertion": function(options, cb) {
+      cb(200, 'OK');
+    },
+    "GET /issuer/assertion": function(options, cb) {
+      if (options.data.url in RESPONSES) {
+        cb(200, 'OK', {json: RESPONSES[options.data.url]});
+      } else
+        cb(404, 'Not Found');
+    }
+  };
+  
+  jQuery.meta("X-Current-User", "example@example.com");
+  jQuery.ajaxTransport("+*", function(options, originalOptions, jqXHR) {
+    return {
+      send: function(headers, completeCallback) {
+        setTimeout(function() {
+          var string = options.type + " " + originalOptions.url;
+          if (string in fakeResponseHandlers) {
+            fakeResponseHandlers[string]({
+              data: originalOptions.data
+            }, completeCallback);
+          } else {
+            completeCallback(404, 'Not Found');
+          }
+          //console.log("ajax", options.type, originalOptions.url, options, originalOptions, headers);
+        }, 10);
+      },
+      abort: function() {
+        throw new Error("abort() is not implemented!");
+      }
+    };
+  });
+  
+  $(window).ready(function() {
+    window.issue(ASSERTIONS, function(errors, successes) {
+      console.log("errors", errors, "successes", successes);
+    });
+  });
+  return null;
+})();
+
 var Session = (function() {
   var loginStarted = false;
   var Session = {
-    CSRF: $("meta[http-equiv='X-CSRF-Token']").attr("content"),
-    currentUser: $("meta[http-equiv='X-Current-User']").attr("content"),
+    CSRF: jQuery.meta("X-CSRF-Token"),
+    currentUser: jQuery.meta("X-Current-User"),
     login: function() {
       if (!Session.currentUser && !loginStarted) {
         navigator.id.getVerifiedEmail(function(assertion) {
@@ -42,9 +146,7 @@ var Session = (function() {
 })();
 
 function showBadges() {
-  $("#welcome").fadeOut(function() {
-    
-  });
+  $("#welcome").fadeOut(Assertions.processNext);
 }
 
 $(window).ready(function() {
@@ -70,21 +172,90 @@ $(window).ready(function() {
     alert("TODO: Close window and send response to parent.");
     return false;
   });
+  
+  var channel = buildChannel();
 });
 
 // This is the core issuing implementation; the response is proxied
 // back to the parent window. The function is global so it can be
 // overridden from testing suites.
 function issue(assertions, cb) {
-  console.error("issue() is not yet implemented. returning DENIED for " +
-                "everything right now.");
-  var errors = assertions.map(function(url) {
-    return {url: url, reason: "DENIED"};
-  });
-  setTimeout(function() { cb(errors, []); }, 10);
+  $("#welcome").fadeIn();
+  var errors = [];
+  var successes = [];
+  window.Assertions = {
+    processNext: function() {
+      if (assertions.length == 0) {
+        cb(errors, successes);
+        return;
+      }
+      var url = assertions.pop();
+      // TODO: parse the URL to see if it's malformed.
+      jQuery.ajax({
+        url: '/issuer/assertion',
+        data: {
+          url: url
+        },
+        success: function(obj) {
+          if (obj.exists) {
+            errors.push({
+              url: url,
+              reason: 'EXISTS'
+            });
+            processNext();
+          } else {
+            var template = _.template($("#badge-ask-template").html());
+            var html = template({
+              hostname: url,
+              assertion: obj.badge
+            });
+            $("#badge-ask").html(html).fadeIn();
+            $("#badge-ask .accept").click(function() {
+              jQuery.ajax({
+                type: 'POST',
+                url: '/issuer/assertion',
+                data: {
+                  url: url
+                },
+                success: function() {
+                  successes.push(url);
+                },
+                error: function() {
+                  // TODO: Display an error to the user.
+                  errors.push({
+                    url: url,
+                    // TODO: Is this really the best reason?
+                    reason: 'INACCESSIBLE'
+                  });
+                },
+                complete: function() {
+                  $("#badge-ask").fadeOut(processNext);
+                }
+              });
+            });
+            $("#badge-ask .reject").click(function() {
+              errors.push({
+                url: url,
+                reason: 'DENIED'
+              });
+              $("#badge-ask").fadeOut(processNext);
+            });
+          }
+        },
+        error: function() {
+          errors.push({
+            url: url,
+            reason: 'INACCESSIBLE'
+          });
+          processNext();
+        }
+      });
+    }
+  };
+  var processNext = window.Assertions.processNext;
 }
 
-var channel = (function() {
+function buildChannel() {
   if (window.parent === window)
     return null;
   
@@ -102,4 +273,4 @@ var channel = (function() {
   });
   
   return channel;
-})();
+}

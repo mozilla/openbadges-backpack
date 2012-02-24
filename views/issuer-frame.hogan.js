@@ -17,7 +17,7 @@
 </div>
 
 <div id="body" class="container-fluid">
-  <div id="welcome">
+  <div id="welcome" style="display: none">
     <p>Hi! You are about to submit a badge to the Mozilla Open Badge Backpack at <span class="host"></span>.</p>
     <div class="logged-in"><button class="next btn primary">Cool, let's go!</button> <button class="btn danger logout">I am not <span class="email"></span>.</button></div>
     <div class="logged-out">
@@ -27,6 +27,14 @@
       </a>
     </div>
   </div>
+  <div id="badge-ask" style="display: none">
+  </div>
+</div>
+<div id="badge-ask-template" style="display: none">
+  <p>Wanna add this badge to your backpack?</p>
+  <p>[[ assertion.badge.name ]] from [[ hostname ]]</p>
+  <button class="accept btn primary">Yup</button>
+  <button class="reject btn danger">Nope</button>
 </div>
 <script src="https://browserid.org/include.js"></script>
 <script src="/js/jquery.min.js"></script>
