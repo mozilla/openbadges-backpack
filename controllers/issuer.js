@@ -3,13 +3,13 @@ var request = require('request')
   , reverse = require('../lib/router').reverse
   , awardBadge = require('../lib/award')
   , remote = require('../lib/remote')
+  , check = require('validator').check
 
 
 exports.issuerBadgeAddFromAssertion = function(req, res, next) {
   // handles the adding of a badge via assertion url called
   // from issuerBadgeAdd
   // called as an ajax call.
-  debugger;
   var user = req.user
     , error = req.flash('error')
     , success = req.flash('success');
@@ -25,6 +25,13 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
   if (!assertionUrl) return res.render('error', 
                                        { status: 400, 
                                          message: 'Must include a url parameter'});
+
+  // check if the assertion url is malformed
+  if (!check(assertionUrl).isUrl()) return res.render('error',
+                                                      { status: 400,
+                                                        message: 'malformed url'});
+
+  return res.render('error', { status:200, message: 'success i guess'});
 
   remote.getHostedAssertion(assertionUrl, function(err, assertion) {
     if (err) {
@@ -48,4 +55,3 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
   })
   logger.debug(req.body['assertion']);
 };
-
