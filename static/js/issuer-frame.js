@@ -14,12 +14,12 @@ var Testing = (function setupTestingEnvironment() {
 
   var FAKE_XHR_DELAY = 10;
   var ASSERTIONS = [
-    "http://foo.org/badge.json",
+    "http://foo.org/newbadge.json",
     "http://foo.org/nonexistent.json",
-    "http://bar.org/badge.json"
+    "http://bar.org/oldbadge.json"
   ];
   var RESPONSES = {
-    "http://foo.org/badge.json": {
+    "http://foo.org/newbadge.json": {
       exists: false,
       badge: {
         "recipient": "example@example.com",
@@ -39,7 +39,7 @@ var Testing = (function setupTestingEnvironment() {
         }
       }
     },
-    "http://bar.org/badge.json": {
+    "http://bar.org/oldbadge.json": {
       exists: true,
       badge: {
         "recipient": "example@example.com",
@@ -64,7 +64,7 @@ var Testing = (function setupTestingEnvironment() {
   function show(text) {
     var div = $('<pre style="whitespace: pre-wrap"></pre>');
     div.text(text);
-    $("#body").append(div);
+    $("#test-info .log").prepend(div);
     div.hide().slideDown();
   }
   
@@ -117,10 +117,11 @@ var Testing = (function setupTestingEnvironment() {
            "errors:\n\n" + JSON.stringify(errors, null, " ") +
            "\n\nsuccesses:\n\n" + JSON.stringify(successes, null, " "));
     });
-    $('<hr>').appendTo("#body");
+    $("#test-info").show();
     show("This page is operating in test mode. All data and " +
          "network operations are simulated. The simulated assertions " +
-         "passed to this page are " + JSON.stringify(ASSERTIONS) + ".");
+         "passed to this page are:\n\n " +
+         JSON.stringify(ASSERTIONS, null, " "));
   });
   navigator.id.getVerifiedEmail = function(cb) {
     var email = "someone_else@example.com";

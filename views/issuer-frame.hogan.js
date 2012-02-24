@@ -29,6 +29,7 @@
   </div>
   <div id="badge-ask" style="display: none">
   </div>
+  <div id="test-info" style="display: none"><hr><div class="log"></div></div>
 </div>
 <div id="badge-ask-template" style="display: none">
   <p>Wanna add this badge to your backpack?</p>
