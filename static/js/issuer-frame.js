@@ -231,8 +231,13 @@ function issue(assertions, cb) {
               reason: 'EXISTS'
             });
             processNext();
+          } else if (obj.badge.recipient != Session.currentUser) {
+            errors.push({
+              url: url,
+              reason: 'INVALID'
+            });
+            processNext();
           } else {
-            // TODO: Check to see if it's issued to the current user?
             var template = _.template($("#badge-ask-template").html());
             var html = template({
               hostname: url,
@@ -254,7 +259,7 @@ function issue(assertions, cb) {
                   errors.push({
                     url: url,
                     // TODO: Is this really the best reason?
-                    reason: 'INACCESSIBLE'
+                    reason: 'INVALID'
                   });
                 },
                 complete: function() {
