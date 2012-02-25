@@ -4,7 +4,7 @@ We intend to provide an open set of specifications, tools and services for
 generating verifiable badges that users can take with them wherever they go
 and use however they like.
 
-For (a lot) more information, check out http://openbadges.org
+For more information, check out http://openbadges.org
 
 ## I'm an Issuer, how do I use this?
 
