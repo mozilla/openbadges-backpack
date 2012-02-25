@@ -72,37 +72,46 @@ var request = require('request')
 
 
 exports.issuerBadgeAddFromAssertion = function(req, res, next) {
-  // handles the adding of a badge via assertion url called
-  // from issuerBadgeAdd
-  // called as an ajax call.
+  /* the issuer api, flawed in that it needs to query to badge assertion
+   * so that we're not making a double request to the issuer, once for the GET
+   * confirming the badge, and once for the POST awarding the badge. Not
+   * sure what caching options we have currently, so just going ahead and
+   * making a double request.
+   * 
+   * request can either be a GET or a POST, one required param 'url'
+   * which points to a badge assertion.
+   * 
+   */
 
   logger.debug("here's my full url " + req.originalUrl);
   var user = req.user
     , error = req.flash('error')
     , success = req.flash('success');
 
-  if (!user) return res.redirect(reverse('backpack.login'), 403);
+  // is the user logged in? if not, suggest they redirect to the login page
+  if (!user) return res.json({message:"user is not logged in, redirect to " + reverse('backpack.login'),
+                              redirect_to: reverse('backpack.login')}, 403);
 
-  debugger;
-
-  // get the url param
-  var assertionUrl = req.query.url; // GET
+  // get the url param (lots of debugging statements here)
+  var assertionUrl = req.query.url; // if it was as a query param in the GET
   if (!assertionUrl) {
     logger.debug("I'm doing a " + req.method); 
     logger.debug("tried GET assertionUrl, didn't get anything " + req.param());
     logger.debug("full query " + JSON.stringify(req.query));
+    // if the param was in a POST body
     assertionUrl = req.body['url'];
     logger.debug("POST attempt got " + assertionUrl);
+    // more debugging
     if (!assertionUrl && req.method=='GET') {
       logger.debug("GET is erroring this was the original url " + req.originalUrl);
       logger.debug(JSON.stringify(req.body));
-      logger.debug(req);
     }
   }
 
+  // no assertionUrl was passed, return error
   if (!assertionUrl) {
     logger.error("didn't receive an assertionUrl returning 400");
-    return res.render('error', { status:400, message: 'url is a required param'});
+    return res.json({message: 'url is a required param'}, 400);
   }
 
   // check if the assertion url is malformed
@@ -111,41 +120,54 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
   } 
   catch (e) {                      
     logger.error("malformed url " + assertionUrl + " returning 400");
-    return res.render('error', { status: 400,
-                               message: 'malformed url'});
+    return res.json({message: 'malformed url'}, 400);
   }
 
+  /* grabbing the remote assertion, 3 nested steps - 
+   * 
+   * 1) grab the remote assertion
+   * 2) grab the remote badge image
+   * if the request is a POST 
+   * 3) award the badge
+   */
   remote.getHostedAssertion(assertionUrl, function(err, assertion) {
     if (err) {
       var error_msg = "trying to grab url " + assertionUrl + " got error " + err;
       logger.error(error_msg);
-      return res.render('error', {status: 404,
-                                  message: error_msg}) 
-      /*todo: figure out returning an ajax error*/
+      return res.json({message: error_msg}, 502) ;
     }
     if (assertion.recipient !== user.get('email')) {
-      return res.render('error', 
-                        {status: 403, 
-                         message: "badge assertion is for a different user"})
+      return res.json({message: "badge assertion is for a different user"}, 403);
     }
+
+    // grabbing the remote badge image
     remote.badgeImage(assertion.badge.image, function(err, imagedata) {
-      awardBadge(assertion, assertionUrl, imagedata, function(err, badge) {
-        if (err) {
-          var error_message = "badge error " + assertionUrl + err;
-          logger.error(error_message);
-          return res.render('error',
-                            {status: 404,
-                             message: error_message})
-        }
-        else { logger.debug("badge added " + assertionUrl); }
-      })
-    })
 
-    var response = {
-      exists: false,
-      assertion: assertion
-    };
-    res.json(response);
+      // awarding the badge, only done if this is a POST
+      if (req.method=='POST') {
+        awardBadge(assertion, assertionUrl, imagedata, function(err, badge) {
+          if (err) {
+            var error_message = "badge error " + assertionUrl + err;
+            logger.error(error_message);
+            // check if this badge is a duplicate, currently in the
+            // error message
+            logger.error(err);
+            var dupe_regex = /Duplicate entry/;
+            if (dupe_regex.test(err)) {
+              return res.json({badge: assertion, exists: true}, 304);
+            }
+            // return a general error message
+            return res.json({'message': error_message}, 403);
+          }
+          logger.debug("badge added " + assertionUrl);
 
-  })
+          return res.json({exists: false, badge:assertion}, 201);
+        });
+      }
+      // if this is a GET, we still need to return the badge
+      else {
+        return res.json({exists: false, badge:assertion}, 200);
+      }
+    });
+  }); // end of the assertion grabbing badge adding.
 };
