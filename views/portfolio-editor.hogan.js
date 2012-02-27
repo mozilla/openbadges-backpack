@@ -2,16 +2,17 @@
 <form class='portfolio' action='/share/{{group.attributes.url}}' method='post'>
   <input type='hidden' name='_csrf' value='{{csrfToken}}'>
   <input type='hidden' name='id' value='{{attributes.id}}'>
+  <input type='hidden' name='url' value='{{groups.attributes.url}}'>
   <header>
     <input tabindex=1 name='title' class='field title' value='{{attributes.title}}'>
     <input tabindex=1 name='subtitle' class='field subtitle' placeholder='Optional subtitle' value='{{attributes.subtitle}}'>
   </header>
 
-  {{#preamble}}
+  {{#attributes.preamble}}
   <section class='preamble'>
-    <textarea tabindex=1 name='preamble' class='field preamble' placeholder='some information about this badge group'>{{preamble}}</textarea>
+    <textarea tabindex=1 name='preamble' class='field preamble' placeholder='some information about this badge group'>{{attributes.preamble}}</textarea>
   </section>
-  {{/preamble}}
+  {{/attributes.preamble}}
 
   <ul class='badges'>
     {{#badges}}

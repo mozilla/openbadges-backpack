@@ -6,7 +6,7 @@
 
   {{#preamble}}
   <section class='preamble'>
-    <p>{{preamble}}</p>
+    <p>{{ preamble }}</p>
   </section>
   {{/preamble}}
 

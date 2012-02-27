@@ -64,8 +64,7 @@ exports.editor = function (request, response) {
     });
     portfolio.group = group;
     portfolio.badges = badgesWithStories;
-    portfolio.preamble = prepareText(portfolio.preamble);
-    portfolio.postamble = prepareText(portfolio.postamble);
+    portfolio.preamble = prepareText(portfolio.get('preamble'));
     response.render('portfolio-editor', {
       csrfToken: request.session._csrf,
       portfolio: portfolio
@@ -95,13 +94,18 @@ exports.show = function (request, response, next) {
       return badge;
     });
     portfolio.badges = badgesWithStories;
-    portfolio.preamble = prepareText(portfolio.preamble);
-    portfolio.postamble = prepareText(portfolio.postamble);
+    portfolio.preamble = prepareText(portfolio.get('preamble'));
     response.render('portfolio', portfolio);
   });
 };
 
 exports.createOrUpdate = function (request, response) {
-  console.dir(request.body);
-  response.send('oh');
+  var attributes = request.body;
+  delete attributes._csrf
+  var portfolio = new Portfolio(attributes);
+  portfolio.save(function (err, p) {
+    console.dir(err);
+    console.dir(p);
+    response.redirect(request.url, '303');
+  })
 };
