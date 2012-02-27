@@ -55,6 +55,12 @@
       <em>[[ assertion.badge.name ]]</em> badge to your backpack.
     </div>
   </div>
+  <div id="already-exists-template">
+    <div class="alert-message danger">
+      <strong>Sorry!</strong> You appear to already have the
+      <em>[[ assertion.badge.name ]]</em> badge in your backpack.
+    </div>
+  </div>
   <div id="login-error-template">
     <div class="alert-message danger">
       <strong>Sorry!</strong> An error occurred when trying to log you in.
