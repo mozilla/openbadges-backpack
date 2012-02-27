@@ -1,0 +1,58 @@
+%define _rootdir /opt/openbadges
+
+%define _gitser %%gitser%%
+%define _gitrev %%gitrev%%
+
+%define _version %{_gitrev}
+
+Name:          openbadges
+Version:       %{_version}
+Release:       1%{?dist}_%{_gitrev}
+Epoch:	       %{_gitser}
+Summary:       OpenBadges server
+Packager:      Philippe M. Chiasson <gozer@mozilla.com>
+Group:         Development/Libraries
+License:       MPL 2.0
+URL:           https://github.com/mozilla/openbadges
+Source0:       %{name}-%{_version}.tar.gz
+BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root
+AutoReqProv:   no
+Requires:      nodejs
+BuildRequires: gcc-c++ git make nodejs-devel mysql-devel
+
+%description
+openbadges server for openbadges.org
+
+%prep
+%setup -q
+
+%build
+rm -rf node_modules
+npm install -d
+export PATH=$PWD/node_modules/.bin:$PATH
+%nodejs_fixshebang node_modules/*/bin/*
+echo "%{version}-%{release}" > static/ver.txt
+
+%check
+export PATH=$PWD/node_modules/.bin:$PATH
+npm ls
+# Can't run this yet, needs a locally running MySQL server
+#vows -i
+
+%install
+rm -rf %{buildroot}
+mkdir -p %{buildroot}%{_rootdir}
+for f in bin controllers lib models node_modules scripts static views *.json *.js; do
+    cp -rp $f %{buildroot}%{_rootdir}/
+done
+
+%clean
+rm -rf %{buildroot}
+
+%files
+%defattr(-,root,root,-)
+%{_rootdir}
+
+%changelog
+* Tue Oct 18 2011 Pete Fritchman <petef@mozilla.com>
+- Initial version
