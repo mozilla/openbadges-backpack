@@ -3,13 +3,16 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 clean:
-	rm -rf node_modules rpmbuild *.rpm *.tar.gz *.spec
+	rm -rf node_modules rpmbuild *.rpm *.tar.gz
 
 npm:
 	npm install
 
-rpm:
+rpm: srpm
 	scripts/rpmbuild.sh
+
+srpm:
+	scripts/rpmbuild.sh src
 
 test: npm
 	npm test

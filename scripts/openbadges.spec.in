@@ -18,7 +18,7 @@ Source0:       %{name}-%{_version}.tar.gz
 BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root
 AutoReqProv:   no
 Requires:      nodejs
-BuildRequires: gcc-c++ git make nodejs-devel mysql-devel
+BuildRequires: gcc-c++ git make npm nodejs-devel mysql-devel
 
 %description
 openbadges server for openbadges.org
