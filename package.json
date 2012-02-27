@@ -12,6 +12,7 @@
   , "connect-cookie-session": "0.x.x"
   , "express": "2.5.x"
   , "formidable": "1.0.x"
+  , "functools": "1.2.x"
   , "hogan.js": "1.0.x"
   , "metapng": "git+https://github.com/brianloveswords/metapng.js.git"
   , "mysql": "0.9.x"
