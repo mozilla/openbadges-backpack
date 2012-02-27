@@ -11,13 +11,13 @@
 
   
   <header>
-    {{#attributes.title}}<h1>{{title}}</h1>{{/attributes.title}}
-    {{#attributes.subtitle}}<h2>{{subtitle}}</h1>{{/attributes.subtitle}}
+    {{#attributes.title}}<h1>{{attributes.title}}</h1>{{/attributes.title}}
+    {{#attributes.subtitle}}<h2>{{attributes.subtitle}}</h1>{{/attributes.subtitle}}
   </header>
 
   {{#attributes.preamble}}
   <section class='preamble'>
-    <p>{{ preamble }}</p>
+    <p>{{ attributes.preamble }}</p>
   </section>
   {{/attributes.preamble}}
 
