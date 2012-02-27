@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Unit Tests</title>
+<link rel="stylesheet" href="qunit.css">
+<h1 id="qunit-header">Unit Tests</h1>
+<h2 id="qunit-banner"></h2>
+<div id="qunit-testrunner-toolbar"></div>
+<h2 id="qunit-userAgent"></h2>
+<ol id="qunit-tests"></ol>
+<div id="qunit-fixture"></div>
+<script src="qunit.js"></script>
+<script src="../js/jschannel.js"></script>
+<script src="../js/jquery.min.js"></script>
+<script>
+var originalChannel = Channel;
+var originaljQuery = jQuery;
+var originalDollar = $;
+</script>
+<script src="../issuer.js"></script>
+<script>
+module('general');
+
+test('OpenBadges global exists', function() {
+  equal(typeof(OpenBadges), 'object');
+});
+
+test('jschannel global is not clobbered', function() {
+  ok(originalChannel === Channel, "Channel is not clobbered");
+});
+
+test('jQuery globals are not clobbered', function() {
+  ok(jQuery === originaljQuery, "jQuery is not clobbered");
+  ok($ === originalDollar, "$ is not clobbered");
+});
+
+module('OpenBadges.issue()');
+
+asyncTest('cross-frame communication works', function() {
+  // Override the issuer-frame's global issue() function and
+  // have it deliver canned results.
+  var frame;
+  function cb(errors, successes) {
+    ok(true, "callback is called");
+    deepEqual(successes, [], "successes is empty");
+    deepEqual(errors, [{
+      url: "http://example.com/badge.json",
+      reason: "DENIED"
+    }], "errors contains all assertions denied");
+    ok(frame.parentNode === null, "frame has been removed from DOM");
+    start();
+  }
+  function hook(event, iframe) {
+    frame = iframe;
+    if (event == "create") {
+      $(iframe.parentNode).hide();
+      ok(true, "iframe is created");
+    } else if (event == "load") {
+      ok(true, "iframe loads");
+      ok(frame.parentNode !== null, "frame is in the DOM");
+      iframe.contentWindow.issue = function(assertions, cb) {
+        var errors = assertions.map(function(url) {
+          return {url: url, reason: "DENIED"};
+        });
+        setTimeout(function() { cb(errors, []); }, 10);
+      };
+    }
+  }
+  OpenBadges.issue(["http://example.com/badge.json"], cb, hook);
+});
+</script>

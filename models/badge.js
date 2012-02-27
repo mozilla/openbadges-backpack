@@ -31,6 +31,9 @@ Badge.prototype.checkHash = function () {
 
 // #TODO: return either null or Error objects with more information about
 // what's going on.
+
+// TODO: make these errors more than strings so we don't have to parse
+// them to figure out how to handle the error
 Badge.validators = {
   type: function (value, attributes) {
     var valid = ['signed', 'hosted'];
