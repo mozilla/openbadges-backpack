@@ -97,7 +97,7 @@
   {{/portfolio}}
   
   <div class='save actions'>
-    <input tabindex=1 class='btn primary large save' type='submit' value='save that ish'>
+    <input tabindex=1 class='btn primary large save' type='submit' value='Save this page'>
   </div>
 
   <script>
