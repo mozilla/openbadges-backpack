@@ -41,13 +41,14 @@ var testStruct = {
 
 exports.editor = function (request, response) {
   var user, group = request.group
-  if (!(user = request.user)) return response.send('nope', 403);
-  if (user.get('id') !== group.get('user_id')) return response.send('nope', 403);
-  function prepareText (txt) { txt = txt||''; return txt.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n\n/g, '</p><p>'); }
-  var portfolio = group.get('portfolio') || new Portfolio({group_id: group.get('id'), title: group.get('name'), stories:{}});
-  console.dir(portfolio);
-  
   var badgeById = {};
+  
+  if (!(user = request.user)) return response.send('nope', 403);
+  
+  if (user.get('id') !== group.get('user_id')) return response.send('nope', 403);
+  
+  var portfolio = group.get('portfolio') || new Portfolio({group_id: group.get('id'), title: group.get('name'), stories:{}});
+  
   request.group.getBadgeObjects(function (err, badges) {
     var badgesWithStories = _.map(badges, function modbadges (badge) {
       var id = badge.get('id')
@@ -73,12 +74,29 @@ exports.editor = function (request, response) {
 };
 
 // #TODO: un-stupid this.
+function prepareText (txt) { txt = txt||''; return txt.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n\n/g, '</p><p>'); }
+
 exports.show = function (request, response, next) {
-  var user, group = request.group
-  var portfolio = group.get('portfolio')
+  var user = request.user
+    , group = request.group
+    , portfolio = group.get('portfolio')
+    , badgeById = {}
+    , message = null
+    , path = request.url
+    , protocol = configuration.get('protocol')
+    , host = configuration.get('hostname')
+    , port = configuration.get('port')
+    , linkurl = url.format({protocol: protocol, hostname: host, port: port, pathname: path })
+  
+  console.dir(linkurl); 
+ 
+  if (user && group.get('user_id') === user.get('id')) {
+    message = 'This is how your portfolio page looks like to the public.'
+      + '<a href="https://twitter.com/share" class="twitter-share-button" data-text="Check out some of the badges I have earned: " data-url="'+linkurl+'" data-via="openbadges" data-size="large">Tweet</a><script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>'
+  }
+  
   if (!portfolio) return response.send('no portfolio :(', 404);
-  function prepareText (txt) { txt = txt||''; return txt.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n\n/g, '</p><p>'); }
-  var badgeById = {};
+  
   request.group.getBadgeObjects(function (err, badges) {
     var badgesWithStories = _.map(badges, function modbadges (badge) {
       var id = badge.get('id')
@@ -95,7 +113,11 @@ exports.show = function (request, response, next) {
     });
     portfolio.badges = badgesWithStories;
     portfolio.preamble = prepareText(portfolio.get('preamble'));
-    response.render('portfolio', portfolio);
+    
+    return response.render('portfolio', {
+      portfolio: portfolio,
+      message: message
+    });
   });
 };
 
@@ -106,6 +128,6 @@ exports.createOrUpdate = function (request, response) {
   portfolio.save(function (err, p) {
     console.dir(err);
     console.dir(p);
-    response.redirect(request.url, '303');
+    return response.redirect(request.url, '303');
   })
 };

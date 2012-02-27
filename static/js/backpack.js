@@ -123,7 +123,8 @@ Group.View = Backbone.View.extend({
   
   
   share: function (event) {
-    console.log('oh sup');
+    window.location = '/share/' + this.model.get('url') + '/edit';
+    return false;
   },
   
   /**
@@ -483,6 +484,7 @@ Group.fromElement = function (element) {
     , groupBadges = new Badge.Collection(_.map(badgeElements, Badge.fromElement))
     , model = new Group.Model({
       id: $el.data('id'),
+      url: $el.data('url'),
       name: $el.find('input').val(),
       badges: groupBadges
     });

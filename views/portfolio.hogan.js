@@ -1,14 +1,25 @@
+{{#portfolio}}
+
 <div class='portfolio'>
+{{#message}}
+  <div class='message-container'>
+    <div class="alert-message info">
+      <p><strong>{{{message}}}</strong></p>
+    </div>
+  </div>
+{{/message}}
+
+  
   <header>
-    {{#title}}<h1>{{title}}</h1>{{/title}}
-    {{#subtitle}}<h2>{{subtitle}}</h1>{{/subtitle}}
+    {{#attributes.title}}<h1>{{title}}</h1>{{/attributes.title}}
+    {{#attributes.subtitle}}<h2>{{subtitle}}</h1>{{/attributes.subtitle}}
   </header>
 
-  {{#preamble}}
+  {{#attributes.preamble}}
   <section class='preamble'>
     <p>{{ preamble }}</p>
   </section>
-  {{/preamble}}
+  {{/attributes.preamble}}
 
   <ul class='badges'>
     {{#badges}}
@@ -95,3 +106,6 @@
     {{postamble}}
   </section>
   {{/postamble}}
+</div>
+
+{{/portfolio}}

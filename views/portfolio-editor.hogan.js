@@ -2,6 +2,7 @@
 <form class='portfolio' action='/share/{{group.attributes.url}}' method='post'>
   <input type='hidden' name='_csrf' value='{{csrfToken}}'>
   <input type='hidden' name='id' value='{{attributes.id}}'>
+  <input type='hidden' name='group_id' value='{{group.attributes.id}}'>
   <input type='hidden' name='url' value='{{groups.attributes.url}}'>
   <header>
     <input tabindex=1 name='title' class='field title' value='{{attributes.title}}'>
