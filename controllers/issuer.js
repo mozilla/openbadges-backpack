@@ -136,7 +136,7 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
       logger.error(error_msg);
       return res.json({message: error_msg}, 502) ;
     }
-    if (assertion.recipient !== user.get('email')) {
+    if (assertion.recipient !== user.get('email') && req.method=='POST') {
       return res.json({message: "badge assertion is for a different user"}, 403);
     }
 
@@ -154,10 +154,10 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
             logger.error(err);
             var dupe_regex = /Duplicate entry/;
             if (dupe_regex.test(err)) {
-              return res.json({badge: assertion, exists: true}, 304);
+              return res.json({badge: assertion, exists: true, message: "badge already exists"}, 500); // FIX TODO change this back to 403
             }
             // return a general error message
-            return res.json({'message': error_message}, 403);
+            return res.json({badge: assertion, exists: false, 'message': error_message}, 500);
           }
           logger.debug("badge added " + assertionUrl);
 
