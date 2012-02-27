@@ -57,8 +57,8 @@
     </div>
   </div>
   <div id="already-exists-template">
-    <div class="alert-message danger">
-      <strong>Sorry!</strong> You appear to already have the
+    <div class="alert-message">
+      You appear to already have the
       <em>[[ assertion.badge.name ]]</em> badge in your backpack.
     </div>
   </div>
