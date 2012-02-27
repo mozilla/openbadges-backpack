@@ -135,7 +135,11 @@ var Testing = (function setupTestingEnvironment() {
     },
     "POST /issuer/assertion": function(options, cb) {
       if (options.data.url == "http://foo.org/makebackpackexplode.json")
-        cb(400, 'Bad Request');
+        cb(400, 'Bad Request', {
+          text: JSON.stringify({
+            message: "blah"
+          })
+        });
       else
         cb(200, 'OK');
     },
