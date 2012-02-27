@@ -47,10 +47,9 @@ suite
         .postFormData({url: 'LOLOL'}).expect(400)
         .undiscuss()
       .discuss('and providing an unreachable url')
-        // TODO: Should these be returning 502 Bad Gateway instead?
         // the .get test thing doesn't seem to want to include query string?
-        .get("?url=" + suite.url('/does/not/exist')).expect(404)
-        .postFormData({url: suite.url('/does/not/exist')}).expect(404)
+        .get("?url=" + suite.url('/does/not/exist')).expect(502)
+        .postFormData({url: suite.url('/does/not/exist')}).expect(502)
         .undiscuss()
       .discuss('and providing a valid url')
         // Make sure the example badge isn't already in their backpack.
