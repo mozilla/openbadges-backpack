@@ -331,7 +331,7 @@ Details.View = Backbone.View.extend({
   show: function () {
     this.$el
       .hide()
-      .appendTo($(body))
+      .appendTo($('body'))
       .fadeIn('fast');
   },
   
