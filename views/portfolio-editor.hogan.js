@@ -1,12 +1,15 @@
-<div class='portfolio'>
+{{#portfolio}}
+<form class='portfolio' action='/share/{{group.attributes.url}}' method='post'>
+  <input type='hidden' name='_csrf' value='{{csrfToken}}'>
+  <input type='hidden' name='id' value='{{attributes.id}}'>
   <header>
-    {{#title}}<h1>{{title}}</h1>{{/title}}
-    {{#subtitle}}<h2>{{subtitle}}</h1>{{/subtitle}}
+    <input tabindex=1 name='title' class='field title' value='{{attributes.title}}'>
+    <input tabindex=1 name='subtitle' class='field subtitle' placeholder='Optional subtitle' value='{{attributes.subtitle}}'>
   </header>
 
   {{#preamble}}
   <section class='preamble'>
-    <p>{{preamble}}</p>
+    <textarea tabindex=1 name='preamble' class='field preamble' placeholder='some information about this badge group'>{{preamble}}</textarea>
   </section>
   {{/preamble}}
 
@@ -17,7 +20,7 @@
           {{#body}}
           <h3>{{badge.name}}</h3>
           
-          <p class='story'>{{_userStory}}</p>
+          <textarea name='stories[{{id}}]' tabindex=1 class='story' placeholder='some information about this badge'>{{_userStory}}</textarea>
           
           <table class='information'>
             <tr>
@@ -89,9 +92,20 @@
       {{/attributes}}
     {{/badges}}
   </ul>
+  {{/portfolio}}
+  
+  <div class='save actions'>
+    <input tabindex=1 class='btn primary large save' type='submit' value='save that ish'>
+  </div>
 
-  {{#postamble}}
-  <section class='postamble'>
-    {{postamble}}
-  </section>
-  {{/postamble}}
+  <script>
+    $('form').on('submit', function(e){
+      e.preventDefault();
+      return false;
+    });
+    $('input.save').on('click', function(e){
+      console.dir('what');
+      $('form')[0].submit();
+    })
+  </script>
+</form>

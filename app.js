@@ -84,8 +84,11 @@ router(app)
 
   .delete('/badge/:badgeId',       'badge.destroy')
   
-  .get('/share/:groupUrl',         'share.test')
+  .get('/share/:groupUrl',         'share.show')
   .get('/share/:groupUrl/edit',    'share.editor')
+  
+  .post('/share/:groupUrl',        'share.createOrUpdate')
+  .put('/share/:groupUrl',         'share.createOrUpdate')
 
 
 if (!module.parent) {

@@ -17,8 +17,12 @@ exports.param = {
       if (!group) {
         return response.send('Could not find group', 404);
       }
-      request.group = group;
-      return next();
+      Portfolio.findOne({group_id: group.get('id')}, function (err, portfolio) {
+        if (err) next(err);
+        if (portfolio) group.set('portfolio', portfolio);
+        request.group = group;
+        return next();
+      });
     });
   }
 }
@@ -39,33 +43,65 @@ exports.editor = function (request, response) {
   var user, group = request.group
   if (!(user = request.user)) return response.send('nope', 403);
   if (user.get('id') !== group.get('user_id')) return response.send('nope', 403);
-  console.dir(user);
-  response.render('portfolio-editor', { oh : 'sup' });
-};
-
-exports.test = function (request, response, next) {
-  var badgeById = {};
-  var portfolio = testStruct;
   function prepareText (txt) { txt = txt||''; return txt.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n\n/g, '</p><p>'); }
+  var portfolio = group.get('portfolio') || new Portfolio({group_id: group.get('id'), title: group.get('name'), stories:{}});
+  console.dir(portfolio);
+  
+  var badgeById = {};
   request.group.getBadgeObjects(function (err, badges) {
-    var badgesWithStories = _.map(badges, function (badge) {
+    var badgesWithStories = _.map(badges, function modbadges (badge) {
       var id = badge.get('id')
-        , story = portfolio.stories[id]
+        , story = portfolio.get('stories')[id]
         , body = badge.get('body')
         , origin = body.badge.issuer.origin
         , criteria = body.badge.criteria
         , evidence = body.evidence;
       if (criteria[0] === '/') body.badge.criteria = origin + criteria;
-      if (evidence[0] === '/') body.evidence = origin + evidence;
-      
+      if (evidence && evidence[0] === '/') body.evidence = origin + evidence;
+      badgeById[id] = badge;
+      badge.set('_userStory', story)
+      return badge;
+    });
+    portfolio.group = group;
+    portfolio.badges = badgesWithStories;
+    portfolio.preamble = prepareText(portfolio.preamble);
+    portfolio.postamble = prepareText(portfolio.postamble);
+    response.render('portfolio-editor', {
+      csrfToken: request.session._csrf,
+      portfolio: portfolio
+    });
+  });
+};
+
+// #TODO: un-stupid this.
+exports.show = function (request, response, next) {
+  var user, group = request.group
+  var portfolio = group.get('portfolio')
+  if (!portfolio) return response.send('no portfolio :(', 404);
+  function prepareText (txt) { txt = txt||''; return txt.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n\n/g, '</p><p>'); }
+  var badgeById = {};
+  request.group.getBadgeObjects(function (err, badges) {
+    var badgesWithStories = _.map(badges, function modbadges (badge) {
+      var id = badge.get('id')
+        , story = portfolio.get('stories')[id]
+        , body = badge.get('body')
+        , origin = body.badge.issuer.origin
+        , criteria = body.badge.criteria
+        , evidence = body.evidence;
+      if (criteria[0] === '/') body.badge.criteria = origin + criteria;
+      if (evidence && evidence[0] === '/') body.evidence = origin + evidence;
       badgeById[id] = badge;
       badge.set('_userStory', story)
       return badge;
     });
     portfolio.badges = badgesWithStories;
-    // #TODO: make text safe
     portfolio.preamble = prepareText(portfolio.preamble);
     portfolio.postamble = prepareText(portfolio.postamble);
     response.render('portfolio', portfolio);
   });
+};
+
+exports.createOrUpdate = function (request, response) {
+  console.dir(request.body);
+  response.send('oh');
 };
