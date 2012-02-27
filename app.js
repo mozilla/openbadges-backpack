@@ -45,12 +45,14 @@ app.helpers({
 // middleware used.
 app.use(express.static(path.join(__dirname, "static")));
 app.use(express.static(path.join(configuration.get('var_dir'), "badges")));
-app.use(middleware.noFrame({ whitelist: [ '/', '/chris', '/share/.*' ] }));
+app.use(middleware.noFrame({ whitelist: [ '/issuer/frame', '/', '/chris', '/share/.*' ] }));
 app.use(express.bodyParser({ uploadDir:configuration.get('badge_path') }));
 app.use(express.cookieParser());
 app.use(express.methodOverride());
 app.use(middleware.logRequests());
 app.use(middleware.cookieSessions());
+//todo make this work!
+//app.use(middleware.noFrame([ '/api/issuer' ]));
 app.use(middleware.userFromSession());
 app.use(middleware.csrf());
 
@@ -62,29 +64,34 @@ app.use(function(req, res, next) {
 });
 
 router(app)
-  .get('/chris',                   'chris.chris')
-  .get('/baker',                   'baker.baker')
-                                   
-  .get('/demo',                    'demo.issuer')
-  .get('/demo/ballertime',         'demo.massAward')
-  .get('/demo/badge.json',         'demo.testBadge')
-  .get('/demo/invalid.json',       'demo.badBadge')
-  .post('/demo/award',             'demo.award')
-                                   
-  .get('/backpack/login',          'backpack.login')
-  .get('/backpack/signout',        'backpack.signout')
-  .get('/',                        'backpack.manage')
-  .get('/backpack',                'backpack.manage')
-  .post('/backpack/badge',         'backpack.userBadgeUpload')
-  .post('/backpack/authenticate',  'backpack.authenticate')
-                                   
-  .post('/group',                  'group.create')
-  .delete('/group/:groupId',       'group.destroy')
-  .get('/group/:groupId',          'group.config')
-  .put('/group/:groupId',          'group.update')
-
+  .get('/baker',                            'baker.baker')
   .delete('/badge/:badgeId',       'badge.destroy')
+  .get('/issuer\.js',              'issuer.generateScript')
+  .get('/issuer/frame',            'issuer.frame')
+  .get('/issuer/assertion',                 'issuer.issuerBadgeAddFromAssertion')
+  .post('/issuer/assertion',                'issuer.issuerBadgeAddFromAssertion')
 
+  .get('/demo',                             'demo.issuer')
+  .get('/demo/ballertime',                  'demo.massAward')
+  .get('/demo/badge.json',                  'demo.testBadge')
+  .get('/demo/invalid.json',                'demo.badBadge')
+  .post('/demo/award',                      'demo.award')
+  
+  .get('/backpack/login',                   'backpack.login')
+  .get('/backpack/signout',                 'backpack.signout')
+  .get('/backpack/badge/:badgeId',          'backpack.details')
+  .get('/',                                 'backpack.manage')
+  .get('/backpack',                         'backpack.manage')
+  .post('/backpack/badge',                  'backpack.userBadgeUpload')
+  .post('/backpack/authenticate',           'backpack.authenticate')
+  .delete('/backpack/badge/:badgeId',       'backpack.deleteBadge')
+  
+  .post('/group',                           'group.create')
+  .put('/group/:id',                        'group.update')
+  .delete('/group/:id',                     'group.destroy')
+  
+  .get('/share/g/:groupId',                 'share.group')
+  .get('/share/b/:badgeId',                 'share.badge')
 
 if (!module.parent) {
   var start_server = function(app) {  
