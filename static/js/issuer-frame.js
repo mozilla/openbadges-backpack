@@ -241,6 +241,16 @@ function showBadges() {
 }
 
 $(window).ready(function() {
+  var activeRequests = 0;
+  
+  $("#ajax-loader").ajaxSend(function() {
+    $(this).fadeIn();
+    activeRequests++;
+  }).ajaxComplete(function() {
+    if (--activeRequests == 0)
+      $(this).fadeOut();
+  });
+  
   if (!Session.currentUser) {
     $(".logged-out").show();
     $(".logged-out .js-browserid-link").click(function() {
@@ -330,7 +340,7 @@ function issue(assertions, cb) {
             $("#badge-ask").empty()
               .append($("#badge-ask-template").render(templateArgs)).fadeIn();
             $("#badge-ask .accept").click(function() {
-              jQuery.ajax({
+              var post = jQuery.ajax({
                 type: 'POST',
                 url: '/issuer/assertion',
                 data: {
@@ -353,11 +363,11 @@ function issue(assertions, cb) {
                     url: url,
                     reason: reason
                   });
-                },
-                complete: function() {
-                  $("#badge-ask").fadeOut(processNext);
                 }
               });
+              var fade = jQuery.Deferred();
+              $("#badge-ask").fadeOut(function() { fade.resolve(); });
+              jQuery.when(fade, post).always(processNext);
             });
             $("#badge-ask .reject").click(function() {
               errors.push({

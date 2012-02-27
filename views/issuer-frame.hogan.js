@@ -10,6 +10,7 @@
   <div class="topbar-inner">
     <div class="container-fluid" style="position: relative;">
       <h3><a href="/" target="_blank">Open Badge Backpack</a></h3>
+      <img src="/images/ajax-loader.gif" id="ajax-loader">
       <a id="moztab" href="http://mozilla.org" target="_blank">a mozilla.org joint</a>
       <a class="close" href="#">&times;</a>
     </div>
