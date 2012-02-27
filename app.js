@@ -90,8 +90,10 @@ router(app)
   .put('/group/:id',                        'group.update')
   .delete('/group/:id',                     'group.destroy')
   
-  .get('/share/g/:groupId',                 'share.group')
-  .get('/share/b/:badgeId',                 'share.badge')
+  .get('/share/:groupUrl/edit',   'share.editor')
+  .post('/share/:groupUrl',        'share.createOrUpdate')
+  .put('/share/:groupUrl',         'share.createOrUpdate')
+  .get('/share/:groupUrl',         'share.show')
 
 if (!module.parent) {
   var start_server = function(app) {  

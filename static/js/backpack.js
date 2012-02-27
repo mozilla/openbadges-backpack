@@ -112,7 +112,8 @@ Group.View = Backbone.View.extend({
     'blur input': 'saveName',
     'drop': 'badgeDrop',
     'mousedown .delete': 'preventDefault',
-    'click .delete': 'destroy'
+    'click .delete': 'destroy',
+    'click .share': 'share'
   },
   
   preventDefault: function (event) {
@@ -120,6 +121,10 @@ Group.View = Backbone.View.extend({
     return false;
   },
   
+  
+  share: function (event) {
+    console.log('oh sup');
+  },
   
   /**
    * Store the name of the group at the beginning of the editing session so
