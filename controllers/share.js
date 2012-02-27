@@ -8,23 +8,20 @@ var User = require('../models/user')
   , _ = require('underscore')
 
 exports.param = {
-  groupUrl: function(req, res, next, url) {
+  groupUrl: function(request, response, next, url) {
     Group.findOne({url: url}, function(err, group) {
       if (err) {
         logger.error("Error pulling group: " + err);
-        return res.send('Error pulling group', 500);
+        return response.send('Error pulling group', 500);
       }
-      
       if (!group) {
-        return res.send('Could not find group', 404);
+        return response.send('Could not find group', 404);
       }
-      
-      req.group = group;
+      request.group = group;
       return next();
     });
   }
 }
-
 
 var testStruct = {
   "title": "My Creative Commons Badges",
@@ -38,14 +35,19 @@ var testStruct = {
   }
 };
 
-exports.test = function (req, res, next) {
+exports.editor = function (request, response) {
+  var user, group = request.group
+  if (!(user = request.user)) return response.send('nope', 403);
+  if (user.get('id') !== group.get('user_id')) return response.send('nope', 403);
+  console.dir(user);
+  response.render('portfolio-editor', { oh : 'sup' });
+};
+
+exports.test = function (request, response, next) {
   var badgeById = {};
-  
   var portfolio = testStruct;
-  
   function prepareText (txt) { txt = txt||''; return txt.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n\n/g, '</p><p>'); }
-  
-  req.group.getBadgeObjects(function (err, badges) {
+  request.group.getBadgeObjects(function (err, badges) {
     var badgesWithStories = _.map(badges, function (badge) {
       var id = badge.get('id')
         , story = portfolio.stories[id]
@@ -64,7 +66,6 @@ exports.test = function (req, res, next) {
     // #TODO: make text safe
     portfolio.preamble = prepareText(portfolio.preamble);
     portfolio.postamble = prepareText(portfolio.postamble);
-    res.render('portfolio', portfolio);
+    response.render('portfolio', portfolio);
   });
-
-}
+};

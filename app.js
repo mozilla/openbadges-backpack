@@ -85,6 +85,7 @@ router(app)
   .delete('/badge/:badgeId',       'badge.destroy')
   
   .get('/share/:groupUrl',         'share.test')
+  .get('/share/:groupUrl/edit',    'share.editor')
 
 
 if (!module.parent) {
