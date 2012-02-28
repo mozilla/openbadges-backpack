@@ -68,7 +68,7 @@ var request = require('request')
   , reverse = require('../lib/router').reverse
   , awardBadge = require('../lib/award')
   , remote = require('../lib/remote')
-  , check = require('validator').check
+  , validator = require('validator')
 
 
 exports.issuerBadgeAddFromAssertion = function(req, res, next) {
@@ -116,7 +116,7 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
 
   // check if the assertion url is malformed
   try {
-    check(assertionUrl).isUrl();
+    validator.check(assertionUrl).isUrl();
   } 
   catch (e) {                      
     logger.error("malformed url " + assertionUrl + " returning 400");

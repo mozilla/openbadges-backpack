@@ -1,5 +1,6 @@
 var loginUtils = require('./login-utils'),
-    assert = require('assert');
+    assert = require('assert'),
+    validator = require('validator');
 
 var app = loginUtils.startApp();
 var suite = loginUtils.suite('issuer api');
@@ -23,6 +24,16 @@ const EXAMPLE_BADGE = {
 };
 
 const EXAMPLE_BADGE_URL = suite.url('/test/assertions/example.json');
+
+validator.check = (function acceptLocalURLs() {
+  var oldCheck = validator.check;
+  
+  return function(url) {
+    if (url.indexOf(suite.url('/') == 0))
+      return {isUrl: function() {}};
+    return oldCheck.apply(validator, arguments);
+  }
+})();
 
 suite
   .discuss('when not logged in')
@@ -49,6 +60,10 @@ suite
       .discuss('and providing an unreachable url')
         // the .get test thing doesn't seem to want to include query string?
         .get("?url=" + suite.url('/does/not/exist')).expect(502)
+        .expect("provides an appropriate error message", function(err, res) {
+          var message = JSON.parse(res.body).message;
+          assert.ok(message.indexOf("Could not reach endpoint") != -1);
+        })
         .postFormData({url: suite.url('/does/not/exist')}).expect(502)
         .undiscuss()
       .discuss('and providing a valid url')
