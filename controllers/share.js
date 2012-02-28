@@ -88,8 +88,6 @@ exports.show = function (request, response, next) {
     , port = configuration.get('port')
     , linkurl = url.format({protocol: protocol, hostname: host, port: port, pathname: path })
   
-  console.dir(linkurl); 
- 
   if (user && group.get('user_id') === user.get('id')) {
     message = 'This is how your portfolio page looks like to the public.'
       + '<a href="https://twitter.com/share" class="twitter-share-button" data-text="Check out some of the badges I have earned: " data-url="'+linkurl+'" data-via="openbadges" data-size="large">Tweet</a><script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>'
@@ -126,8 +124,6 @@ exports.createOrUpdate = function (request, response) {
   delete attributes._csrf
   var portfolio = new Portfolio(attributes);
   portfolio.save(function (err, p) {
-    console.dir(err);
-    console.dir(p);
     return response.redirect(request.url, '303');
   })
 };

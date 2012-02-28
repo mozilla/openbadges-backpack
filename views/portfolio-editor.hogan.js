@@ -106,7 +106,6 @@
       return false;
     });
     $('input.save').on('click', function(e){
-      console.dir('what');
       $('form')[0].submit();
     })
   </script>
