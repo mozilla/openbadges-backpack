@@ -29,7 +29,7 @@ validator.check = (function acceptLocalURLs() {
   var oldCheck = validator.check;
   
   return function(url) {
-    if (url.indexOf(suite.url('/') == 0))
+    if (url.indexOf(suite.url('/')) == 0)
       return {isUrl: function() {}};
     return oldCheck.apply(validator, arguments);
   }
