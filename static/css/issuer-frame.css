@@ -17,3 +17,7 @@
   padding-top: 7px;
   display: none;
 }
+
+.badge-image {
+  max-width: 100%;
+}
