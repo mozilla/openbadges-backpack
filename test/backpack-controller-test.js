@@ -5,36 +5,9 @@ var _ = require('underscore')
   , should = require('should')
   , mysql = require('../lib/mysql.js')
   , map = require('functools').map
-
-var backpack = require('../controllers/backpack.js')
-
-var request = function (opts) {
-  if (!(this instanceof arguments.callee))
-    return new arguments.callee(opts)
-  _.extend(this, opts);
-  this.session = {
-    _csrf: 'default-csrf',
-    email: 'user@example.com'
-  };
-}
-request.prototype.flash = function (type, message){};
-var response = function (request, callback) {
-  if (!(this instanceof arguments.callee))
-    return new arguments.callee(request, callback)
-  this.request = request;
-  this.callback = callback;
-  this.headers = {};
-};
-response.prototype.header = function (key, value) { this.headers[key] = value; };
-response.prototype.render
-  = response.prototype.redirect
-  = response.prototype.send
-  = response.prototype.json
-  = function () {
-    var args = [].slice.call(arguments);
-    args.unshift({response: this, request: this.request});
-    this.callback.apply(this, args);
-  };
+  , utils = require('./utils')
+   ,request = utils.conn.request
+  , response = utils.conn.response
 
 var user, badge, group;
 function setupDatabase (callback) {
@@ -62,6 +35,10 @@ function setupDatabase (callback) {
   });
   map.async(saver, [user, badge, group], callback);
 }
+
+
+var backpack = require('../controllers/backpack.js')
+
 
 vows.describe('basic login controller test').addBatch({
   'setup' : {
