@@ -36,6 +36,10 @@ validation passes, you will receive an HTTP 200 with `content-type: image/png`,
 the body being a your `badge.image` with the assertion URL baked into it.
 4. Send/give the image to the user (for example, email it).
 
+### The Issuer Javascript API
+
+We have an easy to use API built for Issuers to easily push badges into Users Backpacks, giving the User the ability to approve the push through a lightboxed modal.  The API is written in Javascript, and is includable in your project with just a few lines of JS. Full documentation is in the wiki - https://github.com/mozilla/openbadges/wiki/Issuer-API.
+
 ## Details
 
 Please [see the page on Assertions](https://github.com/mozilla/openbadges/wiki/Assertions) to
