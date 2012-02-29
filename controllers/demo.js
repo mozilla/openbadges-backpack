@@ -45,7 +45,7 @@ exports.massAward = function (req, res) {
       return {
         imgData: fs.readFileSync(path.join(demoBadgeDir, f)),
         assertion: makeDemoAssertion(email, imgUrl),
-        assertionUrl: ORIGIN + '/demo/badge.json?' + qs.stringify({image: imgUrl, recipient: email})
+        assertionUrl: ORIGIN + '/demo/badge.json?' + qs.stringify({title: 'raaad', image: imgUrl, recipient: email})
       }
     })
     .forEach(function (item) {

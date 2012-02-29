@@ -335,12 +335,19 @@ function issue(assertions, cb) {
                 success: function() {
                   successes.push(url);
                 },
-                error: function() {
-                  showError("#accept-failure-template", templateArgs);
+                error: function(req) {
+                  var err = JSON.parse(req.responseText);
+                  var template = "#accept-failure-template";
+                  // TODO: Is this really the best reason?
+                  var reason = "INVALID";
+                  if (err.message == "badge already exists") {
+                    template = "#already-exists-template";
+                    reason = "EXISTS";
+                  }
+                  showError(template, templateArgs);
                   errors.push({
                     url: url,
-                    // TODO: Is this really the best reason?
-                    reason: 'INVALID'
+                    reason: reason
                   });
                 },
                 complete: function() {

@@ -27,15 +27,21 @@ exports.cookieSessions = function(){
   });
 };
 
-exports.logRequests = function(){
-  return express.logger({
-    format: 'dev',
-    stream: {
-      write: function(x) {
-        logger.info(typeof x === 'string' ? x.trim() : x);
-      }
+var requestLogger = express.logger({
+  format: 'dev',
+  stream: {
+    write: function(x) {
+      logger.info(typeof x === 'string' ? x.trim() : x);
     }
-  });
+  }
+});
+exports.logRequests = function(){
+  return function (request, response, next) {
+    var ua = request.headers['user-agent']
+      , heartbeat = (ua.indexOf('HTTP-Monitor') === 0);
+    if (heartbeat) return next()
+    requestLogger(request, response, next);
+  }
 };
 
 exports.userFromSession = function (opts) {
@@ -49,7 +55,6 @@ exports.userFromSession = function (opts) {
     }
     
     if (!req.session.emails) {
-      logger.debug('could not find emails array in session');
       return next();
     }
     

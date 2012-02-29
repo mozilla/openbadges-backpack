@@ -27,20 +27,20 @@
     </div>
 
     <div id="body" class="container">
-      <div id='message-container'>
+      <div class='message-container'>
       {{#error.length}}
         <div class="alert-message">
           <p><strong>{{error}}</strong></p>
         </div>
       {{/error.length}}
-      </div>
-
+      
       {{#success.length}}
         <div class="alert-message success">
-          <p><strong>Yay! {{success[0]}}</strong></p>
+          <p><strong>{{success}}</strong></p>
         </div>
       {{/success.length}}
-             
+      </div>
+
       {{{body}}}
     </div>
       

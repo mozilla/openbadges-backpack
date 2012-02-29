@@ -4,6 +4,8 @@
 *#*
 .vagrant
 .DS_Store
+*.rpm
+*.tar.gz
 
 /docs
 /node_modules
