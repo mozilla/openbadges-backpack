@@ -1,0 +1,14 @@
+.logged-in, .logged-out {
+  display: none;
+}
+
+.topbar #moztab {
+  right: 40px;
+}
+
+.topbar .close {
+  position: absolute;
+  top: 0px;
+  right: 10px;
+  font-size: 20px;
+}

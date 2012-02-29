@@ -1,3 +1,0 @@
-#!/bin/bash
-rm -rf $ROOT/node_modules/metapng
-cp -r $ROOT/../metapng $ROOT/node_modules/

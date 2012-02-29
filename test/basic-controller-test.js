@@ -1,6 +1,6 @@
 var fs = require('fs')
   , path = require('path')
-  , vows = require('./setup')
+  , vows = require('vows')
   , assert = require('assert')
 
 var controllers = fs.readdirSync(path.join(__dirname, '../controllers'));
@@ -15,7 +15,7 @@ var testGen = function(files) {
   return test;
 }
 
-vows.describe('controller sanity').addBatch({
+vows.describe('Controller sanity').addBatch({
   'Controller': {
     topic: controllers,
     'exists': function (files){

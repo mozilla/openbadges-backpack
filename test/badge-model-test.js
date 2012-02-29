@@ -1,84 +1,301 @@
-var vows = require('./setup')
+var vows = require('vows')
+  , makeAssertion = require('../lib/utils').fixture
+  , genstring = require('../lib/utils').genstring
+  , mysql = require('../lib/mysql')
   , assert = require('assert')
-  , fixture = require('./utils').fixture
+  , crypto = require('crypto')
   , Badge = require('../models/badge')
-  , genstring = require('./utils').genstring
-  , url = require('url')
 
-var BAD_EMAILS = ['lkajd', 'skj@asdk', '@.com', '909090', '____!@']
-var BAD_URLS = ['-not-asdo', 'ftp://bad-scheme', '@.com:90/']
-var BAD_DATES = ['oiajsd09gjas;oj09', 'foreever ago', '111111', '1314145531', '@.com:90/']
-var BAD_VERSIONS = ['v100', '50', 'v10.1alpha']
+var EMAILS = {
+  good: ['brian@awesome.com', 'yo+wut@example.com', /*'elniño@español.es',*/ 'ümlaut@heavymetal.de'],
+  bad: ['lkajd', 'skj@asdk', '@.com', '909090', '____!@']
+};
+var URLS = {
+  good: ['http://example.com/', 'https://example.com/w/yo', '/partial/path', '/rad.awesome/great/', '/foreign/crázy/ååú´¨la/'],
+  bad: ['-not-asdo', 'ftp://bad-scheme', '@.com:90/', 'just totally wrong']
+};
+var ORIGINS = {
+  good: ['http://example.com', 'https://example.com:80', 'https://www.example.com', 'https://www.example.com:8080'],
+  bad: URLS.bad
+};
+var DATES = {
+  good: [Date.now()/1000 | 0, '2012-01-01'],
+  bad: ['oiajsd09gjas;oj09', 'foreever ago', '@.com:90/', '2001-10-190-19', '901d1', '000000000000000000000']
+};                                                                                                             
+var VERSIONS = {
+  good: ['0.1.1', '2.0.1', '1.2.3', 'v1.2.1'],
+  bad: ['v100', '50', 'v10.1alpha', '1.2.x']
+};
 
-var generateErrorTests = function(field, errType, badData) {
-  var tests = {}, currentTest;
-  for (var i = 0; i < badData.length; i += 1) {
-    var hierarchy = field.split('.');
-    var changes = {}, struct, currentField;
-    changes[hierarchy.pop()] = badData[i];
-    for (var j = hierarchy.length - 1; j >= 0; j--) {
-      struct = {};
-      struct[hierarchy[j]] = changes;
-      changes = struct;
+var sha256 = function (value) {
+  var sum = crypto.createHash('sha256')
+  sum.update(value);
+  return sum.digest('hex');
+};
+
+var makeBadge = function () {
+  var assertion = makeAssertion();
+  return new Badge({
+    type: 'hosted',
+    endpoint: 'http://example.com/awesomebadge.json',
+    image_path: '/dev/null',
+    body: assertion,
+    body_hash: 'sha256$' + genstring(64)
+  });
+};
+var makeBadgeAndSave = function (changes) {
+  var badge = makeBadge();
+  changes = changes || {};
+  Object.keys(changes).forEach(function (k) {
+    if (changes[k] === null) { delete badge.attributes[k]; }
+    else { badge.attributes[k] = changes[k]; }
+  })
+  return function () { 
+    badge.save(this.callback);
+  }
+};
+var assertErrors = function (fields, msgContains) {
+  return function (err, badge) {
+    if (badge instanceof Error) {
+      err = badge;
+      badge = null;
     }
-    currentTest = tests['“' + badData[i] + '”'] = {}
-    currentTest['topic'] = function(){
-      new Badge(fixture(changes)).validate(this.callback)
+    assert.isNull(badge);
+    assert.instanceOf(err, Error);
+    assert.isObject(err.fields);
+    fields.forEach(function (f) {
+      assert.includes(err.fields, f);
+      assert.match(err.fields[f], RegExp(f));
+      if (msgContains) {
+        assert.match(err.fields[f], RegExp(msgContains));
+      }
+    })
+  }
+};
+var makeInvalidationTests = function (field, badData) {
+  var tests = {};
+  badData.forEach(function (v) {
+    var test = tests['like "' + v + '"'] = {}
+    test['topic'] = function () {
+      var fieldReplacement = {}
+      fieldReplacement[field] = v;
+      return Badge.validateBody(makeAssertion(fieldReplacement));
     };
-    currentTest['should fail with `' +  errType + '` error'] = function(err, suc) {
-      assert.ok(err);
-      assert.includes(err.errors, field)
-      assert.equal(err.errors[field].type, errType);
+    test['should fail with error on `' + field + '`'] = assertErrors([field], 'invalid');
+  })
+  return tests;
+};
+var makeValidationTests = function (field, goodData) {
+  var tests = {};
+  goodData.forEach(function (v) {
+    var test = tests['like "' + v + '"'] = {}
+    test['topic'] = function () {
+      var fieldReplacement = {}
+      fieldReplacement[field] = v;
+      return Badge.validateBody(makeAssertion(fieldReplacement));
+    };
+    test['should succeed'] = function (err) { assert.isNull(err); };
+  })
+  return tests;
+};
+var makeMissingTest = function (field) {
+  var test = {};
+  test['topic'] = function () {
+    var fieldReplacement = {}
+    fieldReplacement[field] = null;
+    return Badge.validateBody(makeAssertion(fieldReplacement));
+  };
+  test['should fail with error on `' + field + '`'] = assertErrors([field], 'missing');
+  return test;
+};
+var createDbFixtures = function () {
+  var addUser = "INSERT INTO `user` (email) VALUES ('brian@example.com')";
+  var addBadge = "INSERT INTO `badge`"
+    + "(user_id, type, endpoint, image_path, body, body_hash)"
+    + "VALUES"
+    + "(1, 'hosted', 'http://example.com', '/dev/null', '{\"wut\":\"lol\"}', 'sha256$lol')";
+  mysql.client.query(addUser);
+  mysql.client.query(addBadge);
+};
+var assertFixtureBadge = function (err, results) {
+  var badge;
+  assert.ifError(err);
+  assert.isArray(results);
+  badge = results.pop();
+  assert.equal(badge.get('body_hash'), 'sha256$lol');
+};
+
+
+vows.describe('Badge model').addBatch({
+  'Badge testing:': {
+    topic: function () {
+      mysql.prepareTesting();
+      createDbFixtures();
+      return true;
+    },
+    
+    'Finding badges': {
+      'by user id': {
+        topic: function () {
+          Badge.find({user_id: 1}, this.callback);
+        },
+        'should retrieve the right badge': assertFixtureBadge
+      },
+      'by email address': {
+        topic: function () {  
+          Badge.find({email: 'brian@example.com'}, this.callback);
+        },
+        'should retrieve the right badge': assertFixtureBadge
+      }
+    },
+    'Validating an assertion': {
+      'with a missing `recipient` field': makeMissingTest('recipient'),
+      'with a missing `badge` field': makeMissingTest('badge'),
+      'with a missing `badge.version` field': makeMissingTest('badge.version'),
+      'with a missing `badge.name` field': makeMissingTest('badge.name'),
+      'with a missing `badge.description` field': makeMissingTest('badge.description'),
+      'with a missing `badge.image` field': makeMissingTest('badge.image'),
+      'with a missing `badge.criteria` field': makeMissingTest('badge.criteria'),
+      'with a missing `badge.issuer` field': makeMissingTest('badge.issuer'),
+      'with a missing `badge.issuer.origin` field': makeMissingTest('badge.issuer.origin'),
+      'with a missing `badge.issuer.name` field': makeMissingTest('badge.issuer.name'),
+      
+      'with bogus `recipient`': makeInvalidationTests('recipient', EMAILS.bad),
+      'with valid `recipient`': makeValidationTests('recipient', EMAILS.good),
+      
+      'with bogus `evidence`': makeInvalidationTests('evidence', URLS.bad),
+      'with valid `evidence`': makeValidationTests('evidence', URLS.good),
+      
+      'with bogus `expires`': makeInvalidationTests('expires', DATES.bad),
+      'with valid `expires`': makeValidationTests('expires', DATES.good),
+      
+      'with bogus `issued_on`': makeInvalidationTests('issued_on', DATES.bad),
+      'with valid `issued_on`': makeValidationTests('issued_on', DATES.good),
+
+      'with bogus `badge.version`': makeInvalidationTests('badge.version', VERSIONS.bad),
+      'with valid `badge.version`': makeValidationTests('badge.version', VERSIONS.good),
+      
+      'with bogus `badge.name`': makeInvalidationTests('badge.name', [genstring(129)] ),
+      'with valid `badge.name`': makeValidationTests('badge.name', [genstring(127)] ),
+      
+      'with bogus `badge.description`': makeInvalidationTests('badge.description', [genstring(129)] ),
+      'with valid `badge.description`': makeValidationTests('badge.description', [genstring(127)] ),
+      
+      'with bogus `badge.image`': makeInvalidationTests('badge.image', URLS.bad),
+      'with valid `badge.image`': makeValidationTests('badge.image', URLS.good),
+
+      'with bogus `badge.criteria`': makeInvalidationTests('badge.criteria', URLS.bad),
+      'with valid `badge.criteria`': makeValidationTests('badge.criteria', URLS.good),
+      
+      'with bogus `badge.issuer.origin`': makeInvalidationTests('badge.issuer.origin', ORIGINS.bad),
+      'with valid `badge.issuer.origin`': makeValidationTests('badge.issuer.origin', ORIGINS.good),
+      
+      'with bogus `badge.issuer.name`': makeInvalidationTests('badge.issuer.name', [genstring(129)] ),
+      'with valid `badge.issuer.name`': makeValidationTests('badge.issuer.name', [genstring(127)] ),
+      
+      'with bogus `badge.issuer.org`': makeInvalidationTests('badge.issuer.org', [genstring(129)] ),
+      'with valid `badge.issuer.org`': makeValidationTests('badge.issuer.org', [genstring(127)] ),
+      
+      'with bogus `badge.issuer.contact`': makeInvalidationTests('badge.issuer.contact', EMAILS.bad ),
+      'with valid `badge.issuer.contact`': makeValidationTests('badge.issuer.contact', EMAILS.good ),
+      
+      'that is totally valid': {
+        topic: function () {
+          return Badge.validateBody(makeAssertion({}))
+        },
+        'should succeed': function (err) {
+          assert.isNull(err);
+        }
+      }
+    },
+    'After saving': {
+      'a valid hosted assertion': {
+        topic: makeBadgeAndSave(),
+        'saves badge into the database and gives an id': function (err, badge) {
+          assert.ifError(err);
+          assert.isNumber(badge.get('id'));
+        },
+        'can be retrieved': {
+          topic: function (badge) {
+            Badge.findById(badge.get('id'), this.callback);
+          },
+          'and the body data is unmangled': function (err, badge) {
+            var body = badge.get('body')
+            assert.isObject(body);
+            assert.isObject(body.badge);
+            assert.isObject(body.badge.issuer);
+          },
+          'and the hash is set and correct': function (err, badge) {
+            // sha256 hashes are 64 bytes
+            assert.equal(badge.get('body_hash').length, 64);
+            assert.isTrue(badge.checkHash());
+            badge.set('body_hash', 'wut');
+            assert.isFalse(badge.checkHash());
+          },
+          'and then destroyed': {
+            topic: function (badge) {
+              badge._oldId = badge.get('id'); 
+              badge.destroy(function (err, badge) {
+                if (err) return this.callback(err);
+                this.callback(null, badge);
+              }.bind(this));
+            },
+            'which removes the id': function (err, badge) {
+              assert.ifError(err);
+              assert.isUndefined(badge.get('id'));
+            },
+            'and after being destroyed': {
+              topic: function (badge) {
+                Badge.findById(badge._oldId, this.callback);
+              },
+              'cannot be retrieve from the database': function (err, badge) {
+                assert.ifError(err);
+                assert.isUndefined(badge);
+              }
+            }
+          }
+        }
+      },
+
+      'a hosted assertion without an `endpoint`': {
+        topic: makeBadgeAndSave({endpoint: null}),
+        'should fail with validation error on `endpoint`': assertErrors(['type', 'endpoint'])
+      },
+
+      'a signed assertion without a `jwt`': {
+        topic: makeBadgeAndSave({type: 'signed', jwt: null}),
+        'should fail with validation error on `jwt`': assertErrors(['type', 'jwt'])
+      },
+
+      'a signed assertion without a `public_key`': {
+        topic: makeBadgeAndSave({type: 'signed', jwt: 'stuff', public_key: null}),
+        'should fail with validation error on `public_key`': assertErrors(['type', 'public_key'])
+      },
+      
+      'an assertion with an unknown type': {
+        topic: makeBadgeAndSave({type: 'glurble'}),
+        'should fail with validation error on `type`': assertErrors(['type'])
+      },
+
+      'an assertion without an `image_path`': {
+        topic: makeBadgeAndSave({image_path: null}),
+        'should fail with validation error on `image_path`': assertErrors(['image_path'])
+      },
+
+      'an assertion without a `body`': {
+        topic: makeBadgeAndSave({body: null}),
+        'should fail with validation error on `body`': assertErrors(['body'])
+      },
+      
+      'an assertion with an unexpected `body` type': {
+        topic: makeBadgeAndSave({body: "I just don't understand skrillex"}),
+        'should fail with validation error on `body`': assertErrors(['body'])
+      },
+      
+      'an assertion with an invalid `body`': {
+        topic: makeBadgeAndSave({body: makeAssertion({'badge': null})}),
+        'should fail with validation error on `body`': assertErrors(['body'])
+      }
     }
   }
-  return tests;
-}
-
-vows.describe('Badge Validator').addBatch({
-  'When validating something invalid': {
-    topic: function() { new Badge({}).validate(this.callback); },
-    'we get errors': function(err, suc) {
-      assert.ok(err);
-      assert.instanceOf(err, Error);
-    }
-  },
-  'Invalid badge assertion': {
-    'with bad recipient': generateErrorTests('recipient', 'regexp', BAD_EMAILS),
-    'with bad evidence': generateErrorTests('evidence', 'regexp', BAD_URLS),
-    'with bad expires': generateErrorTests('expires', 'isodate', BAD_DATES),
-    'with bad issued_on': generateErrorTests('expires', 'isodate', BAD_DATES),
-    'with bad badge.version': generateErrorTests('badge.version', 'regexp', BAD_VERSIONS),
-    'with bad badge.name': generateErrorTests('badge.name', 'maxlen', [genstring(500)]),
-    'with bad badge.description': generateErrorTests('badge.description', 'maxlen', [genstring(500)]),
-    'with bad badge.image': generateErrorTests('badge.image', 'regexp', BAD_URLS),
-    'with bad badge.criteria': generateErrorTests('badge.criteria', 'regexp', BAD_URLS),
-    'with bad badge.issuer.name': generateErrorTests('badge.issuer.name', 'maxlen', [genstring(500)]),
-    'with bad badge.issuer.org': generateErrorTests('badge.issuer.org', 'maxlen', [genstring(500)]),
-    'with bad badge.issuer.contact': generateErrorTests('badge.issuer.contact', 'regexp', BAD_EMAILS),
-    'with bad badge.issuer.url': generateErrorTests('evidence', 'regexp', BAD_URLS)
-  },
-  'Valid badge assertion' : {
-    topic: function() { return new Badge(fixture()); },
-    'without issued_on': {
-      topic: function(badge) { badge.issued_on = null; badge.validate(this.callback) },
-      'should not have errors': function(err, succ){
-        assert.equal(err, null)
-      }
-    },
-    'can validate multiple times': {
-      topic: function(badge) {
-        var self = this;
-        badge.validate(function(err){ new Badge(badge).validate(self.callback) })
-      },
-      'without errors': function(err, succ){
-        assert.equal(err, null)
-      }
-    },
-    'gets fully qualified urls from members': function(badge){
-      assert.ok(url.parse(badge.evidence).hostname);
-    },
-    'does not change fully qualified members': function(badge){
-      assert.equal(badge.criteria, badge._doc.criteria);
-    },
-  },
 }).export(module);

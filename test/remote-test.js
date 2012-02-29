@@ -1,110 +1,99 @@
-var vows = require('./setup')
+var vows = require('vows')
   , assert = require('assert')
-  , color = require('colors')
-  , metapng = require('metapng')
-  , issuer = require('./issuer')
   , remote = require('../lib/remote')
-  , configuration = require('../lib/configuration')
+  , genstring = require('../lib/utils').genstring
+  , configuration = require('../lib/configuration');
+
+var TOO_BIG = remote.MAX_RESPONSE_SIZE + 1;
+
+var mockResponse = function (status, length, type) {
+  var resp = {}
+  resp.statusCode = status || 200;
+  resp.headers = {}
+  resp.headers['content-length'] = length || 0;
+  resp.headers['content-type'] = type || 'text/html';
+  return resp;
+}; 
   
-var serv = issuer.complex();
 vows.describe('Handling remote servers').addBatch({
-  'Submitting a': {
-    'good assertion': {
-      topic: issuer.simple.good(),
-      'should get': {
-        topic: function(server) { remote.assertion(server.url, this.callback) },
-        '`status == success`': function(err, result){ assert.equal(err.status, 'success'); },
-        'a proper assertion object': function(err, result){ assert.equal(result.recipient, 'bimmy@example.com'); }
-      },
+  'remote.assert.reachable': {
+    'throws error on status > 400': function () {
+      var resp = mockResponse(500);
+      assert.throws(function () {
+        remote.assert.reachable(null, resp);
+      }, remote.UnreachableError)
     },
-    'assertion with invalid type': {
-      topic: issuer.simple.invalidType(),
-      'should get': {
-        topic: function(server) { remote.assertion(server.url, this.callback) },
-        '`status == failure`': function(err, result){ assert.equal(err.status, 'failure') },
-        '`error == content-type`': function(err, result){ assert.equal(err.error, 'content-type') }
-      },
-    },
-    'bad assertion': {
-      topic: issuer.simple.bad(),
-      'should get': {
-        topic: function(server) { remote.assertion(server.url, this.callback) },
-        '`status == failure`': function(err, result){ assert.equal(err.status, 'failure') },
-        '`error == validation`': function(err, result){ assert.equal(err.error, 'validation') }
-      },
-    },
-    'really bad assertion (bad json)': {
-      topic: issuer.simple.reallyBad(),
-      'should get': {
-        topic: function(server) { remote.assertion(server.url, this.callback) },
-        '`status == failure`': function(err, result){ assert.equal(err.status, 'failure') },
-        '`error == parse`': function(err, result){ assert.equal(err.error, 'parse') }
-      },
-    },
-    'dreadful assertion (4xx or 5xx)': {
-      topic: issuer.simple.dreadful(),
-      'should get': {
-        topic: function(server) { remote.assertion(server.url, this.callback) },
-        '`status == failure`': function(err, result){ assert.equal(err.status, 'failure') },
-        '`error == unreachable`': function(err, result){ assert.equal(err.error, 'unreachable') }
-      },
-    },
-    'bogus assertion (dns error)': {
-      'should get': {
-        topic: function(server) { remote.assertion('http://this-is-not-even-a-server', this.callback) },
-        '`status == failure`': function(err, result){ assert.equal(err.status, 'failure') },
-        '`error == unreachable`': function(err, result){ assert.equal(err.error, 'unreachable') }
-      }
-    },
-    'wildly bogus assertion (dns error)': {
-      'should get': {
-        topic: function(server) { remote.assertion('klasjdf;lajs;dho', this.callback) },
-        '`status == failure`': function(err, result){ assert.equal(err.status, 'failure') },
-        '`error == unreachable`': function(err, result){ assert.equal(err.error, 'unreachable') }
-      }
+    'does not throw error when reachable': function () {
+      var resp = mockResponse(200);
+      assert.doesNotThrow(function () {
+        remote.assert.reachable(null, resp);
+      })
+      
+      resp = mockResponse(304);
+      assert.doesNotThrow(function () {
+        remote.assert.reachable(null, resp);
+      })
+      
+      resp = mockResponse(301);
+      assert.doesNotThrow(function () {
+        remote.assert.reachable(null, resp);
+      })
     }
   },
-  'Fetching a': {
-    'good badge image (PNG)': {
-      topic: serv.url('badge.png'),
-      'should get': {
-        topic: function(url){ remote.badgeImage(url, this.callback) },
-        'a png buffer': function(err, result){
-          assert.ok(Buffer.isBuffer(result));
-        }
+  'remote.assert.size': {
+    'throws error when response header is too big': function () {
+      var resp = mockResponse(200, TOO_BIG);
+      assert.throws(function () {
+        remote.assert.size(resp);
+      }, remote.SizeError);
+    },
+    'throws error when body is too big': function () {
+      var resp = mockResponse(200);
+      assert.throws(function () {
+        remote.assert.size(resp, genstring(TOO_BIG));
+      }, remote.SizeError);
+    },
+    'does not throw error when both are fine': function () {
+      var resp = mockResponse(200);
+      assert.doesNotThrow(function () {
+        remote.assert.size(resp, genstring(TOO_BIG - 2));
+      });
+    }
+  },
+  'remote.assert.contentType': {
+    'throws error when given an expected content type': function () {
+      var resp = mockResponse(200, 0, 'application/json');
+      assert.throws(function () {
+        remote.assert.contentType(resp, 'text/html');
+      }, remote.ContentTypeError);
+    },
+    'does not throw error when given an expected content type': function () {
+      var resp = mockResponse(200, 0, 'application/json');
+      assert.doesNotThrow(function () {
+        remote.assert.contentType(resp, 'application/json');
+      }, remote.ContentTypeError);
+    }
+  },
+  'remote.asyncParse': {
+    'given a valid serialized string': {
+      topic: function () {
+        var valid = '{"what": "yes"}';
+        remote.asyncParse(JSON.parse, valid, this.callback);
+      },
+      'completes without error': function (err, obj) {
+        assert.ifError(err);
+        assert.includes(obj, 'what');
       }
     },
-    'bad badge image (JPG)': {
-      topic: serv.url('badge.jpg'),
-      'should get': {
-        topic: function(url){ remote.badgeImage(url, this.callback) },
-        '`status == failure`': function(err, result){ assert.equal(err.status, 'failure') },
-        '`error == content-type`': function(err, result){ assert.equal(err.error, 'content-type') }
+    'given an invalid serialized string': {
+      topic: function () {
+        var invalid = '{"what": ';
+        remote.asyncParse(JSON.parse, invalid, this.callback);
+      },
+      'sends ParseError': function (err, obj) {
+        assert.instanceOf(err, remote.ParseError);
+        assert.isUndefined(obj);
       }
-    },
-    'bad badge image (GIF)': {
-      topic: serv.url('badge.gif'),
-      'should get': {
-        topic: function(url){ remote.badgeImage(url, this.callback) },
-        '`status == failure`': function(err, result){ assert.equal(err.status, 'failure') },
-        '`error == content-type`': function(err, result){ assert.equal(err.error, 'content-type') }
-      }
-    },
-    'sneaky badge image (JPG labeled as PNG)': {
-      topic: serv.url('sneaky-badge.png'),
-      'should get': {
-        topic: function(url){ remote.badgeImage(url, this.callback) },
-        '`status == failure`': function(err, result){ assert.equal(err.status, 'failure') },
-        '`error == parse`': function(err, result){ assert.equal(err.error, 'parse') }
-      }
-    },
-    'huge badge image (PNG)': {
-      topic: serv.url('huge.png'),
-      'should get': {
-        topic: function(url){ remote.badgeImage(url, this.callback) },
-        '`status == failure`': function(err, result){ assert.equal(err.status, 'failure') },
-        '`error == size`': function(err, result){ assert.equal(err.error, 'size') }
-      }
-    },
+    }
   }
 }).export(module);

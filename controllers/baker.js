@@ -23,15 +23,16 @@ exports.baker = function(req, res) {
   accepts = req.headers['accept'] || '';
   shouldAward = req.query.award === 'true';
   
-  remote.assertion(query.assertion, function(err, data) {
-    if (err.status !== 'success') {
+  // #TODO: re-write this piece of garbage from scratch, jesus christ.
+  remote.getHostedAssertion(query.assertion, function(err, assertion) {
+    if (err) {
       logger.warn('failed grabbing assertion for URL '+ query.assertion);
       logger.warn('reason: '+ JSON.stringify(err));
       res.setHeader('Content-Type', 'application/json');
       return res.send(JSON.stringify(err), 400)
     }
     issuer = url.parse(query.assertion);
-    image = url.parse(data.badge.image);
+    image = url.parse(assertion.badge.image);
     if (!image.hostname) {
       image.host = issuer.host;
       image.port = issuer.port;
@@ -61,7 +62,7 @@ exports.baker = function(req, res) {
 
       if (accepts.match('application/json')) {
         res.setHeader('Content-Type', 'application/json');
-        return res.send(JSON.stringify({'status':'success', 'assertion': JSON.stringify(data) }));
+        return res.send(JSON.stringify({'status':'success', 'assertion': JSON.stringify(assertion) }));
       }
 
       md5sum = crypto.createHash('md5');
@@ -70,7 +71,7 @@ exports.baker = function(req, res) {
       res.setHeader('Content-Disposition', 'attachment; filename="'+filename+'"');
       
       if (shouldAward) {
-        awardBadge(data, query.assertion, badgePNGData, function (err, badge) {
+        awardBadge(assertion, query.assertion, badgePNGData, function (err, badge) {
           if (err) res.setHeader('x-badge-awarded', 'false');
           else res.setHeader('x-badge-awarded', badge.recipient);
           return res.send(badgePNGData);

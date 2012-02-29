@@ -1,6 +1,11 @@
 .#*
 *log
 *~
+*#*
+.vagrant
+.DS_Store
+*.rpm
+*.tar.gz
 
 /docs
 /node_modules
@@ -16,3 +21,4 @@
 /static/_badges*
 !/static/.gitkeep
 /test.json
+/bin/badges.json
