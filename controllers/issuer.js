@@ -154,7 +154,7 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
             logger.error(err);
             var dupe_regex = /Duplicate entry/;
             if (dupe_regex.test(err)) {
-              return res.json({badge: assertion, exists: true, message: "badge already exists"}, 500); // FIX TODO change this back to 403
+              return res.json({badge: assertion, exists: true, message: "badge already exists"}, 304);
             }
             // return a general error message
             return res.json({badge: assertion, exists: false, 'message': error_message}, 500);

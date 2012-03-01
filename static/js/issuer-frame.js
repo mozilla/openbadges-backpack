@@ -346,22 +346,22 @@ function issue(assertions, cb) {
                 data: {
                   url: url
                 },
-                success: function() {
-                  successes.push(url);
+                success: function(data, textStatus, jqXHR) {
+                  if (jqXHR.status == 304) {
+                    showError("#already-exists-template", templateArgs);
+                    errors.push({
+                      url: url,
+                      reason: "EXISTS"
+                    });
+                  } else
+                    successes.push(url);
                 },
                 error: function(req) {
-                  var err = JSON.parse(req.responseText);
-                  var template = "#accept-failure-template";
-                  // TODO: Is this really the best reason?
-                  var reason = "INVALID";
-                  if (err.message == "badge already exists") {
-                    template = "#already-exists-template";
-                    reason = "EXISTS";
-                  }
-                  showError(template, templateArgs);
+                  showError("#accept-failure-template", templateArgs);
                   errors.push({
                     url: url,
-                    reason: reason
+                    // TODO: Is this really the best reason?
+                    reason: "INVALID"
                   });
                 }
               });
