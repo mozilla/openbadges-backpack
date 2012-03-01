@@ -8,7 +8,7 @@
     We've turned on some helpful tooltips to help you get oriented. Mouse over the different parts of your backpack to learn what they do, paying special attention anywhere you see the <i class="icon-info-sign"></i> icon.
   </p>
   <p>
-    When you feel comfortable you can click the <a href="{{#reverse}}backpack.manage{{/reverse}}">Home</a> link here or up top to turn these messages off.
+    When you feel comfortable you can click the <a href="{{#reverse}}backpack.manage{{/reverse}}">Help: On</a> link here or above to toggle these messages off.
   </p>
 </div>
 {{/tooltips}}

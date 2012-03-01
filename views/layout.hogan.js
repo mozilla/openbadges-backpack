@@ -22,6 +22,7 @@
           <ul class="nav">
             <li><a href="{{#reverse}}backpack.manage{{/reverse}}">Home</a></li>
             <li><a href="{{#reverse}}backpack.signout{{/reverse}}">Sign Out</a></li>
+            <li><a href="{{#reverse}}backpack.manage{{/reverse}}{{^tooltips}}?tooltips{{/tooltips}}">Help: {{#tooltips}}On{{/tooltips}}{{^tooltips}}Off{{/tooltips}}</a></li>
           </ul>
         </div>
       </div>
