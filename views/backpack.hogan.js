@@ -53,9 +53,9 @@
       <h1><span rel="popover" data-title="Groups" data-content="You can drag-and-drop badges into groups, which you can use to publish your badges for employers, social networks, etc.">Groups{{#tooltips}}<i class="icon-info-sign"></i>{{/tooltips}}</span></h1>
       {{#groups}}
         <div class='group' data-id="{{attributes.id}}" data-url="{{attributes.url}}">
-        <input class='groupName' type='text' value='{{attributes.name}}' style='display: block'>
-        <span class='icon delete'>&times;</span>
-        <span class='icon share' {{^attributes.badgeObjects}}style='display: none'{{/attributes.badgeObjects}} title='share this group'>5</span>
+        <input class='groupName' type='text' value='{{attributes.name}}' style='display: block' rel="tooltip" data-title="Rename groups to whatever you want!">
+        <span class='icon delete' rel="tooltip" data-title="Click to delete this group">&times;</span>
+        <span class='icon share' rel="tooltip" data-placement="bottom" {{^attributes.badgeObjects}}style='display: none'{{/attributes.badgeObjects}} title='Share this group'>5</span>
           
           {{#attributes.badgeObjects}}
             <span draggable="true" class="badge" data-id="{{attributes.id}}">
@@ -89,6 +89,9 @@
     $('[rel="popover"]').popover({
       animation: false,
       placement: 'right'
+    });
+    $('[rel="tooltip"]').tooltip({
+      animation: false
     });
   });
 </script>
