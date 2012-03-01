@@ -11,6 +11,7 @@ exports.param = {
         return res.send('Error pulling group', 500);
       }
       
+      
       if (!group) {
         return res.send('Could not find group', 404);
       }
@@ -38,7 +39,7 @@ exports.create = function (req, res) {
 
   group.save(function (err, group) {
     res.contentType('json');
-    res.send({id: group.get('id')});
+    res.send({id: group.get('id'), url: group.get('url')});
   })
 };
 

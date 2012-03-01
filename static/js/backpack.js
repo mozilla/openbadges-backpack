@@ -112,7 +112,8 @@ Group.View = Backbone.View.extend({
     'blur input': 'saveName',
     'drop': 'badgeDrop',
     'mousedown .delete': 'preventDefault',
-    'click .delete': 'destroy'
+    'click .delete': 'destroy',
+    'click .share': 'share'
   },
   
   preventDefault: function (event) {
@@ -120,6 +121,11 @@ Group.View = Backbone.View.extend({
     return false;
   },
   
+  
+  share: function (event) {
+    window.location = '/share/' + this.model.get('url') + '/edit';
+    return false;
+  },
   
   /**
    * Store the name of the group at the beginning of the editing session so
@@ -478,6 +484,7 @@ Group.fromElement = function (element) {
     , groupBadges = new Badge.Collection(_.map(badgeElements, Badge.fromElement))
     , model = new Group.Model({
       id: $el.data('id'),
+      url: $el.data('url'),
       name: $el.find('input').val(),
       badges: groupBadges
     });

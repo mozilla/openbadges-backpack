@@ -37,10 +37,10 @@
     <div id='groups' class="span-two-thirds column">
       <h1>Groups</h1>
       {{#groups}}
-        <div class='group' data-id="{{attributes.id}}">
-          <input class='groupName' type='text' value='{{attributes.name}}' style='display: block'>
+        <div class='group' data-id="{{attributes.id}}" data-url="{{attributes.url}}">
+        <input class='groupName' type='text' value='{{attributes.name}}' style='display: block'>
         <span class='icon delete'>&times;</span>
-        <span class='icon config'>&#x2699;</span>
+        <span class='icon share' {{^attributes.badgeObjects}}style='display: none'{{/attributes.badgeObjects}} title='share this group'>5</span>
           
           {{#attributes.badgeObjects}}
             <span draggable="true" class="badge" data-id="{{attributes.id}}">
@@ -53,8 +53,7 @@
       <div class='group isNew'>
         <input class='groupName' type='text' value='New Group'>
         <span class='icon delete'>&times;</span>
-        <span class='icon config'>&#x2699;</span>
-        
+        <span class='icon share' title='share this group'>5</span>
         <h3 class='instructions'>Drag a Badge Here</h3>
       </div>
       
@@ -174,7 +173,8 @@
   <div class='group {{^attributes.id}}isNew{{/attributes.id}}'>
     <input class='groupName' type='text' value='{{name}}'>
         <span class='icon delete'>&times;</span>
-        <span class='icon config'>&#x2699;</span>
+          <span class='icon share' style='display: none' title='share this group'>5</span>
+          
     
     {{^attributes.id}}
       <h3 class='instructions'>Drag a Badge Here</h3>

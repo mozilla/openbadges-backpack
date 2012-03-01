@@ -1,3 +1,13 @@
+@font-face {
+    font-family: 'EntypoRegular';
+    src: url('/fonts/entypo-webfont.eot');
+    src: url('/fonts/entypo-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/fonts/entypo-webfont.woff') format('woff'),
+         url('/fonts/entypo-webfont.ttf') format('truetype'),
+         url('/fonts/entypo-webfont.svg#EntypoRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
 
 html {
   background: #fff url('/images/stripes.png') repeat-x;
@@ -139,7 +149,7 @@ form.baker #assertion {
   font-weight: bold;
   height: 24px;
   width: 24px;
-  text-shadow: #fff -1px -1px 2px;
+  text-shadow: #fff 1px 1px 2px;
   color: #bbb;
   padding: 0;
   margin: 0;
@@ -172,23 +182,25 @@ form.baker #assertion {
 }
 
 .group .delete:active {
-  text-shadow: #aaa -1px -1px 2px;
   top: 8px;
   right: 6px;
-}
-
-.group .config {
-  bottom: 10px;
-  display: none;
-}
-
-.group .config:hover {
-  color: #333;
-}
-.group .config:active {
   text-shadow: #aaa -1px -1px 2px;
+}
+
+.group .share {
+  font-family: 'EntypoRegular';
+  font-size: 3.3em;
+  bottom: 10px;
+}
+
+.group .share:hover {
+  color: #66f;
+  text-shadow: #fff 1px 1px 2px;
+}
+.group .share:active {
   bottom: 8px;
   right: 6px;
+  text-shadow: #aaa -1px -1px 2px;
 }
 
 .group.hovering {
@@ -298,58 +310,6 @@ form.baker #assertion {
   box-shadow: 0px 1px 2px 2px rgba(0, 0, 0, 0.4);
 }
 
-.lightbox table {
-  margin-bottom: 0;
-}
-
-.lightbox table td {
-  border: 0;
-  padding: 4px 12px;
-}
-
-.lightbox table td.label {
-  width: 128px;
-  font-weight: bold;
-  text-align: right;
-}
-
-.lightbox table td.label:after {
-  position: absolute;
-  margin-left: 4px;
-  margin-top: 1px;
-  content: "—";
-  font-weight: normal;
-  color: #bbb;
-  z-index: 5;
-}
-
-.lightbox table td.section-head {
-  color: #999;
-  border-bottom: 1px solid #ccc;
-  line-height: 1.5em;
-  padding-left: 0;
-}
-
-
-.lightbox .contents .information {
-  padding: 10px 3px;
-}
-
-.lightbox .contents .information .image {
-  text-align: center;
-  width: 148px;
-}
-
-.lightbox .contents .information img {
-  max-height: 128px;
-  max-width: 128px;
-  display: block;
-  margin: auto;
-}
-
-.lightbox .contents .information button {
-  margin-top: 16px;
-}
 
 .lightbox .confirm-disown {
   display: none;
@@ -382,6 +342,142 @@ form.baker #assertion {
 .lightbox .confirm-disown .danger {
   float: right;
   font-weight: bold;
+}
+
+
+table.information {
+  margin-bottom: 0;
+  padding: 10px 3px;
+}
+
+.information td {
+  border: 0;
+  padding: 4px 12px;
+}
+
+.information td.label {
+  width: 128px;
+  font-weight: bold;
+  text-align: right;
+}
+
+.information td.label:after {
+  position: absolute;
+  margin-left: 4px;
+  margin-top: 1px;
+  content: "—";
+  font-weight: normal;
+  color: #bbb;
+  z-index: 5;
+}
+
+.information td.section-head {
+  color: #999;
+  border-bottom: 1px solid #ccc;
+  line-height: 1.5em;
+  padding-left: 0;
+}
+
+
+.information .image {
+  text-align: center;
+  width: 148px;
+}
+
+.information img {
+  max-height: 128px;
+  max-width: 128px;
+  display: block;
+  margin: auto;
+}
+
+.information button {
+  margin-top: 16px;
+}
+
+.portfolio p {
+  font-size: 1.3em;
+  line-height: 1.5em;
+  color: #555;
+}
+
+.portfolio ul {
+  list-style: none;
+  margin: 20px auto;
+}
+.portfolio ul li {
+  clear: both;
+}
+
+.portfolio .story {
+  float: right;
+  width: 350px;
+  margin-top: 20px;
+  min-height: 200px;
+  font-size: 1.3em;
+  line-height: 1.5em;
+  color: #555;
+}
+
+.portfolio table.information {
+  width: 550px;
+}
+
+.portfolio input, .portfolio textarea {
+  background: none;
+  border: 1px solid #eee;
+}
+.portfolio input.field:hover, .portfolio textarea:hover {
+  background: none;
+  border: 1px solid #555;
+}
+.portfolio input.field:focus, .portfolio textarea:focus {
+  border: 1px solid #bbb;
+}
+.portfolio .title {
+  display: block;
+  margin-bottom:18px;
+  font-size:30px;
+  line-height:36px;
+  height: 36px;
+  width: 600px;
+}
+.portfolio .subtitle {
+  display: block;
+  width: 600px;
+  font-size:24px;
+  line-height:36px;
+  height: 36px;
+}
+.portfolio .preamble {
+  font-size: 1.3em;
+  line-height: 1.5em;
+  color: #555;
+  margin-top: 0.5em;
+  width: 99%;
+}
+.portfolio .save {
+  text-align: right;
+}
+.portfolio .save input {
+  text-align: center;
+}
+
+.portfolio h3 {
+  background: #ddd;
+  padding: 3px 10px;
+  border-radius: 5px;
+  margin: 45px 0 0;
+  text-shadow: 1px 1px 2px #fff;
+  box-shadow: 1px 1px 1px #aaa;
+}
+.alert-message iframe {
+  float: right;
+}
+
+.portfolio .message-container p {
+  color: white;
+  line-height: 1.7em;
 }
 
 body {
