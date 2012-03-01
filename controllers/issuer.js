@@ -69,6 +69,7 @@ var request = require('request')
   , awardBadge = require('../lib/award')
   , remote = require('../lib/remote')
   , validator = require('validator')
+  , Badge = require('../models/badge.js')
 
 
 exports.issuerBadgeAddFromAssertion = function(req, res, next) {
@@ -166,7 +167,16 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
       }
       // if this is a GET, we still need to return the badge
       else {
-        return res.json({exists: false, badge:assertion}, 200);
+        var response = {exists: false, badge:assertion};
+        Badge.findOne({endpoint: assertionUrl}, function(err, badge) {
+          if (err) {
+            logger.error(err);
+            return res.json({message: "internal server error"}, 500);
+          }
+          if (badge && badge.get("user_id") == req.user.get("id"))
+            response.exists = true;
+          return res.json(response, 200);
+        });
       }
     });
   }); // end of the assertion grabbing badge adding.
