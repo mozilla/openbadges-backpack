@@ -10,7 +10,7 @@
   , "coffeekup": "0.3.x"
   , "colors": "*"
   , "commander": "0.5.x"
-  , "connect-cookie-session": "0.x.x"
+  , "connect-cookie-session": "git+https://github.com/brianloveswords/connect-cookie-session.git"
   , "express": "2.5.x"
   , "formidable": "1.0.x"
   , "functools": "1.2.x"
