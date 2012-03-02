@@ -1,3 +1,18 @@
+{{#tooltips}}
+<div class="alert alert-block alert-info">
+  <h4 class="alert-heading">Welcome to your Badge Backpack!</h4>
+  <p>
+    You collect badges here from various issuers and learning experiences. In fact, you can see the badge(s) you just earned here.
+  </p>
+  <p>
+    We've turned on some helpful tooltips to help you get oriented. Mouse over the different parts of your backpack to learn what they do, paying special attention anywhere you see the <i class="icon-info-sign"></i> icon.
+  </p>
+  <p>
+    When you feel comfortable you can click the <a href="{{#reverse}}backpack.manage{{/reverse}}">Help: Off</a> link here or above to toggle these messages off.
+  </p>
+</div>
+{{/tooltips}}
+
 {{^badges.length}}
 <h1>No badges.  Better get out there and start earning some!</h1>
 <p>By the way, <a href="http://p2pu.org">P2PU</a> would be a great place to start
@@ -6,7 +21,7 @@
 <div class="row" style="position: relative;">
   <div class="span-one-third column">
     {{#badges.length}}
-    <h1>Badges</h1>
+    <h1><span data-title="Badges" data-content="These are the badges you've earned so far! Click on one to see its details." rel="popover">Badges{{#tooltips}}<i class="icon-info-sign"></i>{{/tooltips}}</span></h1>
     <div id="badges" class="js-badges">
       {{#badges}}
         <span draggable="true" class="badge" data-id="{{attributes.id}}">
@@ -17,7 +32,7 @@
     {{/badges.length}}
     
     <div class="upload">
-      <h4>Upload Badges</h4>
+      <h4><span data-title="Upload Badges" data-content="You can upload previously earned badges here, but they have to comply with the OBI metadata spec." rel="popover">Upload Badges{{#tooltips}}<i class="icon-info-sign"></i>{{/tooltips}}</span></h4>
       <p>If you have badges you've been awarded, you can upload them manually</p>
       <form action="{{#reverse}}backpack.userBadgeUpload{{/reverse}}" method="post" enctype="multipart/form-data">
         <fieldset>
@@ -35,12 +50,12 @@
 
   {{#badges.length}}
     <div id='groups' class="span-two-thirds column">
-      <h1>Groups</h1>
+      <h1><span rel="popover" data-title="Groups" data-content="You can drag-and-drop badges into groups, which you can use to publish your badges for employers, social networks, etc.">Groups{{#tooltips}}<i class="icon-info-sign"></i>{{/tooltips}}</span></h1>
       {{#groups}}
         <div class='group' data-id="{{attributes.id}}" data-url="{{attributes.url}}">
-        <input class='groupName' type='text' value='{{attributes.name}}' style='display: block'>
-        <span class='icon delete'>&times;</span>
-        <span class='icon share' {{^attributes.badgeObjects}}style='display: none'{{/attributes.badgeObjects}} title='share this group'>5</span>
+        <input class='groupName' type='text' value='{{attributes.name}}' style='display: block' rel="tooltip" data-title="Rename groups to whatever you want!">
+        <span class='icon delete' rel="tooltip" data-title="Click to delete this group">&times;</span>
+        <span class='icon share' rel="tooltip" data-placement="bottom" {{^attributes.badgeObjects}}style='display: none'{{/attributes.badgeObjects}} title='Share this group'>5</span>
           
           {{#attributes.badgeObjects}}
             <span draggable="true" class="badge" data-id="{{attributes.id}}">
@@ -67,6 +82,20 @@
     window.badgeData[{{attributes.id}}] = {{{serializedAttributes}}};
   {{/badges}}
 </script>
+
+{{#tooltips}}
+<script>
+  $(function(){
+    $('[rel="popover"]').popover({
+      animation: false,
+      placement: 'right'
+    });
+    $('[rel="tooltip"]').tooltip({
+      animation: false
+    });
+  });
+</script>
+{{/tooltips}}
 
 {{=|| ||=}} <!-- need to change delimeter so hogan doesn't parse these --->
 
@@ -174,7 +203,6 @@
     <input class='groupName' type='text' value='{{name}}'>
         <span class='icon delete'>&times;</span>
           <span class='icon share' style='display: none' title='share this group'>5</span>
-          
     
     {{^attributes.id}}
       <h3 class='instructions'>Drag a Badge Here</h3>
