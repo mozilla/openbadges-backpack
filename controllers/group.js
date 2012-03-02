@@ -62,7 +62,11 @@ exports.destroy = function (req, res) {
   if (!req.user) return res.send('nope', 400);
   var group = req.group
   group.destroy(function (err) {
-    if (err) return res.send('nope', 500);
+    if (err) {
+      logger.debug('some sort of error deleting!');
+      logger.debug(err);
+      return res.send('nope', 500);
+    }
     res.contentType('json');
     res.send(JSON.stringify({success: true}));
   })
