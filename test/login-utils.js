@@ -40,7 +40,7 @@ module.exports = {
     var port = this.PORT;
     
     suite.url = function(path) {
-      return 'http://127.0.0.1:' + port + path;
+      return 'http://localhost:' + port + path;
     };
     suite.expectRedirectTo = function(path) {
       var url = this.url(path);

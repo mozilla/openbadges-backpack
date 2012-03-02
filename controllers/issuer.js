@@ -68,7 +68,8 @@ var request = require('request')
   , reverse = require('../lib/router').reverse
   , awardBadge = require('../lib/award')
   , remote = require('../lib/remote')
-  , check = require('validator').check
+  , validator = require('validator')
+  , Badge = require('../models/badge.js')
 
 
 exports.issuerBadgeAddFromAssertion = function(req, res, next) {
@@ -116,7 +117,7 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
 
   // check if the assertion url is malformed
   try {
-    check(assertionUrl).isUrl();
+    validator.check(assertionUrl).isUrl();
   } 
   catch (e) {                      
     logger.error("malformed url " + assertionUrl + " returning 400");
@@ -154,7 +155,7 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
             logger.error(err);
             var dupe_regex = /Duplicate entry/;
             if (dupe_regex.test(err)) {
-              return res.json({badge: assertion, exists: true, message: "badge already exists"}, 500); // FIX TODO change this back to 403
+              return res.json({badge: assertion, exists: true, message: "badge already exists"}, 304);
             }
             // return a general error message
             return res.json({badge: assertion, exists: false, 'message': error_message}, 500);
@@ -166,7 +167,16 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
       }
       // if this is a GET, we still need to return the badge
       else {
-        return res.json({exists: false, badge:assertion}, 200);
+        var response = {exists: false, badge:assertion};
+        Badge.findOne({endpoint: assertionUrl}, function(err, badge) {
+          if (err) {
+            logger.error(err);
+            return res.json({message: "internal server error"}, 500);
+          }
+          if (badge && badge.get("user_id") == req.user.get("id"))
+            response.exists = true;
+          return res.json(response, 200);
+        });
       }
     });
   }); // end of the assertion grabbing badge adding.

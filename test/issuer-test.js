@@ -1,5 +1,8 @@
+require('../lib/mysql').prepareTesting();
+
 var loginUtils = require('./login-utils'),
-    assert = require('assert');
+    assert = require('assert'),
+    validator = require('validator');
 
 var app = loginUtils.startApp();
 var suite = loginUtils.suite('issuer api');
@@ -24,6 +27,16 @@ const EXAMPLE_BADGE = {
 
 const EXAMPLE_BADGE_URL = suite.url('/test/assertions/example.json');
 
+validator.check = (function acceptLocalURLs() {
+  var oldCheck = validator.check;
+  
+  return function(url) {
+    if (url.indexOf(suite.url('/')) == 0)
+      return {isUrl: function() {}};
+    return oldCheck.apply(validator, arguments);
+  }
+})();
+
 suite
   .discuss('when not logged in')
     .path('/issuer/frame')
@@ -40,6 +53,9 @@ suite
     .path('/issuer/assertion')
       .discuss('and providing no "url" argument')
         .get().expect(400)
+        // TODO: Not sure why, but we need this next() here or else
+        // bad things happen if the tests are executed in parallel.
+        .next()
         .postFormData().expect(400)
         .undiscuss()
       .discuss('and providing a malformed url')
@@ -49,31 +65,32 @@ suite
       .discuss('and providing an unreachable url')
         // the .get test thing doesn't seem to want to include query string?
         .get("?url=" + suite.url('/does/not/exist')).expect(502)
+        .expect("provides an appropriate error message", function(err, res) {
+          var message = JSON.parse(res.body).message;
+          assert.ok(message.indexOf("Could not reach endpoint") != -1);
+        })
         .postFormData({url: suite.url('/does/not/exist')}).expect(502)
         .undiscuss()
       .discuss('and providing a valid url')
-        // Make sure the example badge isn't already in their backpack.
-        .delFormData({url: EXAMPLE_BADGE_URL}).next()
         .discuss('that the user does not have in their backpack')
           .get("?url=" + EXAMPLE_BADGE_URL)
             .expect(200, {
               exists: false,
               badge: EXAMPLE_BADGE
             })
+          .next()
           .postFormData({url: EXAMPLE_BADGE_URL})
-            .expect(200)
+            .expect(201)
             .next()
           .undiscuss()
         .discuss('that the user already has in their backpack')
           .postFormData({url: EXAMPLE_BADGE_URL})
-            .expect(400)
+            .expect(304)
           .get("?url="+EXAMPLE_BADGE_URL)
             .expect(200, {
               exists: true,
               badge: EXAMPLE_BADGE
             })
-          .next()
-          .delFormData({url: EXAMPLE_BADGE_URL}).expect(200)
           .next()
           .undiscuss();
           

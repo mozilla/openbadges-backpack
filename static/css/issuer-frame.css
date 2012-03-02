@@ -12,3 +12,12 @@
   right: 10px;
   font-size: 20px;
 }
+
+#ajax-loader {
+  padding-top: 7px;
+  display: none;
+}
+
+.badge-image {
+  max-width: 100%;
+}
