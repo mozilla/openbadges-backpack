@@ -22,8 +22,32 @@ var Testing = (function setupTestingEnvironment() {
     return;
 
   var Testing = {
-    browseridWorks: true
+    browseridWorks: true,
+    instantTransitions: function() {
+      var DELAY_MS = 10;
+      function scheduleCallback(cb, self) {
+        if (cb)
+          setTimeout(function() {
+            cb.call(self);
+          }, DELAY_MS);
+      }
+      function quickShow(cb) {
+        this.show();
+        scheduleCallback(cb, this);
+      }
+      function quickHide(cb) {
+        this.hide();
+        scheduleCallback(cb, this);
+      }
+      jQuery.fn.extend({
+        fadeIn: quickShow,
+        fadeOut: quickHide,
+        slideDown: quickShow,
+        slideUp: quickHide
+      });
+    }
   };
+  
   var FAKE_XHR_DELAY = 10;
   var ASSERTIONS = [
     "http://foo.org/newbadge.json",
@@ -185,6 +209,8 @@ var Testing = (function setupTestingEnvironment() {
     show("The simulated assertions passed to this page are:\n\n " +
          JSON.stringify(ASSERTIONS, null, " "));
   });
+  if (!navigator.id)
+    navigator.id = {};
   navigator.id.getVerifiedEmail = function(cb) {
     var email = "someone_else@example.com";
     show("We just simulated a BrowserID login of " + email + ".");
