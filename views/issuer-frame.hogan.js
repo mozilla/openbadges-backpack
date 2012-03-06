@@ -88,14 +88,14 @@
           <dd>[[ assertion.badge.description ]]</dd>
 
           <dt>Criteria</dt>
-          <dd><a href="[[ assertion.badge.criteria ]]">[[ assertion.badge.criteria ]]</a></dd>
+          <dd><a href="[[assertion.badge.criteria]]">[[ assertion.badge.criteria ]]</a></dd>
 
           <dt>Issuer</dt>
-          <dd>[[ assertion.badge.issuer.name ]] (<a href="[[ assertion.badge.issuer.origin ]]">[[ assertion.badge.issuer.origin ]]</a>)</dd>
+          <dd>[[ assertion.badge.issuer.name ]] (<a href="[[assertion.badge.issuer.origin]]">[[ assertion.badge.issuer.origin ]]</a>)</dd>
         </dl>
       </div>
       <div class="span-one-third columns">
-        <img class="badge-image" src="[[ assertion.badge.image ]]" alt="Badge Image"/>
+        <img class="badge-image" src="[[assertion.badge.image]]" alt="Badge Image"/>
       </div>
     </div>
   </div>
