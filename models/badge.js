@@ -134,7 +134,7 @@ Badge.validateBody = function (body) {
   
   // begin tests
   test.missing('recipient');
-  test.regexp('recipient', 'email');
+  test.regexp('recipient', 'emailOrHash');
   test.regexp('evidence', 'url');
   test.regexp('expires', 'date');
   test.regexp('issued_on', 'date');

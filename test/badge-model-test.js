@@ -6,9 +6,13 @@ var vows = require('vows')
   , crypto = require('crypto')
   , Badge = require('../models/badge')
 
+var RECIPIENTS = {
+  good: ['brian@awesome.com', 'yo+wut@example.com', 'ümlaut@heavymetal.de', 'sha1$c0b19425e0f2c8021ab06c79b19144e127b0f2cb', 'sha256$wutlol$406f04039d10c79c070b26781e8246dc01ed1d0453c5ad0fa705ff7d507fd898'],
+  bad: ['lkajd', 'skj@asdk', '@.com', '909090', '____!@', 'sha1stuff']
+};
 var EMAILS = {
-  good: ['brian@awesome.com', 'yo+wut@example.com', /*'elniño@español.es',*/ 'ümlaut@heavymetal.de'],
-  bad: ['lkajd', 'skj@asdk', '@.com', '909090', '____!@']
+  good: ['brian@awesome.com', 'yo+wut@example.com', 'ümlaut@heavymetal.de'],
+  bad: ['lkajd', 'skj@asdk', '@.com', '909090', '____!@', 'sha1stuff']
 };
 var URLS = {
   good: ['http://example.com/', 'https://example.com/w/yo', '/partial/path', '/rad.awesome/great/', '/foreign/crázy/ååú´¨la/'],
@@ -160,8 +164,8 @@ vows.describe('Badge model').addBatch({
       'with a missing `badge.issuer.origin` field': makeMissingTest('badge.issuer.origin'),
       'with a missing `badge.issuer.name` field': makeMissingTest('badge.issuer.name'),
       
-      'with bogus `recipient`': makeInvalidationTests('recipient', EMAILS.bad),
-      'with valid `recipient`': makeValidationTests('recipient', EMAILS.good),
+      'with bogus `recipient`': makeInvalidationTests('recipient', RECIPIENTS.bad),
+      'with valid `recipient`': makeValidationTests('recipient', RECIPIENTS.good),
       
       'with bogus `evidence`': makeInvalidationTests('evidence', URLS.bad),
       'with valid `evidence`': makeValidationTests('evidence', URLS.good),
