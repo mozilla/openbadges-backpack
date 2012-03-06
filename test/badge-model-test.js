@@ -7,8 +7,8 @@ var vows = require('vows')
   , Badge = require('../models/badge')
 
 var RECIPIENTS = {
-  good: ['brian@awesome.com', 'yo+wut@example.com', 'ümlaut@heavymetal.de', 'sha1$c0b19425e0f2c8021ab06c79b19144e127b0f2cb', 'sha256$wutlol$406f04039d10c79c070b26781e8246dc01ed1d0453c5ad0fa705ff7d507fd898'],
-  bad: ['lkajd', 'skj@asdk', '@.com', '909090', '____!@', 'sha1stuff']
+  good: ['brian@awesome.com', 'yo+wut@example.com', 'ümlaut@heavymetal.de', 'sha1$c0b19425e0f2c8021ab06c79b19144e127b0f2cb', 'sha256$406f04039d10c79c070b26781e8246dc01ed1d0453c5ad0fa705ff7d507fd898'],
+  bad: ['lkajd', 'skj@asdk', '@.com', '909090', '____!@', 'sha1stuff', 'bcrypt$5$something']
 };
 var EMAILS = {
   good: ['brian@awesome.com', 'yo+wut@example.com', 'ümlaut@heavymetal.de'],
