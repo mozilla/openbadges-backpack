@@ -135,7 +135,11 @@ var Testing = (function setupTestingEnvironment() {
     },
     "POST /issuer/assertion": function(options, cb) {
       if (options.data.url == "http://foo.org/makebackpackexplode.json")
-        cb(400, 'Bad Request');
+        cb(400, 'Bad Request', {
+          text: JSON.stringify({
+            message: "blah"
+          })
+        });
       else
         cb(200, 'OK');
     },
@@ -237,6 +241,16 @@ function showBadges() {
 }
 
 $(window).ready(function() {
+  var activeRequests = 0;
+  
+  $("#ajax-loader").ajaxSend(function() {
+    $(this).fadeIn();
+    activeRequests++;
+  }).ajaxComplete(function() {
+    if (--activeRequests == 0)
+      $(this).fadeOut();
+  });
+  
   if (!Session.currentUser) {
     $(".logged-out").show();
     $(".logged-out .js-browserid-link").click(function() {
@@ -326,34 +340,34 @@ function issue(assertions, cb) {
             $("#badge-ask").empty()
               .append($("#badge-ask-template").render(templateArgs)).fadeIn();
             $("#badge-ask .accept").click(function() {
-              jQuery.ajax({
+              var post = jQuery.ajax({
                 type: 'POST',
                 url: '/issuer/assertion',
                 data: {
                   url: url
                 },
-                success: function() {
-                  successes.push(url);
+                success: function(data, textStatus, jqXHR) {
+                  if (jqXHR.status == 304) {
+                    showError("#already-exists-template", templateArgs);
+                    errors.push({
+                      url: url,
+                      reason: "EXISTS"
+                    });
+                  } else
+                    successes.push(url);
                 },
                 error: function(req) {
-                  var err = JSON.parse(req.responseText);
-                  var template = "#accept-failure-template";
-                  // TODO: Is this really the best reason?
-                  var reason = "INVALID";
-                  if (err.message == "badge already exists") {
-                    template = "#already-exists-template";
-                    reason = "EXISTS";
-                  }
-                  showError(template, templateArgs);
+                  showError("#accept-failure-template", templateArgs);
                   errors.push({
                     url: url,
-                    reason: reason
+                    // TODO: Is this really the best reason?
+                    reason: "INVALID"
                   });
-                },
-                complete: function() {
-                  $("#badge-ask").fadeOut(processNext);
                 }
               });
+              var fade = jQuery.Deferred();
+              $("#badge-ask").fadeOut(function() { fade.resolve(); });
+              jQuery.when(fade, post).always(processNext);
             });
             $("#badge-ask .reject").click(function() {
               errors.push({

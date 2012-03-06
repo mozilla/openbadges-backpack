@@ -10,6 +10,7 @@
   <div class="topbar-inner">
     <div class="container-fluid" style="position: relative;">
       <h3><a href="/" target="_blank">Open Badge Backpack</a></h3>
+      <img src="/images/ajax-loader.gif" id="ajax-loader">
       <a id="moztab" href="http://mozilla.org" target="_blank">a mozilla.org joint</a>
       <a class="close" href="#">&times;</a>
     </div>
@@ -56,8 +57,8 @@
     </div>
   </div>
   <div id="already-exists-template">
-    <div class="alert-message danger">
-      <strong>Sorry!</strong> You appear to already have the
+    <div class="alert-message">
+      You appear to already have the
       <em>[[ assertion.badge.name ]]</em> badge in your backpack.
     </div>
   </div>
@@ -67,11 +68,36 @@
     </div>
   </div>
   <div id="badge-ask-template" style="display: none">
-    <p>Wanna add this badge to your backpack?</p>
-    <p>[[ assertion.badge.name ]] from [[ hostname ]]</p>
-    <p>[[ assertion.badge.description ]]</p>
-    <button class="accept btn primary">Yup</button>
-    <button class="reject btn danger">Nope</button>
+    <div class="row">
+      <div class="span-one-third columns management">
+        <div class="accept-reject">
+          <h2>Accept this badge?</h2>
+          <button class="accept btn primary">Yup</button>
+          <button class="reject btn danger">Nope</button>
+        </div>
+      </div>
+      <div class="span-one-third columns badge-details">
+        <dl>
+          <dt>Recipient</dt>
+          <dd>[[ assertion.recipient ]]</dd>
+
+          <dt>Name</dt>
+          <dd>[[ assertion.badge.name ]]</dd>
+
+          <dt>Description</dt>
+          <dd>[[ assertion.badge.description ]]</dd>
+
+          <dt>Criteria</dt>
+          <dd><a href="[[ assertion.badge.criteria ]]">[[ assertion.badge.criteria ]]</a></dd>
+
+          <dt>Issuer</dt>
+          <dd>[[ assertion.badge.issuer.name ]] (<a href="[[ assertion.badge.issuer.origin ]]">[[ assertion.badge.issuer.origin ]]</a>)</dd>
+        </dl>
+      </div>
+      <div class="span-one-third columns">
+        <img class="badge-image" src="[[ assertion.badge.image ]]" alt="Badge Image"/>
+      </div>
+    </div>
   </div>
 </div>
 <script src="https://browserid.org/include.js"></script>

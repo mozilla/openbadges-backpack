@@ -165,7 +165,8 @@ exports.manage = function(req, res, next) {
       success: success,
       badges: badges,
       csrfToken: req.session._csrf,
-      groups: groups
+      groups: groups,
+      tooltips: req.param('tooltips')
     })
   };
   

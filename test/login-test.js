@@ -1,3 +1,5 @@
+require('../lib/mysql').prepareTesting();
+
 var loginUtils = require('./login-utils'),
     assert = require('assert');
 

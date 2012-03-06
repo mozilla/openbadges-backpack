@@ -37,7 +37,7 @@ var requestLogger = express.logger({
 });
 exports.logRequests = function(){
   return function (request, response, next) {
-    var ua = request.headers['user-agent']
+    var ua = request.headers['user-agent'] || ''
       , heartbeat = (ua.indexOf('HTTP-Monitor') === 0);
     if (heartbeat) return next()
     requestLogger(request, response, next);
