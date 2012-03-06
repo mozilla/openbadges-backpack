@@ -21,6 +21,31 @@ Badge.prototype.presave = function () {
   }
 };
 
+Badge.prototype.confirmRecipient = function (email) {
+  var badgeEmail = this.get('body').recipient;
+  if (/@/.test(badgeEmail)) return badgeEmail === email;
+  
+  var hash, salt
+    , parts = badgeEmail.split('$')
+    , algorithm = parts[0]
+    , given = crypto.createHash(algorithm)
+
+  // if there are only two parts, the first part is the algorithm and the
+  // second part is the computed hash.
+  if (parts.length === 2) {
+    hash = parts[1]
+    return given.update(email).digest('hex') === hash;
+  }
+
+  // if there are only two parts, the first part is the algorithm and the
+  // second part is the computed hash.
+  if (parts.length === 3) {
+    salt = parts[1]
+    hash = parts[2]
+    return given.update(email+salt).digest('hex') === hash;
+  }
+};
+
 Badge.prototype.checkHash = function () {
   return sha256(JSON.stringify(this.get('body'))) === this.get('body_hash');
 };
