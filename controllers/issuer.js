@@ -137,16 +137,23 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
       logger.error(error_msg);
       return res.json({message: error_msg}, 502) ;
     }
-    if (assertion.recipient !== user.get('email') && req.method=='POST') {
+    
+    var badge = new Badge(assertion);
+    if (badge.confirmRecipient(user.get('email')) && req.method=='POST') {
       return res.json({message: "badge assertion is for a different user"}, 403);
     }
 
     // grabbing the remote badge image
     remote.badgeImage(assertion.badge.image, function(err, imagedata) {
-
       // awarding the badge, only done if this is a POST
       if (req.method=='POST') {
-        awardBadge(assertion, assertionUrl, imagedata, function(err, badge) {
+        var opts = {
+          assertion: assertion,
+          url: assertionUrl,
+          imagedata: imagedata,
+          recipient: user.get('email')
+        }
+        awardBadge(opts, function(err, badge) {
           if (err) {
             var error_message = "badge error " + assertionUrl + err;
             logger.error(error_message);

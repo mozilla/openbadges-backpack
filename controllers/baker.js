@@ -71,7 +71,13 @@ exports.baker = function(req, res) {
       res.setHeader('Content-Disposition', 'attachment; filename="'+filename+'"');
       
       if (shouldAward) {
-        awardBadge(assertion, query.assertion, badgePNGData, function (err, badge) {
+        var opts = {
+          assertion: assertion,
+          url: query.assertion,
+          imagedata: badgePNGdata,
+          recipient: query.award
+        }
+        awardBadge(opts, function (err, badge) {
           if (err) res.setHeader('x-badge-awarded', 'false');
           else res.setHeader('x-badge-awarded', badge.recipient);
           return res.send(badgePNGData);
