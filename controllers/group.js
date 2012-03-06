@@ -23,9 +23,9 @@ exports.param = {
 }
 
 exports.create = function (req, res) {
-  if (!req.user) return res.send('nope', 400);
-  if (!req.body) return res.send('nope', 400);
-  if (!req.body.badges) return res.send('nope', 400);
+  if (!req.user) return res.json({error:'no user'}, 403);
+  if (!req.body) return res.json({error:'no badge body'}, 400);
+  if (!req.body.badges) return res.json({error:'no badges'}, 400);
   var user = req.user
     , body = req.body
     , badges = body.badges
