@@ -22,27 +22,24 @@ Badge.prototype.presave = function () {
 };
 
 Badge.prototype.confirmRecipient = function (email) {
-  var badgeEmail = this.get('body').recipient;
+  var badgeEmail = this.get('body').recipient
+    , salt = this.get('body').salt || ''
   if (/@/.test(badgeEmail)) return badgeEmail === email;
   
-  var hash, salt
-    , parts = badgeEmail.split('$')
+  var parts = badgeEmail.split('$')
     , algorithm = parts[0]
+    , hash = parts[1]
     , given = crypto.createHash(algorithm)
 
   // if there are only two parts, the first part is the algorithm and the
   // second part is the computed hash.
   if (parts.length === 2) {
-    hash = parts[1]
-    return given.update(email).digest('hex') === hash;
+    return given.update(email + salt).digest('hex') === hash;
   }
-
-  // if there are only two parts, the first part is the algorithm and the
-  // second part is the computed hash.
-  if (parts.length === 3) {
-    salt = parts[1]
-    hash = parts[2]
-    return given.update(email+salt).digest('hex') === hash;
+  // if there are more parts, it's an algorithm with options
+  else {
+    // #TODO: support algorithms with options.
+    return false; 
   }
 };
 

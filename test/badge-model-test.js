@@ -31,16 +31,13 @@ var VERSIONS = {
   bad: ['v100', '50', 'v10.1alpha', '1.2.x']
 };
 
-var sha256 = function (value) {
-  var sum = crypto.createHash('sha256')
+var quicksum = function (algo, value) {
+  var sum = crypto.createHash(algo)
   sum.update(value);
   return sum.digest('hex');
 };
-var md5 = function (value) {
-  var sum = crypto.createHash('md5')
-  sum.update(value);
-  return sum.digest('hex');
-};
+var sha256 = quicksum.bind(null, 'sha256');
+var md5 = quicksum.bind(null, 'md5');
 
 var makeBadge = function () {
   var assertion = makeAssertion();
@@ -322,8 +319,7 @@ vows.describe('Badge model').addBatch({
       var email = 'me@example.com'
         , salt = 'http://p2pu.org'
         , hash = sha256(email+salt)
-        , recp = ['sha256', salt, hash]
-      var user = new Badge({body: {recipient: recp.join('$')}});
+      var user = new Badge({body: {recipient: 'sha256$' + hash, salt: salt}});
       assert.equal(user.confirmRecipient(email), true);
     },
     'md5 hashed email without salt should work': function () {
@@ -336,8 +332,7 @@ vows.describe('Badge model').addBatch({
       var email = 'me@example.com'
         , salt = 'http://p2pu.org'
         , hash = md5(email+salt)
-        , recp = ['md5', salt, hash]
-      var user = new Badge({body: {recipient: recp.join('$')}});
+      var user = new Badge({body: {recipient: 'md5$' + hash, salt: salt}});
       assert.equal(user.confirmRecipient(email), true);
     }
   }
