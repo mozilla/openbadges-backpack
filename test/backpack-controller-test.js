@@ -36,10 +36,7 @@ function setupDatabase (callback) {
   map.async(saver, [user, badge, group], callback);
 }
 
-
 var backpack = require('../controllers/backpack.js')
-
-
 vows.describe('basic login controller test').addBatch({
   'setup' : {
     topic: function () {
