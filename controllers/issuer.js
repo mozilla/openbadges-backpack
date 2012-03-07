@@ -189,3 +189,27 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
     });
   }); // end of the assertion grabbing badge adding.
 };
+
+
+exports.validator = function (request, response) {
+  var data = request.query.data || (request.body && request.body.data)
+  var accept = request.headers['accept'];
+  var missingMsg = 'error: could not validate, could not find assertion in `data` field'
+   
+  switch (accept) {
+   case 'text/plain':
+    response.contentType('txt');
+    return response.send(missingMsg, 400);
+    break;
+   
+   case 'application/json':
+    response.contentType('json');
+    return response.json({message: missingMsg}, 400);
+    break;
+    
+  default:
+    return response.render('validator');
+  }
+  
+  return response.render('validator');
+}

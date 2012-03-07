@@ -74,10 +74,11 @@ exports.baker = function(req, res) {
         var opts = {
           assertion: assertion,
           url: query.assertion,
-          imagedata: badgePNGdata,
+          imagedata: badgePNGData,
           recipient: query.award
         }
         awardBadge(opts, function (err, badge) {
+          console.dir(err);
           if (err) res.setHeader('x-badge-awarded', 'false');
           else res.setHeader('x-badge-awarded', badge.recipient);
           return res.send(badgePNGData);

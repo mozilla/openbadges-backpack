@@ -6,7 +6,7 @@ var _ = require('underscore')
   , mysql = require('../lib/mysql.js')
   , map = require('functools').map
   , utils = require('./utils')
-   ,request = utils.conn.request
+  , request = utils.conn.request
   , response = utils.conn.response
 
 var user, badge, group;
