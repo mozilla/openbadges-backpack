@@ -8,7 +8,8 @@ var app = loginUtils.startApp();
 var suite = loginUtils.suite('issuer api');
 
 const EXAMPLE_BADGE = {
-  "recipient": "example@example.com",
+  "recipient": "sha256$4817f7f2b03fb83c669a56ed1212047a8d9ca294aaf7a01c569de070dfb3fe8b",
+  "salt": "ballertime",
   "evidence": "/badges/html5-basic/example",
   "badge": {
     "version": "0.5.0",
