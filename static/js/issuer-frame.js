@@ -65,7 +65,7 @@ var Testing = (function setupTestingEnvironment() {
         "badge": {
           "version": "0.5.0",
           "name": "HTML9 Fundamental",
-          "image": "/_demo/cc.large.png",
+          "image": "/_demo/nc.large.png",
           "description": "Fetchable and validates fine client-side but not server-side",
           "criteria": "/badges/html9-basic",
           "issuer": {
