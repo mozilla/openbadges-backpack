@@ -45,16 +45,14 @@ app.helpers({
 // middleware used.
 app.use(express.static(path.join(__dirname, "static")));
 app.use(express.static(path.join(configuration.get('var_dir'), "badges")));
-app.use(middleware.noFrame({ whitelist: [ '/issuer/frame', '/', '/chris', '/share/.*' ] }));
+app.use(middleware.noFrame({ whitelist: [ '/issuer/frame', '/', '/share/.*' ] }));
 app.use(express.bodyParser({ uploadDir:configuration.get('badge_path') }));
 app.use(express.cookieParser());
 app.use(express.methodOverride());
 app.use(middleware.logRequests());
 app.use(middleware.cookieSessions());
-//todo make this work!
-//app.use(middleware.noFrame([ '/api/issuer' ]));
 app.use(middleware.userFromSession());
-app.use(middleware.csrf());
+app.use(middleware.csrf({ whitelist: ['/issuer/validator/?'] }));
 
 // Allow everything to be used with CORS.
 // This should probably just be limited to badges
@@ -70,6 +68,9 @@ router(app)
   .get('/issuer/frame',               'issuer.frame')
   .get('/issuer/assertion',           'issuer.issuerBadgeAddFromAssertion')
   .post('/issuer/assertion',          'issuer.issuerBadgeAddFromAssertion')
+  
+  .get('/issuer/validator',           'issuer.validator')
+  .post('/issuer/validator',          'issuer.validator')
 
   .get('/demo',                       'demo.issuer')
   .get('/demo/ballertime',            'demo.massAward')
