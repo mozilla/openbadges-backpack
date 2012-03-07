@@ -132,17 +132,18 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
    * 3) award the badge
    */
   remote.getHostedAssertion(assertionUrl, function(err, assertion) {
+    var recipient = user.get('email');
     if (err) {
       var error_msg = "trying to grab url " + assertionUrl + " got error " + err;
       logger.error(error_msg);
       return res.json({message: error_msg}, 502) ;
     }
     
-    var badge = new Badge(assertion);
-    if (badge.confirmRecipient(user.get('email')) && req.method=='POST') {
+    var userOwnsBadge = Badge.confirmRecipient(assertion, recipient);
+    if (req.method == 'POST' &&  !userOwnsBadge) {
       return res.json({message: "badge assertion is for a different user"}, 403);
     }
-
+    
     // grabbing the remote badge image
     remote.badgeImage(assertion.badge.image, function(err, imagedata) {
       // awarding the badge, only done if this is a POST
@@ -151,7 +152,7 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
           assertion: assertion,
           url: assertionUrl,
           imagedata: imagedata,
-          recipient: user.get('email')
+          recipient: recipient
         }
         awardBadge(opts, function(err, badge) {
           if (err) {

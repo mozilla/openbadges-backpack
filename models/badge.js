@@ -21,9 +21,9 @@ Badge.prototype.presave = function () {
   }
 };
 
-Badge.prototype.confirmRecipient = function (email) {
-  var badgeEmail = this.get('body').recipient
-    , salt = this.get('body').salt || ''
+Badge.confirmRecipient = function (assertion, email) {
+  var badgeEmail = assertion.recipient
+    , salt = assertion.salt || ''
   if (/@/.test(badgeEmail)) return badgeEmail === email;
   
   var parts = badgeEmail.split('$')
@@ -41,7 +41,12 @@ Badge.prototype.confirmRecipient = function (email) {
     // #TODO: support algorithms with options.
     return false; 
   }
+}
+
+Badge.prototype.confirmRecipient = function (email) {
+  return Badge.confirmRecipient(this.get('body'), email);
 };
+
 
 Badge.prototype.checkHash = function () {
   return sha256(JSON.stringify(this.get('body'))) === this.get('body_hash');
