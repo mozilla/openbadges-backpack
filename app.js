@@ -16,7 +16,6 @@ app.config = configuration;
 // default view engine
 app.set('view engine', 'hogan.js');
 app.register('hogan.js', hoganadapter.init(hogan))
-app.register('.coffee', require('coffeekup').adapters.express)
 
 // View helpers. `user` and `badges` are set so we can use them in `if`
 // statements without getting undefined errors and without having to use typeof
