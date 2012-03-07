@@ -3,4 +3,6 @@ exports.config = {
   email: 'example@example.com'
   /* Password for login via BrowserID. */
 , password: 'example'
+  /* Host machine IP from Vagrant VM. */
+, host: '33.33.33.1'
 };

@@ -22,4 +22,4 @@
 !/static/.gitkeep
 /test.json
 /bin/badges.json
-/test/acceptance/local-config.js
+/acceptance-test/local-config.js

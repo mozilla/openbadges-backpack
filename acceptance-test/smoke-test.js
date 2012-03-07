@@ -1,8 +1,11 @@
 var soda = require('soda'),
-    config = require('./local-config').config;
+    config = require('./local-config').config,
+    app = require('../app.js');
+
+app.listen(8888);
 
 var browser = soda.createClient({
-    host: config.host || 'localhost'
+    host: config.host
   , port: config.port || 4444
   , url: config.url || 'http://localhost:8888'
   , browser: config.browser || 'firefox'
@@ -48,4 +51,6 @@ browser
     if (err)
       throw err;
     console.log("Smoke test successful.");
+    // TODO: Why doesn't app.close() exit the process?
+    process.exit(0);
   });
