@@ -6,9 +6,13 @@ var vows = require('vows')
   , crypto = require('crypto')
   , Badge = require('../models/badge')
 
+var RECIPIENTS = {
+  good: ['brian@awesome.com', 'yo+wut@example.com', 'ümlaut@heavymetal.de', 'sha1$c0b19425e0f2c8021ab06c79b19144e127b0f2cb', 'sha256$406f04039d10c79c070b26781e8246dc01ed1d0453c5ad0fa705ff7d507fd898'],
+  bad: ['lkajd', 'skj@asdk', '@.com', '909090', '____!@', 'sha1stuff', 'bcrypt$5$something']
+};
 var EMAILS = {
-  good: ['brian@awesome.com', 'yo+wut@example.com', /*'elniño@español.es',*/ 'ümlaut@heavymetal.de'],
-  bad: ['lkajd', 'skj@asdk', '@.com', '909090', '____!@']
+  good: ['brian@awesome.com', 'yo+wut@example.com', 'ümlaut@heavymetal.de'],
+  bad: ['lkajd', 'skj@asdk', '@.com', '909090', '____!@', 'sha1stuff']
 };
 var URLS = {
   good: ['http://example.com/', 'https://example.com/w/yo', '/partial/path', '/rad.awesome/great/', '/foreign/crázy/ååú´¨la/'],
@@ -27,11 +31,13 @@ var VERSIONS = {
   bad: ['v100', '50', 'v10.1alpha', '1.2.x']
 };
 
-var sha256 = function (value) {
-  var sum = crypto.createHash('sha256')
+var quicksum = function (algo, value) {
+  var sum = crypto.createHash(algo)
   sum.update(value);
   return sum.digest('hex');
 };
+var sha256 = quicksum.bind(null, 'sha256');
+var md5 = quicksum.bind(null, 'md5');
 
 var makeBadge = function () {
   var assertion = makeAssertion();
@@ -160,8 +166,8 @@ vows.describe('Badge model').addBatch({
       'with a missing `badge.issuer.origin` field': makeMissingTest('badge.issuer.origin'),
       'with a missing `badge.issuer.name` field': makeMissingTest('badge.issuer.name'),
       
-      'with bogus `recipient`': makeInvalidationTests('recipient', EMAILS.bad),
-      'with valid `recipient`': makeValidationTests('recipient', EMAILS.good),
+      'with bogus `recipient`': makeInvalidationTests('recipient', RECIPIENTS.bad),
+      'with valid `recipient`': makeValidationTests('recipient', RECIPIENTS.good),
       
       'with bogus `evidence`': makeInvalidationTests('evidence', URLS.bad),
       'with valid `evidence`': makeValidationTests('evidence', URLS.good),
@@ -296,6 +302,38 @@ vows.describe('Badge model').addBatch({
         topic: makeBadgeAndSave({body: makeAssertion({'badge': null})}),
         'should fail with validation error on `body`': assertErrors(['body'])
       }
+    }
+  },
+  '#confirmRecipient': {
+    'regular email should work': function () {
+      var user = new Badge({body: {recipient: 'me@example.com'}});
+      assert.equal(user.confirmRecipient('me@example.com'), true);
+    },
+    'sha256 hashed email without salt should work': function () {
+      var email = 'me@example.com'
+        , hash = sha256(email)
+      var user = new Badge({body: {recipient: 'sha256$' + hash}});
+      assert.equal(user.confirmRecipient(email), true);
+    },
+    'sha256 hashed email with salt should work': function () {
+      var email = 'me@example.com'
+        , salt = 'http://p2pu.org'
+        , hash = sha256(email+salt)
+      var user = new Badge({body: {recipient: 'sha256$' + hash, salt: salt}});
+      assert.equal(user.confirmRecipient(email), true);
+    },
+    'md5 hashed email without salt should work': function () {
+      var email = 'me@example.com'
+        , hash = md5(email)
+      var user = new Badge({body: {recipient: 'md5$' + hash}});
+      assert.equal(user.confirmRecipient(email), true);
+    },
+    'md5 hashed email with salt should work': function () {
+      var email = 'me@example.com'
+        , salt = 'http://p2pu.org'
+        , hash = md5(email+salt)
+      var user = new Badge({body: {recipient: 'md5$' + hash, salt: salt}});
+      assert.equal(user.confirmRecipient(email), true);
     }
   }
 }).export(module);

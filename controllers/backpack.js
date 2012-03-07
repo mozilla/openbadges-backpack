@@ -205,21 +205,29 @@ exports.userBadgeUpload = function(req, res) {
   
   // get the url from the uploaded badge file
   baker.urlFromUpload(tmpfile, function (err, assertionUrl, imagedata) {
+    var recipient = user.get('email');
     if (err) return redirect(err);
     
     // grab the assertion data from the endpoint
     remote.getHostedAssertion(assertionUrl, function (err, assertion) {
       if (err) return redirect(err);
 
+      var userOwnsBadge = Badge.confirmRecipient(assertion, recipient);
       // bail if the badge wasn't issued to the logged in user
-      if (assertion.recipient !== user.get('email')) {
+      if (!userOwnsBadge) {
         err = new Error('This badge was not issued to you! Contact your issuer.');
         err.name = 'InvalidRecipient';
         return redirect(err);
       }
       
       // try to issue the badge 
-      awardBadge(assertion, assertionUrl, imagedata, function(err, badge) {
+      var opts = {
+        assertion: assertion,
+        url: assertionUrl,
+        imagedata: imagedata,
+        recipient: recipient
+      }
+      awardBadge(opts, function(err, badge) {
         if (err) {
           logger.warn('Could not save an uploaded badge: ');
           logger.debug(err);

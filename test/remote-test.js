@@ -74,26 +74,4 @@ vows.describe('Handling remote servers').addBatch({
       }, remote.ContentTypeError);
     }
   },
-  'remote.asyncParse': {
-    'given a valid serialized string': {
-      topic: function () {
-        var valid = '{"what": "yes"}';
-        remote.asyncParse(JSON.parse, valid, this.callback);
-      },
-      'completes without error': function (err, obj) {
-        assert.ifError(err);
-        assert.includes(obj, 'what');
-      }
-    },
-    'given an invalid serialized string': {
-      topic: function () {
-        var invalid = '{"what": ';
-        remote.asyncParse(JSON.parse, invalid, this.callback);
-      },
-      'sends ParseError': function (err, obj) {
-        assert.instanceOf(err, remote.ParseError);
-        assert.isUndefined(obj);
-      }
-    }
-  }
 }).export(module);

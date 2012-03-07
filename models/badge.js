@@ -21,6 +21,33 @@ Badge.prototype.presave = function () {
   }
 };
 
+Badge.confirmRecipient = function (assertion, email) {
+  var badgeEmail = assertion.recipient
+    , salt = assertion.salt || ''
+  if (/@/.test(badgeEmail)) return badgeEmail === email;
+  
+  var parts = badgeEmail.split('$')
+    , algorithm = parts[0]
+    , hash = parts[1]
+    , given = crypto.createHash(algorithm)
+
+  // if there are only two parts, the first part is the algorithm and the
+  // second part is the computed hash.
+  if (parts.length === 2) {
+    return given.update(email + salt).digest('hex') === hash;
+  }
+  // if there are more parts, it's an algorithm with options
+  else {
+    // #TODO: support algorithms with options.
+    return false; 
+  }
+}
+
+Badge.prototype.confirmRecipient = function (email) {
+  return Badge.confirmRecipient(this.get('body'), email);
+};
+
+
 Badge.prototype.checkHash = function () {
   return sha256(JSON.stringify(this.get('body'))) === this.get('body_hash');
 };
@@ -134,7 +161,7 @@ Badge.validateBody = function (body) {
   
   // begin tests
   test.missing('recipient');
-  test.regexp('recipient', 'email');
+  test.regexp('recipient', 'emailOrHash');
   test.regexp('evidence', 'url');
   test.regexp('expires', 'date');
   test.regexp('issued_on', 'date');
