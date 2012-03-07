@@ -142,7 +142,7 @@ Badge.validateBody = function (body) {
     missing: function (fieldStr) {
       var field = fieldFromDottedString(fieldStr, body);
       if (!field) {
-        err.fields[fieldStr] = 'missing email address for `' + fieldStr + '`';
+        err.fields[fieldStr] = 'missing required field: `' + fieldStr + '`';
       }
     },
     regexp: function (fieldStr, type) {

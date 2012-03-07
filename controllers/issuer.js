@@ -1,4 +1,13 @@
-var fs = require('fs');
+var _ = require('underscore')
+  , request = require('request')
+  , fs = require('fs')
+  , logger = require('../lib/logging').logger
+  , reverse = require('../lib/router').reverse
+  , awardBadge = require('../lib/award')
+  , remote = require('../lib/remote')
+  , validator = require('validator')
+  , Badge = require('../models/badge.js')
+
 
 var myFiles = [
   "issuer-parts/issuer-script-intro.js"
@@ -11,26 +20,6 @@ var myFiles = [
 myFiles = myFiles.map(function(filename) {
   return __dirname + '/../static/js/' + filename;
 });
-
-exports.generateScript = function(req, res) {
-  concatenate(myFiles, function(err, data) {
-    if (err) {
-      res.send(500);
-      throw err;
-    } else {
-      res.header('Content-Type', 'application/javascript');
-      res.send(data);
-    }
-  });
-};
-
-exports.frame = function(req, res) {
-  res.render('issuer-frame', {
-    layout: null,
-    csrfToken: req.session._csrf,
-    email: req.session.emails && req.session.emails[0]
-  });
-};
 
 function concatenate(files, cb) {
   var completed = 0;
@@ -63,13 +52,25 @@ if (module.parent === null) {
   });
 }
 
-var request = require('request')
-  , logger = require('../lib/logging').logger
-  , reverse = require('../lib/router').reverse
-  , awardBadge = require('../lib/award')
-  , remote = require('../lib/remote')
-  , validator = require('validator')
-  , Badge = require('../models/badge.js')
+exports.generateScript = function(req, res) {
+  concatenate(myFiles, function(err, data) {
+    if (err) {
+      res.send(500);
+      throw err;
+    } else {
+      res.header('Content-Type', 'application/javascript');
+      res.send(data);
+    }
+  });
+};
+
+exports.frame = function(req, res) {
+  res.render('issuer-frame', {
+    layout: null,
+    csrfToken: req.session._csrf,
+    email: req.session.emails && req.session.emails[0]
+  });
+};
 
 
 exports.issuerBadgeAddFromAssertion = function(req, res, next) {
@@ -190,26 +191,64 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
   }); // end of the assertion grabbing badge adding.
 };
 
-
 exports.validator = function (request, response) {
   var data = request.query.data || (request.body && request.body.data)
   var accept = request.headers['accept'];
-  var missingMsg = 'error: could not validate, could not find assertion in `data` field'
-   
-  switch (accept) {
-   case 'text/plain':
-    response.contentType('txt');
-    return response.send(missingMsg, 400);
-    break;
-   
-   case 'application/json':
-    response.contentType('json');
-    return response.json({message: missingMsg}, 400);
-    break;
+  var missingMsg = 'error: could not validate, could not find assertion in `data` field';
+  var status = 200;
+  var fields = null;
+  
+  if (!data) {
+    status = 400;
+    fields = { general: missingMsg };
+  }
+  else {
+    try {
+      status = 200;
+      var assertion = JSON.parse(data);
+      if (!assertion.badge) assertion.badge = {}
+      if (!assertion.badge.issuer) assertion.badge.issuer = {}
+      var errors = Badge.validateBody( assertion );
+      if (errors) {
+        fields = errors.fields;
+        status = 400;
+      }
+    }
     
-  default:
-    return response.render('validator');
+    catch (err) {
+      status = 500;
+      fields = { general: err.name + ": " + err.message }
+    }
   }
   
-  return response.render('validator');
-}
+  var responder = {
+    'text/plain': function () {
+      response.contentType('txt');
+      if (fields) {
+        var values = _.values(fields);
+        var bullets = _.map(values, function(s){return '* ' + s;}).join('\n');
+        return response.send(bullets, status);
+      }
+      
+      else {
+        return response.send('everything looks good', 200);
+      }
+    },
+    'application/json': function () {
+      response.contentType('json');
+      if (fields) {
+        return response.json({ status: 'error', fields: fields }, status);
+      }
+
+      else {
+        return response.json({ status: 'okay', fields: fields }, 200);
+      }
+    },
+    'default': function () {
+      return response.render('validator', { status: 200, fields: fields||{} });
+    }
+  };
+
+  if (!responder[accept]) accept = 'default';
+  return responder[accept]();
+};
