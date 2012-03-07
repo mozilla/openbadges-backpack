@@ -29,17 +29,6 @@ app.helpers({
   success: [],
   badges: {},
   reverse: router.reverse,
-
-  hardcode: {
-    textbox: function(attrs) {
-      attrs.type = 'text';
-      attrs.name = attrs.id;
-      return div(function(){input(attrs)});
-    },
-    safe: function(val) {
-      return text(val.replace(/</g, '&lt;').replace(/>/g, '&gt;'))
-    }
-  }
 });
 // Middleware. See `middleware.js` for more information on the custom
 // middleware used.

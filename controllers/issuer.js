@@ -229,21 +229,21 @@ exports.validator = function (request, response) {
         var bullets = _.map(values, function(s){return '* ' + s;}).join('\n');
         return response.send(bullets, status);
       }
-      
       else {
         return response.send('everything looks good', 200);
       }
     },
+    
     'application/json': function () {
       response.contentType('json');
       if (fields) {
         return response.json({ status: 'error', fields: fields }, status);
       }
-
       else {
         return response.json({ status: 'okay', fields: fields }, 200);
       }
     },
+    
     'default': function () {
       return response.render('validator', { status: 200, fields: fields||{} });
     }
