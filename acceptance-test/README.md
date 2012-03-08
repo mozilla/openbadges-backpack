@@ -14,9 +14,9 @@ The following instructions assume that you are developing using Vagrant.
 
         java -jar selenium-server.jar
 
-5. From an SSH session to your VM, enter the root directory of your checkout and run:
+5. From an SSH session to your VM, enter the root directory of your checkout and run the following:
 
-        node acceptance-test/smoke-test.js
+        node acceptance-test/run-tests.js
 
 The basic idea is that your VM is sending "orders" to the Selenium server on your host machine. The Selenium server runs on your host machine because it's the one that can easily start browsers&mdash;running the Selenium server on the VM would mean you'd have to install X and at least one browser.
 
