@@ -1,30 +1,12 @@
-var soda = require('soda'),
-    utils = require('./acceptance-test-utils.js');
-
-soda.prototype.waitForBadgePrompt = function(img, action) {
-  return this.waitForVisible('css=#badge-ask img[src="/_demo/' + img + '"]')
-             .click("css=#badge-ask button." + action);
-};
-
-soda.prototype.waitForVisibleContent = function(args) {
-  var hasContent = utils.scriptify(function(window, args) {
-    function collapseWhitespace(text) {
-      return text.replace(/\n/g, ' ').replace(/\s+/g, ' ');
+require('./acceptance-test-utils.js').createClient({
+  extensions: {
+    waitForBadgePrompt: function(img, action) {
+      var imgLocator = 'css=#badge-ask img[src="/_demo/' + img + '"]';
+      return this.waitForVisible(imgLocator)
+                 .click("css=#badge-ask button." + action);
     }
-    
-    var element = window.document.querySelector(args.selector);
-    var html = element && collapseWhitespace(element.innerHTML);
-    if (!html)
-      return false;
-    return html.indexOf(collapseWhitespace(args.content)) != -1;
-  }, args);
-
-  return this.waitForVisible("css=" + args.selector)
-             .waitForCondition(hasContent, 4000);
-};
-
-utils.createClient()
-  .chain
+  }
+}).chain
   .session()
   .open('/issuer/frame').waitForPageToLoad(8000)
     // Log in as a different user and make backpack explode.

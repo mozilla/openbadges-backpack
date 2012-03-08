@@ -14,6 +14,23 @@ soda.prototype.gracefulExit = function() {
   });
 };
 
+soda.prototype.waitForVisibleContent = function(args) {
+  var hasContent = exports.scriptify(function(window, args) {
+    function collapseWhitespace(text) {
+      return text.replace(/\n/g, ' ').replace(/\s+/g, ' ');
+    }
+    
+    var element = window.document.querySelector(args.selector);
+    var html = element && collapseWhitespace(element.innerHTML);
+    if (!html)
+      return false;
+    return html.indexOf(collapseWhitespace(args.content)) != -1;
+  }, args);
+
+  return this.waitForVisible("css=" + args.selector)
+             .waitForCondition(hasContent, 4000);
+};
+
 exports.scriptify = function(func, args) {
   var code = '(' + func.toString() + ')' +
              '(selenium.browserbot.getCurrentWindow(), ' +
@@ -21,8 +38,14 @@ exports.scriptify = function(func, args) {
   return code;
 };
 
-exports.createClient = function() {
+exports.createClient = function(options) {
+  options = options || {};
   app.listen(8888);
+
+  if (options.extensions)
+    for (var name in options.extensions) {
+      soda.prototype[name] = options.extensions[name];
+    }
 
   var browser = soda.createClient({
       host: config.host
