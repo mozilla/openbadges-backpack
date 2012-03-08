@@ -1,19 +1,6 @@
 var soda = require('soda'),
     config = require('./local-config').config,
-    app = require('../app.js');
-
-app.listen(8888);
-
-var browser = soda.createClient({
-    host: config.host
-  , port: config.port || 4444
-  , url: config.url || 'http://localhost:8888'
-  , browser: config.browser || 'firefox'
-});
-
-browser.on('command', function(cmd, args){
-  console.log(' \x1b[33m%s\x1b[0m: %s', cmd, args.join(', '));
-});
+    utils = require('./acceptance-test-utils.js');
 
 function scriptify(func) {
   var code = '(' + func.toString() + ')' +
@@ -38,7 +25,7 @@ soda.prototype.logIntoBrowserID = function(email, password) {
     .click('css=button#signInButton:enabled');
 };
 
-browser
+utils.createClient()
   .chain
   .session()
   .open('/')
