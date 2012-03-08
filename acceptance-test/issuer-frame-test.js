@@ -58,10 +58,4 @@ utils.createClient()
     .waitForBadgePrompt("by.large.png", "reject")
     .waitForVisible("css=#farewell h3.badges-0")
     .click("css=#farewell button.next")
-  .end(function(err) {
-    if (err)
-      throw err;
-    console.log("Issuer frame test successful.");
-    // TODO: Why doesn't app.close() exit the process?
-    process.exit(0);
-  });
+  .gracefulExit();

@@ -28,10 +28,4 @@ utils.createClient()
   .logIntoBrowserID(config.email, config.password)
   .selectWindow('title=Open Badge Backpack')
   .waitForElementPresent('css=div.upload')
-  .end(function(err) {
-    if (err)
-      throw err;
-    console.log("Smoke test successful.");
-    // TODO: Why doesn't app.close() exit the process?
-    process.exit(0);
-  });
+  .gracefulExit();

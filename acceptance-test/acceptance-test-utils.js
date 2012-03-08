@@ -2,6 +2,18 @@ var soda = require('soda'),
     config = require('./local-config').config,
     app = require('../app.js');
 
+soda.prototype.gracefulExit = function() {
+  return this.end(function(err) {
+    this.testComplete(function() {
+      if (err)
+        throw err;
+      console.log("Test successful.");
+      // TODO: Why doesn't app.close() exit the process?
+      process.exit(0);
+    });
+  });
+};
+
 exports.scriptify = function(func, args) {
   var code = '(' + func.toString() + ')' +
              '(selenium.browserbot.getCurrentWindow(), ' +
