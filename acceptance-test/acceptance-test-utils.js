@@ -2,6 +2,13 @@ var soda = require('soda'),
     config = require('./local-config').config,
     app = require('../app.js');
 
+exports.scriptify = function(func, args) {
+  var code = '(' + func.toString() + ')' +
+             '(selenium.browserbot.getCurrentWindow(), ' +
+             JSON.stringify(args) + ');';
+  return code;
+};
+
 exports.createClient = function() {
   app.listen(8888);
 

@@ -1,18 +1,40 @@
-var soda = require('soda');
+var soda = require('soda'),
+    utils = require('./acceptance-test-utils.js');
 
 soda.prototype.waitForBadgePrompt = function(img, action) {
   return this.waitForVisible('css=#badge-ask img[src="/_demo/' + img + '"]')
              .click("css=#badge-ask button." + action);
 };
 
-require('./acceptance-test-utils.js').createClient()
+soda.prototype.waitForVisibleContent = function(args) {
+  var hasContent = utils.scriptify(function(window, args) {
+    function collapseWhitespace(text) {
+      return text.replace(/\n/g, ' ').replace(/\s+/g, ' ');
+    }
+    
+    var element = window.document.querySelector(args.selector);
+    var html = element && collapseWhitespace(element.innerHTML);
+    if (!html)
+      return false;
+    return html.indexOf(collapseWhitespace(args.content)) != -1;
+  }, args);
+
+  return this.waitForVisible("css=" + args.selector)
+             .waitForCondition(hasContent, 4000);
+};
+
+utils.createClient()
   .chain
   .session()
   .open('/issuer/frame').waitForPageToLoad(8000)
     // Log in as a different user and make backpack explode.
     .click("css=#welcome button.logout")
     .waitForBadgePrompt("nc.large.png", "accept")
-    .waitForVisible('css=#messages div.alert-message.danger')
+    .waitForVisibleContent({
+      selector: '#messages div.alert-message.danger',
+      content: "An error occurred when trying to add the " +
+               "<em>HTML9 Fundamental</em> badge to your backpack."
+    })
     .waitForVisible("css=#farewell h3.badges-0")
     .click("css=#farewell button.next")
   .open('/issuer/frame').waitForPageToLoad(8000)
