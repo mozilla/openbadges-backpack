@@ -65,7 +65,7 @@ var Testing = (function setupTestingEnvironment() {
         "badge": {
           "version": "0.5.0",
           "name": "HTML9 Fundamental",
-          "image": "/_demo/cc.large.png",
+          "image": "/_demo/nc.large.png",
           "description": "Fetchable and validates fine client-side but not server-side",
           "criteria": "/badges/html9-basic",
           "issuer": {
@@ -85,7 +85,7 @@ var Testing = (function setupTestingEnvironment() {
         "badge": {
           "version": "0.5.0",
           "name": "HTML5 Fundamental",
-          "image": "/_demo/cc.large.png",
+          "image": "/_demo/by.large.png",
           "description": "Knows the difference between a <section> and an <article>",
           "criteria": "/badges/html5-basic",
           "issuer": {
