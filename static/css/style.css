@@ -257,6 +257,7 @@ form.baker #assertion {
   -ms-transition: opacity 0.5s;
   -o-transition: opacity 0.5s;
   transition: opacity 0.5s;
+  color: #FFFFFF;
   display: block;
   position: absolute;
   font-weight: bold;
@@ -348,10 +349,11 @@ form.baker #assertion {
   font-weight: bold;
 }
 
-
 table.information {
   margin-bottom: 0;
   padding: 10px 3px;
+  border-collapse: separate;
+  font-size: 13px;
 }
 
 .information td {
@@ -359,13 +361,14 @@ table.information {
   padding: 4px 12px;
 }
 
-.information td.label {
+.information td.fieldlabel {
+  display: block;
   width: 128px;
   font-weight: bold;
   text-align: right;
 }
 
-.information td.label:after {
+.information td.fieldlabel:after {
   position: absolute;
   margin-left: 4px;
   margin-top: 1px;
@@ -382,9 +385,9 @@ table.information {
   padding-left: 0;
 }
 
-
 .information .image {
   text-align: center;
+  vertical-align: middle;
   width: 148px;
 }
 
