@@ -2,14 +2,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-CSRF-Token" content="{{ csrfToken }}">
 <meta http-equiv="X-Current-User" content="{{ email }}">
-<link rel="stylesheet" href="/css/bootstrap-1.2.0.min.css" />
+<link rel="stylesheet" href="/css/bootstrap-2.0.2.min.css" />
 <link rel="stylesheet" href="/css/style.css" type="text/css" media="all" />
 <link rel="stylesheet" href="/css/issuer-frame.css" type="text/css" media="all" />
 <title>Issuer Frame</title>
-<div class="topbar">
-  <div class="topbar-inner">
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
     <div class="container-fluid" style="position: relative;">
-      <h3><a href="/" target="_blank">Open Badge Backpack</a></h3>
+      <h3><a class="brand" href="/" target="_blank">Open Badge Backpack</a></h3>
       <img src="/images/ajax-loader.gif" id="ajax-loader">
       <a id="moztab" href="http://mozilla.org" target="_blank">a mozilla.org joint</a>
       <a class="close" href="#">&times;</a>
