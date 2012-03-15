@@ -245,7 +245,11 @@ exports.validator = function (request, response) {
     },
     
     'default': function () {
-      return response.render('validator', { status: 200, fields: fields||{} });
+      return response.render('validator', {
+        status: 200,
+        fields: fields||{},
+        csrfToken: request.session._csrf
+      });
     }
   };
 

@@ -480,6 +480,11 @@ table.information {
   line-height: 1.7em;
 }
 
+#validator textarea {
+  width: 600px;
+  height: 300px;
+}
+
 body {
   cursor: default;
 }
