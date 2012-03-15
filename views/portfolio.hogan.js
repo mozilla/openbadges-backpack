@@ -4,7 +4,8 @@
 {{#message}}
   <div class='message-container'>
     <div class="alert alert-info">
-      <p><strong>{{{message}}}</strong></p>
+      <a class="close" data-dismiss="alert">×</a>
+      {{{message}}}
     </div>
   </div>
 {{/message}}

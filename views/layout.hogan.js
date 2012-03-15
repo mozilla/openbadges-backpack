@@ -30,14 +30,16 @@
     <div id="body" class="container">
       <div class='message-container'>
       {{#error.length}}
-        <div class="alert">
-          <p><strong>{{error}}</strong></p>
+        <div class="alert alert-error">
+          <a class="close" data-dismiss="alert">×</a>
+          {{error}}
         </div>
       {{/error.length}}
       
       {{#success.length}}
         <div class="alert alert-success">
-          <p><strong>{{success}}</strong></p>
+          <a class="close" data-dismiss="alert">×</a>
+          {{success}}
         </div>
       {{/success.length}}
       </div>
