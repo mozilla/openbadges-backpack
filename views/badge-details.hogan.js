@@ -1,6 +1,6 @@
 <h1>{{type.name}}</h1>
 <div class="row">
-  <div class="span-one-third columns badge-details">
+  <div class="span4 columns badge-details">
     <img id="badge-image" src="{{image}}" alt="Badge Image"/>
     <dl>
       <dt>Recipient</dt>
@@ -26,7 +26,7 @@
   </div>
 
   {{#owner}}
-  <div class="span-two-thirds columns management">
+  <div class="span8 columns management">
 
     <div class="accept-reject">
       <h2>Keep this badge?</h2>

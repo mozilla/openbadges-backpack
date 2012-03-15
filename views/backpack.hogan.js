@@ -19,7 +19,7 @@
 {{/badges.length}}
 
 <div class="row" style="position: relative;">
-  <div class="span-one-third column">
+  <div class="span4 column">
     {{#badges.length}}
     <h1><span data-title="Badges" data-content="These are the badges you've earned so far! Click on one to see its details." rel="popover">Badges{{#tooltips}}<i class="icon-info-sign"></i>{{/tooltips}}</span></h1>
     <div id="badges" class="js-badges">
@@ -49,7 +49,7 @@
   </div>
 
   {{#badges.length}}
-    <div id='groups' class="span-two-thirds column">
+    <div id='groups' class="span8 column">
       <h1><span rel="popover" data-title="Groups" data-content="You can drag-and-drop badges into groups, which you can use to publish your badges for employers, social networks, etc.">Groups{{#tooltips}}<i class="icon-info-sign"></i>{{/tooltips}}</span></h1>
       {{#groups}}
         <div class='group' data-id="{{attributes.id}}" data-url="{{attributes.url}}">

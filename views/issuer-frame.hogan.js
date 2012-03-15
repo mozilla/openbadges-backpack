@@ -69,14 +69,14 @@
   </div>
   <div id="badge-ask-template" style="display: none">
     <div class="row">
-      <div class="span-one-third columns management">
+      <div class="span4 columns management">
         <div class="accept-reject">
           <h2>Accept this badge?</h2>
           <button class="accept btn primary">Yup</button>
           <button class="reject btn danger">Nope</button>
         </div>
       </div>
-      <div class="span-one-third columns badge-details">
+      <div class="span4 columns badge-details">
         <dl>
           <dt>Recipient</dt>
           <dd>[[ assertion.recipient ]]</dd>
@@ -94,7 +94,7 @@
           <dd>[[ assertion.badge.issuer.name ]] (<a href="[[assertion.badge.issuer.origin]]">[[ assertion.badge.issuer.origin ]]</a>)</dd>
         </dl>
       </div>
-      <div class="span-one-third columns">
+      <div class="span4 columns">
         <img class="badge-image" src="[[assertion.badge.image]]" alt="Badge Image"/>
       </div>
     </div>
