@@ -21,7 +21,7 @@ exports.baker = function(req, res) {
     });
   }
   accepts = req.headers['accept'] || '';
-  shouldAward = req.query.award === 'true';
+  shouldAward = req.query.award && req.query.award !== 'false';
   
   // #TODO: re-write this piece of garbage from scratch, jesus christ.
   remote.getHostedAssertion(query.assertion, function(err, assertion) {
