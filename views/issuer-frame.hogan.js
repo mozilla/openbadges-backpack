@@ -21,7 +21,7 @@
   <div id="messages"></div>
   <div id="welcome" style="display: none">
     <p>Hi! You are about to submit a badge to the Mozilla Open Badge Backpack at <span class="host"></span>.</p>
-    <div class="logged-in"><button class="next btn primary">Cool, let's go!</button> <button class="btn danger logout">I am not <span class="email"></span>.</button></div>
+    <div class="logged-in"><button class="next btn btn-primary">Cool, let's go!</button> <button class="btn btn-danger logout">I am not <span class="email"></span>.</button></div>
     <div class="logged-out">
       <p>To begin, you will need to log in.</p>
       <a class="js-browserid-link" href="#">
@@ -35,7 +35,7 @@
     <h3 class="badges-many" style="display: none">You added <span class="badges-added"></span> badges to your backpack.</h3>
     <p>If you ever want to manage or view your badges, just visit your
     <a href="/" target="_blank">Open Badge Backpack</a>.</p>
-    <button class="next btn primary">Thanks.</button>
+    <button class="next btn btn-primary">Thanks.</button>
   </div>
   <div id="badge-ask" style="display: none">
   </div>
@@ -51,19 +51,19 @@
 </div>
 <div id="templates" style="display: none">
   <div id="accept-failure-template">
-    <div class="alert-message danger">
+    <div class="alert alert-error">
       <strong>Sorry!</strong> An error occurred when trying to add the
       <em>[[ assertion.badge.name ]]</em> badge to your backpack.
     </div>
   </div>
   <div id="already-exists-template">
-    <div class="alert-message">
+    <div class="alert">
       You appear to already have the
       <em>[[ assertion.badge.name ]]</em> badge in your backpack.
     </div>
   </div>
   <div id="login-error-template">
-    <div class="alert-message danger">
+    <div class="alert alert-error">
       <strong>Sorry!</strong> An error occurred when trying to log you in.
     </div>
   </div>
@@ -72,8 +72,8 @@
       <div class="span4 columns management">
         <div class="accept-reject">
           <h2>Accept this badge?</h2>
-          <button class="accept btn primary">Yup</button>
-          <button class="reject btn danger">Nope</button>
+          <button class="accept btn btn-primary">Yup</button>
+          <button class="reject btn btn-danger">Nope</button>
         </div>
       </div>
       <div class="span4 columns badge-details">

@@ -30,13 +30,13 @@
     <div id="body" class="container">
       <div class='message-container'>
       {{#error.length}}
-        <div class="alert-message">
+        <div class="alert">
           <p><strong>{{error}}</strong></p>
         </div>
       {{/error.length}}
       
       {{#success.length}}
-        <div class="alert-message success">
+        <div class="alert alert-success">
           <p><strong>{{success}}</strong></p>
         </div>
       {{/success.length}}
@@ -48,7 +48,7 @@
       
       {{=|| ||=}} <!-- need to change delimeter so hogan doesn't parse these -->
       <script type="text/html" id="messageTpl">
-        <div class="alert-message {{type}}">
+        <div class="alert alert-{{type}}">
           <p><strong>{{message}}</strong></p>
         </div>
       </script>

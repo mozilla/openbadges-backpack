@@ -33,7 +33,7 @@
       <form action="{{ deleteRoute }}" method="post" style="display: inline">
         <input type="hidden" name="_csrf" value="{{ csrfToken }}"></input>
         <input type="hidden" name="_method" value="delete"></input>
-        <input class="btn danger" type="submit" value="No, delete this badge."></input>
+        <input class="btn btn-danger" type="submit" value="No, delete this badge."></input>
       </form>
     </div>
   </div>

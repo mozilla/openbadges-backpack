@@ -16,7 +16,7 @@
     </div>
 
     <div class="input">
-      <input class="btn primary" type="submit" value="Award badge"></input>
+      <input class="btn btn-primary" type="submit" value="Award badge"></input>
     </div>
     
   </fieldset>

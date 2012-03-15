@@ -20,6 +20,9 @@ body {
 #body {
   padding-top: 60px;
 }
+h1 {
+  margin-bottom: 18px;
+}
 form.signin { display: none; }
 form.baker label {
   font-size: 18px;

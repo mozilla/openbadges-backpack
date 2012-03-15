@@ -4,7 +4,7 @@
     <input id="assertion" class="xlarge" type="text" value="http://badgehub.org/test/badge.json" placeholder="http://your-site.com/path-to-assertion.json" name="assertion"></input>
   </fieldset>
   <fieldset>
-    <input id="submit" class="large btn primary" type="submit" value="Build this badge"></input>
+    <input id="submit" class="large btn btn-primary" type="submit" value="Build this badge"></input>
   </fieldset>
 </form>
 <div id="result"></div>

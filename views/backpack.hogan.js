@@ -32,7 +32,7 @@
     {{/badges.length}}
     
     <div class="upload">
-      <h4><span data-title="Upload Badges" data-content="You can upload previously earned badges here, but they have to comply with the OBI metadata spec." rel="popover">Upload Badges{{#tooltips}}<i class="icon-info-sign"></i>{{/tooltips}}</span></h4>
+      <h3><span data-title="Upload Badges" data-content="You can upload previously earned badges here, but they have to comply with the OBI metadata spec." rel="popover">Upload Badges{{#tooltips}}<i class="icon-info-sign"></i>{{/tooltips}}</span></h3>
       <p>If you have badges you've been awarded, you can upload them manually</p>
       <form action="{{#reverse}}backpack.userBadgeUpload{{/reverse}}" method="post" enctype="multipart/form-data">
         <fieldset>
@@ -42,7 +42,7 @@
           </div>
         </fieldset>
         <div class="clearfix">
-          <input class="btn primary" type="submit" value="Upload"></input>
+          <input class="btn btn-primary" type="submit" value="Upload"></input>
         </div>
       </form>
     </div>
@@ -119,7 +119,7 @@
 
           <div class='buttons'>
             <button class='btn nope'>Nevermind, I want to keep this badge</button>
-            <button class='btn yep danger'>Yes, remove this badge</button>
+            <button class='btn yep btn-danger'>Yes, remove this badge</button>
           </div>
         </div>
 
@@ -127,7 +127,7 @@
           <tr>
             <td rowspan="100" class='image'>
               <img src="{{image_path}}" class='badge-image'>
-              <button class='btn danger disown'>Disown this Badge</button>
+              <button class='btn btn-danger disown'>Disown this Badge</button>
             </td>
 
             <td class='section-head' colspan='2'>Issuer Details</td>

@@ -3,7 +3,7 @@
 <div class='portfolio'>
 {{#message}}
   <div class='message-container'>
-    <div class="alert-message info">
+    <div class="alert alert-info">
       <p><strong>{{{message}}}</strong></p>
     </div>
   </div>
