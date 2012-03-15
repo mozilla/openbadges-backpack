@@ -50,17 +50,18 @@ form.baker #assertion {
   overflow: hidden;
   display: block;
 }
-.topbar .topbar-inner {
+.navbar .navbar-inner {
   height: 30px;
 }
-.topbar h3 {
+.navbar h3 {
+  position: relative;
   top: -3px;
 }
-.topbar .nav {
+.navbar .nav {
   top: -5px;
 }
  
-.topbar h3 a {
+.navbar .brand {
   font-size: 18px;
 }
 .modal {
