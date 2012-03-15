@@ -24,7 +24,7 @@
     <h1><span data-title="Badges" data-content="These are the badges you've earned so far! Click on one to see its details." rel="popover">Badges{{#tooltips}}<i class="icon-info-sign"></i>{{/tooltips}}</span></h1>
     <div id="badges" class="js-badges">
       {{#badges}}
-        <span draggable="true" class="badge" data-id="{{attributes.id}}">
+        <span draggable="true" class="openbadge" data-id="{{attributes.id}}">
           <img src="{{attributes.image_path}}" width="64px"/>
         </span>
       {{/badges}}
@@ -58,7 +58,7 @@
         <span class='icon share' rel="tooltip" data-placement="bottom" {{^attributes.badgeObjects}}style='display: none'{{/attributes.badgeObjects}} title='Share this group'>5</span>
           
           {{#attributes.badgeObjects}}
-            <span draggable="true" class="badge" data-id="{{attributes.id}}">
+            <span draggable="true" class="openbadge" data-id="{{attributes.id}}">
               <img src="{{attributes.image_path}}" width="64px"/>
             </span>
           {{/attributes.badgeObjects}}
@@ -211,7 +211,7 @@
 </script>
 
 <script type='text/html' class='partial' id='badgeTpl'>
-  <span draggable="true" class="badge">
+  <span draggable="true" class="openbadge">
     <img src="{{image_path}}" width="64px"/>
   </span>
 </script>
