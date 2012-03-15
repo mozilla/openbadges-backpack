@@ -11,7 +11,7 @@ var url = require('url')
 exports.baker = function(req, res) {
   var query = req.query || {}
     , issuer       , image  , imageURL
-    , badgePNGData , md5sum , filename
+    , badgePNGdata , md5sum , filename
     , accepts      , shouldAward
 
   if (!query.assertion) {
@@ -49,7 +49,7 @@ exports.baker = function(req, res) {
         return res.send(JSON.stringify(err), 400)
       }
       try {
-        badgePNGData = baker.prepare(imagedata, query.assertion);
+        badgePNGdata = baker.prepare(imagedata, query.assertion);
       } catch (e) {
         logger.error('failed writing data to badge image: '+ e);
         res.setHeader('Content-Type', 'application/json');
@@ -66,7 +66,7 @@ exports.baker = function(req, res) {
       }
 
       md5sum = crypto.createHash('md5');
-      filename = md5sum.update(badgePNGData).digest('hex') + '.png';
+      filename = md5sum.update(badgePNGdata).digest('hex') + '.png';
       res.setHeader('Content-Type', 'image/png');
       res.setHeader('Content-Disposition', 'attachment; filename="'+filename+'"');
       
@@ -80,10 +80,10 @@ exports.baker = function(req, res) {
         awardBadge(opts, function (err, badge) {
           if (err) res.setHeader('x-badge-awarded', 'false');
           else res.setHeader('x-badge-awarded', badge.recipient);
-          return res.send(badgePNGData);
+          return res.send(badgePNGdata);
         });
       } else {
-        return res.send(badgePNGData);
+        return res.send(badgePNGdata);
       }
     });
   });
