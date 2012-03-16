@@ -388,14 +388,14 @@ table.information {
 .information .image {
   text-align: center;
   vertical-align: middle;
-  width: 148px;
+  width: 148px; /* FIXME: this seems to be ignored? */
 }
 
 .information img {
   max-height: 128px;
   max-width: 128px;
   display: block;
-  margin: auto;
+  margin: auto 10px; /* FIXME: the 10px forces the ignored 148px above */
 }
 
 .information button {
