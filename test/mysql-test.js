@@ -3,7 +3,7 @@ var vows = require('vows')
   , mysql = require('../lib/mysql')
   , client = mysql.client
   , conf = require('../lib/configuration').get('database')
-  , testDb = conf.database + "_test";
+  , testDb = 'test_' + conf.database; 
 
 Object.values = function (obj) { return Object.keys(obj).map(function (k) { return obj[k]; }) };
 var extractFirstValues = function (arr) { return arr.map(function (a) { return Object.values(a).pop(); }) }
