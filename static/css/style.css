@@ -362,7 +362,6 @@ table.information {
 }
 
 .information td.fieldlabel {
-  display: block;
   width: 128px;
   font-weight: bold;
   text-align: right;
@@ -394,7 +393,6 @@ table.information {
 .information img {
   max-height: 128px;
   max-width: 128px;
-  display: block;
   margin: auto 10px; /* FIXME: the 10px forces the ignored 148px above */
 }
 
