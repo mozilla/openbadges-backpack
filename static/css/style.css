@@ -429,7 +429,6 @@ table.information {
 }
 
 .portfolio input, .portfolio textarea {
-  background: none;
   border: 1px solid #eee;
 }
 .portfolio input.field:hover, .portfolio textarea:hover {
@@ -476,7 +475,10 @@ table.information {
   text-shadow: 1px 1px 2px #fff;
   box-shadow: 1px 1px 1px #aaa;
 }
-.alert-message iframe {
+.alert {  
+  overflow: hidden;
+}
+.alert iframe {
   float: right;
 }
 
