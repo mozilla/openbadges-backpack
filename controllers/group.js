@@ -11,6 +11,7 @@ exports.param = {
         return res.send('Error pulling group', 500);
       }
       
+      
       if (!group) {
         return res.send('Could not find group', 404);
       }
@@ -22,9 +23,9 @@ exports.param = {
 }
 
 exports.create = function (req, res) {
-  if (!req.user) return res.send('nope', 400);
-  if (!req.body) return res.send('nope', 400);
-  if (!req.body.badges) return res.send('nope', 400);
+  if (!req.user) return res.json({error:'no user'}, 403);
+  if (!req.body) return res.json({error:'no badge body'}, 400);
+  if (!req.body.badges) return res.json({error:'no badges'}, 400);
   var user = req.user
     , body = req.body
     , badges = body.badges
@@ -38,7 +39,7 @@ exports.create = function (req, res) {
 
   group.save(function (err, group) {
     res.contentType('json');
-    res.send({id: group.get('id')});
+    res.send({id: group.get('id'), url: group.get('url')});
   })
 };
 
@@ -61,7 +62,11 @@ exports.destroy = function (req, res) {
   if (!req.user) return res.send('nope', 400);
   var group = req.group
   group.destroy(function (err) {
-    if (err) return res.send('nope', 500);
+    if (err) {
+      logger.debug('some sort of error deleting!');
+      logger.debug(err);
+      return res.send('nope', 500);
+    }
     res.contentType('json');
     res.send(JSON.stringify({success: true}));
   })

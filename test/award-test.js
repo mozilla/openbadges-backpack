@@ -20,14 +20,24 @@ vows.describe('Awarding Badges').addBatch({
     },
     'An awarded badge' : {
       topic: function() {
-        award(assertion, 'http://example.com/this-badge', PNGDATA, this.callback)
+        award({
+          assertion: assertion,
+          url: 'http://example.com/this-badge',
+          imagedata: PNGDATA,
+          recipient: assertion.recipient
+        }, this.callback)
       },
       'gets awarded without error': function(err, badge){
         assert.ifError(err);
       },
       'can be retrieved' : {
         topic: function(err, badge) {
-          award(assertion, 'http://example.com/this-badge', PNGDATA, function(err, badge){
+          award({
+            assertion: assertion,
+            url: 'http://example.com/this-badge',
+            imagedata: PNGDATA,
+            recipient: assertion.recipient
+          }, function(err, badge){
             Badge.find({'endpoint': 'http://example.com/this-badge'}, this.callback)
           }.bind(this));
         },

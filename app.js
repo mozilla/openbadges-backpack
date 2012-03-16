@@ -45,14 +45,14 @@ app.helpers({
 // middleware used.
 app.use(express.static(path.join(__dirname, "static")));
 app.use(express.static(path.join(configuration.get('var_dir'), "badges")));
-app.use(middleware.noFrame({ whitelist: [ '/', '/chris', '/share/.*' ] }));
+app.use(middleware.noFrame({ whitelist: [ '/issuer/frame', '/', '/share/.*' ] }));
 app.use(express.bodyParser({ uploadDir:configuration.get('badge_path') }));
 app.use(express.cookieParser());
 app.use(express.methodOverride());
 app.use(middleware.logRequests());
 app.use(middleware.cookieSessions());
 app.use(middleware.userFromSession());
-app.use(middleware.csrf());
+app.use(middleware.csrf({ whitelist: ['/issuer/validator/?'] }));
 
 // Allow everything to be used with CORS.
 // This should probably just be limited to badges
@@ -62,29 +62,39 @@ app.use(function(req, res, next) {
 });
 
 router(app)
-  .get('/chris',                   'chris.chris')
-  .get('/baker',                   'baker.baker')
-                                   
-  .get('/demo',                    'demo.issuer')
-  .get('/demo/ballertime',         'demo.massAward')
-  .get('/demo/badge.json',         'demo.testBadge')
-  .get('/demo/invalid.json',       'demo.badBadge')
-  .post('/demo/award',             'demo.award')
-                                   
-  .get('/backpack/login',          'backpack.login')
-  .get('/backpack/signout',        'backpack.signout')
-  .get('/',                        'backpack.manage')
-  .get('/backpack',                'backpack.manage')
-  .post('/backpack/badge',         'backpack.userBadgeUpload')
-  .post('/backpack/authenticate',  'backpack.authenticate')
-                                   
-  .post('/group',                  'group.create')
-  .delete('/group/:groupId',       'group.destroy')
-  .get('/group/:groupId',          'group.config')
-  .put('/group/:groupId',          'group.update')
+  .get('/baker',                      'baker.baker')
+  .delete('/badge/:badgeId',          'badge.destroy')
+  .get('/issuer\.js',                 'issuer.generateScript')
+  .get('/issuer/frame',               'issuer.frame')
+  .get('/issuer/assertion',           'issuer.issuerBadgeAddFromAssertion')
+  .post('/issuer/assertion',          'issuer.issuerBadgeAddFromAssertion')
+  
+  .get('/issuer/validator',           'issuer.validator')
+  .post('/issuer/validator',          'issuer.validator')
 
-  .delete('/badge/:badgeId',       'badge.destroy')
-
+  .get('/demo',                       'demo.issuer')
+  .get('/demo/ballertime',            'demo.massAward')
+  .get('/demo/badge.json',            'demo.testBadge')
+  .get('/demo/invalid.json',          'demo.badBadge')
+  .post('/demo/award',                'demo.award')
+  
+  .get('/backpack/login',             'backpack.login')
+  .get('/backpack/signout',           'backpack.signout')
+  .get('/backpack/badge/:badgeId',    'backpack.details')
+  .get('/',                           'backpack.manage')
+  .get('/backpack',                   'backpack.manage')
+  .post('/backpack/badge',            'backpack.userBadgeUpload')
+  .post('/backpack/authenticate',     'backpack.authenticate')
+  .delete('/backpack/badge/:badgeId', 'backpack.deleteBadge')
+  
+  .post('/group',                     'group.create')
+  .put('/group/:groupId',             'group.update')
+  .delete('/group/:groupId',          'group.destroy')
+  
+  .get('/share/:groupUrl/edit',       'share.editor')
+  .post('/share/:groupUrl',           'share.createOrUpdate')
+  .put('/share/:groupUrl',            'share.createOrUpdate')
+  .get('/share/:groupUrl',            'share.show')
 
 if (!module.parent) {
   var start_server = function(app) {  

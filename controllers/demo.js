@@ -30,26 +30,33 @@ exports.award = function(req, res) {
   request({url: bakeURL, encoding:'binary'},  function(err, resp, body) {
     res.send(Buffer(body, 'binary'), {'content-type': 'image/png'});
   });
-
 }
 
 exports.massAward = function (req, res) {
   if (!req.user) return res.send('nope');
   var demoBadgeDir = path.join(process.cwd(), 'static', '_demo')
-    , email = req.user.get('email');  
-  
+    , email = req.user.get('email')
+    , salt = 'ballertime'
+    , hash = require('crypto').createHash('sha256').update(email + salt).digest('hex')
+    , recipient = 'sha256$' + hash;
   fs.readdirSync(demoBadgeDir)
     .map(function (f) {
-      var imgUrl = ORIGIN + '/static/_demo/' + f;
-      console.log(path.join(demoBadgeDir, f));
+      var imgUrl = ORIGIN + '/static/_demo/' + f
+        , assertion = makeDemoAssertion(recipient, imgUrl);
       return {
         imgData: fs.readFileSync(path.join(demoBadgeDir, f)),
-        assertion: makeDemoAssertion(email, imgUrl),
-        assertionUrl: ORIGIN + '/demo/badge.json?' + qs.stringify({image: imgUrl, recipient: email})
+        assertion: assertion,
+        assertionUrl: ORIGIN + '/demo/badge.json?' + qs.stringify({title: 'raaad', image: imgUrl, recipient: recipient})
       }
     })
     .forEach(function (item) {
-      awardBadge(item.assertion, item.assertionUrl, item.imgData);
+      console.dir(item.assertion)
+      awardBadge({
+        assertion: item.assertion,
+        url: item.assertionUrl,
+        imagedata: item.imgData,
+        recipient: email
+      });
     })
   res.redirect(reverse('backpack.manage'), 303)
 }
@@ -77,12 +84,13 @@ exports.badBadge = function(req, res) {
 function makeDemoAssertion(email, image, title, description) {
   return ({
     recipient: email,
+    salt: 'ballertime',
     evidence: '/demo/evidence',
     expires: '2040-08-13',
     issued_on: '2011-08-23',
     badge: {
       version: 'v0.5.0',
-      name: 'DEMO: ' + title || 'Open Badges Demo Badge',
+      name: 'DEMO: ' + (title || 'Open Badges Demo Badge'),
       description: description || "For rocking in the free world",
       image: image,
       criteria: '/demo/criteria',

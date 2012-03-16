@@ -5,22 +5,26 @@
 , "scripts" :
   { "test" : "vows --spec --isolate" }
 , "dependencies":
-  { "express": "2.5.x"
-  , "formidable": "1.0.x"
-  , "mysql": "0.9.x"
-  , "winston": "0.3.x"
-  , "hogan.js": "1.0.x"
-  , "coffeekup": "0.3.x"
-  , "request": "2.9.x"
-  , "connect-cookie-session": "0.x.x"
-  , "commander": "0.5.x"
-  , "metapng": "git+https://github.com/brianloveswords/metapng.js.git"
+  { "api-easy": "0.3.3"
   , "bcrypt": "0.5.x"
-  , "mysql": "0.9.x"      
+  , "coffeekup": "0.3.x"
   , "colors": "*"
+  , "commander": "0.5.x"
+  , "connect-cookie-session": "git+https://github.com/brianloveswords/connect-cookie-session.git"
+  , "express": "2.5.x"
+  , "formidable": "1.0.x"
+  , "functools": "1.2.x"
+  , "hogan.js": "1.0.x"
+  , "metapng": "git+https://github.com/brianloveswords/metapng.js.git"
+  , "mysql": "0.9.x"
+  , "request": "2.9.x"
+  , "soda": "0.2.5"
+  , "should": "0.5.x"
+  , "validator": "0.4.x"      
   , "vows": "0.6.x"
   , "underscore": "1.3.x"
   , "up": "0.1.x"
+  , "winston": "0.5.10"
   }
 , "engines":
   { "node":  "*" }

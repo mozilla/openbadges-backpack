@@ -26,7 +26,6 @@ exports.login = function(req, res) {
   });
 };
 
-
 /**
  * Authenticate the user using a browserID assertion.
  *
@@ -37,8 +36,24 @@ exports.login = function(req, res) {
  */
 
 exports.authenticate = function(req, res) {
+  function response(to, apiError, humanReadableError) {
+    if (jsonResponse) {
+      if (apiError)
+        return res.send({status: 'error', reason: apiError}, 400);
+      else
+        return res.send({status: 'ok', email: req.session.emails[0]});
+    } else {
+      if (humanReadableError)
+        req.flash('error', humanReadableError);
+      return res.redirect(to, 303);
+    }
+  }
+
+  var jsonResponse = req.headers['accept'] &&
+                     req.headers['accept'].indexOf('application/json') != -1;
+
   if (!req.body || !req.body['assertion']) {
-    return res.redirect(reverse('backpack.login'), 303);
+    return response(reverse('backpack.login'), "assertion expected");
   }
 
   var ident = configuration.get('identity')
@@ -46,21 +61,19 @@ exports.authenticate = function(req, res) {
     , assertion = req.body['assertion']
     , audience = configuration.get('hostname');
   
-  browserid(uri, assertion, audience, function (err, verifierResponse) {
+  browserid.verify(uri, assertion, audience, function (err, verifierResponse) {
     if (err) {
       logger.error('Failed browserID verification: ')
       logger.debug('Type: ' + err.type + "; Body: " + err.body);
-      req.flash('error', "Could not verify with browserID!");
-      return res.redirect('back', 303);
+      return response('back', "browserID verification failed: " + err.type,
+                      "Could not verify with browserID!");
     }
-    
-    if (!req.session) res.session = {};
     
     if (!req.session.emails) req.session.emails = []
     
     logger.debug('browserid verified, attempting to authenticate user');
     req.session.emails.push(verifierResponse.email);
-    return res.redirect(reverse('backpack.manage'), 303);
+    return response(reverse('backpack.manage'));
   });
 };
 
@@ -152,7 +165,8 @@ exports.manage = function(req, res, next) {
       success: success,
       badges: badges,
       csrfToken: req.session._csrf,
-      groups: groups
+      groups: groups,
+      tooltips: req.param('tooltips')
     })
   };
   
@@ -191,21 +205,29 @@ exports.userBadgeUpload = function(req, res) {
   
   // get the url from the uploaded badge file
   baker.urlFromUpload(tmpfile, function (err, assertionUrl, imagedata) {
+    var recipient = user.get('email');
     if (err) return redirect(err);
     
     // grab the assertion data from the endpoint
     remote.getHostedAssertion(assertionUrl, function (err, assertion) {
       if (err) return redirect(err);
 
+      var userOwnsBadge = Badge.confirmRecipient(assertion, recipient);
       // bail if the badge wasn't issued to the logged in user
-      if (assertion.recipient !== user.get('email')) {
+      if (!userOwnsBadge) {
         err = new Error('This badge was not issued to you! Contact your issuer.');
         err.name = 'InvalidRecipient';
         return redirect(err);
       }
       
       // try to issue the badge 
-      awardBadge(assertion, assertionUrl, imagedata, function(err, badge) {
+      var opts = {
+        assertion: assertion,
+        url: assertionUrl,
+        imagedata: imagedata,
+        recipient: recipient
+      }
+      awardBadge(opts, function(err, badge) {
         if (err) {
           logger.warn('Could not save an uploaded badge: ');
           logger.debug(err);

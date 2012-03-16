@@ -37,7 +37,7 @@ var requestLogger = express.logger({
 });
 exports.logRequests = function(){
   return function (request, response, next) {
-    var ua = request.headers['user-agent']
+    var ua = request.headers['user-agent'] || ''
       , heartbeat = (ua.indexOf('HTTP-Monitor') === 0);
     if (heartbeat) return next()
     requestLogger(request, response, next);
@@ -77,19 +77,19 @@ exports.userFromSession = function (opts) {
   }
 };
 
+var whitelisted = function(list, input){
+  var pattern;
+  for (var i = list.length; i--; ) {
+    pattern = list[i];
+    if (RegExp('^' + list[i] + '$').test(input)) return true;
+  }
+  return false;
+}
+
 exports.noFrame = function(opts) {
   var list = opts.whitelist;
-  var whitelisted = function(input){
-    var pattern;
-    for (var i = list.length; i--; ) {
-      pattern = list[i];
-      if (RegExp('^' + list[i] + '$').test(input)) return true;
-    }
-    return false;
-  }
-  
   return function(req, res, next){
-    if (!whitelisted(req.url)) res.setHeader('x-frame-options', 'DENY');
+    if (!whitelisted(list, req.url)) res.setHeader('x-frame-options', 'DENY');
     return next();
   };
 };
@@ -101,9 +101,11 @@ exports.noFrame = function(opts) {
 //         we'll have to use this version.
 exports.csrf = function (options) {
   var options = options || {}
-    , value = options.value || defaultValue;
-
+    , value = options.value || defaultValue
+    , list = options.whitelist
   return function(req, res, next){
+    if (whitelisted(list, req.url)) return next();
+    
     var token = req.session._csrf || (req.session._csrf = utils.uid(24));
     if ('GET' == req.method || 'HEAD' == req.method) return next();
     var val = value(req);
@@ -115,7 +117,8 @@ exports.csrf = function (options) {
   }
 };
 
-var utils = {}
+var utils = exports.utils = {};
+
 utils.forbidden = function(res) {
   var body = 'Forbidden';
   res.setHeader('Content-Type', 'text/plain');
