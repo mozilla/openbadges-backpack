@@ -1,5 +1,7 @@
 #!/bin/sh
 CHECK_HTTP=/usr/lib*/nagios/plugins/check_http
+
+#XXX: This needs to be a valid assertion URL
 ASSERTION_URL=http://people.mozilla.com/~pchiasson/badges/mrz.json
 
 HOST=$1
