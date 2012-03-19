@@ -5,9 +5,7 @@ var _ = require('underscore')
   , should = require('should')
   , mysql = require('../lib/mysql.js')
   , map = require('functools').map
-  , utils = require('./utils')
-   ,request = utils.conn.request
-  , response = utils.conn.response
+  , conmock = require('./conmock.js')
 
 var user, badge, group;
 function setupDatabase (callback) {
@@ -46,43 +44,41 @@ vows.describe('group controller test').addBatch({
     },
     '#create: given no user' : {
       topic: function () {
-        var req = new request({});
-        groupcontroller.create(req, response(req, this.callback));
+        conmock(groupcontroller.create, {}, this.callback);
       },
-      'returns a 403 and a json object' : function (conn, obj, status) {
-        status.should.equal(403);
-        obj.error.should.match(/user/);
+      'returns a 403 and a json object' : function (err, mock) {
+        mock.status.should.equal(403);
+        mock.body.error.should.match(/user/);
       },
     },
     '#create: given no body' : {
       topic: function () {
-        var req = new request({user: user});
-        groupcontroller.create(req, response(req, this.callback));
+        conmock(groupcontroller.create, {user: user}, this.callback);
       },
-      'returns a 400 and a json object' : function (conn, obj, status) {
-        status.should.equal(400);
-        obj.error.should.match(/body/);
+      'returns a 400 and a json object' : function (err, mock) {
+        mock.status.should.equal(400);
+        mock.body.error.should.match(/body/);
       },
     },
     '#create: given no badges in the body' : {
       topic: function () {
-        var req = new request({user: user, body: { }});
-        groupcontroller.create(req, response(req, this.callback));
+        var req = { user: user, body: { } };
+        conmock(groupcontroller.create, req, this.callback);
       },
-      'returns a 400 and a json object' : function (conn, obj, status) {
-        status.should.equal(400);
-        obj.error.should.match(/badges/);
+      'returns a 400 and a json object' : function (err, mock) {
+        mock.status.should.equal(400);
+        mock.body.error.should.match(/badges/);
       },
     },
     '#create: given a user and correct input': {
       topic : function () {
-        var req = new request({ user: user, body: {name: 'awesometown', badges: []} })
-        groupcontroller.create(req, response(req, this.callback));
+        var req = { user: user, body: {name: 'awesometown', badges: []} }
+        conmock(groupcontroller.create, req, this.callback);
       },
-      'creates a new group and returns id and url': function (conn, obj) {
-        obj.id.should.equal(2);
-        should.exist(obj.url);
-        obj.url.length.should.be.greaterThan(10);
+      'creates a new group and returns id and url': function (err, mock) {
+        mock.body.id.should.equal(2);
+        should.exist(mock.body.url);
+        mock.body.url.length.should.be.greaterThan(10);
       }
     },
   },

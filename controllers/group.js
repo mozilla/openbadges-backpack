@@ -11,7 +11,6 @@ exports.param = {
         return res.send('Error pulling group', 500);
       }
       
-      
       if (!group) {
         return res.send('Could not find group', 404);
       }
