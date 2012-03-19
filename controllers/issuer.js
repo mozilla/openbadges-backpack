@@ -196,7 +196,7 @@ exports.validator = function (request, response) {
   var accept = request.headers['accept'];
   var missingMsg = 'error: could not validate, could not find assertion in `data` field';
   var status = 200;
-  var fields = null;
+  var fields = {};
   
   if (!data) {
     status = 400;
@@ -217,14 +217,38 @@ exports.validator = function (request, response) {
     
     catch (err) {
       status = 500;
-      fields = { general: err.name + ": " + err.message }
+      if (err.name === "SyntaxError") {
+        fields = { general: "Could not parse this JSON blob. Make sure it is well formed and try again!" }
+      } else {
+        fields = { general: err.name + ": " + err.message }
+      }
     }
   }
   
-  var responder = {
+  function humanize (value, field) {
+    var url = 'Must either be a fully qualified URL (<code>http://example.com/path/evidence.html</code>) or begin with a forward slash (<code>/path/evidence.html</code>). <br> Non-qualified URLs will be prefixed with the origin specified in <code>badge.issuer.origin</code>';
+    var length = 'Cannot be longer than 128 characters'
+    var msgs = {
+      recipient: 'Must be an email address (<code>someone@example.com</code>) or a hash (<code>sha256$1234567890abcdef</code>)',
+      evidence: url,
+      "badge.version": 'Must be in the form of <code>x.y</code> or <code>x.y.z</code>',
+      "badge.name": length,
+      "badge.description": length,
+      "badge.image": url.replace(/evidence.html/g, 'image.png'),
+      "badge.criteria": url.replace(/evidence.html/g, 'criteria.html'),
+      "badge.issuer.name": length,
+      "badge.issuer.org": length,
+      "badge.issuer.contact": 'Must be an email address',
+      "badge.issuer.origin": 'Must be a fully qualified origin (<code>http://example.com</code>)'
+    }
+    if (value.match(/invalid/)) value = msgs[field] || value;
+    return {field: field, value: value};
+  }
+  
+   var responder = {
     'text/plain': function () {
       response.contentType('txt');
-      if (fields) {
+      if (!_.isEmpty(fields)) {
         var values = _.values(fields);
         var bullets = _.map(values, function(s){return '* ' + s;}).join('\n');
         return response.send(bullets, status);
@@ -237,18 +261,22 @@ exports.validator = function (request, response) {
     'application/json': function () {
       response.contentType('json');
       if (fields) {
-        return response.json({ status: 'error', fields: fields }, status);
+        return response.json({ status: 'error', errors: _.map(fields, humanize) }, status);
       }
       else {
-        return response.json({ status: 'okay', fields: fields }, 200);
+        return response.json({ status: 'okay' }, 200);
       }
     },
     
     'default': function () {
+      var fielderrors = _.map(fields, humanize);
       return response.render('validator', {
         status: 200,
-        fields: fields||{},
-        csrfToken: request.session._csrf
+        errors: fielderrors,
+        csrfToken: request.session._csrf,
+        submitted: !!data,
+        success: data && _.isEmpty(fields),
+        data: data
       });
     }
   };

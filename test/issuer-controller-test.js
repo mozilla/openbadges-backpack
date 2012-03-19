@@ -3,6 +3,7 @@ var vows = require('vows')
   , should = require('should')
   , issuer = require('../controllers/issuer.js')
   , conmock = require('./conmock.js')
+  , _ = require('underscore')
 
 vows.describe('issuer controller test').addBatch({
   'Issuer Controller': {
@@ -21,7 +22,7 @@ vows.describe('issuer controller test').addBatch({
         },
         'and "Accept: text/html"' : {
           topic: function () {
-                var req = { headers: {accept: 'text/html'} };
+            var req = { headers: {accept: 'text/html'} };
             conmock(issuer.validator, req, this.callback);
           },
           'renders validator html without options' : function (err, mock) {
@@ -73,14 +74,15 @@ vows.describe('issuer controller test').addBatch({
           'renders validator html with some options' : function (err, mock) {
             mock.fntype.should.equal('render');
             mock.path.should.equal('validator');
-            assert.include(mock.options.fields, 'recipient');
-            assert.include(mock.options.fields, 'badge.version');
-            assert.include(mock.options.fields, 'badge.name');
-            assert.include(mock.options.fields, 'badge.image');
-            assert.include(mock.options.fields, 'badge.description');
-            assert.include(mock.options.fields, 'badge.criteria');
-            assert.include(mock.options.fields, 'badge.issuer.origin');
-            assert.include(mock.options.fields, 'badge.issuer.name');
+            var errors = _.pluck(mock.options.errors, 'field');
+            assert.include(errors, 'recipient');
+            assert.include(errors, 'badge.version');
+            assert.include(errors, 'badge.name');
+            assert.include(errors, 'badge.image');
+            assert.include(errors, 'badge.description');
+            assert.include(errors, 'badge.criteria');
+            assert.include(errors, 'badge.issuer.origin');
+            assert.include(errors, 'badge.issuer.name');
           },
         },
         'and "Accept: application/json"' : {
@@ -91,14 +93,15 @@ vows.describe('issuer controller test').addBatch({
           },
           'sends back json with a bunch of errors' : function (err, mock) {
             mock.status.should.equal(400);
-            assert.include(mock.body.fields, 'recipient');
-            assert.include(mock.body.fields, 'badge.version');
-            assert.include(mock.body.fields, 'badge.name');
-            assert.include(mock.body.fields, 'badge.image');
-            assert.include(mock.body.fields, 'badge.description');
-            assert.include(mock.body.fields, 'badge.criteria');
-            assert.include(mock.body.fields, 'badge.issuer.origin');
-            assert.include(mock.body.fields, 'badge.issuer.name');
+            var errors = _.pluck(mock.body.errors, 'field');
+            assert.include(errors, 'recipient');
+            assert.include(errors, 'badge.version');
+            assert.include(errors, 'badge.name');
+            assert.include(errors, 'badge.image');
+            assert.include(errors, 'badge.description');
+            assert.include(errors, 'badge.criteria');
+            assert.include(errors, 'badge.issuer.origin');
+            assert.include(errors, 'badge.issuer.name');
           },
         },
         'and "Accept: text/plain"' : {
