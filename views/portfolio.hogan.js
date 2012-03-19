@@ -76,10 +76,14 @@
               <td class='label recipient'>Recipient</td>
               <td>{{recipient}}</td>
             </tr>
+            
+            {{#evidence}}
             <tr>
               <td class='label evidence'>Evidence</td>
               <td><a href='{{evidence}}'>{{evidence}}</a></td>
             </tr>
+            {{/evidence}}
+            
             {{#issued_on}}
             <tr>
               <td class='label'>Issued</td>
