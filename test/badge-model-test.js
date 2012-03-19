@@ -19,8 +19,8 @@ var URLS = {
   bad: ['-not-asdo', 'ftp://bad-scheme', '@.com:90/', 'just totally wrong']
 };
 var ORIGINS = {
-  good: ['http://example.com', 'https://example.com:80', 'https://www.example.com', 'https://www.example.com:8080'],
-  bad: URLS.bad
+  good: ['http://example.com', 'https://example.com:80', 'https://www.example.com', 'https://www.example.com:8080', 'http://example.com/'],
+  bad: ['-not-asdo', 'ftp://bad-scheme', '@.com:90/', 'just totally wrong', 'http://example.com/what', 'http://example.com:8080/false']
 };
 var DATES = {
   good: [Date.now()/1000 | 0, '2012-01-01'],

@@ -142,7 +142,7 @@ Badge.validateBody = function (body) {
     missing: function (fieldStr) {
       var field = fieldFromDottedString(fieldStr, body);
       if (!field) {
-        err.fields[fieldStr] = 'missing email address for `' + fieldStr + '`';
+        err.fields[fieldStr] = 'missing required field: `' + fieldStr + '`';
       }
     },
     regexp: function (fieldStr, type) {
@@ -183,7 +183,7 @@ Badge.validateBody = function (body) {
     } else {
       test.missing('badge.issuer.origin');
       test.missing('badge.issuer.name');
-      test.regexp('badge.issuer.origin', 'url');
+      test.regexp('badge.issuer.origin', 'origin');
       test.regexp('badge.issuer.contact', 'email');
       test.length('badge.issuer.org', 128);
       test.length('badge.issuer.name', 128);

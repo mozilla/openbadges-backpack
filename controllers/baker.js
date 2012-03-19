@@ -79,6 +79,7 @@ exports.baker = function(req, res) {
           recipient: email
         }
         awardBadge(opts, function (err, badge) {
+          console.dir(err);
           if (err) res.setHeader('x-badge-awarded', 'false');
           else res.setHeader('x-badge-awarded', badge.recipient);
           return res.send(badgePNGdata);

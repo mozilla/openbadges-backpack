@@ -480,6 +480,23 @@ table.information {
   line-height: 1.7em;
 }
 
+#validator textarea {
+  width: 600px;
+  height: 300px;
+}
+
+#validator .submit {
+  margin: 1em 0;
+}
+
+#validator h2 {
+  margin: 0.25em 0;
+}
+
+#validator li strong {
+  color: #d00;
+}
+
 body {
   cursor: default;
 }
