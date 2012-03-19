@@ -1,7 +1,7 @@
 <div id='validator'>
   <form action='' method='post'>
     <input type='hidden' name='_csrf' value='{{csrfToken}}'>
-    <textarea placeholder='Paste in your assertion here' name='data'>{{data}}</textarea>
+    <textarea placeholder='Paste in your assertion here' name='assertion'>{{assertion}}</textarea>
     <div class='submit'>
       <input type='submit' class='primary large btn' value='Check your assertion'>
     </div>

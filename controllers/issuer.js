@@ -192,23 +192,23 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
 };
 
 exports.validator = function (request, response) {
-  var data = request.query.data || (request.body && request.body.data)
+  var assertion = request.query.assertion || (request.body && request.body.assertion)
   var accept = request.headers['accept'];
   var missingMsg = 'error: could not validate, could not find assertion in `data` field';
   var status = 200;
   var fields = {};
   
-  if (!data) {
+  if (!assertion) {
     status = 400;
     fields = { general: missingMsg };
   }
   else {
     try {
       status = 200;
-      var assertion = JSON.parse(data);
-      if (!assertion.badge) assertion.badge = {}
-      if (!assertion.badge.issuer) assertion.badge.issuer = {}
-      var errors = Badge.validateBody( assertion );
+      var o = JSON.parse(assertion);
+      if (!o.badge) o.badge = {}
+      if (!o.badge.issuer) o.badge.issuer = {}
+      var errors = Badge.validateBody( o );
       if (errors) {
         fields = errors.fields;
         status = 400;
@@ -274,9 +274,9 @@ exports.validator = function (request, response) {
         status: 200,
         errors: fielderrors,
         csrfToken: request.session._csrf,
-        submitted: !!data,
-        success: data && _.isEmpty(fields),
-        data: data
+        submitted: !!assertion,
+        success: assertion && _.isEmpty(fields),
+        assertion: assertion
       });
     }
   };
