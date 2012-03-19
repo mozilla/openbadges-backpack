@@ -109,6 +109,9 @@ Base.prototype.destroy = function (callback) {
     , attributes = this.attributes
     , table = this.getTableName()
     , querySQL = 'DELETE FROM `'+table+'` WHERE `id` = ? LIMIT 1;'
+  
+  callback = callback||function(){};
+  
   client.query(querySQL, [attributes.id], function (err, resp) {
     if (err) { return callback(err); }
     delete attributes.id;
