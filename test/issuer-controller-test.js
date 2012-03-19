@@ -64,7 +64,7 @@ vows.describe('issuer controller test').addBatch({
       
       
       'when client sends an empty data set' : {
-        topic: function () { return function () { return { body: { data : '{}' }, headers: {} } } },
+        topic: function () { return function () { return { body: { assertion : '{}' }, headers: {} } } },
         'and header "Accept: */*"' : {
           topic: function (req) {
             req = req();
