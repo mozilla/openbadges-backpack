@@ -309,6 +309,13 @@ vows.describe('Badge model').addBatch({
       var user = new Badge({body: {recipient: 'me@example.com'}});
       assert.equal(user.confirmRecipient('me@example.com'), true);
     },
+    'return false if not given a comparitor': function () {
+      assert.equal(Badge.confirmRecipient({recipient: 'me@example.com'}), false);
+    },
+    'bogus recipient should return false': function () {
+      var email = 'm;aoeagowije'
+      assert.equal(Badge.confirmRecipient({recipient: 'bogus' }, email), false);
+    },
     'sha256 hashed email without salt should work': function () {
       var email = 'me@example.com'
         , hash = sha256(email)

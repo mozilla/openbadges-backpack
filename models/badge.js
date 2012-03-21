@@ -26,9 +26,13 @@ Badge.confirmRecipient = function (assertion, email) {
     , salt = assertion.salt || ''
   
   if (!badgeEmail || !email) return false;
-  if (/@/.test(badgeEmail)) return badgeEmail === email;
-  if (!(/$/.test(badgeEmail))) return false;
   
+  // if it's an email address, do a straight comparison
+  if (/@/.test(badgeEmail)) return badgeEmail === email;
+  
+  // if it's not an email address, it must have an alg and dollar sign.
+  if (!(badgeEmail.match(/\w+(\d+)?\$.+/))) return false;
+
   var parts = badgeEmail.split('$')
     , algorithm = parts[0]
     , hash = parts[1]
