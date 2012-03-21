@@ -65,8 +65,8 @@ changes, so you don't have to manually reload it.
 
         CREATE DATABASE openbadges;
         GRANT ALL PRIVILEGES ON openbadges.* TO badgemaker@localhost IDENTIFIED BY 'secret';
-        CREATE DATABASE openbadges_test;
-        GRANT ALL PRIVILEGES ON openbadges_test.* to badgemaker@localhost IDENTIFIED BY 'secret';
+        CREATE DATABASE test_openbadges;
+        GRANT ALL PRIVILEGES ON test_openbadges.* to badgemaker@localhost IDENTIFIED BY 'secret';
 
 2. Copy the `openbadges/lib/environments/local-dist.js` to
    `openbadges/lib/environments/local.js` and edit the configuration to match
