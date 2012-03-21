@@ -77,10 +77,14 @@
               <td class='fieldlabel recipient'>Recipient</td>
               <td>{{recipient}}</td>
             </tr>
+            
+            {{#evidence}}
             <tr>
               <td class='fieldlabel evidence'>Evidence</td>
               <td><a href='{{evidence}}'>{{evidence}}</a></td>
             </tr>
+            {{/evidence}}
+            
             {{#issued_on}}
             <tr>
               <td class='fieldlabel'>Issued</td>

@@ -22,14 +22,24 @@ Badge.prototype.presave = function () {
 };
 
 Badge.confirmRecipient = function (assertion, email) {
+  // can't validate if not given an assertion
+  if (!assertion) return false;
+  
   var badgeEmail = assertion.recipient
-    , salt = assertion.salt || ''
+  var salt = assertion.salt || ''
+  
+  if (!badgeEmail || !email) return false;
+  
+  // if it's an email address, do a straight comparison
   if (/@/.test(badgeEmail)) return badgeEmail === email;
   
-  var parts = badgeEmail.split('$')
-    , algorithm = parts[0]
-    , hash = parts[1]
-    , given = crypto.createHash(algorithm)
+  // if it's not an email address, it must have an alg and dollar sign.
+  if (!(badgeEmail.match(/\w+(\d+)?\$.+/))) return false;
+
+  var parts = badgeEmail.split('$');
+  var algorithm = parts[0];
+  var hash = parts[1];
+  var given = crypto.createHash(algorithm);
 
   // if there are only two parts, the first part is the algorithm and the
   // second part is the computed hash.
@@ -142,7 +152,7 @@ Badge.validateBody = function (body) {
     missing: function (fieldStr) {
       var field = fieldFromDottedString(fieldStr, body);
       if (!field) {
-        err.fields[fieldStr] = 'missing email address for `' + fieldStr + '`';
+        err.fields[fieldStr] = 'missing required field: `' + fieldStr + '`';
       }
     },
     regexp: function (fieldStr, type) {
@@ -183,7 +193,7 @@ Badge.validateBody = function (body) {
     } else {
       test.missing('badge.issuer.origin');
       test.missing('badge.issuer.name');
-      test.regexp('badge.issuer.origin', 'url');
+      test.regexp('badge.issuer.origin', 'origin');
       test.regexp('badge.issuer.contact', 'email');
       test.length('badge.issuer.org', 128);
       test.length('badge.issuer.name', 128);

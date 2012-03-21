@@ -4,6 +4,7 @@ var request = function (opts) {
   if (!(this instanceof arguments.callee)) return new arguments.callee(opts);
   _.extend(this, opts);
   this.params = {};
+  this.query = {};
   this.session = {
     _csrf: 'default-csrf',
     email: 'user@example.com'
@@ -16,7 +17,10 @@ request.prototype.flash = function (type, message){};
 
 
 var response = function (request, callback) {
-  if (!(this instanceof arguments.callee)) return new arguments.callee(request, callback);
+  if (!(this instanceof arguments.callee)) {
+    console.log('this should never happen');
+    return new arguments.callee(request, callback);
+  }
   this.request = request;
   this.callback = callback;
   this.headers = {};

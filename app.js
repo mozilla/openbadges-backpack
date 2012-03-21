@@ -16,7 +16,6 @@ app.config = configuration;
 // default view engine
 app.set('view engine', 'hogan.js');
 app.register('hogan.js', hoganadapter.init(hogan))
-app.register('.coffee', require('coffeekup').adapters.express)
 
 // View helpers. `user` and `badges` are set so we can use them in `if`
 // statements without getting undefined errors and without having to use typeof
@@ -29,17 +28,6 @@ app.helpers({
   success: [],
   badges: {},
   reverse: router.reverse,
-
-  hardcode: {
-    textbox: function(attrs) {
-      attrs.type = 'text';
-      attrs.name = attrs.id;
-      return div(function(){input(attrs)});
-    },
-    safe: function(val) {
-      return text(val.replace(/</g, '&lt;').replace(/>/g, '&gt;'))
-    }
-  }
 });
 // Middleware. See `middleware.js` for more information on the custom
 // middleware used.

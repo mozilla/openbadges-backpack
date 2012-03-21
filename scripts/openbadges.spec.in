@@ -42,7 +42,7 @@ npm ls
 %install
 rm -rf %{buildroot}
 mkdir -p %{buildroot}%{_rootdir}
-for f in bin controllers lib models node_modules scripts static views *.json *.js; do
+for f in bin controllers check lib models node_modules scripts static views *.json *.js; do
     cp -rp $f %{buildroot}%{_rootdir}/
 done
 

@@ -6,7 +6,6 @@
   { "test" : "vows --spec --isolate" }
 , "dependencies":
   { "api-easy": "0.3.3"
-  , "bcrypt": "0.5.x"
   , "coffeekup": "0.3.x"
   , "colors": "*"
   , "commander": "0.5.x"
@@ -16,6 +15,7 @@
   , "functools": "1.2.x"
   , "hogan.js": "1.0.x"
   , "metapng": "git+https://github.com/brianloveswords/metapng.js.git"
+  , "mime": "1.2.x"
   , "mysql": "0.9.x"
   , "request": "2.9.x"
   , "soda": "0.2.5"

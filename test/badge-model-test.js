@@ -19,8 +19,8 @@ var URLS = {
   bad: ['-not-asdo', 'ftp://bad-scheme', '@.com:90/', 'just totally wrong']
 };
 var ORIGINS = {
-  good: ['http://example.com', 'https://example.com:80', 'https://www.example.com', 'https://www.example.com:8080'],
-  bad: URLS.bad
+  good: ['http://example.com', 'https://example.com:80', 'https://www.example.com', 'https://www.example.com:8080', 'http://example.com/'],
+  bad: ['-not-asdo', 'ftp://bad-scheme', '@.com:90/', 'just totally wrong', 'http://example.com/what', 'http://example.com:8080/false']
 };
 var DATES = {
   good: [Date.now()/1000 | 0, '2012-01-01'],
@@ -308,6 +308,23 @@ vows.describe('Badge model').addBatch({
     'regular email should work': function () {
       var user = new Badge({body: {recipient: 'me@example.com'}});
       assert.equal(user.confirmRecipient('me@example.com'), true);
+    },
+    'return false if not given an assertion': function () {
+      assert.equal(Badge.confirmRecipient(null), false);
+    },
+    'return false if given strange things for assertion': function () {
+      assert.equal(Badge.confirmRecipient(['nope']), false);
+      assert.equal(Badge.confirmRecipient('nope'), false);
+      assert.equal(Badge.confirmRecipient(Math.PI), false);
+      assert.equal(Badge.confirmRecipient(/nope/), false);
+      assert.equal(Badge.confirmRecipient(function (nope) { return nope }), false);
+    },
+    'return false if not given a comparitor': function () {
+      assert.equal(Badge.confirmRecipient({recipient: 'me@example.com'}), false);
+    },
+    'bogus recipient should return false': function () {
+      var email = 'm;aoeagowije'
+      assert.equal(Badge.confirmRecipient({recipient: 'bogus' }, email), false);
     },
     'sha256 hashed email without salt should work': function () {
       var email = 'me@example.com'
