@@ -53,19 +53,8 @@ form.baker #assertion {
   overflow: hidden;
   display: block;
 }
-.navbar .navbar-inner {
-  height: 30px;
-}
-.navbar h3 {
-  position: relative;
-  top: -3px;
-}
-.navbar .nav {
-  top: -5px;
-}
- 
-.navbar .brand {
-  font-size: 18px;
+.navbar {
+  border-top: 2px solid #fff;
 }
 .modal {
   display: none;
