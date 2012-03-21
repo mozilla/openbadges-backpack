@@ -309,6 +309,16 @@ vows.describe('Badge model').addBatch({
       var user = new Badge({body: {recipient: 'me@example.com'}});
       assert.equal(user.confirmRecipient('me@example.com'), true);
     },
+    'return false if not given an assertion': function () {
+      assert.equal(Badge.confirmRecipient(null), false);
+    },
+    'return false if given strange things for assertion': function () {
+      assert.equal(Badge.confirmRecipient(['nope']), false);
+      assert.equal(Badge.confirmRecipient('nope'), false);
+      assert.equal(Badge.confirmRecipient(Math.PI), false);
+      assert.equal(Badge.confirmRecipient(/nope/), false);
+      assert.equal(Badge.confirmRecipient(function (nope) { return nope }), false);
+    },
     'return false if not given a comparitor': function () {
       assert.equal(Badge.confirmRecipient({recipient: 'me@example.com'}), false);
     },

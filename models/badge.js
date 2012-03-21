@@ -22,8 +22,11 @@ Badge.prototype.presave = function () {
 };
 
 Badge.confirmRecipient = function (assertion, email) {
+  // can't validate if not given an assertion
+  if (!assertion) return false;
+  
   var badgeEmail = assertion.recipient
-    , salt = assertion.salt || ''
+  var salt = assertion.salt || ''
   
   if (!badgeEmail || !email) return false;
   
@@ -33,10 +36,10 @@ Badge.confirmRecipient = function (assertion, email) {
   // if it's not an email address, it must have an alg and dollar sign.
   if (!(badgeEmail.match(/\w+(\d+)?\$.+/))) return false;
 
-  var parts = badgeEmail.split('$')
-    , algorithm = parts[0]
-    , hash = parts[1]
-    , given = crypto.createHash(algorithm)
+  var parts = badgeEmail.split('$');
+  var algorithm = parts[0];
+  var hash = parts[1];
+  var given = crypto.createHash(algorithm);
 
   // if there are only two parts, the first part is the algorithm and the
   // second part is the computed hash.
