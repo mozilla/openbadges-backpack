@@ -10,8 +10,7 @@ var EMAILS = {
 
 var createUser = function (email) {
   return new User({
-    email: (email || 'brian@example.com'),
-    passwd: 'secret'
+    email: (email || 'brian@example.com')
   });
 };
 var makeInvalidEmailTests = function (badData) {
@@ -78,21 +77,6 @@ vows.describe('User model').addBatch({
           'without getting mangled data': function (err, user) {
             assert.equal(user.get('email'), 'brian@example.com');
           },
-          'with a salt being created': function (err, user) {
-            assert.isString(user.get('salt'));
-            assert.ok(user.get('salt').length > 5);
-          },
-          'and the password should have been hashed': function (err, user) {
-            assert.notEqual(user.get('passwd'), 'secret');
-          },
-          'and the password can be checked accurately': function (err, user) {
-            assert.isTrue(user.checkPassword('secret'));
-            assert.isFalse(user.checkPassword('not correct'));
-          },
-          'and the password can be changed': function (err, user) {
-            assert.isTrue(user.checkPassword('secret'));
-            assert.isFalse(user.checkPassword('not correct'));
-          }
         }
       }
     },
@@ -115,14 +99,6 @@ vows.describe('User model').addBatch({
     'Trying to save a user': {
       'with bogus `recipient`': makeInvalidEmailTests(EMAILS.bad),
       'with valid `recipient`': makeValidEmailTests(EMAILS.good)
-    },
-    'A user': {
-      topic: createUser(),
-      'can change her password': function (user) {
-        var newpw = 'whaat';
-        user.changePassword(newpw);
-        assert.isTrue(user.checkPassword(newpw));
-      }
     },
     'User#findOrCreate': {
       topic: function () {
