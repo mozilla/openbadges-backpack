@@ -25,7 +25,7 @@ Badge.confirmRecipient = function (assertion, email) {
   var badgeEmail = assertion.recipient
     , salt = assertion.salt || ''
   
-  if (!badgeEmail) return false;
+  if (!badgeEmail || !email) return false;
   if (/@/.test(badgeEmail)) return badgeEmail === email;
   if (!(/$/.test(badgeEmail))) return false;
   
