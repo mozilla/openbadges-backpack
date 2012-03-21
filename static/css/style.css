@@ -56,6 +56,9 @@ form.baker #assertion {
 .navbar {
   border-top: 2px solid #fff;
 }
+.navbar .container {
+  max-width: 940px;
+}
 .modal {
   display: none;
 }
