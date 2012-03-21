@@ -3,8 +3,9 @@
 <div class='portfolio'>
 {{#message}}
   <div class='message-container'>
-    <div class="alert-message info">
-      <p><strong>{{{message}}}</strong></p>
+    <div class="alert alert-info">
+      <a class="close" data-dismiss="alert">×</a>
+      {{{message}}}
     </div>
   </div>
 {{/message}}
@@ -39,16 +40,16 @@
               <td class='section-head' colspan='2'>Issuer Details</td>
             </tr>
             <tr>
-              <td class='label issuer-name'>Name</td>
+              <td class='fieldlabel issuer-name'>Name</td>
               <td>{{badge.issuer.name}}</td>
             </tr>
             <tr>
-              <td class='label issuer-name'>URL</td>
+              <td class='fieldlabel issuer-name'>URL</td>
               <td><a href={{badge.issuer.origin}}'>{{badge.issuer.origin}}</a></td>
             </tr>
             {{#badge.issuer.org}}
             <tr>
-              <td class='label issuer-name'>Organization</td>
+              <td class='fieldlabel issuer-name'>Organization</td>
               <td>{{badge.issuer.org}}</td>
             </tr>
             {{/badge.issuer.org}}
@@ -57,15 +58,15 @@
               <td class='section-head' colspan='2'>Badge Details</td>
             </tr>
             <tr>
-              <td class='label'>Name</td>
+              <td class='fieldlabel'>Name</td>
               <td>{{badge.name}}</td>
             </tr>
             <tr>
-              <td class='label'>Description</td>
+              <td class='fieldlabel'>Description</td>
               <td>{{badge.description}}</td>
             </tr>
             <tr>
-              <td class='label'>Criteria</td>
+              <td class='fieldlabel'>Criteria</td>
               <td><a href='{{badge.criteria}}'>{{badge.criteria}}</a></td>
             </tr>
 
@@ -73,27 +74,27 @@
               <td class='section-head' colspan='2'>Issuance Details</td>
             </tr>
             <tr>
-              <td class='label recipient'>Recipient</td>
+              <td class='fieldlabel recipient'>Recipient</td>
               <td>{{recipient}}</td>
             </tr>
             
             {{#evidence}}
             <tr>
-              <td class='label evidence'>Evidence</td>
+              <td class='fieldlabel evidence'>Evidence</td>
               <td><a href='{{evidence}}'>{{evidence}}</a></td>
             </tr>
             {{/evidence}}
             
             {{#issued_on}}
             <tr>
-              <td class='label'>Issued</td>
+              <td class='fieldlabel'>Issued</td>
               <td>{{issued_on}}</td>
             </tr>
             {{/issued_on}}
 
             {{#expires}}
             <tr>
-              <td class='label'>Expiration</td>
+              <td class='fieldlabel'>Expiration</td>
               <td>{{expires}}</td>
             </tr>
             {{/expires}}

@@ -19,12 +19,12 @@
 {{/badges.length}}
 
 <div class="row" style="position: relative;">
-  <div class="span-one-third column">
+  <div class="span4 column">
     {{#badges.length}}
     <h1><span data-title="Badges" data-content="These are the badges you've earned so far! Click on one to see its details." rel="popover">Badges{{#tooltips}}<i class="icon-info-sign"></i>{{/tooltips}}</span></h1>
     <div id="badges" class="js-badges">
       {{#badges}}
-        <span draggable="true" class="badge" data-id="{{attributes.id}}">
+        <span draggable="true" class="openbadge" data-id="{{attributes.id}}">
           <img src="{{attributes.image_path}}" width="64px"/>
         </span>
       {{/badges}}
@@ -32,7 +32,7 @@
     {{/badges.length}}
     
     <div class="upload">
-      <h4><span data-title="Upload Badges" data-content="You can upload previously earned badges here, but they have to comply with the OBI metadata spec." rel="popover">Upload Badges{{#tooltips}}<i class="icon-info-sign"></i>{{/tooltips}}</span></h4>
+      <h3><span data-title="Upload Badges" data-content="You can upload previously earned badges here, but they have to comply with the OBI metadata spec." rel="popover">Upload Badges{{#tooltips}}<i class="icon-info-sign"></i>{{/tooltips}}</span></h3>
       <p>If you have badges you've been awarded, you can upload them manually</p>
       <form action="{{#reverse}}backpack.userBadgeUpload{{/reverse}}" method="post" enctype="multipart/form-data">
         <fieldset>
@@ -42,14 +42,14 @@
           </div>
         </fieldset>
         <div class="clearfix">
-          <input class="btn primary" type="submit" value="Upload"></input>
+          <input class="btn btn-primary" type="submit" value="Upload"></input>
         </div>
       </form>
     </div>
   </div>
 
   {{#badges.length}}
-    <div id='groups' class="span-two-thirds column">
+    <div id='groups' class="span8 column">
       <h1><span rel="popover" data-title="Groups" data-content="You can drag-and-drop badges into groups, which you can use to publish your badges for employers, social networks, etc.">Groups{{#tooltips}}<i class="icon-info-sign"></i>{{/tooltips}}</span></h1>
       {{#groups}}
         <div class='group' data-id="{{attributes.id}}" data-url="{{attributes.url}}">
@@ -58,7 +58,7 @@
         <span class='icon share' rel="tooltip" data-placement="bottom" {{^attributes.badgeObjects}}style='display: none'{{/attributes.badgeObjects}} title='Share this group'>5</span>
           
           {{#attributes.badgeObjects}}
-            <span draggable="true" class="badge" data-id="{{attributes.id}}">
+            <span draggable="true" class="openbadge" data-id="{{attributes.id}}">
               <img src="{{attributes.image_path}}" width="64px"/>
             </span>
           {{/attributes.badgeObjects}}
@@ -119,31 +119,31 @@
 
           <div class='buttons'>
             <button class='btn nope'>Nevermind, I want to keep this badge</button>
-            <button class='btn yep danger'>Yes, remove this badge</button>
+            <button class='btn yep btn-danger'>Yes, remove this badge</button>
           </div>
         </div>
 
-        <table class='information'>
+        <table class='information table'>
           <tr>
             <td rowspan="100" class='image'>
               <img src="{{image_path}}" class='badge-image'>
-              <button class='btn danger disown'>Disown this Badge</button>
+              <button class='btn btn-danger disown'>Disown this Badge</button>
             </td>
 
             <td class='section-head' colspan='2'>Issuer Details</td>
           </tr>
           {{#body}}
           <tr>
-            <td class='label issuer-name'>Name</td>
+            <td class='fieldlabel issuer-name'>Name</td>
             <td>{{badge.issuer.name}}</td>
           </tr>
           <tr>
-            <td class='label issuer-name'>URL</td>
+            <td class='fieldlabel issuer-name'>URL</td>
             <td><a href={{badge.issuer.origin}}'>{{badge.issuer.origin}}</a></td>
           </tr>
           {{#badge.issuer.org}}
           <tr>
-            <td class='label issuer-name'>Organization</td>
+            <td class='fieldlabel issuer-name'>Organization</td>
             <td>{{badge.issuer.org}}</td>
           </tr>
           {{/badge.issuer.org}}
@@ -152,15 +152,15 @@
             <td class='section-head' colspan='2'>Badge Details</td>
           </tr>
           <tr>
-            <td class='label'>Name</td>
+            <td class='fieldlabel'>Name</td>
             <td>{{badge.name}}</td>
           </tr>
           <tr>
-            <td class='label'>Description</td>
+            <td class='fieldlabel'>Description</td>
             <td>{{badge.description}}</td>
           </tr>
           <tr>
-            <td class='label'>Criteria</td>
+            <td class='fieldlabel'>Criteria</td>
             <td><a href='{{badge.criteria}}'>{{badge.criteria}}</a></td>
           </tr>
 
@@ -168,23 +168,23 @@
             <td class='section-head' colspan='2'>Issuance Details</td>
           </tr>
           <tr>
-            <td class='label recipient'>Recipient</td>
+            <td class='fieldlabel recipient'>Recipient</td>
             <td>{{recipient}}</td>
           </tr>
           <tr>
-            <td class='label evidence'>Evidence</td>
+            <td class='fieldlabel evidence'>Evidence</td>
             <td><a href='{{evidence}}'>{{evidence}}</a></td>
           </tr>
           {{#issued_on}}
           <tr>
-            <td class='label'>Issued On</td>
+            <td class='fieldlabel'>Issued On</td>
             <td>{{issued_on}}</td>
           </tr>
           {{/issued_on}}
           
           {{#expires}}
           <tr>
-            <td class='label'>Expiration Date</td>
+            <td class='fieldlabel'>Expiration Date</td>
             <td>{{expires}}</td>
           </tr>
           {{/expires}}
@@ -211,7 +211,7 @@
 </script>
 
 <script type='text/html' class='partial' id='badgeTpl'>
-  <span draggable="true" class="badge">
+  <span draggable="true" class="openbadge">
     <img src="{{image_path}}" width="64px"/>
   </span>
 </script>

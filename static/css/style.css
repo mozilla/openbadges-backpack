@@ -18,7 +18,10 @@ body {
   height: 101%;
 }
 #body {
-  padding-top: 60px;
+  padding-top: 20px;
+}
+h1 {
+  margin-bottom: 18px;
 }
 form.signin { display: none; }
 form.baker label {
@@ -50,30 +53,23 @@ form.baker #assertion {
   overflow: hidden;
   display: block;
 }
-.topbar .topbar-inner {
-  height: 30px;
+.navbar {
+  border-top: 2px solid #fff;
 }
-.topbar h3 {
-  top: -3px;
-}
-.topbar .nav {
-  top: -5px;
-}
- 
-.topbar h3 a {
-  font-size: 18px;
+.navbar .container {
+  max-width: 940px;
 }
 .modal {
   display: none;
 }
 
-.badge {
+.openbadge {
   display: inline-block;
   overflow: hidden;
   cursor: pointer;
 }
 
-.badge:active {
+.openbadge:active {
   outline: none;
 }
 
@@ -253,6 +249,7 @@ form.baker #assertion {
   -ms-transition: opacity 0.5s;
   -o-transition: opacity 0.5s;
   transition: opacity 0.5s;
+  color: #FFFFFF;
   display: block;
   position: absolute;
   font-weight: bold;
@@ -344,24 +341,26 @@ form.baker #assertion {
   font-weight: bold;
 }
 
-
 table.information {
   margin-bottom: 0;
   padding: 10px 3px;
+  border-collapse: separate;
+  font-size: 13px;
 }
 
 .information td {
   border: 0;
-  padding: 4px 12px;
+  padding: 2px 12px;
 }
 
-.information td.label {
-  width: 128px;
+.information td.fieldlabel {
+  padding-left: 50px;
+  white-space: nowrap;
   font-weight: bold;
   text-align: right;
 }
 
-.information td.label:after {
+.information td.fieldlabel:after {
   position: absolute;
   margin-left: 4px;
   margin-top: 1px;
@@ -378,17 +377,15 @@ table.information {
   padding-left: 0;
 }
 
-
 .information .image {
   text-align: center;
-  width: 148px;
+  vertical-align: middle;
 }
 
 .information img {
   max-height: 128px;
   max-width: 128px;
-  display: block;
-  margin: auto;
+  margin: auto 10px; 
 }
 
 .information button {
@@ -424,7 +421,6 @@ table.information {
 }
 
 .portfolio input, .portfolio textarea {
-  background: none;
   border: 1px solid #eee;
 }
 .portfolio input.field:hover, .portfolio textarea:hover {
@@ -471,7 +467,10 @@ table.information {
   text-shadow: 1px 1px 2px #fff;
   box-shadow: 1px 1px 1px #aaa;
 }
-.alert-message iframe {
+.alert {  
+  overflow: hidden;
+}
+.alert iframe {
   float: right;
 }
 

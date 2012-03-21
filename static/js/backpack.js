@@ -480,7 +480,7 @@ AllGroups.on('remove', function (group) {
  */
 Group.fromElement = function (element) {
   var $el = $(element)
-    , badgeElements = $el.find('.badge')
+    , badgeElements = $el.find('.openbadge')
     , groupBadges = new Badge.Collection(_.map(badgeElements, Badge.fromElement))
     , model = new Group.Model({
       id: $el.data('id'),
@@ -508,7 +508,7 @@ Badge.fromElement = function (element) {
 };
 
 // creating models from html on the page
-var existingBadges = $('#badges').find('.badge')
+var existingBadges = $('#badges').find('.openbadge')
   , existingGroups = $('#groups').find('.group');
 _.each(existingBadges, Badge.fromElement);
 _.each(existingGroups, Group.fromElement);

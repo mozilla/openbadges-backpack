@@ -4,8 +4,8 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge;chrome=1" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="/css/bootstrap-1.2.0.min.css" />
-    <link rel="stylesheet" href="/css/tooltip-bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/bootstrap-2.0.2.min.css" />
+    <link href="//www.mozilla.org/tabzilla/media/css/tabzilla.css" rel="stylesheet" /> 
     <link rel="stylesheet" href="/css/style.css" type="text/css" media="all" />
     <title dir="ltr">Open Badge Backpack</title>
 
@@ -14,11 +14,11 @@
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
   </head>
   <body>
-    <div class="topbar">
-      <div class="topbar-inner">
+    <div class="navbar">
+      <div class="navbar-inner">
         <div class="container" style="position: relative;">
-          <h3><a href="/">Open Badge Backpack</a></h3>
-          <a id="moztab" href="http://mozilla.org">a mozilla.org joint</a>
+          <h3><a class="brand" href="/">Open Badge Backpack</a></h3>
+          <a href="http://www.mozilla.org/" id="tabzilla">a mozilla.org joint</a> 
           <ul class="nav">
             <li><a href="{{#reverse}}backpack.manage{{/reverse}}">Home</a></li>
             <li><a href="{{#reverse}}backpack.signout{{/reverse}}">Sign Out</a></li>
@@ -31,14 +31,16 @@
     <div id="body" class="container">
       <div class='message-container'>
       {{#error.length}}
-        <div class="alert-message">
-          <p><strong>{{error}}</strong></p>
+        <div class="alert alert-error">
+          <a class="close" data-dismiss="alert">×</a>
+          {{error}}
         </div>
       {{/error.length}}
       
       {{#success.length}}
-        <div class="alert-message success">
-          <p><strong>{{success}}</strong></p>
+        <div class="alert alert-success">
+          <a class="close" data-dismiss="alert">×</a>
+          {{success}}
         </div>
       {{/success.length}}
       </div>
@@ -49,7 +51,7 @@
       
       {{=|| ||=}} <!-- need to change delimeter so hogan doesn't parse these -->
       <script type="text/html" id="messageTpl">
-        <div class="alert-message {{type}}">
+        <div class="alert alert-{{type}}">
           <p><strong>{{message}}</strong></p>
         </div>
       </script>
@@ -59,7 +61,8 @@
       <script type="text/javascript" src="/js/ICanHaz.js"></script>
       <script type="text/javascript" src="/js/underscore.js"></script>
       <script type="text/javascript" src="/js/backbone.js"></script>
-      <script type="text/javascript" src="/js/tooltip-bootstrap.min.js"></script>
+      <script type="text/javascript" src="/js/bootstrap-2.0.2.min.js"></script>
+      <script src="//www.mozilla.org/tabzilla/media/js/tabzilla.js"></script> 
       
       <!-- my libraries -->
       <script type="text/javascript" src="/js/jquery.sync.js"></script>
