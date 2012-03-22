@@ -12,7 +12,7 @@
       <h3><a class="brand" href="/" target="_blank">Open Badge Backpack</a></h3>
       <img src="/images/ajax-loader.gif" id="ajax-loader">
       <a id="moztab" href="http://mozilla.org" target="_blank">a mozilla.org joint</a>
-      <a class="close" href="#">&times;</a>
+      <a class="close closeFrame" href="#">&times;</a>
     </div>
   </div>
 </div>

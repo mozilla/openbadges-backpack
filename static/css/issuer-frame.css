@@ -1,16 +1,40 @@
+body {
+  padding-top: 60px;
+}
+
 .logged-in, .logged-out {
   display: none;
 }
 
-.topbar #moztab {
+.navbar {
+  border-top: none;
+}
+
+.navbar .brand {
+  position: relative;
+  top: -3px;
+}
+
+.navbar #moztab {
   right: 40px;
 }
 
-.topbar .close {
+.navbar .closeFrame {
   position: absolute;
   top: 0px;
   right: 10px;
   font-size: 20px;
+  color: #fff;
+  opacity: 0.6;
+  text-shadow: none;
+}
+.navbar .closeFrame:hover {
+  opacity: 0.8;
+  text-decoration: none;
+}
+
+.navbar-inner {
+  height: 32px;
 }
 
 #ajax-loader {

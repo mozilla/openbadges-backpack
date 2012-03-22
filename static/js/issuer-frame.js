@@ -334,7 +334,7 @@ function issue(assertions, cb) {
           $("#farewell .badges-added").text(successes.length);
         }
         $("#farewell .next").click(exit);
-        $(".topbar .close").unbind().click(exit);
+        $(".navbar .closeFrame").unbind().click(exit);
         $("#farewell").fadeIn();
         return;
       }
@@ -415,7 +415,7 @@ function issue(assertions, cb) {
     }
   };
   var processNext = window.Assertions.processNext;
-  $(".topbar .close").click(function() {
+  $(".navbar .closeFrame").click(function() {
     assertions.forEach(function(assertion) {
       errors.push({
         url: assertion,
