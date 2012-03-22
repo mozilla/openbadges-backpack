@@ -12,7 +12,10 @@ exports.param = {};
 
 exports.param['badgeId'] = function(req, res, next, id) {
   Badge.findById(id, function(err, badge) {
-    if (!badge) return res.send('could not find badge', 404);
+    if (!badge) return res.send({
+      status: 'missing',
+      message: 'could not find badge'
+    }, 404);
     req.badge = badge;
     return next();
   });
@@ -31,9 +34,17 @@ exports.param['badgeId'] = function(req, res, next, id) {
 exports.destroy = function (req, res) {
   var badge = req.badge;
   var user = req.user;
-  var failNow = function () { return res.send("Cannot delete a badge you don't own", 403) };
+  var failNow = function () {
+    return res.send({
+      status: 'forbidden',
+      message: "Cannot delete a badge you don't own"
+    }, 403)
+  };
   
-  if (!badge) return res.send("Cannot delete a badge that doesn't exist", 404);
+  if (!badge) return res.send({
+    status: 'missing',
+    message: "Cannot delete a badge that doesn't exist"
+  }, 404);
   
   if (!user) return failNow()
   
@@ -43,9 +54,12 @@ exports.destroy = function (req, res) {
     if (err) {
       logger.warn('Failed to delete badge');
       logger.warn(err);
-      return res.send('Could not delete badge. This error has been logged', 500);
+      return res.send({
+        status: 'error',
+        message: 'Could not delete badge: ' + err
+      }, 500);
     }
-    return res.send('cool', 200);
+    return res.send({status: 'okay'}, 200);
   })
 };
 
