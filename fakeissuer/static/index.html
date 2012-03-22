@@ -1,0 +1,33 @@
+<!doctype html public "wutlol">
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge;chrome=1"/>
+    
+    <title dir="ltr">Yep</title>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <script src="http://localhost:8888/issuer.js"></script>
+  </head>
+  <body>
+    <label>Email: <input id='email'></label>
+    <button id='unhashed'>Unhashed</button>
+    <button id='hashed'>Hashed</button>
+    <script>
+      var unhashed = document.getElementById('unhashed');
+      var hashed = document.getElementById('hashed');
+      function getEmail() {
+        return document.getElementById('email').value;
+      }
+      
+      unhashed.addEventListener('click', function(){
+        OpenBadges.issue(['http://localhost:8889/raw.json?email=' + getEmail()]);
+      },false)
+    
+      hashed.addEventListener('click', function(){
+        OpenBadges.issue(['http://localhost:8889/hashed.json?email=' + getEmail()]);
+      },false)
+    
+    </script>
+  </body>
+</html>

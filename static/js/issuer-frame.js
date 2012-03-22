@@ -346,19 +346,25 @@ function issue(assertions, cb) {
           url: url
         },
         success: function(obj) {
+          // if the badge already exists in the database, skip this assertion
           if (obj.exists) {
             errors.push({
               url: url,
               reason: 'EXISTS'
             });
             processNext();
-          } else if (obj.badge.recipient != Session.currentUser) {
+          }
+
+          // make sure the recipient matches the current user.
+          else if (!obj.owner) {
             errors.push({
               url: url,
               reason: 'INVALID'
             });
             processNext();
-          } else {
+          }
+
+          else {
             var templateArgs = {
               hostname: url,
               assertion: obj.badge
