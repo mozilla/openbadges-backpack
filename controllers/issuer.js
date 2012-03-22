@@ -116,13 +116,15 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
     return res.json({message: 'url is a required param'}, 400);
   }
 
-  // check if the assertion url is malformed
-  try {
-    validator.check(assertionUrl).isUrl();
-  } 
-  catch (e) {                      
-    logger.error("malformed url " + assertionUrl + " returning 400");
-    return res.json({message: 'malformed url'}, 400);
+  //check if the assertion url is malformed
+  if (!assertionUrl.match(/localhost/)) {
+    try {
+      validator.check(assertionUrl).isUrl();
+    } 
+    catch (e) {                      
+      logger.error("malformed url " + assertionUrl + " returning 400");
+      return res.json({message: 'malformed url'}, 400);
+    }
   }
 
   /* grabbing the remote assertion, 3 nested steps - 
@@ -174,16 +176,22 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
           return res.json({exists: false, badge:assertion}, 201);
         });
       }
+      
       // if this is a GET, we still need to return the badge
       else {
-        var response = {exists: false, badge:assertion};
+        var response = {exists: false, badge: assertion};
         Badge.findOne({endpoint: assertionUrl}, function(err, badge) {
           if (err) {
             logger.error(err);
             return res.json({message: "internal server error"}, 500);
           }
+          
           if (badge && badge.get("user_id") == req.user.get("id"))
             response.exists = true;
+          
+          if (Badge.confirmRecipient(assertion, req.user.get('email')))
+            response.owner = true;
+          
           return res.json(response, 200);
         });
       }
