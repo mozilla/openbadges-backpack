@@ -1,8 +1,16 @@
+body {
+  padding-top: 60px;
+}
+
 .logged-in, .logged-out {
   display: none;
 }
 
-.topbar #moztab {
+.navbar {
+  border-top: none;
+}
+
+.navbar #moztab {
   right: 40px;
 }
 
