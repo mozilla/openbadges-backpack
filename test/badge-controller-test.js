@@ -1,4 +1,3 @@
-var _ = require('underscore');
 var map = require('functools').map;
 var vows = require('vows');
 var assert = require('assert');
@@ -8,8 +7,7 @@ var issuer = require('../controllers/issuer.js');
 var conmock = require('./conmock.js');
 var mysql = require('../lib/mysql.js')
 
-
-var user, badgeRaw, badgeHash, group;
+var user, badgeRaw, badgeHash;
 
 function makeHash (email, salt) {
   var sha = require('crypto').createHash('sha256');
@@ -20,7 +18,6 @@ function setupDatabase (callback) {
   var fixture = require('../lib/utils').fixture;
   var User = require('../models/user.js')
   var Badge = require('../models/badge.js')
-  var Group = require('../models/group.js')
   function saver (m, cb) { m.save(cb) };
   mysql.prepareTesting();
   
