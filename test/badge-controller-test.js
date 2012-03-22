@@ -61,6 +61,7 @@ vows.describe('badge controller test').addBatch({
       },
       'get back status 403' : function (err, mock) {
         mock.status.should.equal(403);
+        mock.body.status = 'forbidden';
       },
     },
     '#destroy: given no badge': {
@@ -70,6 +71,7 @@ vows.describe('badge controller test').addBatch({
       },
       'get back status 404' : function (err, mock) {
         mock.status.should.equal(404);
+        mock.body.status = 'missing';
       },
     },
     '#destroy: given correct user and a raw email badge': {
@@ -79,6 +81,7 @@ vows.describe('badge controller test').addBatch({
       },
       'get back status 200' : function (err, mock) {
         mock.status.should.equal(200);
+        mock.body.status = 'okay';
       },
     },
     '#destroy: given correct user and a hashed email badge': {
@@ -88,6 +91,7 @@ vows.describe('badge controller test').addBatch({
       },
       'get back status 200' : function (err, mock) {
         mock.status.should.equal(200);
+        mock.body.status = 'okay';
       },
     }
   }

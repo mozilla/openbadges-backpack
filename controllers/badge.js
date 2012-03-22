@@ -1,6 +1,11 @@
 var Badge = require('../models/badge')
   , logger = require('../lib/logging').logger
 
+
+function respond (status, message) {
+  return {status: status, message: message};
+}
+
 exports.param = {};
 
 /**
@@ -12,10 +17,9 @@ exports.param = {};
 
 exports.param['badgeId'] = function(req, res, next, id) {
   Badge.findById(id, function(err, badge) {
-    if (!badge) return res.send({
-      status: 'missing',
-      message: 'could not find badge'
-    }, 404);
+    if (!badge)
+      return res.send(respond('missing', 'could not find badge'), 404);
+    
     req.badge = badge;
     return next();
   });
@@ -35,29 +39,20 @@ exports.destroy = function (req, res) {
   var badge = req.badge;
   var user = req.user;
   var failNow = function () {
-    return res.send({
-      status: 'forbidden',
-      message: "Cannot delete a badge you don't own"
-    }, 403)
+    return res.send(respond('forbidden', "Cannot delete a badge you don't own"), 403)
   };
   
-  if (!badge) return res.send({
-    status: 'missing',
-    message: "Cannot delete a badge that doesn't exist"
-  }, 404);
+  if (!badge)
+    return res.send(respond('missing', "Cannot delete a badge that doesn't exist"), 404);
   
-  if (!user) return failNow()
-  
-  if (badge.get('user_id') !== user.get('id')) return failNow()
+  if (!user || badge.get('user_id') !== user.get('id'))
+    return failNow()
   
   badge.destroy(function (err, badge) {
     if (err) {
       logger.warn('Failed to delete badge');
       logger.warn(err);
-      return res.send({
-        status: 'error',
-        message: 'Could not delete badge: ' + err
-      }, 500);
+      return res.send(respond('error', 'Could not delete badge: ' + err), 500);
     }
     return res.send({status: 'okay'}, 200);
   })
