@@ -25,7 +25,7 @@
           </ul>
           {{#user}}
             <ul class="nav pull-right">
-              <li><a href="#">{{attributes.email}}</a></li>
+              <li class="user">{{attributes.email}}</li>
               <li><a href="{{#reverse}}backpack.signout{{/reverse}}">Sign Out</a></li>
             </ul>
           {{/user}}
