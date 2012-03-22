@@ -76,6 +76,7 @@ suite
         .discuss('that the user does not have in their backpack')
           .get("?url=" + EXAMPLE_BADGE_URL)
             .expect(200, {
+              owner:  true,
               exists: false,
               badge: EXAMPLE_BADGE
             })
@@ -89,6 +90,7 @@ suite
             .expect(304)
           .get("?url="+EXAMPLE_BADGE_URL)
             .expect(200, {
+              owner: true,
               exists: true,
               badge: EXAMPLE_BADGE
             })
