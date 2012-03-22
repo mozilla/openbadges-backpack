@@ -2,8 +2,6 @@ var map = require('functools').map;
 var vows = require('vows');
 var assert = require('assert');
 var should = require('should');
-
-var issuer = require('../controllers/issuer.js');
 var conmock = require('./conmock.js');
 var mysql = require('../lib/mysql.js')
 
