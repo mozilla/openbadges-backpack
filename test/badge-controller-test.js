@@ -5,7 +5,7 @@ var should = require('should');
 var conmock = require('./conmock.js');
 var mysql = require('../lib/mysql.js')
 
-var user, badgeRaw, badgeHash;
+var user, otherUser, badgeRaw, badgeHash;
 
 function makeHash (email, salt) {
   var sha = require('crypto').createHash('sha256');
@@ -20,6 +20,9 @@ function setupDatabase (callback) {
   mysql.prepareTesting();
   
   user = new User({ email: 'brian@example.com' })
+  
+  otherUser = new User({ email: 'liar@thief.co.uk' })
+  
   badgeRaw = new Badge({
     user_id: 1,
     type: 'hosted',
@@ -44,7 +47,7 @@ function setupDatabase (callback) {
     })
   });
   
-  map.async(saver, [user, badgeRaw, badgeHash], callback);
+  map.async(saver, [user, otherUser, badgeRaw, badgeHash], callback);
 }
 
 var badgecontroller = require('../controllers/badge.js')
@@ -57,6 +60,16 @@ vows.describe('badge controller test').addBatch({
     '#destroy: given no user ': {
       'topic' : function () {
         var req = { badge: badgeRaw };
+        conmock(badgecontroller.destroy, req, this.callback);
+      },
+      'get back status 403' : function (err, mock) {
+        mock.status.should.equal(403);
+        mock.body.status = 'forbidden';
+      },
+    },
+    '#destroy: given wrong user ': {
+      'topic' : function () {
+        var req = { user: otherUser, badge: badgeRaw };
         conmock(badgecontroller.destroy, req, this.callback);
       },
       'get back status 403' : function (err, mock) {
