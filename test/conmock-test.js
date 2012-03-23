@@ -58,6 +58,19 @@ vows.describe('Connection mocking').addBatch({
         mock.headers['oh'].should.equal('hai');
       },
     },
+    '#next': {
+      topic: function () {
+        function mware (request, response, next) {
+          response.header('oh', 'hai');
+          next();
+        };
+        conmock(mware, {}, this.callback);
+      },
+      'callback gets called, knows headers': function (err, mock) {
+        mock.headers['oh'].should.equal('hai');
+      }
+    },
+
     '#contentType' : {
       'given "json"': {
         topic: function () {
