@@ -1,11 +1,10 @@
 var express = require('express')
-  , secrets = require('./lib/secrets')
-  , session = require('connect-cookie-session')
-  , configuration = require('./lib/configuration')
-  , logger = require('./lib/logging').logger
-  , crypto = require('crypto')
-  , User = require('./models/user')
-    
+var secrets = require('./lib/secrets')
+var session = require('connect-cookie-session')
+var configuration = require('./lib/configuration')
+var logger = require('./lib/logging').logger
+var crypto = require('crypto')
+var User = require('./models/user')
     
 // `COOKIE_SECRET` is randomly generated on the first run of the server,
 // then stored to a file and looked up on restart to maintain state.
@@ -22,7 +21,7 @@ exports.cookieSessions = function(){
     cookie: {
       httpOnly: true,
       maxAge: (7 * 24 * 60 * 60 * 1000), //one week
-      secure: false
+      secure: (configuration.get('protocol') === 'https')
     }
   });
 };
