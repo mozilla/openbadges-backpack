@@ -78,10 +78,20 @@ exports.baker = function(req, res) {
           imagedata: badgePNGdata,
           recipient: email
         }
+        
+        logger.debug('Issuer wants to award: value for email is: ' + email);
+        
         awardBadge(opts, function (err, badge) {
-          console.dir(err);
-          if (err) res.setHeader('x-badge-awarded', 'false');
-          else res.setHeader('x-badge-awarded', badge.recipient);
+          if (err) {
+            logger.debug('There was an error awarding');
+            logger.debug(JSON.stringify(err));
+            res.setHeader('x-badge-awarded', 'false');
+          }
+          else {
+            logger.debug('Badge was awarded just fine');
+            logger.debug(JSON.stringify(badge));
+            res.setHeader('x-badge-awarded', badge.get('recipient'));
+          }
           return res.send(badgePNGdata);
         });
       } else {
