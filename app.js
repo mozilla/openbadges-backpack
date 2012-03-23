@@ -21,13 +21,18 @@ app.register('hogan.js', hoganadapter.init(hogan))
 // statements without getting undefined errors and without having to use typeof
 // checks.
 app.helpers({
-  user: null,
   login: true,
   title: 'Backpack',
   error: [],
   success: [],
   badges: {},
   reverse: router.reverse,
+});
+
+app.dynamicHelpers({
+  user: function(req, res){
+    return req.user || null;
+  }
 });
 
 // Middleware. See `middleware.js`

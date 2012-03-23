@@ -59,6 +59,13 @@ form.baker #assertion {
 .navbar .container {
   max-width: 940px;
 }
+.navbar .user {
+  padding: 10px 10px 11px;
+  line-height: 19px;
+  color: #999999;
+  text-decoration: none;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
 .modal {
   display: none;
 }
@@ -432,17 +439,17 @@ table.information {
 }
 .portfolio .title {
   display: block;
-  margin-bottom:18px;
-  font-size:30px;
-  line-height:36px;
+  margin-bottom: 18px;
+  font-size: 30px;
+  line-height: 36px;
   height: 36px;
   width: 600px;
 }
 .portfolio .subtitle {
   display: block;
   width: 600px;
-  font-size:24px;
-  line-height:36px;
+  font-size: 24px;
+  line-height: 36px;
   height: 36px;
 }
 .portfolio .preamble {
