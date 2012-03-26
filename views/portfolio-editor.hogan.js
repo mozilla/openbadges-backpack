@@ -101,12 +101,12 @@
   </div>
 
   <script>
-    $('form').on('submit', function(e){
+    $('form.portfolio').on('submit', function(e){
       e.preventDefault();
       return false;
     });
     $('input.save').on('click', function(e){
-      $('form')[0].submit();
+      $('form.portfolio')[0].submit();
     })
   </script>
 </form>
