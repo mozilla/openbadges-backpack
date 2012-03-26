@@ -28,13 +28,14 @@ app.helpers({
   badges: {},
   reverse: router.reverse,
 });
+
 app.dynamicHelpers({
   user: function(req, res){
     return req.user || null;
   }
 });
-// Middleware. See `middleware.js` for more information on the custom
-// middleware used.
+
+// Middleware. See `middleware.js`
 app.use(express.static(path.join(__dirname, "static")));
 app.use(express.static(path.join(configuration.get('var_dir'), "badges")));
 app.use(middleware.noFrame({ whitelist: [ '/issuer/frame', '/', '/share/.*' ] }));
@@ -45,13 +46,7 @@ app.use(middleware.logRequests());
 app.use(middleware.cookieSessions());
 app.use(middleware.userFromSession());
 app.use(middleware.csrf({ whitelist: ['/issuer/validator/?'] }));
-
-// Allow everything to be used with CORS.
-// This should probably just be limited to badges
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  next();
-});
+app.use(middleware.cors({ whitelist: ['/_badges.*', '/issuer.*', '/baker'] }));
 
 router(app)
   .get('/baker',                      'baker.baker')

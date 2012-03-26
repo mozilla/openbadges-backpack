@@ -44,7 +44,11 @@ conmock = function (fn, request, callback) {
       callback(null, this);
     },
   };
-  return fn(request, response);
+  function next () {
+    response.fntype = 'next';
+    callback(null, response);
+  }
+  return fn(request, response, next);
 };
 
 module.exports = conmock;
