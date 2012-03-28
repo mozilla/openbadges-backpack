@@ -93,6 +93,16 @@ exports.noFrame = function(opts) {
   };
 };
 
+exports.cors = function (options) {
+  var options = options || {}
+  var list = options.whitelist || []
+  if (typeof list === 'string') list = [list];
+  return function(req, res, next){
+    if (!whitelisted(list, req.url)) return next();
+    res.header("Access-Control-Allow-Origin", "*");
+    return next();
+  }
+}
 
 // #FIXME: This was pulled from connect/lib/middleware/csrf.js
 //         The current version of the csrf middleware checks the token on

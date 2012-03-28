@@ -1,17 +1,19 @@
 class openbadges::db {  
-  define mysqldb( $user, $password ) {
+  define mysqldb( $user, $password, $encoding ) {
     exec { "create-${name}-db":
       unless => "/usr/bin/mysql -u${user} -p${password} ${name}",
-      command => "/usr/bin/mysql -uroot -p$mysql_password -e \"create database ${name}; grant all on ${name}.* to ${user}@localhost identified by '$password';\"",
+      command => "/usr/bin/mysql -uroot -p$mysql_password -e \"create database ${name} character set ${encoding}; grant all on ${name}.* to ${user}@localhost identified by '$password';\"",
     }
   }
   mysqldb { "openbadges":
     user => "badgemaker",
     password => "secret",
+    encoding => "utf8",
   }  
   mysqldb { "test_openbadges":
     user => "badgemaker",
     password => "secret",
+    encoding => "utf8",
   }  
 }
 
