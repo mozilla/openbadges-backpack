@@ -56,6 +56,11 @@
         <input class='groupName' type='text' value='{{attributes.name}}' style='display: block' rel="tooltip" data-title="Rename groups to whatever you want!">
         <span class='icon delete' rel="tooltip" data-title="Click to delete this group">&times;</span>
         <span class='icon share' rel="tooltip" data-placement="bottom" {{^attributes.badgeObjects}}style='display: none'{{/attributes.badgeObjects}} title='Share this group'>5</span>
+        
+        <span class='public'>
+          <input type='checkbox' id='public{{attributes.id}}'>
+          <label for='public{{attributes.id}}'>public</label>
+        </span>
           
           {{#attributes.badgeObjects}}
             <span draggable="true" class="openbadge" data-id="{{attributes.id}}">
@@ -201,11 +206,18 @@
 <script type='text/html' id='groupTpl'>
   <div class='group {{^attributes.id}}isNew{{/attributes.id}}'>
     <input class='groupName' type='text' value='{{name}}'>
-        <span class='icon delete'>&times;</span>
-          <span class='icon share' style='display: none' title='share this group'>5</span>
+    <span class='icon delete'>&times;</span>
+    <span class='icon share' style='display: none' title='share this group'>5</span>
     
     {{^attributes.id}}
       <h3 class='instructions'>Drag a Badge Here</h3>
+    {{/attributes.id}}
+  
+    {{#attributes.id}}
+      <span class='public'>
+        <input type='checkbox' id='public{{attributes.id}}'>
+        <label for='public{{attributes.id}}'>public</label>
+      </span>
     {{/attributes.id}}
   </div>
 </script>

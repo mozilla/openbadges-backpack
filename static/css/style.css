@@ -236,6 +236,35 @@ form.baker #assertion {
   transition: all 0.25s ease;
 }
 
+.group .public * {
+  -webkit-transition: all 0.25s ease;
+  -moz-transition: all 0.25s ease;
+  -ms-transition: all 0.25s ease;
+  -o-transition: all 0.25s ease;
+  transition: all 0.25s ease;
+}
+
+.group .public {
+  bottom: 2px;
+  left: 10px;
+  position: absolute;
+}
+.group .public label {
+  color: #868;
+  font-size: 12px;
+  line-height: 12px;
+  display: inline-block;
+}
+
+.group .public input {
+  display: inline-block;
+}
+
+.group .public input:checked ~ label {
+  color: #181;
+  font-weight: bold;
+}
+
 [draggable=true] {
   -khtml-user-drag: element;
 }
