@@ -3,39 +3,76 @@ var Group = require('../models/group.js');
 var Badge = require('../models/badge.js');
 var User = require('../models/user.js');
 
-exports.param = {
-  userId: function(request, response, next, id) {
-    // make sure to always return 200 to jsonp or else it will fail
-    // silently on the client -- the user agent won't bother to make
-    // a script tag if the resource is "not found".
+
+// Helpers
+// -------
+var formatters = {
+  'application/json': function (responseData, request) {
+    var callback = request.query.callback;
+    if (!callback)
+      return responseData;
+    else 
+      return callback + '(' + JSON.stringify(responseData) + ')'
+  }
+}
+
+var formatter = function formatter (responseData, request) {
+  var format = request.headers['accept'] || 'application/json';
+  // extensions rule everything around me.
+  if (request.url.match(/\.json$/)) format = 'application/json';
+  return formatters[format](responseData, request);
+}
+
+
+// Parameter Handlers
+// ------------------
+
+// make sure to always return 200 to jsonp or else it will fail
+// silently on the client -- the user agent won't bother to make
+// a script tag if the resource is "not found".
+var findThing = function findThing (name) {
+  var M = ({ user: User, group: Group })[name]
+  return function thingFinder (request, response, next, id) {
     var jsonp = request.query.callback
     
-    User.findById(id, function(err, user) {
+    M.findById(id, function(err, thing) {
       if (err) {
-        logger.error("Error pulling user: " + err);
+        logger.error("Error pulling " + name + ": " + err);
         return response.send(formatter({
           status: 'error',
-          error: 'Could not pull user'
+          error: 'Could not pull ' + name
         }, request), jsonp ? 200: 500);
       }
       
-      if (!user || !user.get('id'))
+      if (!thing || !thing.get('id'))
         return response.send(formatter({
           status: 'missing',
-          error: 'Could not find user'
+          error: 'Could not find ' + name
         }, request), jsonp ? 200: 404)
       
-      request.paramUser = user;
+      if (request[name]) request['_' + name] = request[name];
+      request[name] = thing;
       return next();
     });
   }
 }
 
+exports.param = {
+  dUserId: findThing('user'),
+  dGroupId: findThing('group')
+}
+
+
+// Controllers
+// ------------
 function displayerAPIVersion (request, response, next) {
   response.send(formatter({status: 'okay', version: '0.5.0'}, request))
 }
 
 function emailToUserId (request, response, next) {
+  // don't use formatter here -- we aren't supporting jsonp or CORS for
+  // the email to userId API because we want to discourage people including
+  // email addresses in cleartext (such as in the source of some javascript)
   var obj = request.body || {};
   var email = obj['email'];
   
@@ -72,7 +109,7 @@ function emailToUserId (request, response, next) {
 }
 
 function userGroups (request, response, next) {
-  var user = request.paramUser
+  var user = request.user
   var jsonp = request.query.callback
   if (!user || !user.get('id'))
     // make sure to always return 200 to jsonp or else it will fail
@@ -103,25 +140,11 @@ function userGroups (request, response, next) {
   
 }
 
-var formatters = {
-  'application/json': function (responseData, request) {
-    var callback = request.query.callback;
-    if (!callback)
-      return responseData;
-    else 
-      return callback + '(' + JSON.stringify(responseData) + ')'
-  }
+function userGroupBadges (request, response, next) {
+  
 }
 
-var formatter = function formatter (responseData, request) {
-  var format = request.headers['accept'] || 'application/json';
-  
-  // extensions rule everything around me.
-  if (request.url.match(/\.json$/)) format = 'application/json';
-  
-  return formatters[format](responseData, request);
-}
-
-exports.version = displayerAPIVersion;
-exports.emailToUserId = emailToUserId;
-exports.userGroups = userGroups;
+exports.version = displayerAPIVersion
+exports.emailToUserId = emailToUserId
+exports.userGroups = userGroups
+exports.userGroupBadges = userGroupBadges

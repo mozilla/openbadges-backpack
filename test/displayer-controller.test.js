@@ -47,16 +47,16 @@ vows.describe('displayer controller tests').addBatch({
       setupDatabase(this.callback);
     },
     
-    'param handler: userId': {
+    'param handler: dUserId': {
       'given real userId':  {
         topic: function () {
           var userId = 1;
-          conmock(displayer.param['userId'], { }, userId, this.callback);
+          conmock(displayer.param['dUserId'], { }, userId, this.callback);
         },
         'returns real user' : function (err, mock) {
           var request = mock._request;
-          should.exist(request.paramUser);
-          request.paramUser.get('id').should.equal(1);
+          should.exist(request.user);
+          request.user.get('id').should.equal(1);
         },
       },
       
@@ -64,12 +64,12 @@ vows.describe('displayer controller tests').addBatch({
         'normal request':  {
           topic: function () {
             var userId = 100;
-            conmock(displayer.param['userId'], { }, userId, this.callback);
+            conmock(displayer.param['dUserId'], { }, userId, this.callback);
           },
           'returns 404, error message' : function (err, mock) {
             mock.status.should.equal(404);
             mock.body.status.should.equal('missing');
-            should.not.exist(mock._request.paramUser);
+            should.not.exist(mock._request.user);
           },
         },
         
@@ -77,16 +77,58 @@ vows.describe('displayer controller tests').addBatch({
           topic: function () {
             var userId = 100;
             var req = { query: { callback : 'wut' } };
-            conmock(displayer.param['userId'], req, userId, this.callback);
+            conmock(displayer.param['dUserId'], req, userId, this.callback);
           },
           'returns 200, error message' : function (err, mock) {
             mock.status.should.equal(200);
             mock.body.should.match(/missing/);
-            should.not.exist(mock._request.paramUser);
+            should.not.exist(mock._request.user);
           },
         }
       }
     },
+    
+    'param handler: dGroupId': {
+      'given real groupId':  {
+        topic: function () {
+          var groupId = 1;
+          conmock(displayer.param['dGroupId'], { }, groupId, this.callback);
+        },
+        'returns real group' : function (err, mock) {
+          var request = mock._request;
+          should.exist(request.group);
+          request.group.get('id').should.equal(1);
+        },
+      },
+      
+      'given missing groupId' : {
+        'normal request':  {
+          topic: function () {
+            var groupId = 100;
+            conmock(displayer.param['dGroupId'], { }, groupId, this.callback);
+          },
+          'returns 404, error message' : function (err, mock) {
+            mock.status.should.equal(404);
+            mock.body.status.should.equal('missing');
+            should.not.exist(mock._request.group);
+          },
+        },
+        
+        'jsonp request':  {
+          topic: function () {
+            var groupId = 100;
+            var req = { query: { callback : 'wut' } };
+            conmock(displayer.param['dGroupId'], req, groupId, this.callback);
+          },
+          'returns 200, error message' : function (err, mock) {
+            mock.status.should.equal(200);
+            mock.body.should.match(/missing/);
+            should.not.exist(mock._request.group);
+          },
+        }
+      }
+    },
+    
     
     '#version' : {
       topic: function () {
@@ -135,7 +177,7 @@ vows.describe('displayer controller tests').addBatch({
     '#userGroups': {
       'given a userId, no callback': {
         topic: function () {
-          var req = { params: { userId: 1 }, paramUser: user };
+          var req = { user: user };
           conmock(displayer.userGroups, req, this.callback);
         },
         'return 200, group data' : function (err, mock) {
@@ -153,8 +195,7 @@ vows.describe('displayer controller tests').addBatch({
           var req = {
             url: "/yep.json",
             query: { callback : 'wutlol' },
-            params: { userId: 1 },
-            paramUser: user,
+            user: user,
           }
           conmock(displayer.userGroups, req, this.callback);
         },
@@ -168,8 +209,7 @@ vows.describe('displayer controller tests').addBatch({
           var req = {
             url: "/yep.json",
             query: { callback : 'wutlol' },
-            params: { userId: 2 },
-            paramUser: new User({ email: 'unsaved@example.com' })
+            user: new User({ email: 'unsaved@example.com' })
           }
           conmock(displayer.userGroups, req, this.callback);
         },
