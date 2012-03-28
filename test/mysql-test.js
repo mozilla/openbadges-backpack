@@ -12,12 +12,23 @@ var toObj = function (arr) { var r = {}; arr.forEach(function (a) { r[a] = 1; })
 mysql.prepareTesting();
 vows.describe('Testing database').addBatch({
   "After running test prep": {
-    topic: function () {
-      client.query('show databases', this.callback);
+    'proper database': {
+      topic: function () {
+        client.query('show databases', this.callback);
+      },
+      'is created': function (err, results) {
+        var databases = extractFirstValues(results);
+        assert.includes(databases, testDb);
+      }
     },
-    'proper database is created': function (err, results) {
-      var databases = extractFirstValues(results);
-      assert.includes(databases, testDb);
+    'database encoding': {
+      topic: function () {
+        client.query("show variables like 'character_set_database'", this.callback);
+      },
+      'is utf8': function (err, results) {
+        // #TODO: maybe shouldn't hardcode the encoding? (defined in puppet manifests)
+        assert.equal(results[0].Value, 'utf8');
+      }
     },
     'expected tables': {
       topic: function () {
