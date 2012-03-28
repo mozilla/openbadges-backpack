@@ -5,14 +5,25 @@ var User = require('../models/user.js');
 
 exports.param = {
   userId: function(request, response, next, id) {
+    // make sure to always return 200 to jsonp or else it will fail
+    // silently on the client -- the user agent won't bother to make
+    // a script tag if the resource is "not found".
+    var jsonp = request.query.callback
+    
     User.findById(id, function(err, user) {
       if (err) {
         logger.error("Error pulling user: " + err);
-        return response.send({status: 'error', error: 'Could not pull user'}, 500);
+        return response.send(formatter({
+          status: 'error',
+          error: 'Could not pull user'
+        }, request), jsonp ? 200: 500);
       }
       
-      if (!group)
-        return response.send('Could not find user', 404);
+      if (!user || !user.get('id'))
+        return response.send(formatter({
+          status: 'missing',
+          error: 'Could not find user'
+        }, request), jsonp ? 200: 404)
       
       request.paramUser = user;
       return next();
@@ -21,7 +32,7 @@ exports.param = {
 }
 
 function displayerAPIVersion (request, response, next) {
-  response.send({status: 'okay', version: '0.5.0'})
+  response.send(formatter({status: 'okay', version: '0.5.0'}, request))
 }
 
 function emailToUserId (request, response, next) {
@@ -61,15 +72,18 @@ function emailToUserId (request, response, next) {
 }
 
 function userGroups (request, response, next) {
-  
-  var user = request.paramUser;
-  if (!user)
-    return response.send({
+  var user = request.paramUser
+  var jsonp = request.query.callback
+  if (!user || !user.get('id'))
+    // make sure to always return 200 to jsonp or else it will fail
+    // silently on the client -- the user agent won't bother to make
+    // a script tag if the resource is "not found".
+    return response.send(formatter({
       status: 'missing',
       error: 'Could not find user'
-    }, 404);
+    }, request), jsonp ? 200: 404)
   
-  var userId = user.get('id');
+  var userId = user.get('id')
   
   Group.find({ user_id: userId, 'public': 1 }, function (err, groups) {
     var exposedGroupData = _.map(groups, function (group) {
@@ -78,14 +92,34 @@ function userGroups (request, response, next) {
         name: group.get('name'),
         badges: group.get('badges').length
       }
-    });
+    })
     
-    return response.send({
+    var responseData = formatter({
       userId: userId,
       groups: exposedGroupData
-    }, 200);
+    }, request)
+    return response.send(responseData, 200)
   })
   
+}
+
+var formatters = {
+  'application/json': function (responseData, request) {
+    var callback = request.query.callback;
+    if (!callback)
+      return responseData;
+    else 
+      return callback + '(' + JSON.stringify(responseData) + ')'
+  }
+}
+
+var formatter = function formatter (responseData, request) {
+  var format = request.headers['accept'] || 'application/json';
+  
+  // extensions rule everything around me.
+  if (request.url.match(/\.json$/)) format = 'application/json';
+  
+  return formatters[format](responseData, request);
 }
 
 exports.version = displayerAPIVersion;
