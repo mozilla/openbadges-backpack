@@ -2,6 +2,7 @@ var _ = require('underscore');
 var Group = require('../models/group.js');
 var Badge = require('../models/badge.js');
 var User = require('../models/user.js');
+var conf = require('../lib/configuration');
 
 
 // Helpers
@@ -21,6 +22,15 @@ var formatter = function formatter (responseData, request) {
   // extensions rule everything around me.
   if (request.url.match(/\.json$/)) format = 'application/json';
   return formatters[format](responseData, request);
+}
+
+var fullUrl = function fullUrl (pathname) {
+  return require('url').format({
+    protocol: conf.get('protocol'),
+    hostname: conf.get('hostname'),
+    port: conf.get('port'),
+    pathname: pathname
+  })
 }
 
 
@@ -141,7 +151,25 @@ function userGroups (request, response, next) {
 }
 
 function userGroupBadges (request, response, next) {
-  
+  var user = request.user
+  var group = request.group
+  group.getBadgeObjects(function (err, badges) {
+    // #TODO: revisit this when we implement signed badges
+    var exposedBadgeData = _.map(badges, function (badge) {
+      return {
+        lastValidated: badge.get('validated_on'),
+        assertionType: badge.get('type'),
+        hostedUrl: badge.get('endpoint'),
+        assertion: badge.get('body'),
+        imageUrl: fullUrl(badge.get('image_path')),
+      }
+    })
+    return response.send(formatter({
+      userId: user.get('id'),
+      groupId: group.get('id'),
+      badges: exposedBadgeData
+    }, request))
+  })
 }
 
 exports.version = displayerAPIVersion

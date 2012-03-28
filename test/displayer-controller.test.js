@@ -7,7 +7,7 @@ var User = require('../models/user.js')
 var Badge = require('../models/badge.js')
 var Group = require('../models/group.js')
 
-var user, otherUser, badge, group, otherGroup;
+var user, otherUser, badge, group, privateGroup;
 function setupDatabase (callback) {
   var badgedata = require('../lib/utils').fixture({recipient: 'brian@example.com'})
   var map = require('functools').map;
@@ -31,14 +31,14 @@ function setupDatabase (callback) {
     'public': 1,
     badges: [1]
   });
-  otherGroup = new Group({
+  privateGroup = new Group({
     user_id: 1,
     name: 'Private Group',
     url: 'Private URL',
     'public': 0,
     badges: [1]
   });
-  map.async(saver, [user, otherUser, badge, group, otherGroup], callback);
+  map.async(saver, [user, otherUser, badge, group, privateGroup], callback);
 }
 
 vows.describe('displayer controller tests').addBatch({
@@ -219,6 +219,33 @@ vows.describe('displayer controller tests').addBatch({
           mock.body.should.match(/missing/);
         },
       }
-    }
+    },
+    '#userGroupBadges' : {
+      'given a valid, public group': {
+        'normal request' : {
+          topic: function () {
+            var req = { user: user, group: group }
+            conmock(displayer.userGroupBadges, req, this.callback)
+          },
+          'return 200, sweet sweet data' : function (err, mock) {
+            mock.status.should.equal(200)
+            mock.body.badges.length.should.equal(1)
+            var badge = mock.body.badges[0] 
+            badge.hostedUrl = 'endpoint'
+            badge.assertionType = 'hosted'
+          },
+        },
+        'jsonp request' : {
+          topic: function () {
+            var req = { user: user, group: group, query: { callback: 'saucesome' } }
+            conmock(displayer.userGroupBadges, req, this.callback)
+          },
+          'return 200, sweet sweet data' : function (err, mock) {
+            mock.status.should.equal(200)
+            mock.body.should.match(/^saucesome\(/)
+          },
+        }
+      }
+    },
   }
 }).export(module)
