@@ -4,7 +4,7 @@ var should = require('should');
 var conmock = require('./conmock.js');
 var displayer = require('../controllers/displayer.js');
 
-var user, badge, group;
+var user, badge, group, otherGroup;
 function setupDatabase (callback) {
   var User = require('../models/user.js')
   var Badge = require('../models/badge.js')
@@ -25,12 +25,19 @@ function setupDatabase (callback) {
   });
   group = new Group({
     user_id: 1,
-    name: 'name',
-    url: 'url',
+    name: 'Public Group',
+    url: 'Public URL',
     'public': 1,
     badges: [1]
   });
-  map.async(saver, [user, badge, group], callback);
+  otherGroup = new Group({
+    user_id: 1,
+    name: 'Private Group',
+    url: 'Private URL',
+    'public': 0,
+    badges: [1]
+  });
+  map.async(saver, [user, badge, group, otherGroup], callback);
 }
 
 vows.describe('displayer controller tests').addBatch({
@@ -38,9 +45,9 @@ vows.describe('displayer controller tests').addBatch({
     topic: function () {
       setupDatabase(this.callback);
     },
+    
     '#version' : {
       topic: function () {
-        console.dir(user);
         conmock(displayer.version, {}, this.callback);
       },
       'should 200, return API version' : function (err, mock) {
@@ -49,13 +56,14 @@ vows.describe('displayer controller tests').addBatch({
         mock.body['version'].should.equal('0.5.0');
       },
     },
+    
     '#emailToUserId' : {
       'given an email address in query' : {
         topic: function () {
           var req = { body: { email: 'brian@example.com'  } };
           conmock(displayer.emailToUserId, req, this.callback);
         },
-        'should return 200, proper user id' : function (err, mock) {
+        'return 200, proper user id' : function (err, mock) {
           mock.status.should.equal(200);
           mock.body['email'].should.equal('brian@example.com');
           mock.body['userId'].should.equal(1);
@@ -65,7 +73,7 @@ vows.describe('displayer controller tests').addBatch({
         topic : function () {
           conmock(displayer.emailToUserId, {}, this.callback);
         },
-        'should return 400, error message' : function (err, mock) {
+        'return 400, error message' : function (err, mock) {
           mock.status.should.equal(400);
           mock.body.error.should.match(/missing/);
         }
@@ -75,10 +83,28 @@ vows.describe('displayer controller tests').addBatch({
           var req = { body: { email: 'kangaroo@example.com'  } };
           conmock(displayer.emailToUserId, req, this.callback);
         },
-        'should return 404, error message' : function (err, mock) {
+        'return 404, error message' : function (err, mock) {
           mock.status.should.equal(404);
           mock.body.error.should.match(/find/);
         }
+      }
+    },
+
+    '#userGroups': {
+      'given a userId, no callback': {
+        topic: function () {
+          var req = { params: { userId: 1 }, paramUser: user };
+          conmock(displayer.userGroups, req, this.callback);
+        },
+        'return 200, group data' : function (err, mock) {
+          mock.status.should.equal(200);
+          mock.body['userId'].should.equal(1);
+          mock.body['groups'].length.should.equal(1);
+          var group = mock.body['groups'][0];
+
+          group.name.should.equal('Public Group');
+          group.badges.should.equal(1);
+        },
       }
     }
   }
