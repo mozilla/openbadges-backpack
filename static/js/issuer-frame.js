@@ -58,6 +58,7 @@ var Testing = (function setupTestingEnvironment() {
   ];
   var RESPONSES = {
     "http://foo.org/makebackpackexplode.json": {
+      owner: false,
       exists: false,
       badge: {
         "recipient": "someone_else@example.com",
@@ -78,6 +79,7 @@ var Testing = (function setupTestingEnvironment() {
       }
     },
     "http://foo.org/newbadge.json": {
+      owner: true,
       exists: false,
       badge: {
         "recipient": "example@example.com",
@@ -98,6 +100,7 @@ var Testing = (function setupTestingEnvironment() {
       }
     },
     "http://foo.org/another_newbadge.json": {
+      owner: true,
       exists: false,
       badge: {
         "recipient": "example@example.com",
@@ -118,6 +121,7 @@ var Testing = (function setupTestingEnvironment() {
       }
     },
     "http://bar.org/oldbadge.json": {
+      owner: true,
       exists: true,
       badge: {
         "recipient": "example@example.com",
