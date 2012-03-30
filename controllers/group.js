@@ -7,40 +7,40 @@ var logger = require('../lib/logging').logger;
 function makeBadgeObj (attr) { return new Badge(attr) }
 
 exports.param = {
-  groupId: function(req, res, next, id) {
+  groupId: function(request, response, next, id) {
     Group.findById(id, function(err, group) {
       if (err) {
         logger.error("Error pulling group: " + err);
-        return res.send({
+        return response.send({
           status: 'error',
           'error': 'Error pulling group'
         }, 500);
       }
       
       if (!group) 
-       return res.send({
+       return response.send({
          status: 'missing',
          error: 'Could not find group'
         }, 404);
       
-      req.group = group;
+      request.group = group;
       return next();
     });
   }
 }
 
-exports.create = function (req, res) {
-  if (!req.user)
-    return res.json({error: 'no user'}, 403);
+exports.create = function (request, response) {
+  if (!request.user)
+    return response.json({error: 'no user'}, 403);
   
-  if (!req.body)
-    return res.json({error: 'no badge body'}, 400);
+  if (!request.body)
+    return response.json({error: 'no badge body'}, 400);
   
-  if (!req.body.badges)
-    return res.json({error: 'no badges'}, 400);
+  if (!request.body.badges)
+    return response.json({error: 'no badges'}, 400);
   
-  var user = req.user;
-  var body = req.body;
+  var user = request.user;
+  var body = request.body;
   var badges = body.badges;
   var group = new Group({
     user_id: user.get('id'),
@@ -52,40 +52,40 @@ exports.create = function (req, res) {
     if (err) {
       logger.debug('there was some sort of error creating a group:');
       logger.debug(err);
-      return res.send('there was an error', 500)
+      return response.send('there was an error', 500)
     }
-    res.contentType('json');
-    res.send({id: group.get('id'), url: group.get('url')});
+    response.contentType('json');
+    response.send({id: group.get('id'), url: group.get('url')});
   })
 };
 
-exports.update = function (req, res) {
-  if (!req.user)
-    return res.send({
+exports.update = function (request, response) {
+  if (!request.user)
+    return response.send({
       status: 'forbidden',
       error: 'user required'
     }, 403);
   
-  if (!req.group)
-    return res.send({
+  if (!request.group)
+    return response.send({
       status: 'missing-required',
       error: 'missing group to update'
     }, 400);
   
-  if (req.user.get('id') !== req.group.get('user_id'))
-    return res.send({
+  if (request.user.get('id') !== request.group.get('user_id'))
+    return response.send({
       status: 'forbidden',
       error: 'you cannot modify a group you do not own'
     }, 403);
   
-  if (!req.body)
-    return res.send({
+  if (!request.body)
+    return response.send({
       status: 'missing-required',
       error: 'missing fields to update'
     }, 400)
   
-  var group = req.group;
-  var body = req.body;
+  var group = request.group;
+  var body = request.body;
   
   if (body.name) {
     var saferName = body.name.replace('<', '&lt;').replace('>', '&gt;');
@@ -104,14 +104,14 @@ exports.update = function (req, res) {
     if (err) {
       logger.debug('there was an error updating a group:');
       logger.debug(err);
-      return res.send({
+      return response.send({
         status: 'error',
         error: 'there was an unknown error. it has been logged.'
       }, 500);
     }
     
-    res.contentType('json');
-    res.send({status: 'okay'});
+    response.contentType('json');
+    response.send({status: 'okay'});
   })
 };
 
