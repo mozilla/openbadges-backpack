@@ -4,17 +4,24 @@ var Portfolio = require('../models/portfolio.js');
 var Badge = require('../models/badge.js');
 var logger = require('../lib/logging').logger;
 
+function makeBadgeObj (attr) { return new Badge(attr) }
+
 exports.param = {
   groupId: function(req, res, next, id) {
     Group.findById(id, function(err, group) {
       if (err) {
         logger.error("Error pulling group: " + err);
-        return res.send('Error pulling group', 500);
+        return res.send({
+          status: 'error',
+          'error': 'Error pulling group'
+        }, 500);
       }
       
-      if (!group) {
-        return res.send('Could not find group', 404);
-      }
+      if (!group) 
+       return res.send({
+         status: 'missing',
+         error: 'Could not find group'
+        }, 404);
       
       req.group = group;
       return next();
@@ -23,17 +30,22 @@ exports.param = {
 }
 
 exports.create = function (req, res) {
-  if (!req.user) return res.json({error:'no user'}, 403);
-  if (!req.body) return res.json({error:'no badge body'}, 400);
-  if (!req.body.badges) return res.json({error:'no badges'}, 400);
-  function makeNewBadge(attributes) { return new Badge(attributes); }
+  if (!req.user)
+    return res.json({error: 'no user'}, 403);
+  
+  if (!req.body)
+    return res.json({error: 'no badge body'}, 400);
+  
+  if (!req.body.badges)
+    return res.json({error: 'no badges'}, 400);
+  
   var user = req.user;
   var body = req.body;
   var badges = body.badges;
   var group = new Group({
     user_id: user.get('id'),
     name: body.name,
-    badges: badges.map(makeNewBadge)
+    badges: badges.map(makeBadgeObj)
   }); 
 
   group.save(function (err, group) {
@@ -85,7 +97,6 @@ exports.update = function (req, res) {
   }
   
   if (body.badges) {
-    function makeBadgeObj(attr) { return new Badge(attr) }
     group.set('badges', body.badges.map(makeBadgeObj));
   }
   
