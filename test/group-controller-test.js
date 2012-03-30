@@ -1,18 +1,19 @@
 var _ = require('underscore')
-  , app = require('../app.js')
-  , vows = require('vows')
-  , assert = require('assert')
-  , should = require('should')
-  , mysql = require('../lib/mysql.js')
-  , map = require('functools').map
-  , conmock = require('./conmock.js')
+var app = require('../app.js')
+var vows = require('vows')
+var assert = require('assert')
+var should = require('should')
+var mysql = require('../lib/mysql.js')
+var map = require('functools').map
+var conmock = require('./conmock.js')
+
+var User = require('../models/user.js')
+var Badge = require('../models/badge.js')
+var Group = require('../models/group.js')
+var Portfolio = require('../models/portfolio.js')
 
 var user, otheruser, badge, group, othergroup, portfolio;
 function setupDatabase (callback) {
-  var User = require('../models/user.js')
-  var Badge = require('../models/badge.js')
-  var Group = require('../models/group.js')
-  var Portfolio = require('../models/portfolio.js')
   var badgedata = require('../lib/utils').fixture({recipient: 'brian@example.com'})
   mysql.prepareTesting();
   function saver (m, cb) { m.save(cb) };
@@ -56,9 +57,7 @@ function setupDatabase (callback) {
   map.async(saver, [user, otheruser, badge, group, othergroup, portfolio], callback);
 }
 
-
 var groupcontroller = require('../controllers/group.js')
-
 vows.describe('group controller test').addBatch({
   'setup' : {
     topic: function () {
