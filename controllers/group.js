@@ -13,7 +13,7 @@ exports.param = {
         logger.error("Error pulling group: " + err);
         return response.send({
           status: 'error',
-          'error': 'Error pulling group'
+          error: 'Error pulling group'
         }, 500);
       }
       
@@ -70,7 +70,7 @@ exports.update = function (request, response) {
     return response.send({
       status: 'missing-required',
       error: 'missing group to update'
-    }, 400);
+    }, 404);
   
   if (request.user.get('id') !== request.group.get('user_id'))
     return response.send({
@@ -120,20 +120,32 @@ exports.destroy = function (request, response) {
   var group = request.group;
   
   if (!user)
-    return response.send('no logged in user', 403);
+    return response.send({
+      status: 'forbidden',
+      error: 'user required'
+    }, 403);
   
   if (!group)
-    return response.send('group not found', 404);
+    return response.send({
+      status: 'missing-required',
+      error: 'missing group to update'
+    }, 404);
   
   if (group.get('user_id') !== user.get('id'))
-    return response.send('group not yours', 403);
+    return response.send({
+      status: 'forbidden',
+      error: 'you cannot modify a group you do not own'
+    }, 403);
   
   // find any profile associated with this group and delete it
   Portfolio.findOne({group_id: group.get('id')}, function (err, folio) {
     if (err) {
       logger.debug('error finding portfolios:');
       logger.debug(err);
-      return response.send('nope', 500);
+      return response.send({
+        status: 'error',
+        error: 'there was some sort of error and it has been logged'
+      }, 500);
     }
     
     if (folio) folio.destroy();
@@ -142,10 +154,12 @@ exports.destroy = function (request, response) {
       if (err) {
         logger.debug('error deleting group');
         logger.debug(err);
-        return response.send('nope', 500);
+        return response.send({
+          status: 'error',
+          error: 'there was some sort of error and it has been logged'
+        }, 500);
       }
-      response.contentType('json');
-      response.send(JSON.stringify({success: true}));
+      response.send({status: 'okay'});
     })
   })
 };

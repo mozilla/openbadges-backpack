@@ -160,8 +160,8 @@ vows.describe('group controller test').addBatch({
           var req = { user: user }
           conmock(groupcontroller.update, req, this.callback);
         },
-        'respond with 400' : function (err, mock) {
-          mock.status.should.equal(400);
+        'respond with 404' : function (err, mock) {
+          mock.status.should.equal(404);
         },
       },
       'when the given user is not the owner of the group': {
