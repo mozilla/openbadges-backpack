@@ -35,7 +35,7 @@ function setupDatabase (callback) {
     user_id: 1,
     name: 'name',
     url: 'url',
-    'public': 1,
+    'public': 0,
     badges: [1]
   });
   
@@ -189,9 +189,20 @@ vows.describe('group controller test').addBatch({
             var req = { user: user, group: group, body: { name: 'huh' } }
             conmock(groupcontroller.update, req, this.callback)
           },
-          'should update the name' : function (err, mock) {
+          'respond with 200, update the name' : function (err, mock) {
             mock.status.should.equal(200)
             group.get('name').should.equal('huh')
+          },
+        },
+        'and a `public` field' : {
+          topic : function () {
+            group.set('public', false)
+            var req = { user: user, group: group, body: { 'public': true } }
+            conmock(groupcontroller.update, req, this.callback)
+          },
+          'respond with 200, update the public boolean' : function (err, mock) {
+            mock.status.should.equal(200)
+            group.get('public').should.equal(true)
           },
         },
       },

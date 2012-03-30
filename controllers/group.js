@@ -80,6 +80,10 @@ exports.update = function (req, res) {
     group.set('name', saferName);
   }
   
+  if (body['public']) {
+    group.set('public', !!body['public']);
+  }
+  
   if (body.badges) {
     function makeBadgeObj(attr) { return new Badge(attr) }
     group.set('badges', body.badges.map(makeBadgeObj));
