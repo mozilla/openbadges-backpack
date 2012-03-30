@@ -12,7 +12,7 @@ var Badge = require('../models/badge.js')
 var Group = require('../models/group.js')
 var Portfolio = require('../models/portfolio.js')
 
-var user, otheruser, badge, group, othergroup, portfolio;
+var user, otherUser, badge, group, otherGroup, portfolio;
 function setupDatabase (callback) {
   var badgedata = require('../lib/utils').fixture({recipient: 'brian@example.com'})
   mysql.prepareTesting();
@@ -20,7 +20,7 @@ function setupDatabase (callback) {
   
   user = new User({ email: 'brian@example.com' })
   
-  otheruser = new User({ email: 'lolwut@example.com' })
+  otherUser = new User({ email: 'lolwut@example.com' })
   
   badge = new Badge({
     user_id: 1,
@@ -39,7 +39,7 @@ function setupDatabase (callback) {
     badges: [1]
   });
   
-  othergroup = new Group({
+  otherGroup = new Group({
     user_id: 1,
     name: 'name',
     url: 'url2',
@@ -54,7 +54,7 @@ function setupDatabase (callback) {
     stories: '{"1": "oh hey"}'
   });
   
-  map.async(saver, [user, otheruser, badge, group, othergroup, portfolio], callback);
+  map.async(saver, [user, otherUser, badge, group, otherGroup, portfolio], callback);
 }
 
 var groupcontroller = require('../controllers/group.js')
@@ -120,7 +120,7 @@ vows.describe('group controller test').addBatch({
     },
     '#destroy: given the wrong user': {
       'topic' : function () {
-        var req = { group: group, user: otheruser };
+        var req = { group: group, user: otherUser };
         conmock(groupcontroller.destroy, req, this.callback);
       },
       'fails with a 403': function (err, mock) {
@@ -138,11 +138,62 @@ vows.describe('group controller test').addBatch({
     },
     '#destroy: given an empty group with a portfolio': {
       'topic' : function () {
-        var req = { group: othergroup, user: user };
+        var req = { group: otherGroup, user: user };
         conmock(groupcontroller.destroy, req, this.callback);
       },
       'succeeds with a 200' : function (err, mock) {
         mock.status.should.equal(200);
+      },
+    },
+    '#update' : {
+      'when missing user' : {
+        topic : function () {
+          var req = {}
+          conmock(groupcontroller.update, req, this.callback);
+        },
+        'respond with 403' : function (err, mock) {
+          mock.status.should.equal(403);
+        },
+      },
+      'when missing group': {
+        topic : function () {
+          var req = { user: user }
+          conmock(groupcontroller.update, req, this.callback);
+        },
+        'respond with 400' : function (err, mock) {
+          mock.status.should.equal(400);
+        },
+      },
+      'when the given user is not the owner of the group': {
+        topic : function () {
+          var req = { user: otherUser, group: group }
+          conmock(groupcontroller.update, req, this.callback);
+        },
+        'respond with 403' : function (err, mock) {
+          mock.status.should.equal(403);
+        },
+      },
+      'when given user and group': {
+        'but no body': {
+          topic : function () {
+            var req = { user: user, group: group }
+            conmock(groupcontroller.update, req, this.callback)
+          },
+          'respond with 400, missing required' : function (err, mock) {
+            mock.status.should.equal(400)
+            mock.body.status.should.equal('missing-required')
+          },
+        },
+        'and a `name` field' : {
+          topic : function () {
+            var req = { user: user, group: group, body: { name: 'huh' } }
+            conmock(groupcontroller.update, req, this.callback)
+          },
+          'should update the name' : function (err, mock) {
+            mock.status.should.equal(200)
+            group.get('name').should.equal('huh')
+          },
+        },
       },
     },
   },

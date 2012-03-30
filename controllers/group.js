@@ -48,16 +48,53 @@ exports.create = function (req, res) {
 };
 
 exports.update = function (req, res) {
-  if (!req.user) return res.send('nope', 403);
-  function makeNewBadge(attributes) { return new Badge(attributes); }
+  if (!req.user)
+    return res.send({
+      status: 'forbidden',
+      error: 'user required'
+    }, 403);
+  
+  if (!req.group)
+    return res.send({
+      status: 'missing-required',
+      error: 'missing group to update'
+    }, 400);
+  
+  if (req.user.get('id') !== req.group.get('user_id'))
+    return res.send({
+      status: 'forbidden',
+      error: 'you cannot modify a group you do not own'
+    }, 403);
+  
+  if (!req.body)
+    return res.send({
+      status: 'missing-required',
+      error: 'missing fields to update'
+    }, 400)
+  
   var group = req.group;
   var body = req.body;
-  var saferName = body.name.replace('<', '&lt;').replace('>', '&gt;');
   
-  group.set('name', saferName);
-  group.set('badges', body.badges.map(makeNewBadge));
+  if (body.name) {
+    var saferName = body.name.replace('<', '&lt;').replace('>', '&gt;');
+    group.set('name', saferName);
+  }
+  
+  if (body.badges) {
+    function makeBadgeObj(attr) { return new Badge(attr) }
+    group.set('badges', body.badges.map(makeBadgeObj));
+  }
+  
   group.save(function (err) {
-    if (err) return res.send('nope', 500);
+    if (err) {
+      logger.debug('there was an error updating a group:');
+      logger.debug(err);
+      return res.send({
+        status: 'error',
+        error: 'there was an unknown error. it has been logged.'
+      }, 500);
+    }
+    
     res.contentType('json');
     res.send({status: 'okay'});
   })
