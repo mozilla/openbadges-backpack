@@ -36,6 +36,7 @@ var formatResponse = function formatResponse (data, request, response, overrideF
     logger.debug('could not find a formatter for api request')
     logger.debug('  url: ' + url)
     logger.debug('  accept header: ' + accept)
+    response.contentType('txt')
     return response.send('error: could not find formatter', 400)
   }
   
