@@ -218,7 +218,22 @@ vows.describe('displayer controller tests').addBatch({
           mock.body.should.match(/^wutlol\(/);
           mock.body.should.match(/missing/);
         },
+      },
+      'given some strange format': {
+        topic: function () {
+          var req = {
+            url: "/yep.umad",
+            user: user,
+            headers: { 'accept' : '*/*' }
+          }
+          conmock(displayer.userGroups, req, this.callback);
+        },
+        'do not crash, return 400' : function (err, mock) {
+          mock.status.should.equal(400);
+          mock.body.should.match(/format/);
+        },
       }
+      
     },
     '#userGroupBadges' : {
       'given a valid, public group': {
@@ -265,8 +280,8 @@ vows.describe('displayer controller tests').addBatch({
             mock.status.should.equal(200)
             mock.body.should.match(/^saucesome\(/)
           },
-        }
-      }
+        },
+      },
     },
   }
 }).export(module)

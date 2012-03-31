@@ -3,6 +3,7 @@ var Group = require('../models/group.js');
 var Badge = require('../models/badge.js');
 var User = require('../models/user.js');
 var conf = require('../lib/configuration');
+var logger = require('../lib/logging').logger
 
 
 // Helpers
@@ -17,11 +18,29 @@ var formatters = {
   }
 }
 
-var formatter = function formatter (responseData, request) {
-  var format = request.headers['accept'] || 'application/json';
+var formatResponse = function formatResponse (data, request, response, overrideFormat) {
+  var rawData = data
+  var status = data.httpStatus
+  var jsonp = request.query.callback
+  var accept = request.headers['accept']
+  var url = request.url
+  
+  // accept header is secondary as it will be less often used
+  var format = accept || 'application/json'
+  
   // extensions rule everything around me.
-  if (request.url.match(/\.json$/)) format = 'application/json';
-  return formatters[format](responseData, request);
+  if (url.match(/\.json(p?)$/)) format = 'application/json'
+  
+  // if we can't find a formatter, send out a plain text response.
+  if (!formatters[format]) {
+    logger.debug('could not find a formatter for api request')
+    logger.debug('  url: ' + url)
+    logger.debug('  accept header: ' + accept)
+    return response.send('error: could not find formatter', 400)
+  }
+  
+  var preparedData = formatters[format](rawData, request)
+  return response.send(preparedData, jsonp ? 200 : status);
 }
 
 var fullUrl = function fullUrl (pathname) {
@@ -48,17 +67,19 @@ var findThing = function findThing (name) {
     M.findById(id, function(err, thing) {
       if (err) {
         logger.error("Error pulling " + name + ": " + err);
-        return response.send(formatter({
+        return formatResponse({
+          httpStatus: 500,
           status: 'error',
           error: 'Could not pull ' + name
-        }, request), jsonp ? 200: 500);
+        }, request, response);
       }
       
       if (!thing || !thing.get('id'))
-        return response.send(formatter({
+        return formatResponse({
+          httpStatus: 404,
           status: 'missing',
           error: 'Could not find ' + name
-        }, request), jsonp ? 200: 404)
+        }, request, response)
       
       if (request[name]) request['_' + name] = request[name];
       request[name] = thing;
@@ -76,7 +97,10 @@ exports.param = {
 // Controllers
 // ------------
 function displayerAPIVersion (request, response, next) {
-  response.send(formatter({status: 'okay', version: '0.5.0'}, request))
+  return formatResponse({
+    status: 'okay',
+    version: '0.5.0'
+  }, request, response)
 }
 
 function emailToUserId (request, response, next) {
@@ -125,10 +149,11 @@ function userGroups (request, response, next) {
     // make sure to always return 200 to jsonp or else it will fail
     // silently on the client -- the user agent won't bother to make
     // a script tag if the resource is "not found".
-    return response.send(formatter({
+    return formatResponse({
+      httpStatus: 404,
       status: 'missing',
       error: 'Could not find user'
-    }, request), jsonp ? 200: 404)
+    }, request, response)
   
   var userId = user.get('id')
   
@@ -141,11 +166,10 @@ function userGroups (request, response, next) {
       }
     })
     
-    var responseData = formatter({
+    return formatResponse({
       userId: userId,
       groups: exposedGroupData
-    }, request)
-    return response.send(responseData, 200)
+    }, request, response)
   })
   
 }
@@ -157,10 +181,11 @@ function userGroupBadges (request, response, next) {
   
   // if the group exists but it's private, just pretend it doesn't exist
   if (!group.get('public'))
-    return response.send(formatter({
+    return formatResponse({
+      httpStatus: 404,
       status: 'missing',
       error: 'Could not find group'
-    }, request), jsonp ? 200: 404) 
+    }, request, response) 
  
   group.getBadgeObjects(function (err, badges) {
     // #TODO: revisit this when we implement signed badges
@@ -173,11 +198,11 @@ function userGroupBadges (request, response, next) {
         imageUrl: fullUrl(badge.get('image_path')),
       }
     })
-    return response.send(formatter({
+    return formatResponse({
       userId: user.get('id'),
       groupId: group.get('id'),
       badges: exposedBadgeData
-    }, request))
+    }, request, response)
   })
 }
 
