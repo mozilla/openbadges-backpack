@@ -21,9 +21,9 @@ var global = {
 }
 
 var Badge = {}
-  , Group = {}
-  , Message = {}
-  , Details = {}
+var Group = {}
+var Message = {}
+var Details = {}
 
 // Helper functions
 // ----------------------
@@ -170,11 +170,22 @@ Group.View = Backbone.View.extend({
    */
   destroy: function (event) {
     var group = this.model
-      , allGroups = group.collection;
+    var allGroups = group.collection;
     allGroups.remove(group);
     this.$el.addClass('dying');
     this.$el.animate({opacity: 0});
     this.$el.slideUp(null, this.remove.bind(this));
+  },
+  
+  /**
+   * Save the privacy setting of the group.
+   *
+   * @param {Event} event
+   */
+  savePrivacy: function (event) {
+    var $el = $(event.currentTarget)
+    this.model.set({ 'public': $el.prop('checked') })
+    this.model.save(null, { error: errHandler })
   },
   
   
@@ -186,8 +197,8 @@ Group.View = Backbone.View.extend({
    */
   saveName: function (event) {
     var $el = $(event.currentTarget)
-      , newName = $el.val()
-      , oldName = $el.data('previously')
+    var newName = $el.val()
+    var oldName = $el.data('previously')
     
     // Bail early if the name didn't change.
     if (newName === oldName) return;
@@ -207,8 +218,8 @@ Group.View = Backbone.View.extend({
    */
   addNew: function (event, badge) {
     var newBadge = new Badge.Model(badge.attributes)
-      , newView = new Badge.View({model: newBadge})
-      , collection = this.model.get('badges');
+    var newView = new Badge.View({model: newBadge})
+    var collection = this.model.get('badges');
     collection.add(newBadge);
     newView.render();
     newView.addToGroup(this);
@@ -243,8 +254,8 @@ Group.View = Backbone.View.extend({
    */
   badgeDrop: function (event) {
     var view = global.dragging
-      , badge = view.model
-      , collection = this.model.get('badges');
+    var badge = view.model
+    var collection = this.model.get('badges');
     
     // prevent bug in firefox: https://bugzilla.mozilla.org/show_bug.cgi?id=727844
     event.preventDefault();
@@ -381,8 +392,8 @@ Badge.View = Backbone.View.extend({
    */
   addToGroup: function (groupView) {
     var $el = this.$el
-      , $groupEl = groupView.$el
-      , isNew = $groupEl.hasClass('isNew')
+    var $groupEl = groupView.$el
+    var isNew = $groupEl.hasClass('isNew')
     
     $groupEl.removeClass('isNew');
     
@@ -397,8 +408,8 @@ Badge.View = Backbone.View.extend({
     if (isNew) {
       // first create a new group to use as a drop target
       var newBadgeCollection = new Badge.Collection([])
-        , newGroupModel = new Group.Model({badges: newBadgeCollection})
-        , newGroupView = new Group.View({model: newGroupModel});
+      var newGroupModel = new Group.Model({badges: newBadgeCollection})
+      var newGroupView = new Group.View({model: newGroupModel});
       newBadgeCollection.belongsTo = newGroupModel;
       newGroupView.render();
       
@@ -460,7 +471,7 @@ AllGroups.on('remove', function (group) {
   },
   maybeRemoveBadge: function (event) {
     var badgeView = global.dragging
-      , badge = badgeView.model;
+    var badge = badgeView.model;
     
     if (event.target.className === 'group')
       return;
@@ -480,14 +491,15 @@ AllGroups.on('remove', function (group) {
  */
 Group.fromElement = function (element) {
   var $el = $(element)
-    , badgeElements = $el.find('.openbadge')
-    , groupBadges = new Badge.Collection(_.map(badgeElements, Badge.fromElement))
-    , model = new Group.Model({
-      id: $el.data('id'),
-      url: $el.data('url'),
-      name: $el.find('input').val(),
-      badges: groupBadges
-    });
+  var badgeElements = $el.find('.openbadge')
+  var groupBadges = new Badge.Collection(_.map(badgeElements, Badge.fromElement))
+  var model = new Group.Model({
+    id: $el.data('id'),
+    url: $el.data('url'),
+    name: $el.find('.groupName').val(),
+    'public': $el.find('.js-privacy').prop('checked'),
+    badges: groupBadges
+  });
   groupBadges.belongsTo = model;
   AllGroups.add(model);
   new Group.View({ model: model }).setElement($el);
@@ -501,7 +513,7 @@ Group.fromElement = function (element) {
  */
 Badge.fromElement = function (element) {
   var $el = $(element)
-    , model = new Badge.Model(window.badgeData[$el.data('id')])
+  var model = new Badge.Model(window.badgeData[$el.data('id')])
   new Badge.View({ model: model }).attachToExisting($el);
   if (!AllBadges.get(model.id)) AllBadges.add(model);
   return model;
@@ -509,7 +521,7 @@ Badge.fromElement = function (element) {
 
 // creating models from html on the page
 var existingBadges = $('#badges').find('.openbadge')
-  , existingGroups = $('#groups').find('.group');
+var existingGroups = $('#groups').find('.group');
 _.each(existingBadges, Badge.fromElement);
 _.each(existingGroups, Group.fromElement);
 
