@@ -4,7 +4,7 @@ var CSRF = $("input[name='_csrf']").val();
 $.ajaxSetup({
   beforeSend: function (xhr, settings) {
     if (settings.crossDomain)
-      return; 
+      return;
     if (settings.type == "GET")
       return;
     xhr.setRequestHeader('X-CSRF-Token', CSRF)
@@ -29,7 +29,7 @@ var Details = {}
 // ----------------------
 /**
  * Handle Backbone.sync errors.
- * 
+ *
  * @param {Model} model the model attempting to be saved
  * @param {XHRObject} xhr the xhr request object.
  */
@@ -116,18 +116,18 @@ Group.View = Backbone.View.extend({
     'click .share': 'share',
     'change .js-privacy': 'savePrivacy'
   },
-  
+
   preventDefault: function (event) {
     event.preventDefault();
     return false;
   },
-  
-  
+
+
   share: function (event) {
     window.location = '/share/' + this.model.get('url') + '/edit';
     return false;
   },
-  
+
   /**
    * Store the name of the group at the beginning of the editing session so
    * we can either revert it if the user cancels or skip hitting the server if
@@ -139,7 +139,7 @@ Group.View = Backbone.View.extend({
     var $el = $(event.currentTarget);
     $el.data('previously', $el.val());
   },
-  
+
   /**
    * Monitor keypresses to see if the user is done editing.
    *
@@ -147,13 +147,13 @@ Group.View = Backbone.View.extend({
    */
   checkDone: function (event) {
     var $el = $(event.currentTarget);
-    
+
     switch (event.keyCode) {
       // enter key, user wants to save
      case 13:
       $el.trigger('blur');
       break;
-      
+
       // escape key, user wants to revert changes
      case 27:
       $el.val($el.data('previously'));
@@ -161,8 +161,8 @@ Group.View = Backbone.View.extend({
       break;
     }
   },
-  
-  
+
+
   /**
    * Destroy this view (with style).
    *
@@ -176,7 +176,7 @@ Group.View = Backbone.View.extend({
     this.$el.animate({opacity: 0});
     this.$el.slideUp(null, this.remove.bind(this));
   },
-  
+
   /**
    * Save the privacy setting of the group.
    *
@@ -187,8 +187,7 @@ Group.View = Backbone.View.extend({
     this.model.set({ 'public': $el.prop('checked') })
     this.model.save(null, { error: errHandler })
   },
-  
-  
+
   /**
    * Save the new name of the group model associated with this view.
    * Doesn't hit the server if the name didn't actually change.
@@ -199,18 +198,18 @@ Group.View = Backbone.View.extend({
     var $el = $(event.currentTarget)
     var newName = $el.val()
     var oldName = $el.data('previously')
-    
+
     // Bail early if the name didn't change.
     if (newName === oldName) return;
-    
+
     this.model.set({ name: newName });
     this.model.save(null, { error: errHandler });
   },
-  
-  
+
+
   /**
    * Copies a badge from the master list to this group.
-   * 
+   *
    * @param {Event} event
    * @param {Model} badge model to be copied.
    *
@@ -225,13 +224,13 @@ Group.View = Backbone.View.extend({
     newView.addToGroup(this);
   },
 
-  
+
   /**
    * Move badge from existing group to this group.
-   * 
+   *
    * @param {Event} event
    * @param {Model} badge model to be moved.
-   * 
+   *
    * @see Badge.View#addToGroup
    */
   moveExisting: function (event, badge) {
@@ -241,7 +240,7 @@ Group.View = Backbone.View.extend({
     badgeView.addToGroup(this);
   },
 
-  
+
   /**
    * Figure out what to do with the badge that has been dropped here.
    * If the badge is from an existing group, move it. If it's from
@@ -256,22 +255,22 @@ Group.View = Backbone.View.extend({
     var view = global.dragging
     var badge = view.model
     var collection = this.model.get('badges');
-    
+
     // prevent bug in firefox: https://bugzilla.mozilla.org/show_bug.cgi?id=727844
     event.preventDefault();
     event.stopPropagation();
-    
+
     if (collection.get(badge)) {
       return;
-    } 
-    
+    }
+
     if (!badge.collection || badge.collection === AllBadges) {
       return this.addNew(event, badge);
     }
     return this.moveExisting(event, badge);
   },
-  
-  
+
+
   /**
    * Render this sucker. Uses ICanHaz.js to find a template with the
    * id "#groupTpl"
@@ -297,19 +296,19 @@ Details.View = Backbone.View.extend({
     'click .confirm-disown .nope': 'hideConfirmation',
     'click .confirm-disown .yep': 'destroyBadge'
   },
-  
+
   debugBadge: function (event) {
     console.dir(this.model.get('body'));
   },
-  
+
   showConfirmation: function () {
     this.$el.find('.confirm-disown').fadeIn('fast');
   },
-  
+
   hideConfirmation: function () {
     this.$el.find('.confirm-disown').fadeOut('fast');
   },
-  
+
   destroyBadge: function () {
     var badge = this.model;
     _.each(AllGroups.models, function (group) {
@@ -324,12 +323,12 @@ Details.View = Backbone.View.extend({
     badge.destroy();
     this.hide();
   },
-  
+
   nothing: function (event) {
     event.preventDefault();
     event.stopPropagation();
   },
-  
+
   hide: function() {
     this.$el
       .stop()
@@ -339,14 +338,14 @@ Details.View = Backbone.View.extend({
     this.hideConfirmation();
     return false;
   },
-  
+
   show: function () {
     this.$el
       .hide()
       .appendTo($('body'))
       .fadeIn('fast');
   },
-  
+
   render: function () {
     ich.grabTemplates();
     this.el = ich.detailsTpl(this.model.attributes);
@@ -364,15 +363,15 @@ Badge.View = Backbone.View.extend({
     'click' : 'showDetails',
     'dragstart' : 'start'
   },
-  
+
   initialize: function () {
     Badge.View.all.push(this);
   },
-  
+
   showDetails: function (event) {
     this.detailsView.show();
   },
-  
+
   /**
    * Store this view in a semi-global variable (closed-over) variable
    * so we can look it up later on drops.
@@ -383,20 +382,20 @@ Badge.View = Backbone.View.extend({
     global.dragging = this;
     event.stopPropagation();
   },
-  
-  
+
+
   /**
    * Add this badge view to a group view. Do some fancy fx during the dom transition.
-   * 
+   *
    * @param {View} groupView the view to add this badge to.
    */
   addToGroup: function (groupView) {
     var $el = this.$el
     var $groupEl = groupView.$el
     var isNew = $groupEl.hasClass('isNew')
-    
+
     $groupEl.removeClass('isNew');
-    
+
     function doIt () {
       $el.sync(
         ['fadeOut', 'fast'],
@@ -404,7 +403,7 @@ Badge.View = Backbone.View.extend({
         ['fadeIn', 'fast']
       );
     }
-    
+
     if (isNew) {
       // first create a new group to use as a drop target
       var newBadgeCollection = new Badge.Collection([])
@@ -412,14 +411,14 @@ Badge.View = Backbone.View.extend({
       var newGroupView = new Group.View({model: newGroupModel});
       newBadgeCollection.belongsTo = newGroupModel;
       newGroupView.render();
-      
+
       // then add the badge view to old group drop target
       $groupEl.find('.instructions').fadeOut('linear', doIt);
     } else {
       doIt();
     }
   },
-  
+
   /**
    * Render this sucker. Uses ICanHaz.js to find a template with the
    * id "#badgeTpl"
@@ -472,10 +471,10 @@ AllGroups.on('remove', function (group) {
   maybeRemoveBadge: function (event) {
     var badgeView = global.dragging
     var badge = badgeView.model;
-    
+
     if (event.target.className === 'group')
       return;
-    
+
     if (badge.collection && badge.collection !== AllBadges) {
       badgeView.remove();
       badge.collection.remove(badge);
