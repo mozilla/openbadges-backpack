@@ -153,6 +153,15 @@ function userGroups (request, response, next) {
 function userGroupBadges (request, response, next) {
   var user = request.user
   var group = request.group
+  var jsonp = request.query.callback
+  
+  // if the group exists but it's private, just pretend it doesn't exist
+  if (!group.get('public'))
+    return response.send(formatter({
+      status: 'missing',
+      error: 'Could not find group'
+    }, request), jsonp ? 200: 404) 
+ 
   group.getBadgeObjects(function (err, badges) {
     // #TODO: revisit this when we implement signed badges
     var exposedBadgeData = _.map(badges, function (badge) {

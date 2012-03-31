@@ -245,6 +245,27 @@ vows.describe('displayer controller tests').addBatch({
             mock.body.should.match(/^saucesome\(/)
           },
         }
+      },
+      'given a valid, private group': {
+        'normal request' : {
+          topic: function () {
+            var req = { user: user, group: privateGroup }
+            conmock(displayer.userGroupBadges, req, this.callback)
+          },
+          'return 404, public group not found' : function (err, mock) {
+            mock.status.should.equal(404)
+          },
+        },
+        'jsonp request' : {
+          topic: function () {
+            var req = { user: user, group: group, query: { callback: 'saucesome' } }
+            conmock(displayer.userGroupBadges, req, this.callback)
+          },
+          'return 200, sweet sweet data' : function (err, mock) {
+            mock.status.should.equal(200)
+            mock.body.should.match(/^saucesome\(/)
+          },
+        }
       }
     },
   }
