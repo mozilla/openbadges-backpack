@@ -236,6 +236,35 @@ form.baker #assertion {
   transition: all 0.25s ease;
 }
 
+.group .public * {
+  -webkit-transition: all 0.25s ease;
+  -moz-transition: all 0.25s ease;
+  -ms-transition: all 0.25s ease;
+  -o-transition: all 0.25s ease;
+  transition: all 0.25s ease;
+}
+
+.group .public {
+  bottom: 2px;
+  left: 10px;
+  position: absolute;
+}
+.group .public label {
+  color: #868;
+  font-size: 12px;
+  line-height: 12px;
+  display: inline-block;
+}
+
+.group .public input {
+  display: inline-block;
+}
+
+.group .public input:checked ~ label {
+  color: #181;
+  font-weight: bold;
+}
+
 [draggable=true] {
   -khtml-user-drag: element;
 }
@@ -503,6 +532,42 @@ table.information {
   color: #d00;
 }
 
+#converter {
+  text-align: center;
+}
+
+#converter .alert {
+  display: none;
+}
+
+#converter input {
+  font-size: 2em;
+}
+
+#converter .submit input {
+  width: 200px;
+}
+
+#converter .input input {
+  height: 36px;
+  vertical-align: middle;
+  text-align: center;
+}
+
+#converter .email {
+  width: 400px;
+}
+
+#converter .userid {
+  width: 100px;
+}
+
+#converter .arrow {
+  display: inline-block;
+  font-size: 2em;
+  font-weight: bold;
+  padding: 0 12px;
+}
 body {
   cursor: default;
 }

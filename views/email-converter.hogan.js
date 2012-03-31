@@ -1,0 +1,15 @@
+<div id='converter'>
+  <div class="alert alert-error"></div>
+  <div class="alert alert-success"></div>
+  
+  <div class='input'>
+    <input tabindex=1 class='email' type='email' placeholder='something@example.com'>
+    <span class='arrow'>&rarr;</span>
+    <input tabindex=3 class='userid disabled' placeholder="12345">
+  </div>
+  <div class='submit'>
+    <input tabindex=2 type="submit" class="btn btn-primary btn-large" value="Let's do this">
+  </div>
+</div>
+
+<script src='/js/email-converter.js'></script>
