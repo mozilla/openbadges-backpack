@@ -60,10 +60,10 @@ router(app)
   .post('/issuer/validator',          'issuer.validator')
 
   
-  .get('/displayer/:dUserId/groups.:format',          'displayer.userGroups')
-  .get('/displayer/:dUserId/group/:dGroupId:.format', 'displayer.userGroupBadges')
-  .get('/displayer/convert/email',                    'displayer.emailToUserIdView')
-  .post('/displayer/convert/email',                   'displayer.emailToUserId')
+  .get('/displayer/:dUserId/groups.:format?',          'displayer.userGroups')
+  .get('/displayer/:dUserId/group/:dGroupId:.format?', 'displayer.userGroupBadges')
+  .get('/displayer/convert/email',                     'displayer.emailToUserIdView')
+  .post('/displayer/convert/email',                    'displayer.emailToUserId')
 
   .get('/demo',                       'demo.issuer')
   .get('/demo/ballertime',            'demo.massAward')
