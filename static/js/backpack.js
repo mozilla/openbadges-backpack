@@ -113,7 +113,8 @@ Group.View = Backbone.View.extend({
     'drop': 'badgeDrop',
     'mousedown .delete': 'preventDefault',
     'click .delete': 'destroy',
-    'click .share': 'share'
+    'click .share': 'share',
+    'change .js-privacy': 'savePrivacy'
   },
   
   preventDefault: function (event) {
@@ -138,7 +139,6 @@ Group.View = Backbone.View.extend({
     var $el = $(event.currentTarget);
     $el.data('previously', $el.val());
   },
-  
   
   /**
    * Monitor keypresses to see if the user is done editing.

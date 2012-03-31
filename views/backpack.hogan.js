@@ -58,7 +58,7 @@
         <span class='icon share' rel="tooltip" data-placement="bottom" {{^attributes.badgeObjects}}style='display: none'{{/attributes.badgeObjects}} title='Share this group'>5</span>
         
         <span class='public'>
-          <input type='checkbox' id='public{{attributes.id}}'>
+          <input type='checkbox' id='public{{attributes.id}}' class='js-privacy' {{#attributes.public}}checked{{/attributes.public}}>
           <label for='public{{attributes.id}}'>public</label>
         </span>
           
@@ -215,7 +215,7 @@
   
     {{#attributes.id}}
       <span class='public'>
-        <input type='checkbox' id='public{{attributes.id}}'>
+        <input type='checkbox' id='public{{attributes.id}}' class='js-privacy' {{#attributes.public}}checked{{/attributes.public}}>
         <label for='public{{attributes.id}}'>public</label>
       </span>
     {{/attributes.id}}
