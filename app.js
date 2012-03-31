@@ -59,6 +59,10 @@ router(app)
   .get('/issuer/validator',           'issuer.validator')
   .post('/issuer/validator',          'issuer.validator')
 
+  
+  .get('/displayer/:dUserId/groups.json',          'displayer.userGroups')
+  .get('/displayer/:dUserId/group/:dGroupId.json', 'displayer.userGroupBadges')
+
   .get('/demo',                       'demo.issuer')
   .get('/demo/ballertime',            'demo.massAward')
   .get('/demo/badge.json',            'demo.testBadge')
