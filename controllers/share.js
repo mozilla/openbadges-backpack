@@ -18,7 +18,7 @@ exports.param = {
         return response.send('Could not find group', 404);
       }
       Portfolio.findOne({group_id: group.get('id')}, function (err, portfolio) {
-        if (err) next(err);
+        if (err) return next(err);
         if (portfolio) group.set('portfolio', portfolio);
         request.group = group;
         return next();
@@ -120,9 +120,29 @@ exports.show = function (request, response, next) {
 };
 
 exports.createOrUpdate = function (request, response) {
-  var attributes = request.body;
-  delete attributes._csrf
-  var portfolio = new Portfolio(attributes);
+  var group = request.group
+  var user = request.user
+  
+  if (!user)
+    return response.send('Forbidden', 403)
+  
+  if (group.get('user_id') !== user.get('id'))
+    return response.send('Forbidden', 403)
+  
+  var stories = {}
+  var submitted = request.body;
+  
+  for (var i = 0; i < submitted.stories.length; i++)
+    if (submitted.stories[i]) stories[i] = submitted.stories[i];
+  
+  var portfolio = new Portfolio({
+    stories: stories,
+    group_id: group.get('id'),
+    title: submitted.title,
+    subtitle: submitted.subtitle,
+    preamble: submitted.preamble,
+  })
+  
   portfolio.save(function (err, p) {
     return response.redirect(request.url, '303');
   })
