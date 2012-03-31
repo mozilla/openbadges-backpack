@@ -532,6 +532,42 @@ table.information {
   color: #d00;
 }
 
+#converter {
+  text-align: center;
+}
+
+#converter .alert {
+  display: none;
+}
+
+#converter input {
+  font-size: 2em;
+}
+
+#converter .submit input {
+  width: 200px;
+}
+
+#converter .input input {
+  height: 36px;
+  vertical-align: middle;
+  text-align: center;
+}
+
+#converter .email {
+  width: 400px;
+}
+
+#converter .userid {
+  width: 100px;
+}
+
+#converter .arrow {
+  display: inline-block;
+  font-size: 2em;
+  font-weight: bold;
+  padding: 0 12px;
+}
 body {
   cursor: default;
 }

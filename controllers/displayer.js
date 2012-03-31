@@ -18,7 +18,7 @@ var formatters = {
   }
 }
 
-var formatResponse = function formatResponse (data, request, response, overrideFormat) {
+var formatResponse = function formatResponse (data, request, response) {
   var rawData = data
   var status = data.httpStatus
   var jsonp = request.query.callback
@@ -102,6 +102,10 @@ function displayerAPIVersion (request, response, next) {
     status: 'okay',
     version: '0.5.0'
   }, request, response)
+}
+
+function emailToUserIdView (request, response, next) {
+  return response.render('email-converter');
 }
 
 function emailToUserId (request, response, next) {
@@ -209,5 +213,6 @@ function userGroupBadges (request, response, next) {
 
 exports.version = displayerAPIVersion
 exports.emailToUserId = emailToUserId
+exports.emailToUserIdView = emailToUserIdView
 exports.userGroups = userGroups
 exports.userGroupBadges = userGroupBadges
