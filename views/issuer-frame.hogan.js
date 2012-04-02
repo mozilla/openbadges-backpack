@@ -79,7 +79,7 @@
       <div class="span4 columns badge-details">
         <dl>
           <dt>Recipient</dt>
-          <dd>[[ assertion.recipient ]]</dd>
+          <dd>[[ recipient ]]</dd>
 
           <dt>Name</dt>
           <dd>[[ assertion.badge.name ]]</dd>
