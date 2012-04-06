@@ -1,0 +1,32 @@
+body {
+  padding: 20px 0;
+}
+
+dfn {
+  font-weight: bold;
+  font-style: normal;
+}
+
+dfn:before {
+  content: '“';
+}
+
+dfn:after {
+  content: '”';
+}
+
+a.onpage,
+a.onpage:hover,
+a.onpage:active {
+  color: #333;
+  text-decoration: underline;
+}
+
+.vcard {
+  margin-bottom: 1em;
+}
+
+b {
+  font-weight: normal;
+  text-decoration: underline;
+}
