@@ -52,14 +52,29 @@
 <div id="templates" style="display: none">
   <div id="accept-failure-template">
     <div class="alert alert-error">
+      <a class="close">×</a>
       <strong>Sorry!</strong> An error occurred when trying to add the
       <em>[[ assertion.badge.name ]]</em> badge to your backpack.
     </div>
   </div>
   <div id="already-exists-template">
     <div class="alert">
+      <a class="close">×</a>
       You appear to already have the
       <em>[[ assertion.badge.name ]]</em> badge in your backpack.
+    </div>
+  </div>
+  <div id="owner-mismatch-template">
+    <div class="alert alert-error">
+      <a class="close">×</a>
+      It appears that the 
+      <em>[[ assertion.badge.name ]]</em> badge was not awarded to you ([[ user ]]).
+    </div>
+  </div>
+  <div id="inaccessible-template">
+    <div class="alert alert-error">
+      <a class="close">×</a>
+      An assertion URL could not be retrieved.
     </div>
   </div>
   <div id="login-error-template">

@@ -308,7 +308,15 @@ $(window).ready(function() {
 });
 
 function showError(templateName, args) {
-  $(templateName).render(args).appendTo("#messages").hide().slideDown();
+  $(templateName).render(args).appendTo("#messages").hide().slideDown(function(){
+    var msg = this;
+    $(msg).click(function(){
+      console.log(msg);
+      $(msg).slideUp(function(){
+        $(this).remove();
+      });
+    });
+  });
 }
 
 // This is the core issuing implementation; the response is proxied
@@ -356,12 +364,19 @@ function issue(assertions, cb) {
           url: url
         },
         success: function(obj) {
+          var templateArgs = {
+            hostname: url,
+            assertion: obj.badge,
+            recipient: obj.recipient,
+            user: Session.currentUser
+          };
           // if the badge already exists in the database, skip this assertion
           if (obj.exists) {
             errors.push({
               url: url,
               reason: 'EXISTS'
             });
+            showError("#already-exists-template", templateArgs);
             processNext();
           }
 
@@ -371,15 +386,11 @@ function issue(assertions, cb) {
               url: url,
               reason: 'INVALID'
             });
+            showError("#owner-mismatch-template", templateArgs);
             processNext();
           }
 
           else {
-            var templateArgs = {
-              hostname: url,
-              assertion: obj.badge,
-              recipient: obj.recipient
-            };
             $("#badge-ask").empty()
               .append($("#badge-ask-template").render(templateArgs)).fadeIn();
             $("#badge-ask .accept").click(function() {
@@ -426,6 +437,7 @@ function issue(assertions, cb) {
             url: url,
             reason: 'INACCESSIBLE'
           });
+          showError("#inaccessible-template", {});
           processNext();
         }
       });
