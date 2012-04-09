@@ -45,7 +45,7 @@
             </tr>
             <tr>
               <td class='fieldlabel issuer-name'>URL</td>
-              <td><a href={{badge.issuer.origin}}'>{{badge.issuer.origin}}</a></td>
+              <td><a href='{{badge.issuer.origin}}'>{{badge.issuer.origin}}</a></td>
             </tr>
             {{#badge.issuer.org}}
             <tr>
@@ -70,14 +70,6 @@
               <td><a href='{{badge.criteria}}'>{{badge.criteria}}</a></td>
             </tr>
 
-            <tr>
-              <td class='section-head' colspan='2'>Issuance Details</td>
-            </tr>
-            <tr>
-              <td class='fieldlabel recipient'>Recipient</td>
-              <td>{{recipient}}</td>
-            </tr>
-            
             {{#evidence}}
             <tr>
               <td class='fieldlabel evidence'>Evidence</td>

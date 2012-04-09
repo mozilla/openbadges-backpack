@@ -371,7 +371,8 @@ function issue(assertions, cb) {
           else {
             var templateArgs = {
               hostname: url,
-              assertion: obj.badge
+              assertion: obj.badge,
+              recipient: obj.recipient
             };
             $("#badge-ask").empty()
               .append($("#badge-ask-template").render(templateArgs)).fadeIn();

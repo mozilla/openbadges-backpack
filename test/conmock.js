@@ -1,9 +1,15 @@
 var _ = require('underscore')
   , mime = require('mime')
 
-conmock = function (fn, request, callback) {
+conmock = function (fn, request, paramVal, callback) {
+  if (typeof paramVal === 'function') {
+    callback = paramVal;
+    paramVal = callback;
+  }
   var mock = {};
   var request = _.defaults(request, {
+    url: '',
+    headers: {},
     params: {},
     session: {},
     query: {},
@@ -44,11 +50,13 @@ conmock = function (fn, request, callback) {
       callback(null, this);
     },
   };
+  response._request = request;
+  
   function next () {
     response.fntype = 'next';
     callback(null, response);
   }
-  return fn(request, response, next);
+  return fn(request, response, next, paramVal);
 };
 
 module.exports = conmock;

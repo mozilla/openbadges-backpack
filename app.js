@@ -45,7 +45,7 @@ app.use(express.methodOverride());
 app.use(middleware.logRequests());
 app.use(middleware.cookieSessions());
 app.use(middleware.userFromSession());
-app.use(middleware.csrf({ whitelist: ['/issuer/validator/?'] }));
+app.use(middleware.csrf({ whitelist: ['/issuer/validator/?', '/displayer/convert/.+'] }));
 app.use(middleware.cors({ whitelist: ['/_badges.*', '/issuer.*', '/baker'] }));
 
 router(app)
@@ -58,6 +58,12 @@ router(app)
   
   .get('/issuer/validator',           'issuer.validator')
   .post('/issuer/validator',          'issuer.validator')
+
+  
+  .get('/displayer/:dUserId/groups.:format?',          'displayer.userGroups')
+  .get('/displayer/:dUserId/group/:dGroupId:.format?', 'displayer.userGroupBadges')
+  .get('/displayer/convert/email',                     'displayer.emailToUserIdView')
+  .post('/displayer/convert/email',                    'displayer.emailToUserId')
 
   .get('/demo',                       'demo.issuer')
   .get('/demo/ballertime',            'demo.massAward')

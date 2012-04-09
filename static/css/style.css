@@ -70,6 +70,33 @@ form.baker #assertion {
   display: none;
 }
 
+#footer {
+  padding: 20px 0;
+}
+#footer ul {
+  margin: 0;
+}
+#footer ul li {
+  display: inline-block;
+  border-left: 1px solid #999;
+  padding: 0 10px;
+  margin: 0;
+}
+#footer ul li:first-child {
+  border-left: none;
+  margin-left: 0;
+  padding-left: 0;
+}
+#footer h2 {
+  display: none;
+}
+#footer aside {
+  font-size: 0.85em;
+}
+#footer aside a {
+  color: #999;
+}
+
 .openbadge {
   display: inline-block;
   overflow: hidden;
@@ -234,6 +261,35 @@ form.baker #assertion {
   -ms-transition: all 0.25s ease;
   -o-transition: all 0.25s ease;
   transition: all 0.25s ease;
+}
+
+.group .public * {
+  -webkit-transition: all 0.25s ease;
+  -moz-transition: all 0.25s ease;
+  -ms-transition: all 0.25s ease;
+  -o-transition: all 0.25s ease;
+  transition: all 0.25s ease;
+}
+
+.group .public {
+  bottom: 2px;
+  left: 10px;
+  position: absolute;
+}
+.group .public label {
+  color: #868;
+  font-size: 12px;
+  line-height: 12px;
+  display: inline-block;
+}
+
+.group .public input {
+  display: inline-block;
+}
+
+.group .public input:checked ~ label {
+  color: #181;
+  font-weight: bold;
 }
 
 [draggable=true] {
@@ -503,6 +559,42 @@ table.information {
   color: #d00;
 }
 
+#converter {
+  text-align: center;
+}
+
+#converter .alert {
+  display: none;
+}
+
+#converter input {
+  font-size: 2em;
+}
+
+#converter .submit input {
+  width: 200px;
+}
+
+#converter .input input {
+  height: 36px;
+  vertical-align: middle;
+  text-align: center;
+}
+
+#converter .email {
+  width: 400px;
+}
+
+#converter .userid {
+  width: 100px;
+}
+
+#converter .arrow {
+  display: inline-block;
+  font-size: 2em;
+  font-weight: bold;
+  padding: 0 12px;
+}
 body {
   cursor: default;
 }
