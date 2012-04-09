@@ -20,7 +20,7 @@
 <div id="body" class="container-fluid">
   <div id="messages"></div>
   <div id="welcome" style="display: none">
-    <p>Hi! You are about to submit a badge to the Mozilla Open Badge Backpack at <span class="host"></span>.</p>
+    <p>Hi! You are about to submit <span class="badge-count">a badge</span> to the Mozilla Open Badge Backpack at <span class="host"></span><span class="logged-in"> as <span class="email"></span></span>.</p>
     <div class="logged-in"><button class="next btn btn-primary">Cool, let's go!</button> <button class="btn btn-danger logout">I am not <span class="email"></span>.</button></div>
     <div class="logged-out">
       <p>To begin, you will need to log in.</p>

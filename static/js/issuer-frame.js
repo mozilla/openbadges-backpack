@@ -315,6 +315,12 @@ function showError(templateName, args) {
 // back to the parent window. The function is global so it can be
 // overridden from testing suites.
 function issue(assertions, cb) {
+  if (assertions.length == 1) {
+    $("#welcome .badge-count").text("a badge");
+  }
+  else {
+    $("#welcome .badge-count").text(assertions.length + " badges");
+  }
   $("#welcome").fadeIn();
   var errors = [];
   var successes = [];
