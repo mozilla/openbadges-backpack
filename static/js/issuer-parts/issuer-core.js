@@ -63,26 +63,39 @@ var OpenBadges = (function() {
     },
     resize: function(el){
       // the basic issuer frame column is 300px wide with 20px padding
-      var size;
-      if($(window).width() >= 660){
+      var column = 300;
+      var margin = 20;
+      var twoCol = (column * 2) + (margin * 3);
+      var winWidth = $(window).width();
+      var elWidth = $(el).width();
+
+      function asPx(n) {
+        return n.toString() + 'px';
+      }
+
+      var newSize = {};
+      if (winWidth >= twoCol && elWidth < twoCol){
         // two-column iframe
-        size = {
-          width: "660px",
-          "margin-left": "-330px",
+        newSize = {
+          width: asPx(twoCol),
+          "margin-left": asPx(-twoCol/2),
           height: "60%",
           top: "20%"
         };
       }
-      else {
+      else if (winWidth < twoCol && elWidth >= twoCol) {
         // one-column iframe
-        size = {
-          width: "340px",
-          "margin-left": "-170px",
+        newSize = {
+          width: asPx(column + (2 * margin)),
+          "margin-left": asPx(-(column + (2 * margin))/2),
           height: "90%",
           top: "5%"
         };
       }
-      $(el).css(size);
+      
+      if (newSize) {
+        $(el).animate(newSize);
+      }
     }
   };
   
