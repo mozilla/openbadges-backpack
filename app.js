@@ -61,7 +61,7 @@ router(app)
 
   
   .get('/displayer/:dUserId/groups.:format?',          'displayer.userGroups')
-  .get('/displayer/:dUserId/group/:dGroupId:.format?', 'displayer.userGroupBadges')
+  .get('/displayer/:dUserId/group/:dGroupId.json',     'displayer.userGroupBadges')
   .get('/displayer/convert/email',                     'displayer.emailToUserIdView')
   .post('/displayer/convert/email',                    'displayer.emailToUserId')
 
