@@ -309,6 +309,10 @@ vows.describe('Badge model').addBatch({
       var user = new Badge({body: {recipient: 'me@example.com'}});
       assert.equal(user.confirmRecipient('me@example.com'), true);
     },
+    'should handle email with + sign': function () {
+      var user = new Badge({body: {recipient: 'me+beer@example.com'}});
+      assert.equal(user.confirmRecipient('me+beer@example.com'), true);
+    },
     'return false if not given an assertion': function () {
       assert.equal(Badge.confirmRecipient(null), false);
     },

@@ -21,11 +21,11 @@
       }
       
       unhashed.addEventListener('click', function(){
-        OpenBadges.issue(['http://localhost:8889/raw.json?email=' + getEmail()]);
+        OpenBadges.issue(['http://localhost:8889/raw.json?email=' + encodeURIComponent(getEmail())]);
       },false)
     
       hashed.addEventListener('click', function(){
-        OpenBadges.issue(['http://localhost:8889/hashed.json?email=' + getEmail()]);
+        OpenBadges.issue(['http://localhost:8889/hashed.json?email=' + encodeURIComponent(getEmail())]);
       },false)
     
     </script>
