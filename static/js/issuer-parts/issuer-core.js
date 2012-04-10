@@ -33,12 +33,12 @@ var OpenBadges = (function() {
       $(iframe).css({
         border: "none",
         position: "absolute",
-        top: "20%",
+        left: "50%",
         height: "60%",
-        width: "80%",
-        left: "10%",
-        right: "10%"
+        top: "20%"
       });
+      OpenBadges.resize(iframe);
+      $(window).resize(function(){OpenBadges.resize(iframe);});
       if (!hook) hook = function() {};
       $(iframe).one("load", function() {
         hook("load", iframe);
@@ -60,6 +60,29 @@ var OpenBadges = (function() {
         });
       }).appendTo(div);
       hook("create", iframe);
+    },
+    resize: function(el){
+      // the basic issuer frame column is 300px wide with 20px padding
+      var size;
+      if($(window).width() >= 660){
+        // two-column iframe
+        size = {
+          width: "660px",
+          "margin-left": "-330px",
+          height: "60%",
+          top: "20%"
+        };
+      }
+      else {
+        // one-column iframe
+        size = {
+          width: "340px",
+          "margin-left": "-170px",
+          height: "90%",
+          top: "5%"
+        };
+      }
+      $(el).css(size);
     }
   };
   
