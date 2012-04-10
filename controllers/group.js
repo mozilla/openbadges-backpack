@@ -92,8 +92,10 @@ exports.update = function (request, response) {
     group.set('name', saferName);
   }
   
-  if (body['public']) {
-    group.set('public', !!body['public']);
+  if (body['public'] === true) {
+    group.set('public', true);
+  } else {
+    group.set('public', false);
   }
   
   if (body.badges) {
