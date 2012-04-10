@@ -1,5 +1,13 @@
 body {
   padding-top: 60px;
+  max-width: 660px;
+  margin: 0 auto;
+}
+
+#welcome .badge-count,
+#welcome .host,
+#welcome .email {
+  font-weight: bold;
 }
 
 .logged-in, .logged-out {

@@ -90,6 +90,7 @@
           <button class="accept btn btn-primary">Yup</button>
           <button class="reject btn btn-danger">Nope</button>
         </div>
+        <img class="badge-image" src="[[assertion.badge.image]]" alt="Badge Image"/>
       </div>
       <div class="span4 columns badge-details">
         <dl>
@@ -108,9 +109,6 @@
           <dt>Issuer</dt>
           <dd>[[ assertion.badge.issuer.name ]] (<a href="[[assertion.badge.issuer.origin]]">[[ assertion.badge.issuer.origin ]]</a>)</dd>
         </dl>
-      </div>
-      <div class="span4 columns">
-        <img class="badge-image" src="[[assertion.badge.image]]" alt="Badge Image"/>
       </div>
     </div>
   </div>

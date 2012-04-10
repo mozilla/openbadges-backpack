@@ -324,7 +324,7 @@ function showError(templateName, args) {
 // overridden from testing suites.
 function issue(assertions, cb) {
   if (assertions.length == 1) {
-    $("#welcome .badge-count").text("a badge");
+    $("#welcome .badge-count").text("1 badge");
   }
   else {
     $("#welcome .badge-count").text(assertions.length + " badges");
