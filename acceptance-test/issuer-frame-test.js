@@ -9,17 +9,6 @@ require('./acceptance-test-utils.js').createClient({
 }).chain
   .session()
   .open('/issuer/frame').waitForPageToLoad(8000)
-    // Log in as a different user and make backpack explode.
-    .click("css=#welcome button.logout")
-    .waitForBadgePrompt("nc.large.png", "accept")
-    .waitForVisibleContent({
-      selector: '#messages div.alert.alert-error',
-      content: "An error occurred when trying to add the " +
-               "<em>HTML9 Fundamental</em> badge to your backpack."
-    })
-    .waitForVisible("css=#farewell h3.badges-0")
-    .click("css=#farewell button.next")
-  .open('/issuer/frame').waitForPageToLoad(8000)
     // Accept 2 badges
     .click("css=#welcome button.next.btn.btn-primary")
     .waitForBadgePrompt("cc.large.png", "accept")
