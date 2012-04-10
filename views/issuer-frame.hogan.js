@@ -20,7 +20,7 @@
 <div id="body" class="container-fluid">
   <div id="messages"></div>
   <div id="welcome" style="display: none">
-    <p>Hi! You are about to submit a badge to the Mozilla Open Badge Backpack at <span class="host"></span>.</p>
+    <p>Hi! You are about to submit <span class="badge-count">a badge</span> to the Mozilla Open Badge Backpack at <span class="host"></span><span class="logged-in"> as <span class="email"></span></span>.</p>
     <div class="logged-in"><button class="next btn btn-primary">Cool, let's go!</button> <button class="btn btn-danger logout">I am not <span class="email"></span>.</button></div>
     <div class="logged-out">
       <p>To begin, you will need to log in.</p>
@@ -52,14 +52,29 @@
 <div id="templates" style="display: none">
   <div id="accept-failure-template">
     <div class="alert alert-error">
+      <a class="close">×</a>
       <strong>Sorry!</strong> An error occurred when trying to add the
       <em>[[ assertion.badge.name ]]</em> badge to your backpack.
     </div>
   </div>
   <div id="already-exists-template">
     <div class="alert">
+      <a class="close">×</a>
       You appear to already have the
       <em>[[ assertion.badge.name ]]</em> badge in your backpack.
+    </div>
+  </div>
+  <div id="owner-mismatch-template">
+    <div class="alert alert-error">
+      <a class="close">×</a>
+      It appears that the 
+      <em>[[ assertion.badge.name ]]</em> badge was not awarded to you ([[ user ]]).
+    </div>
+  </div>
+  <div id="inaccessible-template">
+    <div class="alert alert-error">
+      <a class="close">×</a>
+      An assertion URL could not be retrieved.
     </div>
   </div>
   <div id="login-error-template">
@@ -75,6 +90,7 @@
           <button class="accept btn btn-primary">Yup</button>
           <button class="reject btn btn-danger">Nope</button>
         </div>
+        <img class="badge-image" src="[[assertion.badge.image]]" alt="Badge Image"/>
       </div>
       <div class="span4 columns badge-details">
         <dl>
@@ -93,9 +109,6 @@
           <dt>Issuer</dt>
           <dd>[[ assertion.badge.issuer.name ]] (<a href="[[assertion.badge.issuer.origin]]">[[ assertion.badge.issuer.origin ]]</a>)</dd>
         </dl>
-      </div>
-      <div class="span4 columns">
-        <img class="badge-image" src="[[assertion.badge.image]]" alt="Badge Image"/>
       </div>
     </div>
   </div>
