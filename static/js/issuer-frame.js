@@ -58,6 +58,7 @@ var Testing = (function setupTestingEnvironment() {
   ];
   var RESPONSES = {
     "http://foo.org/makebackpackexplode.json": {
+      owner: false,
       exists: false,
       badge: {
         "recipient": "someone_else@example.com",
@@ -78,6 +79,7 @@ var Testing = (function setupTestingEnvironment() {
       }
     },
     "http://foo.org/newbadge.json": {
+      owner: true,
       exists: false,
       badge: {
         "recipient": "example@example.com",
@@ -98,6 +100,7 @@ var Testing = (function setupTestingEnvironment() {
       }
     },
     "http://foo.org/another_newbadge.json": {
+      owner: true,
       exists: false,
       badge: {
         "recipient": "example@example.com",
@@ -118,6 +121,7 @@ var Testing = (function setupTestingEnvironment() {
       }
     },
     "http://bar.org/oldbadge.json": {
+      owner: true,
       exists: true,
       badge: {
         "recipient": "example@example.com",
@@ -304,13 +308,27 @@ $(window).ready(function() {
 });
 
 function showError(templateName, args) {
-  $(templateName).render(args).appendTo("#messages").hide().slideDown();
+  $(templateName).render(args).appendTo("#messages").hide().slideDown(function(){
+    var msg = this;
+    $(msg).click(function(){
+      console.log(msg);
+      $(msg).slideUp(function(){
+        $(this).remove();
+      });
+    });
+  });
 }
 
 // This is the core issuing implementation; the response is proxied
 // back to the parent window. The function is global so it can be
 // overridden from testing suites.
 function issue(assertions, cb) {
+  if (assertions.length == 1) {
+    $("#welcome .badge-count").text("1 badge");
+  }
+  else {
+    $("#welcome .badge-count").text(assertions.length + " badges");
+  }
   $("#welcome").fadeIn();
   var errors = [];
   var successes = [];
@@ -346,12 +364,19 @@ function issue(assertions, cb) {
           url: url
         },
         success: function(obj) {
+          var templateArgs = {
+            hostname: url,
+            assertion: obj.badge,
+            recipient: obj.recipient,
+            user: Session.currentUser
+          };
           // if the badge already exists in the database, skip this assertion
           if (obj.exists) {
             errors.push({
               url: url,
               reason: 'EXISTS'
             });
+            showError("#already-exists-template", templateArgs);
             processNext();
           }
 
@@ -361,14 +386,11 @@ function issue(assertions, cb) {
               url: url,
               reason: 'INVALID'
             });
+            showError("#owner-mismatch-template", templateArgs);
             processNext();
           }
 
           else {
-            var templateArgs = {
-              hostname: url,
-              assertion: obj.badge
-            };
             $("#badge-ask").empty()
               .append($("#badge-ask-template").render(templateArgs)).fadeIn();
             $("#badge-ask .accept").click(function() {
@@ -415,6 +437,7 @@ function issue(assertions, cb) {
             url: url,
             reason: 'INACCESSIBLE'
           });
+          showError("#inaccessible-template", {});
           processNext();
         }
       });

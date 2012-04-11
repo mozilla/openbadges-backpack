@@ -78,6 +78,7 @@ suite
             .expect(200, {
               owner:  true,
               exists: false,
+              recipient: 'example@example.com',
               badge: EXAMPLE_BADGE
             })
           .next()
@@ -92,6 +93,7 @@ suite
             .expect(200, {
               owner: true,
               exists: true,
+              recipient: 'example@example.com',
               badge: EXAMPLE_BADGE
             })
           .next()

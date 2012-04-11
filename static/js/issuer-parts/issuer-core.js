@@ -33,12 +33,12 @@ var OpenBadges = (function() {
       $(iframe).css({
         border: "none",
         position: "absolute",
-        top: "20%",
+        left: "50%",
         height: "60%",
-        width: "80%",
-        left: "10%",
-        right: "10%"
+        top: "20%"
       });
+      OpenBadges.resize(iframe);
+      $(window).resize(function(){OpenBadges.resize(iframe);});
       if (!hook) hook = function() {};
       $(iframe).one("load", function() {
         hook("load", iframe);
@@ -60,6 +60,42 @@ var OpenBadges = (function() {
         });
       }).appendTo(div);
       hook("create", iframe);
+    },
+    resize: function(el){
+      // the basic issuer frame column is 300px wide with 20px padding
+      var column = 300;
+      var margin = 20;
+      var twoCol = (column * 2) + (margin * 3);
+      var winWidth = $(window).width();
+      var elWidth = $(el).width();
+
+      function asPx(n) {
+        return n.toString() + 'px';
+      }
+
+      var newSize = {};
+      if (winWidth >= twoCol && elWidth < twoCol){
+        // two-column iframe
+        newSize = {
+          width: asPx(twoCol),
+          "margin-left": asPx(-twoCol/2),
+          height: "60%",
+          top: "20%"
+        };
+      }
+      else if (winWidth < twoCol && elWidth >= twoCol) {
+        // one-column iframe
+        newSize = {
+          width: asPx(column + (2 * margin)),
+          "margin-left": asPx(-(column + (2 * margin))/2),
+          height: "90%",
+          top: "5%"
+        };
+      }
+      
+      if (newSize) {
+        $(el).animate(newSize);
+      }
     }
   };
   

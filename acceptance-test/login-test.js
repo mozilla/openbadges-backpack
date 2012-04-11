@@ -15,9 +15,7 @@ utils.createClient({
           return active === passwordField;
         }), 3000)
         .type('css=input#password', password)
-        .click('css=button.returning:enabled')
-        .waitForElementPresent('css=button#signInButton')
-        .click('css=button#signInButton:enabled');
+        .click('css=button.returning:enabled');
     }
   }
 }).chain

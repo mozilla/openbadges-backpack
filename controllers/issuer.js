@@ -179,7 +179,7 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
       
       // if this is a GET, we still need to return the badge
       else {
-        var response = {exists: false, badge: assertion};
+        var response = {exists: false, badge: assertion, recipient: recipient};
         Badge.findOne({endpoint: assertionUrl}, function(err, badge) {
           if (err) {
             logger.error(err);
