@@ -68,7 +68,7 @@ suite
         .get("?url=" + suite.url('/does/not/exist')).expect(502)
         .expect("provides an appropriate error message", function(err, res) {
           var message = JSON.parse(res.body).message;
-          assert.ok(message.indexOf("Could not reach endpoint") != -1);
+          assert.ok(message.match(/unreachable/i));
         })
         .postFormData({url: suite.url('/does/not/exist')}).expect(502)
         .undiscuss()
