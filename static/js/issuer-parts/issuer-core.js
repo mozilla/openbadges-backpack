@@ -1,4 +1,65 @@
 var OpenBadges = (function() {
+  var layout = (function(){
+    var column = 300;
+    var margin = 20;
+    var twoCol = (column * 2) + (margin * 3);
+    var oneCol = column + (margin * 2);
+
+    function asPx(n) {
+      return n.toString() + 'px';
+    }
+
+    function bestSize() {
+      // the basic issuer frame column is 300px wide with 20px padding
+      var winWidth = $(window).width();
+      
+      var size;
+      if( winWidth >= twoCol ){
+        // two-column iframe
+        size = {
+          width: asPx(twoCol),
+          "margin-left": asPx(-twoCol/2),
+          height: "60%",
+          top: "20%"
+        };
+      }
+      else {
+        // one-column iframe
+        size = {
+          width: asPx(oneCol),
+          "margin-left": asPx(-oneCol/2),
+          height: "90%",
+          top: "5%"
+        };
+      }
+
+      return size;
+    }
+
+    var targetWidth;
+
+    function resize(el){
+      var winWidth = $(window).width();
+      if(!targetWidth){
+        targetWidth = $(el).width();
+      }
+
+      if ((winWidth >= layout.breakpoint && targetWidth < layout.breakpoint) 
+          || (winWidth < layout.breakpoint && targetWidth >= layout.breakpoint)){
+        var size = bestSize(); 
+        targetWidth = size.width.substring(0, size.width.length-2);
+        $(el).animate(size, { queue: false });
+      }
+    }
+
+    return {
+      bestSize: bestSize,
+      resize: resize,
+      breakpoint: twoCol
+    };
+  
+  })();
+
   function findRoot() {
     for (var i = 0; i < document.scripts.length; i++) {
       var script = document.scripts[i];
@@ -8,7 +69,7 @@ var OpenBadges = (function() {
     }
     throw new Error("issuer script not found.");
   }
-  
+
   var OpenBadges = {
     // The root URL of the Open Badges API, determined dynamically.
     ROOT: null,
@@ -30,15 +91,13 @@ var OpenBadges = (function() {
       var iframe = document.createElement("iframe");
       iframe.setAttribute("src", root + "issuer/frame");
       iframe.setAttribute("scrolling", "no");
-      $(iframe).css({
+      var baseStyles = {
         border: "none",
         position: "absolute",
-        left: "50%",
-        height: "60%",
-        top: "20%"
-      });
-      OpenBadges.resize(iframe);
-      $(window).resize(function(){OpenBadges.resize(iframe);});
+        left: "50%"
+      };
+      $(iframe).css($.extend(baseStyles, layout.bestSize()));
+      $(window).resize(function(){layout.resize(iframe);});
       if (!hook) hook = function() {};
       $(iframe).one("load", function() {
         hook("load", iframe);
@@ -60,42 +119,6 @@ var OpenBadges = (function() {
         });
       }).appendTo(div);
       hook("create", iframe);
-    },
-    resize: function(el){
-      // the basic issuer frame column is 300px wide with 20px padding
-      var column = 300;
-      var margin = 20;
-      var twoCol = (column * 2) + (margin * 3);
-      var winWidth = $(window).width();
-      var elWidth = $(el).width();
-
-      function asPx(n) {
-        return n.toString() + 'px';
-      }
-
-      var newSize = {};
-      if (winWidth >= twoCol && elWidth < twoCol){
-        // two-column iframe
-        newSize = {
-          width: asPx(twoCol),
-          "margin-left": asPx(-twoCol/2),
-          height: "60%",
-          top: "20%"
-        };
-      }
-      else if (winWidth < twoCol && elWidth >= twoCol) {
-        // one-column iframe
-        newSize = {
-          width: asPx(column + (2 * margin)),
-          "margin-left": asPx(-(column + (2 * margin))/2),
-          height: "90%",
-          top: "5%"
-        };
-      }
-      
-      if (newSize) {
-        $(el).animate(newSize);
-      }
     }
   };
   
