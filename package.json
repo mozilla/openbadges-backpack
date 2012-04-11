@@ -17,6 +17,7 @@
   , "metapng": "git+https://github.com/brianloveswords/metapng.js.git"
   , "mime": "1.2.x"
   , "mysql": "0.9.x"
+  , "nock": "~0.11.6"
   , "request": "2.9.x"
   , "soda": "0.2.5"
   , "should": "0.5.x"
