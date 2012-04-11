@@ -58,9 +58,10 @@ exports.baker = function(req, res) {
     // bail if we get an error from `getHostedAssertion`, convert error
     // object to json and pass it back.
     if (err) {
+      var errorString = JSON.stringify(err);
       logger.warn('failed grabbing assertion for URL '+ assertionUrl);
-      logger.warn('reason: '+ JSON.stringify(err));
-      return res.send(JSON.stringify(err), 400)
+      logger.warn('reason: '+ errorString);
+      return res.send(errorString, 400);
     }
     
     // if the url for the image isn't fully qualified, parse what we have
@@ -82,9 +83,10 @@ exports.baker = function(req, res) {
       // if we can't find the badge image for whatever reason, bail and
       // return the error object as json.
       if (err) {
+        var errorString = JSON.stringify(err);
         logger.warn('failed grabbing badge image '+ imageUrl);
-        logger.warn('reason: '+ JSON.stringify(err));
-        return res.send(JSON.stringify(err), 400);
+        logger.warn('reason: '+ errorString);
+        return res.send(errorString, 400);
       }
       
       // there is a chance that baker.prepare could throw an error. if it
@@ -94,11 +96,11 @@ exports.baker = function(req, res) {
       }
       catch (err) {
         logger.error('failed writing data to badge image: '+ err);
-        return res.send(JSON.stringify({
+        return res.send({
           status: 'failure',
           error: 'processing',
           reason: 'could not write data to PNG: ' + err
-        }), 400);
+        }, 400);
       }
 
       // if the user agent only wants json, we'll give 'em json.
@@ -150,9 +152,14 @@ exports.baker = function(req, res) {
           
           // set the awarded header to be the recipient if badge was awarded
           else {
+            var body = badge.get('body');
+            var recipient = (
+              typeof body === 'string' ? JSON.parse(body) : body
+            )['recipient']
+            
             logger.debug('Badge was awarded just fine');
             logger.debug(JSON.stringify(badge));
-            res.setHeader('x-badge-awarded', badge.get('recipient'));
+            res.setHeader('x-badge-awarded', recipient);
           }
           return res.send(imageData);
         });
