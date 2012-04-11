@@ -23,6 +23,9 @@ conmock = function (fn, request, paramVal, callback) {
       if (value) return this.headers[key] = value;
       return this.headers[key];
     },
+    setHeader: function (key, value) {
+      return this.headers[key] = value;
+    },
     contentType: function (type) {
       return this.header('Content-Type', mime.lookup(type));
     },
