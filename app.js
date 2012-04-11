@@ -48,6 +48,14 @@ app.use(middleware.userFromSession());
 app.use(middleware.csrf({ whitelist: ['/issuer/validator/?', '/displayer/convert/.+'] }));
 app.use(middleware.cors({ whitelist: ['/_badges.*', '/issuer.*', '/baker'] }));
 
+app.configure('development', function(){
+  app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+});
+
+app.configure('production', function(){
+  app.use(express.errorHandler());
+});
+
 router(app)
   .get('/baker',                      'baker.baker')
   .delete('/badge/:badgeId',          'badge.destroy')
