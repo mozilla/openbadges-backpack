@@ -46,7 +46,7 @@ app.use(middleware.logRequests());
 app.use(middleware.cookieSessions());
 app.use(middleware.userFromSession());
 app.use(middleware.csrf({ whitelist: ['/issuer/validator/?', '/displayer/convert/.+'] }));
-app.use(middleware.cors({ whitelist: ['/_badges.*', '/issuer.*', '/baker'] }));
+app.use(middleware.cors({ whitelist: ['/_badges.*', '/issuer.*', '/baker', '/displayer/.+/group.*'] }));
 
 app.configure('development', function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
