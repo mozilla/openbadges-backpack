@@ -147,6 +147,8 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
       return res.json({ message: "badge assertion is for a different user" }, 403);
     }
     
+    // #TODO: write tests for invalid assertions, potentially move this check
+    //   into remote.getHostedAssertion?
     // Badge.validateBody is ill named -- it returns null if the badge is
     // valid, an error object if the badge is not valid.
     if (Badge.validateBody(assertion)) {
