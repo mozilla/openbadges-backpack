@@ -14,7 +14,7 @@ const EXAMPLE_BADGE = {
   "badge": {
     "version": "0.5.0",
     "name": "HTML5 Fundamental",
-    "image": "/_demo/cc.large.png",
+    "image": "http://p2pu.org/_demo/cc.large.png",
     "description": "Knows the difference between a <section> and an <article>",
     "criteria": "/badges/html5-basic",
     "issuer": {
