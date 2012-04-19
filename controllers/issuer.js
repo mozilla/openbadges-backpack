@@ -1,13 +1,34 @@
-var _ = require('underscore')
-  , request = require('request')
-  , fs = require('fs')
-  , logger = require('../lib/logging').logger
-  , reverse = require('../lib/router').reverse
-  , awardBadge = require('../lib/award')
-  , remote = require('../lib/remote')
-  , validator = require('validator')
-  , Badge = require('../models/badge.js')
+var _ = require('underscore');
+var request = require('request');
+var fs = require('fs');
+var url = require('url');
+var logger = require('../lib/logging').logger;
+var reverse = require('../lib/router').reverse;
+var awardBadge = require('../lib/award');
+var remote = require('../lib/remote');
+var validator = require('validator');
+var Badge = require('../models/badge.js');
 
+/**
+ * Fully qualify a url.
+ *
+ * @param {String} pathOrUrl either a path like /what.html or a full url
+ * @param {String} origin a full quallified url
+ * @return {String} a fully qualified url, using parts from the origin if
+ *   the original `pathOrUrl` was just a path.
+ */
+function qualifyUrl (pathOrUrl, origin) {
+  var parts = url.parse(pathOrUrl);
+  if (!parts.hostname) {
+    var originParts = url.parse(origin);
+    parts.host = originParts.host;
+    parts.port = originParts.port;
+    parts.slashes = originParts.slashes;
+    parts.protocol = originParts.protocol;
+    parts.hostname = originParts.hostname;
+  }
+  return url.format(parts);
+}
 
 var myFiles = [
   "issuer-parts/issuer-script-intro.js"
@@ -87,8 +108,8 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
 
   logger.debug("here's my full url " + req.originalUrl);
   var user = req.user
-    , error = req.flash('error')
-    , success = req.flash('success');
+  var error = req.flash('error')
+  var success = req.flash('success');
 
   // is the user logged in? if not, suggest they redirect to the login page
   if (!user) return res.json({message:"user is not logged in, redirect to " + reverse('backpack.login'),
@@ -156,7 +177,8 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
     }      
     
     // grabbing the remote badge image
-    remote.badgeImage(assertion.badge.image, function(err, imagedata) {
+    var imageUrl = qualifyUrl(assertion.badge.image, assertion.badge.issuer.origin);
+    remote.badgeImage(imageUrl, function(err, imagedata) {
       // awarding the badge, only done if this is a POST
       if (req.method=='POST') {
         var opts = {
@@ -187,6 +209,8 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
       
       // if this is a GET, we still need to return the badge
       else {
+        assertion.badge.image = imageUrl; 
+       
         var response = {exists: false, badge: assertion, recipient: recipient};
         Badge.findOne({endpoint: assertionUrl}, function(err, badge) {
           if (err) {
