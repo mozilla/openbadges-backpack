@@ -144,7 +144,7 @@
           </tr>
           <tr>
             <td class='fieldlabel issuer-name'>URL</td>
-            <td><a href={{badge.issuer.origin}}'>{{badge.issuer.origin}}</a></td>
+            <td><a href="{{badge.issuer.origin}}">{{badge.issuer.origin}}</a></td>
           </tr>
           {{#badge.issuer.org}}
           <tr>
