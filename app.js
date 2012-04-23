@@ -75,7 +75,7 @@ router(app)
 
   .get('/demo',                       'demo.issuer')
   .get('/demo/ballertime',            'demo.massAward')
-  .get('/demo/badge.json',            'demo.testBadge')
+  .get('/demo/badge.json',            'demo.demoBadge')
   .get('/demo/invalid.json',          'demo.badBadge')
   .post('/demo/award',                'demo.award')
   
