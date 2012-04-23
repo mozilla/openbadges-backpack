@@ -2,6 +2,10 @@ body {
   padding: 20px 0;
 }
 
+.container {
+  padding-bottom: 4em;
+}
+
 dfn {
   font-weight: bold;
   font-style: normal;
