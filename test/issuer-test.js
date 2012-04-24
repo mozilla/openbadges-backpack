@@ -27,6 +27,7 @@ const EXAMPLE_BADGE = {
 };
 
 const EXAMPLE_BADGE_URL = suite.url('/test/assertions/example.json');
+const BAD_IMG_BADGE_URL = suite.url('/test/assertions/bad_img.json');
 
 validator.check = (function acceptLocalURLs() {
   var oldCheck = validator.check;
@@ -73,6 +74,14 @@ suite
         .postFormData({url: suite.url('/does/not/exist')}).expect(502)
         .undiscuss()
       .discuss('and providing a valid url')
+        .discuss('with an unreachable image')
+          .get("?url=" + BAD_IMG_BADGE_URL)
+            .expect(502)
+            .expect("provides an appropriate error message", function(err, res) {
+              var message = JSON.parse(res.body).message;
+              assert.ok(message.match(/image.*unreachable/i));
+            })
+          .undiscuss()
         .discuss('that the user does not have in their backpack')
           .get("?url=" + EXAMPLE_BADGE_URL)
             .expect(200, {
