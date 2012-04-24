@@ -5,7 +5,7 @@
   "badge": {
     "version": "0.5.0",
     "name": "HTML5 Fundamental",
-    "image": "https://github.com/mozilla/openbadges/raw/development/static/images/demo-badge.png",
+    "image": "https://github.com/mozilla/openbadges/raw/development/static/images/CANT_BE_REACHED.png",
     "description": "Knows the difference between a <section> and an <article>",
     "criteria": "/badges/html5-basic",
     "issuer": {
