@@ -179,7 +179,7 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
     // grabbing the remote badge image
     var imageUrl = qualifyUrl(assertion.badge.image, assertion.badge.issuer.origin);
     remote.badgeImage(imageUrl, function(err, imagedata) {
-      if(err){
+      if (err){
         var error_msg = "trying to grab image at url " + imageUrl + " got error " + err;
         logger.error(error_msg);
         return res.json({ message: error_msg }, 502);
