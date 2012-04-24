@@ -179,6 +179,11 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
     // grabbing the remote badge image
     var imageUrl = qualifyUrl(assertion.badge.image, assertion.badge.issuer.origin);
     remote.badgeImage(imageUrl, function(err, imagedata) {
+      if(err){
+        var error_msg = "trying to grab image at url " + imageUrl + " got error " + err;
+        logger.error(error_msg);
+        return res.json({ message: error_msg }, 502);
+      }
       // awarding the badge, only done if this is a POST
       if (req.method=='POST') {
         var opts = {
