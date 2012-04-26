@@ -1,6 +1,7 @@
 {{#portfolio}}
 
 <div class='portfolio'>
+<div class="socialshare" data-type="small-bubbles"></div>
 {{#message}}
   <div class='message-container'>
     <div class="alert alert-info">

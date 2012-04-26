@@ -86,13 +86,6 @@ function prepareText(txt) {
   return better;
 }
 
-function makeLinkUrl(path, configuration) {
-  var protocol = configuration.get('protocol');
-  var host = configuration.get('hostname');
-  var port = configuration.get('port');
-  return url.format({protocol: protocol, hostname: host, port: port, pathname: path });
-}
-
 exports.show = function (request, response, next) {
   var user = request.user;
   var group = request.group;
@@ -100,12 +93,10 @@ exports.show = function (request, response, next) {
   
   if (!portfolio) return response.send('no portfolio :(', 404);
   
-  // if this is the user's page, show a tweet link.
-  // #TODO: replace this with the SocialShare stuff.
+  // if this is the user's page, show SocialShare button
   if (user && group.get('user_id') === user.get('id')) {
-    var linkurl = makeLinkUrl(request.url, configuration);
-    var twitterHtml = '<a href="https://twitter.com/share" class="twitter-share-button" data-text="Check out some of the badges I have earned: " data-url="' + linkurl + '" data-via="openbadges" data-size="large">Tweet</a><script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>';
-    var message = 'This is how your portfolio page looks like to the public.' + twitterHtml;
+    message = 'This is how your portfolio page looks like to the public.'
+      + '<div class="socialshare" data-type="small-bubbles"></div>'
   }
   
   request.group.getBadgeObjects(function (err, badges) {
