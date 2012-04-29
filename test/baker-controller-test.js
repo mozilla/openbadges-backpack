@@ -46,6 +46,12 @@ var scope = nock('http://example.com')
 
   .intercept('/image-award.png', 'HEAD').reply(200, '', { 'Content-Type': 'image/png' })
   .get('/image-award.png').reply(200, imagedata, { 'Content-Type': 'image/png' })
+
+  .intercept('/invalidAssertion','HEAD').reply(200,'')
+  .get('/invalidAssertion').reply(200,fixture({
+    'badge.image': 'http://example.com/image.png',
+    'recipient': 'example.com'
+  }),{'Content-Type': 'application/json'})
 ;
 
 mysql.prepareTesting();
@@ -130,6 +136,16 @@ vows.describe('baker controller testing').addBatch({
         mock.headers.should.have.property('Content-Type', 'image/png');
         mock.headers.should.have.property('x-badge-awarded', 'brian@example.com');
         mock.status.should.equal(200);
+      }
+    },
+    'Valid assertion url, but invalid assertion content':{
+      topic: function(){
+        var req = { query: { assertion: 'http://example.com/invalidAssertion'}};
+        conmock(controller.baker,req,this.callback);
+      },
+      'returns 400, Invalid Assertion': function(error, mock){
+        mock.status.should.equal(400);
+        mock.body.should.match(/invalid/);
       }
     }
   }

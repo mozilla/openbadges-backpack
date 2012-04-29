@@ -9,6 +9,7 @@ var configuration = require('../lib/configuration');
 var baker = require('../lib/baker');
 var remote = require('../lib/remote');
 var awardBadge = require('../lib/award');
+var Badge = require('../models/badge');
 
 /**
  * Fully qualify a url.
@@ -63,7 +64,16 @@ exports.baker = function(req, res) {
       logger.warn('reason: '+ errorString);
       return res.send(errorString, 400);
     }
-    
+    // Check if the assertion obtained is a valid assetion
+    // If not send a proper response
+
+    err = Badge.validateBody(assertion);
+    if (err) {
+      errorString = "Invalid Assertion :" + JSON.stringify(err);
+      logger.warn(errorString);
+      return res.send(errorString,400);
+    }
+
     // if the url for the image isn't fully qualified, parse what we have
     // and fill out the rest from `issuer.origin`
     try {
