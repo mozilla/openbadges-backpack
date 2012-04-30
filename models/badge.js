@@ -1,13 +1,13 @@
-var mysql = require('../lib/mysql')
-  , regex = require('../lib/regex')
-  , crypto = require('crypto')
-  , Base = require('./mysql-base');
+var mysql = require('../lib/mysql');
+var regex = require('../lib/regex');
+var crypto = require('crypto');
+var Base = require('./mysql-base');
 
-var sha256 = function (value) {
-  var sum = crypto.createHash('sha256')
+function sha256(value) {
+  var sum = crypto.createHash('sha256');
   sum.update(value);
   return sum.digest('hex');
-};
+}
 
 var Badge = function (attributes) {
   this.attributes = attributes;
@@ -21,18 +21,18 @@ Badge.prototype.presave = function () {
   }
 };
 
-Badge.confirmRecipient = function (assertion, email) {
+Badge.confirmRecipient = function confirmRecipient(assertion, email) {
   // can't validate if not given an assertion
   if (!assertion) return false;
-  
-  var badgeEmail = assertion.recipient
-  var salt = assertion.salt || ''
-  
+
+  var badgeEmail = assertion.recipient;
+  var salt = assertion.salt || '';
+
   if (!badgeEmail || !email) return false;
-  
+
   // if it's an email address, do a straight comparison
   if (/@/.test(badgeEmail)) return badgeEmail === email;
-  
+
   // if it's not an email address, it must have an alg and dollar sign.
   if (!(badgeEmail.match(/\w+(\d+)?\$.+/))) return false;
 
@@ -49,16 +49,16 @@ Badge.confirmRecipient = function (assertion, email) {
   // if there are more parts, it's an algorithm with options
   else {
     // #TODO: support algorithms with options.
-    return false; 
+    return false;
   }
-}
+};
 
-Badge.prototype.confirmRecipient = function (email) {
+Badge.prototype.confirmRecipient = function confirmRecipient(email) {
   return Badge.confirmRecipient(this.get('body'), email);
 };
 
 
-Badge.prototype.checkHash = function () {
+Badge.prototype.checkHash = function checkHash() {
   return sha256(JSON.stringify(this.get('body'))) === this.get('body_hash');
 };
 
@@ -114,8 +114,8 @@ Badge.validators = {
 
 // Prepare a field as it goes into or comes out of the database.
 Badge.prepare = {
-  in: { body: function (value) { return JSON.stringify(value); } },
-  out: { body: function (value) { return JSON.parse(value); } }
+  'in': { body: function (value) { return JSON.stringify(value); } },
+  'out': { body: function (value) { return JSON.parse(value); } }
 };
 
 // Virtual finders. By default, `find()` will take the keys of the criteria
@@ -129,25 +129,25 @@ Badge.finders = {
   }
 };
 
-// Validate the structure and values of the body field, which contains the 
+// Validate the structure and values of the body field, which contains the
 // badge assertion as received from the issuer. Returns an error object with a
 // `fields` attribute describing the errors if invalid, and `undefined` if
 // valid.
 Badge.validateBody = function (body) {
   var err = new Error('Invalid badge assertion');
   err.fields = {};
-  
+
   var fieldFromDottedString = function (str, obj) {
-    var fields = str.split('.')
-      , current = obj
-      , previous = null;
+    var fields = str.split('.');
+    var current = obj;
+    var previous = null;
     fields.forEach(function (f) {
       previous = current;
       current = current[f];
-    })
+    });
     return previous[fields.pop()];
   };
-  
+
   var test = {
     missing: function (fieldStr) {
       var field = fieldFromDottedString(fieldStr, body);
@@ -168,7 +168,7 @@ Badge.validateBody = function (body) {
       }
     }
   };
-  
+
   // begin tests
   test.missing('recipient');
   test.regexp('recipient', 'emailOrHash');
@@ -201,5 +201,5 @@ Badge.validateBody = function (body) {
   }
   if (Object.keys(err.fields).length) { return err; }
   return null;
-}
+};
 module.exports = Badge;
