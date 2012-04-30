@@ -6,8 +6,8 @@ var logger = require('../lib/logging').logger;
 var reverse = require('../lib/router').reverse;
 var awardBadge = require('../lib/award');
 var remote = require('../lib/remote');
-var validator = require('validator');
 var Badge = require('../models/badge.js');
+var regex = require('../lib/regex.js');
 
 /**
  * Fully qualify a url.
@@ -138,14 +138,10 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
   }
 
   //check if the assertion url is malformed
-  if (!assertionUrl.match(/localhost/)) {
-    try {
-      validator.check(assertionUrl).isUrl();
-    } 
-    catch (e) {                      
-      logger.error("malformed url " + assertionUrl + " returning 400");
-      return res.json({message: 'malformed url'}, 400);
-    }
+  
+  if (!regex.url.test(assertionUrl)) {
+    logger.error("malformed url " + assertionUrl + " returning 400");
+    return res.json({message: 'malformed url'}, 400);
   }
 
   /* grabbing the remote assertion, 3 nested steps - 
