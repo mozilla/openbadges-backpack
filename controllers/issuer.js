@@ -17,7 +17,7 @@ var regex = require('../lib/regex.js');
  * @return {String} a fully qualified url, using parts from the origin if
  *   the original `pathOrUrl` was just a path.
  */
-function qualifyUrl (pathOrUrl, origin) {
+function qualifyUrl(pathOrUrl, origin) {
   var parts = url.parse(pathOrUrl);
   if (!parts.hostname) {
     var originParts = url.parse(origin);
@@ -31,23 +31,23 @@ function qualifyUrl (pathOrUrl, origin) {
 }
 
 var myFiles = [
-  "issuer-parts/issuer-script-intro.js"
-, "jquery.min.js"
-, "jschannel.js"
-, "issuer-parts/issuer-core.js"
-, "issuer-parts/issuer-script-outro.js"
+  "issuer-parts/issuer-script-intro.js",
+  "jquery.min.js",
+  "jschannel.js",
+  "issuer-parts/issuer-core.js",
+  "issuer-parts/issuer-script-outro.js"
 ];
 
-myFiles = myFiles.map(function(filename) {
+myFiles = myFiles.map(function (filename) {
   return __dirname + '/../static/js/' + filename;
 });
 
 function concatenate(files, cb) {
   var completed = 0;
   var contents = [];
-  
+
   function startLoading(i) {
-    fs.readFile(files[i], function(err, data) {
+    fs.readFile(files[i], function (err, data) {
       if (err) {
         cb(err);
         return;
@@ -61,10 +61,10 @@ function concatenate(files, cb) {
 
   for (var i = 0; i < files.length; i++)
     startLoading(i);
-};
+}
 
 if (module.parent === null) {
-  concatenate(myFiles, function(err, data) {
+  concatenate(myFiles, function (err, data) {
     var filename = 'issuer.js';
     if (err)
       throw err;
@@ -73,8 +73,8 @@ if (module.parent === null) {
   });
 }
 
-exports.generateScript = function(req, res) {
-  concatenate(myFiles, function(err, data) {
+exports.generateScript = function (req, res) {
+  concatenate(myFiles, function (err, data) {
     if (err) {
       res.send(500);
       throw err;
@@ -85,7 +85,7 @@ exports.generateScript = function(req, res) {
   });
 };
 
-exports.frame = function(req, res) {
+exports.frame = function (req, res) {
   res.render('issuer-frame', {
     layout: null,
     csrfToken: req.session._csrf,
@@ -94,38 +94,38 @@ exports.frame = function(req, res) {
 };
 
 
-exports.issuerBadgeAddFromAssertion = function(req, res, next) {
+exports.issuerBadgeAddFromAssertion = function (req, res, next) {
   /* the issuer api, flawed in that it needs to query to badge assertion
    * so that we're not making a double request to the issuer, once for the GET
    * confirming the badge, and once for the POST awarding the badge. Not
    * sure what caching options we have currently, so just going ahead and
    * making a double request.
-   * 
+   *
    * request can either be a GET or a POST, one required param 'url'
    * which points to a badge assertion.
-   * 
+   *
    */
 
   logger.debug("here's my full url " + req.originalUrl);
-  var user = req.user
-  var error = req.flash('error')
+  var user = req.user;
+  var error = req.flash('error');
   var success = req.flash('success');
 
   // is the user logged in? if not, suggest they redirect to the login page
-  if (!user) return res.json({message:"user is not logged in, redirect to " + reverse('backpack.login'),
-                              redirect_to: reverse('backpack.login')}, 403);
+  if (!user) return res.json({ message: "user is not logged in, redirect to " + reverse('backpack.login'),
+                               redirect_to: reverse('backpack.login') }, 403);
 
   // get the url param (lots of debugging statements here)
   var assertionUrl = req.query.url; // if it was as a query param in the GET
   if (!assertionUrl) {
-    logger.debug("I'm doing a " + req.method); 
+    logger.debug("I'm doing a " + req.method);
     logger.debug("tried GET assertionUrl, didn't get anything " + req.param());
     logger.debug("full query " + JSON.stringify(req.query));
     // if the param was in a POST body
     assertionUrl = req.body['url'];
     logger.debug("POST attempt got " + assertionUrl);
     // more debugging
-    if (!assertionUrl && req.method=='GET') {
+    if (!assertionUrl && req.method == 'GET') {
       logger.debug("GET is erroring this was the original url " + req.originalUrl);
       logger.debug(JSON.stringify(req.body));
     }
@@ -148,51 +148,52 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
     }
   }
 
-  /* grabbing the remote assertion, 3 nested steps - 
-   * 
+  /* grabbing the remote assertion, 3 nested steps -
+   *
    * 1) grab the remote assertion
    * 2) grab the remote badge image
-   * if the request is a POST 
+   * if the request is a POST
    * 3) award the badge
    */
-  remote.getHostedAssertion(assertionUrl, function(err, assertion) {
+  remote.getHostedAssertion(assertionUrl, function (err, assertion) {
     var recipient = user.get('email');
     if (err || !assertion) {
       var error_msg = "trying to grab url " + assertionUrl + " got error " + err;
       logger.error(error_msg);
-      return res.json({ message: error_msg }, 502) ;
+      return res.json({ message: error_msg }, 502);
     }
-    
+
     var userOwnsBadge = Badge.confirmRecipient(assertion, recipient);
     if (req.method == 'POST' &&  !userOwnsBadge) {
       return res.json({ message: "badge assertion is for a different user" }, 403);
     }
-    
+
     // #TODO: write tests for invalid assertions, potentially move this check
     //   into remote.getHostedAssertion?
     // Badge.validateBody is ill named -- it returns null if the badge is
     // valid, an error object if the badge is not valid.
     if (Badge.validateBody(assertion)) {
       return res.json({ message: "badge assertion appears to be invalid" }, 400);
-    }      
-    
+    }
+
     // grabbing the remote badge image
     var imageUrl = qualifyUrl(assertion.badge.image, assertion.badge.issuer.origin);
-    remote.badgeImage(imageUrl, function(err, imagedata) {
-      if (err){
+    remote.badgeImage(imageUrl, function (err, imagedata) {
+      if (err) {
         var error_msg = "trying to grab image at url " + imageUrl + " got error " + err;
         logger.error(error_msg);
         return res.json({ message: error_msg }, 502);
       }
       // awarding the badge, only done if this is a POST
-      if (req.method=='POST') {
+      if (req.method == 'POST') {
         var opts = {
           assertion: assertion,
           url: assertionUrl,
           imagedata: imagedata,
           recipient: recipient
-        }
-        awardBadge(opts, function(err, badge) {
+        };
+        
+        awardBadge(opts, function (err, badge) {
           if (err) {
             var error_message = "badge error " + assertionUrl + err;
             logger.error(error_message);
@@ -207,28 +208,27 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
             return res.json({badge: assertion, exists: false, 'message': error_message}, 500);
           }
           logger.debug("badge added " + assertionUrl);
-
-          return res.json({exists: false, badge:assertion}, 201);
+          return res.json({exists: false, badge: assertion}, 201);
         });
       }
-      
+
       // if this is a GET, we still need to return the badge
       else {
-        assertion.badge.image = imageUrl; 
-       
+        assertion.badge.image = imageUrl;
+
         var response = {exists: false, badge: assertion, recipient: recipient};
-        Badge.findOne({endpoint: assertionUrl}, function(err, badge) {
+        Badge.findOne({endpoint: assertionUrl}, function (err, badge) {
           if (err) {
             logger.error(err);
             return res.json({message: "internal server error"}, 500);
           }
-          
+
           if (badge && badge.get("user_id") == req.user.get("id"))
             response.exists = true;
-          
+
           if (Badge.confirmRecipient(assertion, req.user.get('email')))
             response.owner = true;
-          
+
           return res.json(response, 200);
         });
       }
@@ -237,12 +237,12 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
 };
 
 exports.validator = function (request, response) {
-  var assertion = request.query.assertion || (request.body && request.body.assertion)
+  var assertion = request.query.assertion || (request.body && request.body.assertion);
   var accept = request.headers['accept'];
   var missingMsg = 'error: could not validate, could not find assertion in `data` field';
   var status = 200;
   var fields = {};
-  
+
   if (!assertion) {
     status = 400;
     fields = { general: missingMsg };
@@ -250,29 +250,29 @@ exports.validator = function (request, response) {
   else {
     try {
       status = 200;
-      var o = JSON.parse(assertion);
-      if (!o.badge) o.badge = {}
-      if (!o.badge.issuer) o.badge.issuer = {}
-      var errors = Badge.validateBody( o );
+      var assertionObject = JSON.parse(assertion);
+      if (!assertionObject.badge) assertionObject.badge = {};
+      if (!assertionObject.badge.issuer) assertionObject.badge.issuer = {};
+      var errors = Badge.validateBody(assertionObject);
       if (errors) {
         fields = errors.fields;
         status = 400;
       }
     }
-    
+
     catch (err) {
       status = 500;
       if (err.name === "SyntaxError") {
-        fields = { general: "Could not parse this JSON blob. Make sure it is well formed and try again!" }
+        fields = { general: "Could not parse this JSON blob. Make sure it is well formed and try again!" };
       } else {
-        fields = { general: err.name + ": " + err.message }
+        fields = { general: err.name + ": " + err.message };
       }
     }
   }
-  
-  function humanize (value, field) {
+
+  function humanize(value, field) {
     var url = 'Must either be a fully qualified URL (<code>http://example.com/path/evidence.html</code>) or begin with a forward slash (<code>/path/evidence.html</code>). <br> Non-qualified URLs will be prefixed with the origin specified in <code>badge.issuer.origin</code>';
-    var length = 'Cannot be longer than 128 characters'
+    var length = 'Cannot be longer than 128 characters';
     var msgs = {
       recipient: 'Must be an email address (<code>someone@example.com</code>) or a hash (<code>sha256$1234567890abcdef</code>)',
       evidence: url,
@@ -285,24 +285,24 @@ exports.validator = function (request, response) {
       "badge.issuer.org": length,
       "badge.issuer.contact": 'Must be an email address',
       "badge.issuer.origin": 'Must be a fully qualified origin (<code>http://example.com</code>)'
-    }
+    };
     if (value.match(/invalid/)) value = msgs[field] || value;
     return {field: field, value: value};
   }
-  
-   var responder = {
+
+  var responder = {
     'text/plain': function () {
       response.contentType('txt');
       if (!_.isEmpty(fields)) {
         var values = _.values(fields);
-        var bullets = _.map(values, function(s){return '* ' + s;}).join('\n');
+        var bullets = _.map(values, function (s) { return '* ' + s; }).join('\n');
         return response.send(bullets, status);
       }
       else {
         return response.send('everything looks good', 200);
       }
     },
-    
+
     'application/json': function () {
       response.contentType('json');
       if (fields) {
@@ -312,7 +312,7 @@ exports.validator = function (request, response) {
         return response.json({ status: 'okay' }, 200);
       }
     },
-    
+
     'default': function () {
       var fielderrors = _.map(fields, humanize);
       return response.render('validator', {

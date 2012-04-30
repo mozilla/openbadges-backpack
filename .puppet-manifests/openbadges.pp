@@ -29,7 +29,7 @@ class openbadges::app {
   }
   
   npm { "vows": }
-  
+  npm { "jshint": }
   npm { "up": }
   
   file { "package.json":

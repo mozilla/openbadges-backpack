@@ -7,5 +7,6 @@
   "laxbreak": true,
   "noarg": true,
   "undef": true,
+  "proto": true,
   "lastsemic": true
 }
