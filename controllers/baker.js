@@ -69,9 +69,9 @@ exports.baker = function(req, res) {
 
     err = Badge.validateBody(assertion);
     if (err) {
-      errorString = "Invalid Assertion :" + JSON.stringify(err);
-      logger.warn(errorString);
-      return res.send(errorString,400);
+      var errorString = JSON.stringify(err);
+      logger.warn('Invalid Assertion :' + errorString);
+      return res.send(errorString, 400);
     }
 
     // if the url for the image isn't fully qualified, parse what we have
