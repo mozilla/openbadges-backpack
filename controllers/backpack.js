@@ -1,28 +1,28 @@
-var request = require('request')
-  , _ = require('underscore')
-  , qs = require('querystring')
-  , fs = require('fs')
-  , logger = require('../lib/logging').logger
-  , url = require('url')
-  , configuration = require('../lib/configuration')
-  , baker = require('../lib/baker')
-  , remote = require('../lib/remote')
-  , browserid = require('../lib/browserid')
-  , awardBadge = require('../lib/award')
-  , reverse = require('../lib/router').reverse
-  , Badge = require('../models/badge')
-  , Group = require('../models/group')
+var request = require('request');
+var _ = require('underscore');
+var qs = require('querystring');
+var fs = require('fs');
+var logger = require('../lib/logging').logger;
+var url = require('url');
+var configuration = require('../lib/configuration');
+var baker = require('../lib/baker');
+var remote = require('../lib/remote');
+var browserid = require('../lib/browserid');
+var awardBadge = require('../lib/award');
+var reverse = require('../lib/router').reverse;
+var Badge = require('../models/badge');
+var Group = require('../models/group');
 
 /**
  * Render the login page.
  */
 
-exports.login = function(req, res) {
-  // req.flash returns an array. Pass on the whole thing to the view and
+exports.login = function login(request, response) {
+  // request.flash returns an array. Pass on the whole thing to the view and
   // decide there if we want to display all of them or just the first one.
-  res.render('login', {
-    error: req.flash('error'),
-    csrfToken: req.session._csrf
+  response.render('login', {
+    error: request.flash('error'),
+    csrfToken: request.session._csrf
   });
 };
 
@@ -35,45 +35,45 @@ exports.login = function(req, res) {
  *   on success: redirect to `backpack.manage`
  */
 
-exports.authenticate = function(req, res) {
-  function response(to, apiError, humanReadableError) {
+exports.authenticate = function authenticate(request, response) {
+  function formatResponse(to, apiError, humanReadableError) {
     if (jsonResponse) {
       if (apiError)
-        return res.send({status: 'error', reason: apiError}, 400);
+        return response.send({status: 'error', reason: apiError}, 400);
       else
-        return res.send({status: 'ok', email: req.session.emails[0]});
+        return response.send({status: 'ok', email: request.session.emails[0]});
     } else {
       if (humanReadableError)
-        req.flash('error', humanReadableError);
-      return res.redirect(to, 303);
+        request.flash('error', humanReadableError);
+      return response.redirect(to, 303);
     }
   }
 
-  var jsonResponse = req.headers['accept'] &&
-                     req.headers['accept'].indexOf('application/json') != -1;
+  var jsonResponse = request.headers['accept'] &&
+                     request.headers['accept'].indexOf('application/json') != -1;
 
-  if (!req.body || !req.body['assertion']) {
-    return response(reverse('backpack.login'), "assertion expected");
+  if (!request.body || !request.body['assertion']) {
+    return formatResponse(reverse('backpack.login'), "assertion expected");
   }
 
-  var ident = configuration.get('identity')
-    , uri = ident.protocol + '://' +  ident.server + ident.path
-    , assertion = req.body['assertion']
-    , audience = configuration.get('hostname');
-  
+  var ident = configuration.get('identity');
+  var uri = ident.protocol + '://' +  ident.server + ident.path;
+  var assertion = request.body['assertion'];
+  var audience = configuration.get('hostname');
+
   browserid.verify(uri, assertion, audience, function (err, verifierResponse) {
     if (err) {
-      logger.error('Failed browserID verification: ')
+      logger.error('Failed browserID verification: ');
       logger.debug('Type: ' + err.type + "; Body: " + err.body);
-      return response('back', "browserID verification failed: " + err.type,
-                      "Could not verify with browserID!");
+      return formatResponse('back', "browserID verification failed: " + err.type,
+                            "Could not verify with browserID!");
     }
-    
-    if (!req.session.emails) req.session.emails = []
-    
+
+    if (!request.session.emails) request.session.emails = [];
+
     logger.debug('browserid verified, attempting to authenticate user');
-    req.session.emails.push(verifierResponse.email);
-    return response(reverse('backpack.manage'));
+    request.session.emails.push(verifierResponse.email);
+    return formatResponse(reverse('backpack.manage'));
   });
 };
 
@@ -84,9 +84,9 @@ exports.authenticate = function(req, res) {
  * @return {HTTP 303} redirect user to login page
  */
 
-exports.signout = function(req, res) {
-  req.session = {};
-  res.redirect(reverse('backpack.login'), 303);
+exports.signout = function signout(request, response) {
+  request.session = {};
+  response.redirect(reverse('backpack.login'), 303);
 };
 
 
@@ -96,80 +96,80 @@ exports.signout = function(req, res) {
  * @return {HTTP 303} redirect user to login page
  */
 
-exports.manage = function(req, res, next) {
-  var user = req.user
-    , error = req.flash('error')
-    , success = req.flash('success')
-    , groups = []
-    , badgeIndex = {};
-  if (!user) return res.redirect(reverse('backpack.login'), 303);
-  
-  res.header('Cache-Control', 'no-cache, must-revalidate');
-  
-  var prepareBadgeIndex = function (badges) {
+exports.manage = function manage(request, response, next) {
+  var user = request.user;
+  var error = request.flash('error');
+  var success = request.flash('success');
+  var groups = [];
+  var badgeIndex = {};
+  if (!user) return response.redirect(reverse('backpack.login'), 303);
+
+  response.header('Cache-Control', 'no-cache, must-revalidate');
+
+  function prepareBadgeIndex(badges) {
     badges.forEach(function (badge) {
-      var body = badge.get('body')
-        , origin = body.badge.issuer.origin
-        , criteria = body.badge.criteria
-        , evidence = body.evidence;
+      var body = badge.get('body');
+      var origin = body.badge.issuer.origin;
+      var criteria = body.badge.criteria;
+      var evidence = body.evidence;
+
       if (criteria[0] === '/') body.badge.criteria = origin + criteria;
       if (evidence && evidence[0] === '/') body.evidence = origin + evidence;
-      
+
       badgeIndex[badge.get('id')] = badge;
       badge.serializedAttributes = JSON.stringify(badge.attributes);
     });
-    
-  };
-  
-  var getGroups = function () {
+  }
+
+  function getGroups() {
     Group.find({user_id: user.get('id')}, getBadges);
-  };
-  
-  var getBadges = function (err, results) {
+  }
+
+  function getBadges(err, results) {
     if (err) return next(err);
     groups = results;
-    Badge.find({email: user.get('email')}, makeResponse)
-  };
-  
-  var modifyGroups = function (groups) {
+    Badge.find({email: user.get('email')}, makeResponse);
+  }
+
+  function modifyGroups(groups) {
     groups.forEach(function (group) {
-      var badgeObjects = []
-        , badgeIds = group.get('badges');
-      
-      function badgeFromIndex (id) { return badgeIndex[id]; }
-      
+      var badgeObjects = [];
+      var badgeIds = group.get('badges');
+
+      function badgeFromIndex(id) { return badgeIndex[id] }
+
       // copy URL from attributes to main namespace.
       group.url = group.get('url');
-      
+
       // fail early if there aren't any badges associated with this group
       if (!group.get('badges')) return;
-      
+
       // strip out all of the ids which aren't in the index of user owned badges
       badgeIds = _.filter(badgeIds, badgeFromIndex);
-      
+
       // get badge objects from the list of remaining good ids
       badgeObjects = badgeIds.map(badgeFromIndex);
-    
-      
+
+
       group.set('badges', badgeIds);
       group.set('badgeObjects', badgeObjects);
     });
-  };
-  
-  var makeResponse = function (err, badges) {
+  }
+
+  function makeResponse(err, badges) {
     if (err) return next(err);
     prepareBadgeIndex(badges);
     modifyGroups(groups);
-    res.render('backpack', {
+    response.render('backpack', {
       error: error,
       success: success,
       badges: badges,
-      csrfToken: req.session._csrf,
+      csrfToken: request.session._csrf,
       groups: groups,
-      tooltips: req.param('tooltips')
-    })
-  };
-  
+      tooltips: request.param('tooltips')
+    });
+  }
+
   var startResponse = getGroups;
   return startResponse();
 };
@@ -185,29 +185,31 @@ exports.manage = function(req, res, next) {
  * @return {HTTP 303} redirects to manage (with error, if necessary)
  */
 
-exports.userBadgeUpload = function(req, res) {
-  var user = req.user
-    , tmpfile = req.files.userBadge;
-  
+exports.userBadgeUpload = function userBadgeUpload(request, response) {
+  var user = request.user;
+  var tmpfile = request.files.userBadge;
+
   // go back to the manage page and potentially show an error
-  var redirect = function(err) {
+  function redirect(err) {
     if (err) {
       logger.warn('There was an error uploading a badge');
       logger.debug(err);
-      req.flash('error', err.message);
+      request.flash('error', err.message);
     }
-    return res.redirect(reverse('backpack.manage'), 303);
+    return response.redirect(reverse('backpack.manage'), 303);
   }
-  
-  if (!user) return res.redirect(reverse('backpack.login'), 303);
-  
-  if (!tmpfile.size) return redirect(new Error('You must choose a badge to upload.'));
-  
+
+  if (!user)
+    return response.redirect(reverse('backpack.login'), 303);
+
+  if (!tmpfile.size)
+    return redirect(new Error('You must choose a badge to upload.'));
+
   // get the url from the uploaded badge file
   baker.urlFromUpload(tmpfile, function (err, assertionUrl, imagedata) {
     var recipient = user.get('email');
     if (err) return redirect(err);
-    
+
     // grab the assertion data from the endpoint
     remote.getHostedAssertion(assertionUrl, function (err, assertion) {
       if (err) return redirect(err);
@@ -219,15 +221,16 @@ exports.userBadgeUpload = function(req, res) {
         err.name = 'InvalidRecipient';
         return redirect(err);
       }
-      
-      // try to issue the badge 
+
+      // try to issue the badge
       var opts = {
         assertion: assertion,
         url: assertionUrl,
         imagedata: imagedata,
         recipient: recipient
-      }
-      awardBadge(opts, function(err, badge) {
+      };
+      
+      awardBadge(opts, function (err, badge) {
         if (err) {
           logger.warn('Could not save an uploaded badge: ');
           logger.debug(err);

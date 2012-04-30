@@ -1,14 +1,14 @@
-var mysql = require('../lib/mysql')
-  , crypto = require('crypto')
-  , Badge = require('./badge')
-  , Base = require('./mysql-base.js')
-  , _ = require('underscore');
+var mysql = require('../lib/mysql');
+var crypto = require('crypto');
+var Badge = require('./badge');
+var Base = require('./mysql-base.js');
+var _ = require('underscore');
 
-var md5 = function (v) {
+function md5(v) {
   var sum = crypto.createHash('md5');
   sum.update(v);
   return sum.digest('hex');
-};
+}
 
 var Group = function (attributes) {
   this.attributes = attributes;
@@ -16,16 +16,17 @@ var Group = function (attributes) {
 
 Base.apply(Group, 'group');
 
-Group.prototype.updateUrl = function () {
+Group.prototype.updateUrl = function updateUrl() {
   this.set('url', md5('' + this.get('name') + this.get('user_id') + Date.now()));
 };
 
-Group.prototype.getBadgeObjects = function (callback) {
-  var badges = this.get('badges')
-    , badgeIds = (typeof badges === "string" ? JSON.parse(badges) : badges)
-    , values = badgeIds
-    , placeholders = badgeIds.map(function(){return '?';}).join(',')
-    , query = 'SELECT * FROM `badge` WHERE `id` IN (' + placeholders + ') AND `user_id` = ?';
+Group.prototype.getBadgeObjects = function getBadgeObjects(callback) {
+  var badges = this.get('badges');
+  var badgeIds = (typeof badges === "string" ? JSON.parse(badges) : badges);
+  var values = badgeIds;
+  var placeholders = badgeIds.map(function () { return '?' }).join(',');
+  var query = 'SELECT * FROM `badge` WHERE `id` IN (' + placeholders + ') AND `user_id` = ?';
+  
   values.push(this.get('user_id'));
   return this.client.query(query, values, function (err, results) {
     if (err) { return callback(err); }
@@ -33,12 +34,12 @@ Group.prototype.getBadgeObjects = function (callback) {
   });
 };
 
-Group.prototype.presave = function () {
+Group.prototype.presave = function presave() {
   if (!this.attributes.id && !this.attributes.url) { this.updateUrl(); }
-}
+};
 
 Group.prepare = {
-  in: {
+  'in': {
     badges: function (value) {
       // Assume this is an array of badge items if it's an array of objects.
       if (!value) { return; }
@@ -48,7 +49,7 @@ Group.prepare = {
       return JSON.stringify(value);
     }
   },
-  out: {
+  'out': {
     badges: function (value) {
       if (value) { return JSON.parse(value) }
     }
