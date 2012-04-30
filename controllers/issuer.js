@@ -139,8 +139,13 @@ exports.issuerBadgeAddFromAssertion = function(req, res, next) {
 
   //check if the assertion url is malformed
   if (!regex.url.test(assertionUrl)) {
-    logger.error("malformed url " + assertionUrl + " returning 400");
-    return res.json({message: 'malformed url'}, 400);
+    // try one pass of decoding
+    logger.debug('url did not pass, trying to decodeURIComponent');
+    assertionUrl = decodeURIComponent(assertionUrl);
+    if (!regex.url.test(assertionUrl)) {
+      logger.error("malformed url " + assertionUrl + " returning 400");
+      return res.json({ message: 'malformed url' }, 400);
+    }
   }
 
   /* grabbing the remote assertion, 3 nested steps - 
