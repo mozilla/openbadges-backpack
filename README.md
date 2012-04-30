@@ -102,5 +102,6 @@ rather than having to manually edit /etc/hosts
 
 ## Related Projects
 * https://github.com/lmorchard/django-badger -- Issuing app for Django
-* https://github.com/PRX/badges_engine -- Rails Engine for issuing.
+* https://github.com/ralphbean/tahrir -- A pyramid (python) app for issuing your own Open Badges
 * https://github.com/openmichigan/open_badges -- Drupal module for managing/issuing badges
+* https://github.com/PRX/badges_engine -- Rails Engine for issuing.
