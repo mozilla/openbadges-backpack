@@ -338,6 +338,12 @@ function issue(assertions, cb) {
     $("button, a").unbind();
     cb(errors, successes);
   }
+  
+  // setup key handler so we exit immediately if the user hits escape
+  $('body').keydown(function (event) {
+    if (event.keyCode === 27) exit();
+  });
+  
   window.Assertions = {
     processNext: function() {
       if (assertions.length == 0) {

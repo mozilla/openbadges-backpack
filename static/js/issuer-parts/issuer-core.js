@@ -77,6 +77,10 @@ var OpenBadges = (function() {
     //   https://github.com/mozilla/openbadges/wiki/Issuer-API
     // The final (undocumented) argument is used for testing.
     issue: function OpenBadges_issue(assertions, callback, hook) {
+      // setup no-op functions if the user doesn't pass in callback or hook
+      hook = hook || function () {};
+      callback = callback || function () {};
+      
       var root = this.ROOT = findRoot();
       var div = $('<div></div>');
       div.css({
@@ -98,7 +102,6 @@ var OpenBadges = (function() {
       };
       $(iframe).css($.extend(baseStyles, layout.bestSize()));
       $(window).resize(function(){layout.resize(iframe);});
-      if (!hook) hook = function() {};
       $(iframe).one("load", function() {
         hook("load", iframe);
         var channel = Channel.build({
@@ -117,6 +120,9 @@ var OpenBadges = (function() {
             });
           }
         });
+        // set focus to the new iframe so key event handlers work
+        // without the user having to click into it.
+        $(iframe).focus();
       }).appendTo(div);
       hook("create", iframe);
     }
