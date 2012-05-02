@@ -332,15 +332,21 @@ function issue(assertions, cb) {
   $("#welcome").fadeIn();
   var errors = [];
   var successes = [];
+  function exit() {
+    // We're on our way out. Disable all event handlers on the page,
+    // so the user can't do anything.
+    $("button, a").unbind();
+    cb(errors, successes);
+  }
+  
+  // setup key handler so we exit immediately if the user hits escape
+  $('body').keydown(function (event) {
+    if (event.keyCode === 27) exit();
+  });
+  
   window.Assertions = {
     processNext: function() {
       if (assertions.length == 0) {
-        function exit() {
-          // We're on our way out. Disable all event handlers on the page,
-          // so the user can't do anything.
-          $("button, a").unbind();
-          cb(errors, successes);
-        }
         if ($("#welcome:visible").length) {
           exit();
           return;
@@ -356,7 +362,7 @@ function issue(assertions, cb) {
         $("#farewell").fadeIn();
         return;
       }
-      var url = assertions.pop();
+      var url = assertions[assertions.length-1];
       // TODO: parse the URL to see if it's malformed.
       jQuery.ajax({
         url: '/issuer/assertion',
@@ -372,6 +378,7 @@ function issue(assertions, cb) {
           };
           // if the badge already exists in the database, skip this assertion
           if (obj.exists) {
+            assertions.pop();
             errors.push({
               url: url,
               reason: 'EXISTS'
@@ -382,6 +389,7 @@ function issue(assertions, cb) {
 
           // make sure the recipient matches the current user.
           else if (!obj.owner) {
+            assertions.pop();
             errors.push({
               url: url,
               reason: 'INVALID'
@@ -394,6 +402,7 @@ function issue(assertions, cb) {
             $("#badge-ask").empty()
               .append($("#badge-ask-template").render(templateArgs)).fadeIn();
             $("#badge-ask .accept").click(function() {
+              assertions.pop();
               var post = jQuery.ajax({
                 type: 'POST',
                 url: '/issuer/assertion',
@@ -424,6 +433,7 @@ function issue(assertions, cb) {
               jQuery.when(fade, post).always(processNext);
             });
             $("#badge-ask .reject").click(function() {
+              assertions.pop();
               errors.push({
                 url: url,
                 reason: 'DENIED'
@@ -433,6 +443,7 @@ function issue(assertions, cb) {
           }
         },
         error: function() {
+          assertions.pop();
           errors.push({
             url: url,
             reason: 'INACCESSIBLE'
@@ -452,7 +463,7 @@ function issue(assertions, cb) {
       });
     });
     assertions = [];
-    processNext();
+    exit();
     return false;
   });
 }
