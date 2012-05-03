@@ -11,3 +11,6 @@ before_script:
   - mysql -e 'create database test_openbadges;'
   - mysql -uroot -e "grant all on openbadges.* to 'badgemaker'@'localhost' identified by 'secret'"
   - mysql -uroot -e "grant all on test_openbadges.* to 'badgemaker'@'localhost' identified by 'secret'"
+notifications:
+  irc:
+    - "irc.mozilla.org#badges"
