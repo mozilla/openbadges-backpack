@@ -86,6 +86,13 @@ function prepareText(txt) {
   return better;
 }
 
+function makeLinkUrl(path, configuration) {
+  var protocol = configuration.get('protocol');
+  var host = configuration.get('hostname');
+  var port = configuration.get('port');
+  return url.format({protocol: protocol, hostname: host, port: port, pathname: path });
+}
+
 exports.show = function (request, response, next) {
   var user = request.user;
   var group = request.group;
@@ -96,7 +103,7 @@ exports.show = function (request, response, next) {
   // if this is the user's page, show SocialShare button
   if (user && group.get('user_id') === user.get('id')) {
     message = '<p style="float: left;">This is how your portfolio page looks like to the public.</p>'
-      + '<div class="socialshare" style="float: right;" data-type="small-bubbles"></div>'
+      + '<div class="socialshare" style="float: right;" data-type="small-bubbles" data-tweet-at="openbadges"></div>'
   }
   
   request.group.getBadgeObjects(function (err, badges) {
@@ -104,6 +111,11 @@ exports.show = function (request, response, next) {
     portfolio.badges = badgesWithStories;
     portfolio.preamble = prepareText(portfolio.get('preamble'));
     return response.render('portfolio', {
+      opengraph: [
+        { property: 'title', content: portfolio.attributes.title },
+        { property: 'type', content: 'openbadges:share' },
+        { property: 'url', content: makeLinkUrl(request.url, configuration) }
+      ],
       portfolio: portfolio,
       message: message
     });
