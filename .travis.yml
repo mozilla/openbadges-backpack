@@ -8,4 +8,4 @@ notifications:
 before_script:
   - ln -s lib/environments/local-dist.js lib/environments/local.js
   - mysql -e 'create database openbadges;'
-  - mysql -e "grant all on openbadges.* to 'badgemaker'@'localhost' identified by 'secret'"
+  - mysql -uroot -e "grant all on openbadges.* to 'badgemaker'@'localhost' identified by 'secret'"
