@@ -455,12 +455,6 @@ table.information {
   margin-top: 16px;
 }
 
-.portfolio p {
-  font-size: 1.3em;
-  line-height: 1.5em;
-  color: #555;
-}
-
 .portfolio ul {
   list-style: none;
   margin: 20px auto;
@@ -532,14 +526,6 @@ table.information {
 }
 .alert {  
   overflow: hidden;
-}
-.alert iframe {
-  float: right;
-}
-
-.portfolio .message-container p {
-  color: white;
-  line-height: 1.7em;
 }
 
 #validator textarea {

@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge;chrome=1" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/socialshare.min.css" type="text/css" media="all" />
     <link rel="stylesheet" href="/css/bootstrap-2.0.2.min.css" />
     <link href="//www.mozilla.org/tabzilla/media/css/tabzilla.css" rel="stylesheet" /> 
     <link rel="stylesheet" href="/css/style.css" type="text/css" media="all" />
@@ -82,6 +83,7 @@
       <!-- my libraries -->
       <script type="text/javascript" src="/js/jquery.sync.js"></script>
       <script type="text/javascript" src="/js/backpack.js"></script>
+      <script type="text/javascript" src="/js/socialshare.min.js"></script>
       
   </body>
 </html>
