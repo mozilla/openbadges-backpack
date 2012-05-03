@@ -1,5 +1,5 @@
 # Mozilla Open Badges
-[![Build Status](https://secure.travis-ci.org/mozilla/openbadges.png)](http://travis-ci.org/mozilla/openbadges)
+[![Build Status](https://secure.travis-ci.org/mozilla/openbadges.png?branch=development)](http://travis-ci.org/mozilla/openbadges)
 
 ## Overview
 We intend to provide an open set of specifications, tools and services for
