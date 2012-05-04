@@ -2,5 +2,5 @@
 git pull origin development && \
     npm install && \
     npm test && \
-    kill -s SIGHUP `cat openbadges/var/server.pid`
+    kill -s SIGHUP `cat var/server.pid`
 
