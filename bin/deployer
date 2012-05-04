@@ -28,6 +28,7 @@ function accept() {
   console.log.apply(console, args);
 }
 var log = console.log;
+
 program
   .version('0.0.1')
   .option('-p, --port <n>', 'port the webhook endpoint should listen on')
@@ -35,7 +36,6 @@ program
   .option('-b, --branch <name>', 'branch to watch')
   .option('-e, --script <file>', 'file to execute on a successful test run')
   .parse(process.argv);
-
 
 if (program.port === undefined) {
   program.missingArgument('--port');
@@ -57,6 +57,7 @@ if (!path.existsSync(program.script)) {
 debug('listening on port', program.port.toString().blue);
 debug('authorization code', program.auth.toString().blue);
 
+var lastRunData;
 function requestHandler(request, response) {
   var auth;
   var length;
@@ -69,6 +70,13 @@ function requestHandler(request, response) {
     args.unshift('reject'.red);
     console.log.apply(console, args);
  }
+
+  if (request.method.match(/get/i)) {
+    response.setHeader('content-type', 'text/plain; charset=utf-8');
+    if (!lastRunData)
+      return response.end('nothing has been run yet');
+    return response.end(lastRunData);
+  }
 
   if (!request.method.match(/post/i))
     return reject('got request, but not a POST');
@@ -98,6 +106,7 @@ function requestHandler(request, response) {
     var message = payload.status_message;
     var status = payload.status;
     var branch = payload.branch;
+    var lastChar = '\n';
 
     if (!message || status === undefined || !branch) {
       reject('the payload didn\'t have the expected fields');
@@ -110,16 +119,16 @@ function requestHandler(request, response) {
     if (!message.match(/passed/i) || status !== 0)
       return reject('the tests failed, not deploying.');
 
-    var script = spawn('./' + program.script);
-
-    var lastChar = '\n';
+    lastRunData = '';
     function echoScript(data) {
       var dataString = data.toString();
       if (lastChar === '\n') process.stdin.write(program.script.magenta + ' ');
       process.stdin.write(data);
+      lastRunData += dataString;
       lastChar = dataString[dataString.length - 1];
     }
 
+    var script = spawn('./' + program.script);
     script.stdout.on('data', echoScript);
     script.stderr.on('data', echoScript);
     script.on('exit', function (code) {
