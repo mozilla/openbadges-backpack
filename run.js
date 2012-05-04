@@ -4,21 +4,29 @@ var colors = require('colors');
 var http = require('http');
 var program = require('commander');
 var qs = require('querystring');
+var fs = require('fs');
+var util = require('util');
 
 program
   .version('0.5.0')
-  .option('-p, --port [port]', 'Run a webhook server on specified port')
-  .option('-b, --branch [branch]', 'Only watch for changes on specified branch [master]', 'master')
-  .option('-e, --env [env]', 'Run under specified environment')
+  .option('-e, --env [env]', 'run under specified environment')
+  .option('-f, --pidfile [file]', 'save a pidfile')
   .parse(process.argv);
 
 var restarts = 0;
-var running_server;
-var log = function () {
-  console.log("runner: ".magenta + Array.prototype.slice.call(arguments).join(' '));
+var runningServer;
+
+function log () {
+  var args = [].slice.call(arguments);
+  args.unshift('runner'.magenta);
+  console.log.apply(console, args);
 };
 
-var spawn_server = function () {
+function inspect (thing) {
+  return util.inspect(thing, undefined, undefined, true);
+}
+
+var spawnServer = function () {
   var app, fancypid;
   if (++restarts > 5) {
     log('too many failures, shut. down. everything.');
@@ -33,102 +41,62 @@ var spawn_server = function () {
     process.stdout.write(fancypid);
     process.stdout.write(data);
   });
-  
+
   app.stderr.on('data', function (data) {
     process.stderr.write(fancypid);
     process.stderr.write(data);
   });
-  
+
   app.on('exit', function (code, sig) {
     if (sig) log('server killed with signal ' + sig);
     if (code) log('server exited with code ' + code);
-    running_server = spawn_server();
+    runningServer = spawnServer();
   });
 
   return app;
 };
 
-var webhook_server = function (port, branch) {
-  log('starting webhook server on port', port);
-  log('watching for changes on', branch, 'branch');
-  http.createServer(function (req, resp) {
-    var commitData = '';
-    req.on('data', function (incoming) { commitData += incoming });
-    req.on('end', function () {
-      var commit, payload;
-      resp.end('okay');
-      try {
-        payload = qs.parse(commitData)['payload'];
-        commit = JSON.parse(payload);
-      } catch (e) {
-        log('ignoring illegal webhook attempt from', req.client.remoteAddress);
-        return;
-      }
-      if (commit.ref.match('refs/heads/' + branch)) {
-        log('new deploy at ' + (new Date()).toGMTString());
-        pull_new_code(function () { running_server.kill() });
-      }
-    });
-  }).listen(port);
-};
+process.on('SIGHUP', function () {
+  // crash the server
+  runningServer.kill();
+})
+;
+process.on('SIGINT', (function (timeout) {
+  var seriously = 0;
+  return function () {
+    if (seriously) process.exit();
+    seriously = true;
+    setTimeout(function () {
+      seriously = false
+    }, timeout);
+  }
+})(1000));
 
-var pull_new_code = function (callback) {
-  var git = spawn('git', ['pull', 'deploy', 'master']);
-  var preface = 'git '.magenta;
-  
-  git.stdout.on('data', function (data) {
-    process.stdout.write(preface);
-    process.stderr.write(data);
-  });
-  
-  git.stderr.on('data', function (data) {
-    process.stderr.write(preface);
-    process.stderr.write(data);
-  });
-  
-  git.on('exit', function (code, sig) {
-    if (code === 0) install_new_modules(callback);
-  });
-};
+process.on('exit', function () {
+  if (pidfile) {
+    log('destroying pidfile', pidfile.bold);
+    try {
+      fs.unlinkSync(pidfile);
+    } catch (err) {
+      console.log('couldn\'t destroy pidfile:', inspect(err));
+    }
+  }
+});
 
-var install_new_modules = function (callback) {
-  var npm = spawn('npm', ['install']);
-  var preface = 'npm '.magenta;
-  
-  npm.stdout.on('data', function (data) {
-    process.stdout.write(preface);
-    process.stderr.write(data);
-  });
-  
-  npm.stderr.on('data', function (data) {
-    process.stderr.write(preface);
-    process.stderr.write(data);
-  });
-  
-  npm.on('exit', function (code, sig) {
-    if (code === 0) { callback(); }
-  });
-};
+var pidfile = program.pidfile;
+if (program.env)
+  process.env['NODE_ENV'] = program.env;
 
-if (program.env) process.env['NODE_ENV'] = program.env;
-
-log('pid:', process.pid);
-running_server = spawn_server();
-
-if (program.port && program.branch) {
-  webhook_server(program.port, program.branch);
+if (pidfile) {
+  log('saving pid to', pidfile.bold);
+  fs.writeFileSync(pidfile, process.pid.toString())
 }
 
-process.on('SIGHUP', function () {
-  running_server.kill();
-});
+log('runner pid is', process.pid.toString().bold);
+runningServer = spawnServer();
 
-var srs = 0;
-process.on('SIGINT', function () {
-  if (srs) process.exit();
-  srs = 1;
-  setTimeout(function () { srs = 0 }, 1000);
-});
+// reduce restart count every 5 seconds
+setInterval(function () {
+  if (restarts > 0) restarts--;
+}, 5000);
 
-// reduce restart count.
-setInterval(function () { if (restarts > 0) restarts--; }, 5000);
