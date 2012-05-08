@@ -13,9 +13,11 @@
     <label>Email: <input id='email'></label>
     <button id='unhashed'>Unhashed</button>
     <button id='hashed'>Hashed</button>
+    <button id='invalid'>Invalid</button>
     <script>
       var unhashed = document.getElementById('unhashed');
       var hashed = document.getElementById('hashed');
+      var invalid = document.getElementById('invalid');
       function getEmail() {
         return document.getElementById('email').value;
       }
@@ -26,6 +28,11 @@
     
       hashed.addEventListener('click', function(){
         OpenBadges.issue(['http://localhost:8889/hashed.json?email=' + encodeURIComponent(getEmail())]);
+      },false)
+
+      // added to test whether proper error message is thrown for invalid assertion 
+      invalid.addEventListener('click', function(){
+        OpenBadges.issue(['http://localhost:8889/invalid.json?email=' + encodeURIComponent(getEmail())]);
       },false)
     
     </script>

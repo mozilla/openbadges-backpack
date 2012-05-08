@@ -52,6 +52,14 @@ app.get('/hashed.json', function (request, response) {
   });
 });
 
+app.get('/invalid.json', function (request, response) {
+  return response.send({
+    recipient: request.query.email||'brian@mozillafoundation.org',
+    evidence: '/whatever.html',
+    expires: '2040-08-13',
+    issued_on: '2011-08-23'
+  });
+});
 
 
 

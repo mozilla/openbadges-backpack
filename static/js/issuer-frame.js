@@ -442,13 +442,16 @@ function issue(assertions, cb) {
             });
           }
         },
-        error: function() {
+        error: function(xhr) {
           assertions.pop();
+          var templateArgs = {
+            error : jQuery.parseJSON(xhr.responseText)
+          };
           errors.push({
             url: url,
-            reason: 'INACCESSIBLE'
+            reason: templateArgs.error.message
           });
-          showError("#inaccessible-template", {});
+          showError("#inaccessible-template", templateArgs);
           processNext();
         }
       });
