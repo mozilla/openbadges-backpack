@@ -74,7 +74,7 @@
   <div id="inaccessible-template">
     <div class="alert alert-error">
       <a class="close">×</a>
-      <em>[[ error.message ]]</em>
+      We have encountered the following problem: <em>[[ error.message ]]</em>
     </div>
   </div>
   <div id="login-error-template">

@@ -449,7 +449,8 @@ function issue(assertions, cb) {
           };
           errors.push({
             url: url,
-            reason: templateArgs.error.message
+            reason: 'INACCESSIBLE',
+            message: templateArgs.error.message
           });
           showError("#inaccessible-template", templateArgs);
           processNext();
