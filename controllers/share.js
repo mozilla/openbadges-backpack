@@ -37,10 +37,10 @@ function badgeModifierFactory(portfolio, badgeById) {
     var origin = body.badge.issuer.origin;
     var criteria = body.badge.criteria;
     var evidence = body.evidence;
-    
+
     if (criteria[0] === '/') body.badge.criteria = origin + criteria;
     if (evidence && evidence[0] === '/') body.evidence = origin + evidence;
-    
+
     badge.set('_userStory', story);
     return badge;
   };
@@ -49,13 +49,13 @@ function badgeModifierFactory(portfolio, badgeById) {
 exports.editor = function (request, response) {
   var user = request.user;
   var group = request.group;
-  
+
   if (!user)
     return response.send('nope', 403);
-  
+
   if (user.get('id') !== group.get('user_id'))
     return response.send('nope', 403);
-  
+
   var portfolio = group.get('portfolio');
   if (!portfolio)
     portfolio = new Portfolio({
@@ -63,7 +63,7 @@ exports.editor = function (request, response) {
       title: group.get('name'),
       stories: {}
     });
-  
+
   request.group.getBadgeObjects(function (err, badges) {
     var badgesWithStories = _.map(badges, badgeModifierFactory(portfolio));
     portfolio.group = group;
@@ -97,15 +97,15 @@ exports.show = function (request, response, next) {
   var user = request.user;
   var group = request.group;
   var portfolio = group.get('portfolio');
-  
+
   if (!portfolio) return response.send('no portfolio :(', 404);
-  
+
   // if this is the user's page, show SocialShare button
   if (user && group.get('user_id') === user.get('id')) {
-    message = '<p style="float: left;">This is how your portfolio page looks like to the public.</p>'
+    var message = '<p style="float: left;">This is how your portfolio page looks like to the public.</p>'
       + '<div class="socialshare" style="float: right;" data-type="small-bubbles" data-tweet-at="openbadges"></div>'
   }
-  
+
   request.group.getBadgeObjects(function (err, badges) {
     var badgesWithStories = _.map(badges, badgeModifierFactory(portfolio));
     portfolio.badges = badgesWithStories;
@@ -117,7 +117,7 @@ exports.show = function (request, response, next) {
         { property: 'url', content: makeLinkUrl(request.url, configuration) }
       ],
       portfolio: portfolio,
-      message: message
+      message: message || ''
     });
   });
 };
@@ -125,19 +125,19 @@ exports.show = function (request, response, next) {
 exports.createOrUpdate = function (request, response) {
   var group = request.group;
   var user = request.user;
-  
+
   if (!user)
     return response.send('Forbidden', 403);
-  
+
   if (group.get('user_id') !== user.get('id'))
     return response.send('Forbidden', 403);
-  
+
   var stories = {};
   var submitted = request.body;
-  
+
   for (var i = 0; i < submitted.stories.length; i++)
     if (submitted.stories[i]) stories[i] = submitted.stories[i];
-  
+
   var portfolio = new Portfolio({
     stories: stories,
     group_id: group.get('id'),
@@ -145,7 +145,7 @@ exports.createOrUpdate = function (request, response) {
     subtitle: submitted.subtitle,
     preamble: submitted.preamble
   });
-  
+
   portfolio.save(function (err, p) {
     return response.redirect(request.url, '303');
   });
