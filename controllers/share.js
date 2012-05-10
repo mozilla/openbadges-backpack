@@ -103,7 +103,7 @@ exports.show = function (request, response, next) {
   // if this is the user's page, show SocialShare button
   if (user && group.get('user_id') === user.get('id')) {
     var message = '<p style="float: left;">This is how your portfolio page looks like to the public.</p>'
-      + '<div class="socialshare" style="float: right;" data-type="small-bubbles" data-tweet-at="openbadges"></div>'
+      + '<div class="socialshare" style="float: right;" data-type="small-bubbles" data-tweet-at="openbadges"></div>';
   }
 
   request.group.getBadgeObjects(function (err, badges) {
