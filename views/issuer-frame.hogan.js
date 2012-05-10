@@ -74,7 +74,7 @@
   <div id="inaccessible-template">
     <div class="alert alert-error">
       <a class="close">×</a>
-      An assertion URL could not be retrieved.
+      We have encountered the following problem: <em>[[ error.message ]]</em>
     </div>
   </div>
   <div id="login-error-template">
