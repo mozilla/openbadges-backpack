@@ -124,7 +124,7 @@ Group.View = Backbone.View.extend({
 
 
   share: function (event) {
-    window.location = '/share/' + this.model.get('url') + '/edit';
+    window.location = '/share/' + this.model.get('url') + '/';
     return false;
   },
 
