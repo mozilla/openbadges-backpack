@@ -10,6 +10,11 @@
   </div>
 {{/message}}
 
+  {{#owner}}
+  <div class='edit'>
+    <a href="edit" class='edit btn btn-primary'>Edit this page</a>
+  </div>
+  {{/owner}}
   
   <header>
     {{#attributes.title}}<h1>{{attributes.title}}</h1>{{/attributes.title}}

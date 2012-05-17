@@ -94,22 +94,36 @@ function makeLinkUrl(path, configuration) {
 }
 
 exports.show = function (request, response, next) {
-  var user = request.user;
-  var group = request.group;
-  var portfolio = group.get('portfolio');
+  var user, group, portfolio, owner, message;
 
-  if (!portfolio) return response.send('no portfolio :(', 404);
+  user = request.user;
+  group = request.group;
+  portfolio = group.get('portfolio');
+  owner = user && group.get('user_id') === user.get('id');
+
+  // If there is no portfolio and this is the owner, create and save a new
+  // portfolio object. Otherwise, kick the user out.
+  if (!portfolio) {
+    if (!owner) return response.send('no portfolio :(', 404);
+    portfolio = new Portfolio({
+      group_id: group.get('id'),
+      title: group.get('name'),
+      stories: {}
+    });
+    portfolio.save();
+  }
 
   // if this is the user's page, show SocialShare button
-  if (user && group.get('user_id') === user.get('id')) {
-    var message = '<p style="float: left;">This is how your portfolio page looks like to the public.</p>'
+  if (owner)
+    message = '<p style="float: left;">This is how your portfolio page looks like to the public.</p>'
       + '<div class="socialshare" style="float: right;" data-type="small-bubbles" data-tweet-at="openbadges"></div>';
-  }
+
 
   request.group.getBadgeObjects(function (err, badges) {
     var badgesWithStories = _.map(badges, badgeModifierFactory(portfolio));
     portfolio.badges = badgesWithStories;
     portfolio.preamble = prepareText(portfolio.get('preamble'));
+
     return response.render('portfolio', {
       opengraph: [
         { property: 'title', content: portfolio.attributes.title },
@@ -117,7 +131,8 @@ exports.show = function (request, response, next) {
         { property: 'url', content: makeLinkUrl(request.url, configuration) }
       ],
       portfolio: portfolio,
-      message: message || ''
+      message: message || null,
+      owner: owner
     });
   });
 };

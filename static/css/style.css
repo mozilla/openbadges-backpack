@@ -455,6 +455,10 @@ table.information {
   margin-top: 16px;
 }
 
+.portfolio div.edit {
+  text-align: right;
+}
+
 .portfolio ul {
   list-style: none;
   margin: 20px auto;
