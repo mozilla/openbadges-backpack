@@ -86,6 +86,7 @@ exports.generateScript = function (req, res) {
 };
 
 exports.frame = function (req, res) {
+  res.header('Cache-Control', 'no-cache, must-revalidate');
   res.render('issuer-frame', {
     layout: null,
     csrfToken: req.session._csrf,
@@ -192,7 +193,7 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
           imagedata: imagedata,
           recipient: recipient
         };
-        
+
         awardBadge(opts, function (err, badge) {
           if (err) {
             var error_message = "badge error " + assertionUrl + err;

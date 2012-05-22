@@ -12,7 +12,7 @@ var OpenBadges = (function() {
     function bestSize() {
       // the basic issuer frame column is 300px wide with 20px padding
       var winWidth = $(window).width();
-      
+
       var size;
       if( winWidth >= twoCol ){
         // two-column iframe
@@ -44,9 +44,9 @@ var OpenBadges = (function() {
         targetWidth = $(el).width();
       }
 
-      if ((winWidth >= layout.breakpoint && targetWidth < layout.breakpoint) 
+      if ((winWidth >= layout.breakpoint && targetWidth < layout.breakpoint)
           || (winWidth < layout.breakpoint && targetWidth >= layout.breakpoint)){
-        var size = bestSize(); 
+        var size = bestSize();
         targetWidth = size.width.substring(0, size.width.length-2);
         $(el).animate(size, { queue: false });
       }
@@ -57,7 +57,7 @@ var OpenBadges = (function() {
       resize: resize,
       breakpoint: twoCol
     };
-  
+
   })();
 
   function findRoot() {
@@ -80,7 +80,7 @@ var OpenBadges = (function() {
       // setup no-op functions if the user doesn't pass in callback or hook
       hook = hook || function () {};
       callback = callback || function () {};
-      
+
       var root = this.ROOT = findRoot();
       var div = $('<div></div>');
       div.css({
@@ -93,7 +93,8 @@ var OpenBadges = (function() {
         backgroundColor: 'rgba(0, 0, 0, 0.5)'
       }).appendTo(document.body);
       var iframe = document.createElement("iframe");
-      iframe.setAttribute("src", root + "issuer/frame");
+      // add Date.now() to aggressively cache-bust.
+      iframe.setAttribute("src", root + "issuer/frame" + Date.now());
       iframe.setAttribute("scrolling", "no");
       var baseStyles = {
         border: "none",
@@ -127,6 +128,6 @@ var OpenBadges = (function() {
       hook("create", iframe);
     }
   };
-  
+
   return OpenBadges;
 })();
