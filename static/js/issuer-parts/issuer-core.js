@@ -94,7 +94,8 @@ var OpenBadges = (function() {
       }).appendTo(document.body);
       var iframe = document.createElement("iframe");
       // add Date.now() to aggressively cache-bust.
-      iframe.setAttribute("src", root + "issuer/frame" + Date.now());
+      var url = root + "issuer/frame?" + Date.now();
+      iframe.setAttribute("src", url);
       iframe.setAttribute("scrolling", "no");
       var baseStyles = {
         border: "none",
