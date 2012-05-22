@@ -72,7 +72,7 @@ exports.authenticate = function authenticate(request, response) {
     if (!request.session.emails) request.session.emails = [];
 
     logger.debug('browserid verified, attempting to authenticate user');
-    request.session.emails.push(verifierResponse.email);
+    request.session.emails = [verifierResponse.email];
     return formatResponse(reverse('backpack.manage'));
   });
 };
@@ -229,7 +229,7 @@ exports.userBadgeUpload = function userBadgeUpload(request, response) {
         imagedata: imagedata,
         recipient: recipient
       };
-      
+
       awardBadge(opts, function (err, badge) {
         if (err) {
           logger.warn('Could not save an uploaded badge: ');
