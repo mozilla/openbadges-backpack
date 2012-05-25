@@ -24,5 +24,13 @@ srpm:
 test: npm
 	npm test
 
+start-issuer:
+	node fakeissuer/issuer.js > issuer.pid&
+
+stop-issuer:
+	kill `cat issuer.pid`
+
 jenkins_build: 
 	echo 'yep'
+
+.PHONY: fakeissuer

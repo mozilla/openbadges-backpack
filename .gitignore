@@ -6,6 +6,7 @@
 .DS_Store
 *.rpm
 *.tar.gz
+*.pid
 
 /docs
 /node_modules

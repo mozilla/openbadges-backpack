@@ -23,16 +23,19 @@
       }
       
       unhashed.addEventListener('click', function(){
-        OpenBadges.issue(['http://localhost:8889/raw.json?email=' + encodeURIComponent(getEmail())]);
+        var url = 'http://localhost:8889/raw.json?email=' + encodeURIComponent(getEmail());
+        OpenBadges.issue(url);
       },false)
     
       hashed.addEventListener('click', function(){
-        OpenBadges.issue(['http://localhost:8889/hashed.json?email=' + encodeURIComponent(getEmail())]);
+        var url = 'http://localhost:8889/hashed.json?email=' + encodeURIComponent(getEmail())
+        OpenBadges.issue([url]);
       },false)
 
       // added to test whether proper error message is thrown for invalid assertion 
       invalid.addEventListener('click', function(){
-        OpenBadges.issue(['http://localhost:8889/invalid.json?email=' + encodeURIComponent(getEmail())]);
+        var url = 'http://localhost:8889/invalid.json?email=' + encodeURIComponent(getEmail());
+        OpenBadges.issue(url);
       },false)
     
     </script>
