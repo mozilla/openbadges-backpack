@@ -9,7 +9,7 @@ var logger = require('../lib/logging').logger;
 var reverse = require('../lib/router').reverse;
 
 var protocol = configuration.get('protocol') || 'http';
-var port = configuration.get('external_port') || '';
+var port = configuration.get('port') || '';
 var ORIGIN = protocol + '://' + configuration.get('hostname') + (port ? ':' + port : '');
 
 // Render the view for the demo badge issuer.
@@ -25,7 +25,7 @@ exports.issuer = function (req, res) {
 exports.award = function (req, res) {
   var assertionURL = encodeURIComponent([ORIGIN + '/demo/badge.json', qs.stringify(req.body)].join('?'));
   var bakeURL = ORIGIN + '/baker?award=true&assertion=' + assertionURL;
-  
+
   request({url: bakeURL, encoding: 'binary'},  function (err, resp, body) {
     res.send(Buffer(body, 'binary'), {'content-type': 'image/png'});
   });
@@ -38,7 +38,7 @@ exports.massAward = function (req, res) {
   var salt = 'ballertime';
   var hash = require('crypto').createHash('sha256').update(email + salt).digest('hex');
   var recipient = 'sha256$' + hash;
-  
+
   fs.readdirSync(demoBadgeDir)
     .map(function (f) {
       var imgUrl = ORIGIN + '/static/_demo/' + f;
