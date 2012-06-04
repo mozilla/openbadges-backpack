@@ -224,6 +224,18 @@ vows.describe('Badge model').addBatch({
         'should not crash': function (err) {
           assert.ok(!(err instanceof TypeError));
         }
+      },
+      'with a completely invalid body type': {
+        topic: function () {
+          try{
+            return Badge.validateBody(function(){ });
+          } catch (ex) {
+            return ex
+          }
+        },
+        'should not crash': function (err) {
+          assert.ok(!(err instanceof TypeError));
+        }
       }
     },
     'After saving': {
