@@ -66,9 +66,9 @@ exports.baker = function (request, response) {
       logger.warn('reason: ' + errorString);
       return response.send(errorString, 400);
     }
+
     // Check if the assertion obtained is a valid assetion
     // If not send a proper response
-
     err = Badge.validateBody(assertion);
     if (err) {
       errorString = JSON.stringify(err);

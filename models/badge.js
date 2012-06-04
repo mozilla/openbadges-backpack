@@ -137,7 +137,13 @@ Badge.validateBody = function (body) {
   var err = new Error('Invalid badge assertion');
   err.fields = {};
 
-  var fieldFromDottedString = function (str, obj) {
+  var internalClass = Object.prototype.toString.call(body);
+  if (!body || internalClass !== '[object Object]') {
+    err.message = 'Invalid badge assertion: invalid body';
+    return err
+  }
+
+  function fieldFromDottedString (str, obj) {
     var fields = str.split('.');
     var current = obj;
     var previous = null;
@@ -146,7 +152,7 @@ Badge.validateBody = function (body) {
       current = current[f];
     });
     return previous[fields.pop()];
-  };
+  }
 
   var test = {
     missing: function (fieldStr) {
