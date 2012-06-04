@@ -25,7 +25,7 @@ var ORIGINS = {
 var DATES = {
   good: [Date.now()/1000 | 0, '2012-01-01'],
   bad: ['oiajsd09gjas;oj09', 'foreever ago', '@.com:90/', '2001-10-190-19', '901d1', '000000000000000000000']
-};                                                                                                             
+};
 var VERSIONS = {
   good: ['0.1.1', '2.0.1', '1.2.3', 'v1.2.1'],
   bad: ['v100', '50', 'v10.1alpha', '1.2.x']
@@ -56,7 +56,7 @@ var makeBadgeAndSave = function (changes) {
     if (changes[k] === null) { delete badge.attributes[k]; }
     else { badge.attributes[k] = changes[k]; }
   })
-  return function () { 
+  return function () {
     badge.save(this.callback);
   }
 };
@@ -139,7 +139,7 @@ vows.describe('Badge model').addBatch({
       createDbFixtures();
       return true;
     },
-    
+
     'Finding badges': {
       'by user id': {
         topic: function () {
@@ -148,7 +148,7 @@ vows.describe('Badge model').addBatch({
         'should retrieve the right badge': assertFixtureBadge
       },
       'by email address': {
-        topic: function () {  
+        topic: function () {
           Badge.find({email: 'brian@example.com'}, this.callback);
         },
         'should retrieve the right badge': assertFixtureBadge
@@ -165,52 +165,64 @@ vows.describe('Badge model').addBatch({
       'with a missing `badge.issuer` field': makeMissingTest('badge.issuer'),
       'with a missing `badge.issuer.origin` field': makeMissingTest('badge.issuer.origin'),
       'with a missing `badge.issuer.name` field': makeMissingTest('badge.issuer.name'),
-      
+
       'with bogus `recipient`': makeInvalidationTests('recipient', RECIPIENTS.bad),
       'with valid `recipient`': makeValidationTests('recipient', RECIPIENTS.good),
-      
+
       'with bogus `evidence`': makeInvalidationTests('evidence', URLS.bad),
       'with valid `evidence`': makeValidationTests('evidence', URLS.good),
-      
+
       'with bogus `expires`': makeInvalidationTests('expires', DATES.bad),
       'with valid `expires`': makeValidationTests('expires', DATES.good),
-      
+
       'with bogus `issued_on`': makeInvalidationTests('issued_on', DATES.bad),
       'with valid `issued_on`': makeValidationTests('issued_on', DATES.good),
 
       'with bogus `badge.version`': makeInvalidationTests('badge.version', VERSIONS.bad),
       'with valid `badge.version`': makeValidationTests('badge.version', VERSIONS.good),
-      
+
       'with bogus `badge.name`': makeInvalidationTests('badge.name', [genstring(129)] ),
       'with valid `badge.name`': makeValidationTests('badge.name', [genstring(127)] ),
-      
+
       'with bogus `badge.description`': makeInvalidationTests('badge.description', [genstring(129)] ),
       'with valid `badge.description`': makeValidationTests('badge.description', [genstring(127)] ),
-      
+
       'with bogus `badge.image`': makeInvalidationTests('badge.image', URLS.bad),
       'with valid `badge.image`': makeValidationTests('badge.image', URLS.good),
 
       'with bogus `badge.criteria`': makeInvalidationTests('badge.criteria', URLS.bad),
       'with valid `badge.criteria`': makeValidationTests('badge.criteria', URLS.good),
-      
+
       'with bogus `badge.issuer.origin`': makeInvalidationTests('badge.issuer.origin', ORIGINS.bad),
       'with valid `badge.issuer.origin`': makeValidationTests('badge.issuer.origin', ORIGINS.good),
-      
+
       'with bogus `badge.issuer.name`': makeInvalidationTests('badge.issuer.name', [genstring(129)] ),
       'with valid `badge.issuer.name`': makeValidationTests('badge.issuer.name', [genstring(127)] ),
-      
+
       'with bogus `badge.issuer.org`': makeInvalidationTests('badge.issuer.org', [genstring(129)] ),
       'with valid `badge.issuer.org`': makeValidationTests('badge.issuer.org', [genstring(127)] ),
-      
+
       'with bogus `badge.issuer.contact`': makeInvalidationTests('badge.issuer.contact', EMAILS.bad ),
       'with valid `badge.issuer.contact`': makeValidationTests('badge.issuer.contact', EMAILS.good ),
-      
+
       'that is totally valid': {
         topic: function () {
           return Badge.validateBody(makeAssertion({}))
         },
         'should succeed': function (err) {
           assert.isNull(err);
+        }
+      },
+      'with a completely missing body': {
+        topic: function () {
+          try{
+            return Badge.validateBody(null);
+          } catch (ex) {
+            return ex
+          }
+        },
+        'should not crash': function (err) {
+          assert.ok(!(err instanceof TypeError));
         }
       }
     },
@@ -240,7 +252,7 @@ vows.describe('Badge model').addBatch({
           },
           'and then destroyed': {
             topic: function (badge) {
-              badge._oldId = badge.get('id'); 
+              badge._oldId = badge.get('id');
               badge.destroy(function (err, badge) {
                 if (err) return this.callback(err);
                 this.callback(null, badge);
@@ -277,7 +289,7 @@ vows.describe('Badge model').addBatch({
         topic: makeBadgeAndSave({type: 'signed', jwt: 'stuff', public_key: null}),
         'should fail with validation error on `public_key`': assertErrors(['type', 'public_key'])
       },
-      
+
       'an assertion with an unknown type': {
         topic: makeBadgeAndSave({type: 'glurble'}),
         'should fail with validation error on `type`': assertErrors(['type'])
@@ -292,12 +304,12 @@ vows.describe('Badge model').addBatch({
         topic: makeBadgeAndSave({body: null}),
         'should fail with validation error on `body`': assertErrors(['body'])
       },
-      
+
       'an assertion with an unexpected `body` type': {
         topic: makeBadgeAndSave({body: "I just don't understand skrillex"}),
         'should fail with validation error on `body`': assertErrors(['body'])
       },
-      
+
       'an assertion with an invalid `body`': {
         topic: makeBadgeAndSave({body: makeAssertion({'badge': null})}),
         'should fail with validation error on `body`': assertErrors(['body'])
