@@ -88,6 +88,8 @@ router(app)
   .post('/backpack/authenticate',     'backpack.authenticate')
   .delete('/backpack/badge/:badgeId', 'backpack.deleteBadge')
 
+  .get('/stats',                      'backpack.stats')
+
   .post('/group',                     'group.create')
   .put('/group/:groupId',             'group.update')
   .delete('/group/:groupId',          'group.destroy')

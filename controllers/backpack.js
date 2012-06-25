@@ -89,6 +89,30 @@ exports.signout = function signout(request, response) {
   response.redirect(reverse('backpack.login'), 303);
 };
 
+/**
+ * Some statistics on the backpack...aggregated across all 
+ * individual backpacks
+ */
+
+exports.stats = function stats(request, response, next) {
+
+  function makeResponse(err, badges) {
+    if (err) return next(err);
+    prepareBadgeIndex(badges);
+    modifyGroups(groups);
+    response.render('backpack', {
+      error: error,
+      success: success,
+      badges: badges,
+      csrfToken: request.session._csrf,
+      groups: groups,
+      tooltips: request.param('tooltips')
+    });
+  }
+
+  
+}
+
 
 /**
  * Render the management page for logged in users.
@@ -135,7 +159,7 @@ exports.manage = function manage(request, response, next) {
     groups.forEach(function (group) {
       var badgeObjects = [];
       var badgeIds = group.get('badges');
-
+p
       function badgeFromIndex(id) { return badgeIndex[id] }
 
       // copy URL from attributes to main namespace.
@@ -184,6 +208,7 @@ exports.manage = function manage(request, response, next) {
  * @param {File} userBadge uploaded badge from user (from request)
  * @return {HTTP 303} redirects to manage (with error, if necessary)
  */
+
 
 exports.userBadgeUpload = function userBadgeUpload(request, response) {
   var user = request.user;
