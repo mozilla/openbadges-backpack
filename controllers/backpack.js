@@ -95,9 +95,6 @@ exports.signout = function signout(request, response) {
  */
 
 exports.stats = function stats(request, response, next) {
-//  var user = request.user;
-//  var error = request.flash('error');
-//  var success = request.flash('success');
 
   function computeStats(badges) {
     var total_badges = badges.length;
