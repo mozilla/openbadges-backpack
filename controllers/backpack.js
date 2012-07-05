@@ -97,26 +97,26 @@ exports.signout = function signout(request, response) {
 exports.stats = function stats(request, response, next) {
 
   function computeStats(badges) {
-    var total_badges = badges.length;
-    var total_per_issuer = {};
+    var totalBadges = badges.length;
+    var totalPerIssuer = {};
 
     _.each(badges, function(b) {
-      issuer_name = b.attributes.body.badge.issuer.name || 'No Issuer Name';
-      if (_.has(total_per_issuer, issuer_name)) {
-        total_per_issuer[issuer_name] = total_per_issuer[issuer_name] + 1;
+      var issuerName = b.attributes.body.badge.issuer.name || 'No Issuer Name';
+      if (totalPerIssuer[issuerName]) {
+        totalPerIssuer[issuerName]++;
       } else {
-        total_per_issuer[issuer_name] = 1;
+        totalPerIssuer[issuerName] = 1;
       }
     });    
     
     // transform the total_per_issuer object into a nicer array for display
-    var nice_total_per_issuer = _.map(total_per_issuer, function(v,k) {
-      return {'name':k, 'total':v};
+    var niceTotalPerIssuer = _.map(totalPerIssuer, function(v,k) {
+      return {name: k, total: v};
     });
 
     return {
-      'total_badges':total_badges,
-      'total_per_issuer': nice_total_per_issuer
+      totalBadges: totalBadges,
+      totalPerIssuer: niceTotalPerIssuer
     }
   }
 
@@ -126,9 +126,9 @@ exports.stats = function stats(request, response, next) {
 
   function makeResponse(err, badges) {
     if (err) return next(err);
-    data = computeStats(badges);
+    var data = computeStats(badges);
     response.render('stats', {
-      stats: data,
+      stats: data
     });
   }
 

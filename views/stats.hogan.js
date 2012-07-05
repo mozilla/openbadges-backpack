@@ -1,12 +1,12 @@
 <h1>Backpack Facts</h1>
 
 {{#stats}}
-<p>There's {{total_badges}} badges in the system.</p>
+<p>There's {{totalBadges}} badges in the system.</p>
 <p>Some details per issuer,
   <ul>
-    {{#total_per_issuer}}
+    {{#totalPerIssuer}}
     <li>{{name}} has {{total}} badges</li>
-    {{/total_per_issuer}}
+    {{/totalPerIssuer}}
   </ul>
 </p>
 {{/stats}}
