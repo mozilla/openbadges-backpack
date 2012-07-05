@@ -95,6 +95,12 @@ exports.signout = function signout(request, response) {
  */
 
 exports.stats = function stats(request, response, next) {
+  var user = request.user;
+  var adminUsers = configuration.get('admins');
+
+  if (! user || ! adminUsers[user.attributes.email]) {
+    return response.send('Must be an admin user', 403);
+  }
 
   function computeStats(badges) {
     var totalBadges = badges.length;
