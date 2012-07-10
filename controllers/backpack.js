@@ -89,6 +89,60 @@ exports.signout = function signout(request, response) {
   response.redirect(reverse('backpack.login'), 303);
 };
 
+/**
+ * Some statistics on the backpack...aggregated across all 
+ * individual backpacks
+ */
+
+exports.stats = function stats(request, response, next) {
+  var user = request.user;
+  var adminUsers = configuration.get('admins');
+
+  if (!user || !adminUsers.indexOf(user.attributes.email) === -1) {
+    return response.send('Must be an admin user', 403);
+  }
+
+  function computeStats(badges) {
+    var totalBadges = badges.length;
+    var totalPerIssuer = {};
+
+    _.each(badges, function(b) {
+      var issuerName = b.attributes.body.badge.issuer.name || 'No Issuer Name';
+      if (totalPerIssuer[issuerName]) {
+        totalPerIssuer[issuerName]++;
+      } else {
+        totalPerIssuer[issuerName] = 1;
+      }
+    });    
+    
+    // transform the total_per_issuer object into a nicer array for display
+    var niceTotalPerIssuer = _.map(totalPerIssuer, function(v,k) {
+      return {name: k, total: v};
+    });
+
+    return {
+      totalBadges: totalBadges,
+      totalPerIssuer: niceTotalPerIssuer
+    }
+  }
+
+  function getBadges() {
+    Badge.findAll(makeResponse);
+  }
+
+  function makeResponse(err, badges) {
+    if (err) return next(err);
+    var data = computeStats(badges);
+    response.render('stats', {
+      stats: data
+    });
+  }
+
+  var startResponse = getBadges;
+  return startResponse();
+  
+}
+
 
 /**
  * Render the management page for logged in users.
@@ -184,6 +238,7 @@ exports.manage = function manage(request, response, next) {
  * @param {File} userBadge uploaded badge from user (from request)
  * @return {HTTP 303} redirects to manage (with error, if necessary)
  */
+
 
 exports.userBadgeUpload = function userBadgeUpload(request, response) {
   var user = request.user;
