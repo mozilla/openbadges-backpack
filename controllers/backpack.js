@@ -98,7 +98,7 @@ exports.stats = function stats(request, response, next) {
   var user = request.user;
   var adminUsers = configuration.get('admins');
 
-  if (! user || ! adminUsers[user.attributes.email]) {
+  if (! user || ! adminUsers.indexOf(user.attributes.email) === -1) {
     return response.send('Must be an admin user', 403);
   }
 
