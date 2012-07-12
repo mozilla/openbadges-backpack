@@ -98,12 +98,13 @@ exports.stats = function stats(request, response, next) {
   var user = request.user;
   var adminUsers = configuration.get('admins');
 
-  logger.info(user.get('email') + ' is trying to access /stats');
-  logger.info(adminUsers);
+  if (!user)
+    return response.send('Must be logged in', 403);
 
-  if (!user || adminUsers.indexOf(user.attributes.email) < 0) {
+  if (adminUsers.indexOf(user.get('email')) < 0)
     return response.send('Must be an admin user', 403);
-  }
+
+  logger.info(user.get('email') + ' is accessing /stats');
 
   function computeStats(badges) {
     var totalBadges = badges.length;
