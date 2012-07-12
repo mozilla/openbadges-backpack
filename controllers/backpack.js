@@ -90,7 +90,7 @@ exports.signout = function signout(request, response) {
 };
 
 /**
- * Some statistics on the backpack...aggregated across all 
+ * Some statistics on the backpack...aggregated across all
  * individual backpacks
  */
 
@@ -98,7 +98,10 @@ exports.stats = function stats(request, response, next) {
   var user = request.user;
   var adminUsers = configuration.get('admins');
 
-  if (!user || !adminUsers.indexOf(user.attributes.email) === -1) {
+  logger.info(user.get('email') + ' is trying to access /stats');
+  logger.info(adminUsers);
+
+  if (!user || adminUsers.indexOf(user.attributes.email) < 0) {
     return response.send('Must be an admin user', 403);
   }
 
@@ -113,8 +116,8 @@ exports.stats = function stats(request, response, next) {
       } else {
         totalPerIssuer[issuerName] = 1;
       }
-    });    
-    
+    });
+
     // transform the total_per_issuer object into a nicer array for display
     var niceTotalPerIssuer = _.map(totalPerIssuer, function(v,k) {
       return {name: k, total: v};
@@ -140,7 +143,7 @@ exports.stats = function stats(request, response, next) {
 
   var startResponse = getBadges;
   return startResponse();
-  
+
 }
 
 
