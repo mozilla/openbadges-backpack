@@ -27,8 +27,12 @@ function formatResponse(data, request, response) {
   // accept header is secondary as it will be less often used
   var format = accept || 'application/json';
 
+  // remove the query string
+  url = url.split('?')[0];
+
   // extensions rule everything around me.
-  if (url.match(/\.json(p?)$/)) format = 'application/json';
+  if (url.match(/\.json(p?)$/))
+    format = 'application/json';
 
   // if we can't find a formatter, send out a plain text response.
   if (!formatters[format]) {
@@ -39,6 +43,7 @@ function formatResponse(data, request, response) {
     return response.send('error: could not find formatter', 400);
   }
 
+  response.setHeader('Content-Type', format);
   var preparedData = formatters[format](rawData, request);
   return response.send(preparedData, jsonp ? 200 : status);
 }
