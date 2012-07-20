@@ -4,12 +4,6 @@ _.templateSettings = {
   escape : /\[\[(.+?)\]\]/g
 };
 
-jQuery.extend({
-  meta: function(name, value) {
-    return $("meta[http-equiv='" + name + "']").attr("content", value);
-  }
-});
-
 jQuery.fn.extend({
   render: function(args) {
     var template = _.template(this.html());
@@ -18,6 +12,7 @@ jQuery.fn.extend({
 });
 
 var Testing = (function setupTestingEnvironment() {
+  return;
   if (window.parent !== window)
     return;
 
@@ -223,51 +218,11 @@ var Testing = (function setupTestingEnvironment() {
   return Testing;
 })();
 
-var Session = (function() {
-  var loginStarted = false;
-  var Session = {
-    CSRF: jQuery.meta("X-CSRF-Token"),
-    currentUser: jQuery.meta("X-Current-User"),
-    login: function() {
-      if (!loginStarted) {
-        navigator.id.getVerifiedEmail(function(assertion) {
-          jQuery.ajax({
-            url: '/backpack/authenticate',
-            type: 'POST',
-            dataType: 'json',
-            data: {assertion: assertion},
-            success: function(data) {
-              Session.currentUser = data.email;
-              Session.trigger("login-complete");
-            },
-            error: function() {
-              Session.trigger("login-error");
-            },
-            complete: function() {
-              loginStarted = false;
-            }
-          });
-        });
-        loginStarted = true;
-        Session.trigger('login-started');
-      }
-    }
-  };
-
-  _.extend(Session, Backbone.Events);
-
-  jQuery.ajaxSetup({
-    beforeSend: function (xhr, settings) {
-      if (!settings.crossDomain && settings.type != "GET")
-        xhr.setRequestHeader('X-CSRF-Token', Session.CSRF)
-    }
-  });
-
-  return Session;
-})();
+var Session = Session();
+var App;
 
 function showBadges() {
-  $("#welcome").fadeOut(Assertions.processNext);
+  $("#welcome").fadeOut(App.start);
 }
 
 $(window).ready(function() {
@@ -464,6 +419,121 @@ function issue(assertions, cb) {
       errors.push({
         url: assertion,
         reason: 'DENIED'
+      });
+    });
+    assertions = [];
+    exit();
+    return false;
+  });
+}
+
+function issue(assertions, cb){
+
+  if (assertions.length == 1) {
+    $("#welcome .badge-count").text("1 badge");
+  }
+  else {
+    $("#welcome .badge-count").text(assertions.length + " badges");
+  }
+  $("#welcome").fadeIn();
+
+  App = App(assertions, {
+    build: function(assertion){
+      var d = $.Deferred();
+      jQuery.ajax({
+	url: '/issuer/assertion',
+	data: {
+	  url: assertion
+	},
+	success: function(obj){
+	  console.log('ajax success', obj);
+	  if (obj.exists) { d.reject('EXISTS'); }
+	  else if (!obj.owner) { d.reject('INVALID'); }
+	  else { d.resolve(obj); }
+	},
+	error: function(){
+	  console.log('ajax error');
+	  d.reject('INACCESSIBLE');
+	}
+      });
+      return d;
+    },
+    issue: function(){
+      console.log('issue noop');
+      return {};
+    }
+  });
+
+  var badgesProcessed;
+
+  App.on('badges-ready', function(badges){
+    badgesProcessed = $.Deferred();
+
+    var next = 0;
+    function offerNext(){
+      if (next >= badges.length) {
+	$("#badge-ask").fadeOut(function(){
+	  badgesProcessed.resolve();
+	});
+	return;
+      }
+
+      var badge = badges[next];
+      next++;
+      console.log('offering', badge.assertion);
+      var obj = badge.badgeData();
+      var templateArgs = {
+	hostname: badge.assertion,
+	assertion: obj.badge,
+	recipient: obj.recipient,
+	user: Session.currentUser
+      };
+      $("#badge-ask").fadeOut().empty()
+	.append($("#badge-ask-template").render(templateArgs)).fadeIn();
+      $("#badge-ask .accept").click(function(){
+	badge.issue();
+	offerNext();
+      });
+      $("#badge-ask .reject").click(function(){
+	badge.reject('DENIED');
+	offerNext();
+      });
+    }
+    console.log('begin offering');
+    offerNext();
+  });
+
+  App.on('badges-complete', function(failures, successes, t){
+    console.log('failed', failures, 'succeeded', successes);
+    function exit() {
+      // We're on our way out. Disable all event handlers on the page,
+      // so the user can't do anything.
+      $("button, a").unbind();
+      cb(failures, successes);
+    }
+    $.when(badgesProcessed).then(function(){
+      if (successes.length < 2)
+	$("#farewell .badges-" + successes.length).show();
+      else {
+	$("#farewell .badges-many").show();
+	$("#farewell .badges-added").text(successes.length);
+      }
+      $("#farewell .next").click(exit);
+      $(".navbar .closeFrame").unbind().click(exit);
+      $("#farewell").fadeIn();
+      return;
+    });
+  });
+
+  App.on('state-change', function(badge, state){
+    console.log('state-change', badge, state);
+  });
+
+  $(".navbar .closeFrame").click(function() {
+    assertions.forEach(function(assertion) {
+      errors.push({
+	url: assertion,
+	reason: 'DENIED'
       });
     });
     assertions = [];

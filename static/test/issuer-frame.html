@@ -2,79 +2,20 @@
 <meta charset="utf-8">
 <title>Unit Tests</title>
 <link rel="stylesheet" href="qunit.css">
+
 <h1 id="qunit-header">Unit Tests</h1>
 <h2 id="qunit-banner"></h2>
 <div id="qunit-testrunner-toolbar"></div>
 <h2 id="qunit-userAgent"></h2>
 <ol id="qunit-tests"></ol>
 <div id="qunit-fixture"></div>
+
 <script src="qunit.js"></script>
 <script src="../js/jquery.min.js"></script>
 <script src="../js/underscore-min.js"></script>
 <script src="../js/backbone-min.js"></script>
+<script src="../js/issuer-frame-reboot.js"></script>
 <script>
-
-jQuery.extend({
-  meta: function(name, value) {
-    return $("meta[http-equiv='" + name + "']").attr("content", value);
-  }
-});
-
-var Session = function(spec) {
-  var spec = spec || {};
-
-  var startLogin = spec.startLogin || function(deferred) {
-    navigator.id.getVerifiedEmail(function(assertion) {
-      jQuery.ajax({
-	url: '/backpack/authenticate',
-	type: 'POST',
-	dataType: 'json',
-	data: {assertion: assertion},
-	success: function(data) {
-	  deferred.resolve(data);
-	},
-	error: function() {
-	  deferred.reject();
-	}
-      });
-    });
-  };
-
-  var loginStarted = false;
-  var Session = {
-    CSRF: jQuery.meta("X-CSRF-Token"),
-    currentUser: jQuery.meta("X-Current-User"),
-    login: function() {
-      if (!loginStarted) {
-	var login = jQuery.Deferred();
-	login.done(function(data) {
-	  Session.currentUser = data.email;
-	  Session.trigger("login-complete");
-	});
-	login.fail(function() {
-	  Session.trigger("login-error");
-	});
-	login.always(function() {
-	  loginStarted = false;
-	});
-	loginStarted = true;
-	Session.trigger('login-started');
-	startLogin(login);
-      }
-    }
-  };
-
-  _.extend(Session, Backbone.Events);
-
-  jQuery.ajaxSetup({
-    beforeSend: function (xhr, settings) {
-      if (!settings.crossDomain && settings.type != "GET")
-	xhr.setRequestHeader('X-CSRF-Token', Session.CSRF)
-    }
-  });
-
-  return Session;
-};
 
 module("Session");
 
@@ -131,114 +72,6 @@ asyncTest('Session.login success', function(){
   s.login();
 });
 
-</script>
-<script>
-
-/* Badge - an evented Deferred representing a badge
- *   Takes an assertion url
- *   Optionally takes build and issue methods in a spec object
- *     These should return Deferreds or plain objects
- *     `build` attempts to build a full badge out of the assertion url
- *     `issue` attempts to issue the badge
- *
- *   Events:
- *     built   - fired when build succeeds
- *     issued  - fired when issue succeeds
- *
- *   The Deferred is resolved if build and issue succeed, and rejected
- *   if either has an error or the badge is rejected by the user.
- */
-var Badge = function(assertion, spec){
-  var spec = spec || {};
-  var build = spec.build || function(){ return {}; };
-  var issue = spec.issue || function(){ return {}; };
-
-  var buildState;
-  var issueState;
-
-  var Badge = $.Deferred(function(){
-    var _state = 'pendingBuild';
-    var _badgeData;
-
-    function changeState(to){
-      _state = to;
-      Badge.trigger('state-change', to);
-    }
-
-    this.assertion = assertion;
-
-    this.error;
-    this.fail(function(reason){
-      this.error = {url: assertion, reason: reason};
-      changeState('failed');
-    });
-
-    this.start = function(){
-      buildState = build(assertion);
-
-      $.when(buildState).then(
-	function buildSuccess(data){
-	  _badgeData = data;
-	  changeState('built');
-	  Badge.trigger('built');
-	},
-	function buildFailure(data){
-	  changeState('failed');
-	  Badge.reject(data);
-	}
-      );
-    };
-
-    this.issue = function(){
-      if (_state != 'built')
-	throw new Error('Cannot issue unbuilt badge');
-
-      changeState('pendingIssue');
-      issueState = issue(assertion);
-
-      $.when(issueState).then(
-	function issueSuccess(){
-	  changeState('issued');
-	  Badge.trigger('issued');
-	  Badge.resolve();
-	},
-	function issueFailure(data){
-	  changeState('failed');
-	  Badge.reject(data);
-	}
-      );
-    };
-
-    this.badgeData = function(){
-      return _badgeData;
-    };
-
-    this.result = function(){
-      var state = this.state();
-
-      if (state === 'issued')
-	return this.assertion;
-      else if (state === 'failed')
-	return this.error;
-      else
-	throw new Error("Can't return result for state " + state);
-    };
-
-    this.state = function(){
-      return _state;
-    };
-
-    this.isState = function(state){
-      return state === _state;
-    }
-
-    _.extend(this, Backbone.Events);
-
-  });
-
-  return Badge;
-};
-
 module("Badge");
 
 asyncTest('Successful badge', function(){
@@ -256,7 +89,7 @@ asyncTest('Successful badge', function(){
     ok(false, 'fail');
   });
   b.always(function(){
-    equal(this.state(), 'issued');
+    equal(this.state(), 'complete');
     equal(this.assertion, 'foo');
     start();
   });
@@ -353,7 +186,7 @@ asyncTest('Successful badge states', function(){
     stateChanges++;
   });
   b.always(function(){
-    equal(stateChanges, 3);
+    equal(stateChanges, 4);
     deepEqual(states, ['pendingBuild', 'built', 'pendingIssue', 'issued']);
     start();
   });
@@ -413,82 +246,46 @@ asyncTest('Badge data', function(){
   b.start();
 });
 
-</script>
-<script>
-
-var App = function(assertions, spec){
-  var assertions = assertions || [];
-  var spec = spec || {};
-  var build = spec.build || function(){ return $.Deferred().resolve(); };
-  var issue = spec.issue || function(){ return $.Deferred().resolve(); };
-
-  var badges = [];
-
-  var App = {
-    start: function(){
-      if (assertions.length === 0) {
-	App.trigger('badges-complete', [], [], 0);
-      }
-      else {
-	assertions.forEach(function(assertion, i, arr){
-	  var b = Badge(assertion, {
-	    build: build,
-	    issue: issue
-	  });
-	  b.on('state-change', function(){
-	    App.trigger('state-change');
-	  });
-	  badges.push(b);
-	});
-	badges.forEach(function(badge, i, arr){
-	  badge.start();
-	});
-      }
+asyncTest('Delayed badge data', function(){
+  var b = Badge('foo', {
+    build: function(assertion){
+      var build = $.Deferred();
+      setTimeout(function(){
+	build.resolve({url: assertion, extra: 'stuff'});
+      }, 500);
+      return build;
     }
-  };
+  });
+  equal(b.badgeData(), undefined, 'no data before build');
+  b.on('built', function(){
+    deepEqual(b.badgeData(), {url: 'foo', extra: 'stuff'}, 'badgeData holds build');
+    start();
+  });
+  b.start();
+});
 
-  _.extend(App, Backbone.Events);
+test('Badge isState', function(){
+  var b = Badge('foo');
+  ok(b.isState('pendingBuild'));
+  ok(b.isState('pendingBuild', 'somethingElse', 'maybeThis'));
+  ok(b.isState('somethingFirst', 'pendingBuild', 'somethingElse', 'maybeThis'));
+  ok(!b.isState('wrong'));
+  ok(!b.isState('wrong', 'somethingElse', 'maybeThis'));
+});
 
-  function checkAllBuilt() {
-    var building = _.find(badges, function(badge){ return badge.state() === 'pendingBuild'; });
-    if (!building){
-      var built = _.filter(badges, function(badge){ return badge.state() === 'built'; });
-      App.off('state-change', checkAllBuilt);
-      if (built.length > 0) {
-	App.trigger('badges-ready', built);
-      }
-    }
-  }
+asyncTest('Failing a failed badge does nothing', function(){
+  var b = Badge('foo', {
+    build: function(assertion){ return $.Deferred().reject('first'); }
+  });
+  b.fail(function(){
+    deepEqual(b.result(), {url: 'foo', reason: 'first'});
+    b.reject('second');
+    deepEqual(b.result(), {url: 'foo', reason: 'first'});
+    start();
+  });
+  b.start();
+});
 
-  function checkAllIssued() {
-    var nonFinal = _.find(badges, function(badge){ return !(badge.state() === 'issued' || badge.state() === 'failed'); });
-    if (!nonFinal) {
-      var issuedCount = _.reduce(badges, function(memo, badge){ return badge.state() === 'issued' ? memo + 1 : memo; }, 0);
-      App.trigger('badges-issued', issuedCount);
-    }
-  }
-
-  function checkAllDone() {
-    var pending = _.find(badges, function(badge){ return !(badge.isResolved() || badge.isRejected()); });
-    if(!pending) {
-      var failures = _.map(
-	_.filter(badges, function(badge){ return badge.isState('failed'); }),
-	function(badge){ return badge.result() }
-      );
-      var successes = _.map(
-	_.filter(badges, function(badge){ return badge.isState('issued'); }),
-	function(badge){ return badge.result() }
-      );
-      App.trigger('badges-complete', failures, successes, badges.length);
-    }
-  }
-
-  App.on('state-change', checkAllBuilt);
-  App.on('state-change', checkAllIssued);
-  App.on('state-change', checkAllDone);
-
-  return App;
-};
 
 module("App");
 
@@ -524,7 +321,11 @@ asyncTest('Accept a badge', function(){
     equal(badges[0].assertion, 'foo');
     badges[0].issue();
   });
+  var completeSeen = false;
   app.on('badges-complete', function(failures, successes, total){
+    if (completeSeen)
+      ok(false, 'badges-complete should only fire once');
+    completeSeen = true;
     ok(ready, 'Saw badges-ready event');
     ok(true, 'badges-complete event');
     deepEqual(failures, [], 'empty failures');
@@ -644,5 +445,31 @@ asyncTest('Two bad', function(){
   });
   app.start();
 });
+
+asyncTest('Abort', function(){
+  var app = App(['foo', 'bar', 'baz'], {
+    build: function(assertion){
+      var d = $.Deferred();
+      if (assertion === 'foo')
+	setTimeout(function(){ d.resolve(); }, 500);
+      else if (assertion === 'bar')
+	d.reject('failed build');
+      else if (assertion === 'baz')
+	setTimeout(function(){ d.reject('fail later'); }, 500);
+      return d;
+    }
+  });
+  app.on('badges-complete', function(f, s, t){
+    deepEqual(f, [
+      {url: 'foo', reason: 'DENIED'},
+      {url: 'bar', reason: 'failed build'},
+      {url: 'baz', reason: 'DENIED'}
+    ]);
+    start();
+  });
+  app.start();
+  app.abort();
+});
+
 </script>
 
