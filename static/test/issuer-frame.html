@@ -446,7 +446,7 @@ asyncTest('Two bad', function(){
   app.start();
 });
 
-asyncTest('Abort', function(){
+asyncTest('Abort after start', function(){
   var app = App(['foo', 'bar', 'baz'], {
     build: function(assertion){
       var d = $.Deferred();
@@ -459,7 +459,11 @@ asyncTest('Abort', function(){
       return d;
     }
   });
-  app.on('badges-complete', function(f, s, t){
+  app.on('badges-complete', function(){
+    ok(false, 'should not complete');
+    start();
+  });
+  app.on('badges-aborted', function(f, s, t){
     deepEqual(f, [
       {url: 'foo', reason: 'DENIED'},
       {url: 'bar', reason: 'failed build'},
@@ -468,6 +472,23 @@ asyncTest('Abort', function(){
     start();
   });
   app.start();
+  app.abort();
+});
+
+asyncTest('Abort before start', function(){
+  var app = App(['foo', 'bar', 'baz']);
+  app.on('badges-complete', function(){
+    ok(false, 'should not complete');
+    start();
+  });
+  app.on('badges-aborted', function(f, s, t){
+    deepEqual(f, [
+      {url: 'foo', reason: 'DENIED'},
+      {url: 'bar', reason: 'DENIED'},
+      {url: 'baz', reason: 'DENIED'}
+    ]);
+    start();
+  });
   app.abort();
 });
 

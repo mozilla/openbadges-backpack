@@ -175,6 +175,18 @@ var App = function(assertions, spec){
   var issue = spec.issue || function(){ return $.Deferred().resolve(); };
 
   var badges = [];
+  var aborted = false;
+
+  assertions.forEach(function(assertion, i, arr){
+    var b = Badge(assertion, {
+      build: build,
+      issue: issue
+    });
+    b.on('state-change', function(to){
+      App.trigger('state-change', b, to);
+    });
+    badges.push(b);
+  });
 
   var App = {
     start: function(){
@@ -182,22 +194,13 @@ var App = function(assertions, spec){
 	App.trigger('badges-complete', [], [], 0);
       }
       else {
-	assertions.forEach(function(assertion, i, arr){
-	  var b = Badge(assertion, {
-	    build: build,
-	    issue: issue
-	  });
-	  b.on('state-change', function(to){
-	    App.trigger('state-change', b, to);
-	  });
-	  badges.push(b);
-	});
 	badges.forEach(function(badge, i, arr){
 	  badge.start();
 	});
       }
     },
     abort: function(){
+      aborted = true;
       badges.forEach(function(badge){
 	badge.reject('DENIED');
       });
@@ -242,7 +245,8 @@ var App = function(assertions, spec){
 	function(badge){ return badge.result() }
       );
       App.off('state-change', checkAllDone);
-      App.trigger('badges-complete', failures, successes, badges.length);
+      var evt = aborted ? 'badges-aborted' : 'badges-complete';
+      App.trigger(evt, failures, successes, badges.length);
     }
   }
 

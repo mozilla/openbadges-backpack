@@ -511,7 +511,7 @@ function issue(assertions, cb){
       $("button, a").unbind();
       cb(failures, successes);
     }
-    $.when(badgesProcessed).then(function(){
+    $.when(badgesProcessed).always(function(){
       if (successes.length < 2)
 	$("#farewell .badges-" + successes.length).show();
       else {
@@ -525,19 +525,17 @@ function issue(assertions, cb){
     });
   });
 
+  App.on('badges-aborted', function(failures, successes, t){
+    $("button, a").unbind();
+    cb(failures, successes);
+  });
+
   App.on('state-change', function(badge, state){
     console.log('state-change', badge, state);
   });
 
   $(".navbar .closeFrame").click(function() {
-    assertions.forEach(function(assertion) {
-      errors.push({
-	url: assertion,
-	reason: 'DENIED'
-      });
-    });
-    assertions = [];
-    exit();
+    App.abort();
     return false;
   });
 }
