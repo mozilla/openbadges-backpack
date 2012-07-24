@@ -262,8 +262,8 @@ $(window).ready(function() {
   var channel = buildChannel();
 });
 
-function showError(templateName, args) {
-  $(templateName).render(args).appendTo("#messages").hide().slideDown(function(){
+function showError(template, data) {
+  $(template).render(data).appendTo("#messages").hide().slideDown(function(){
     var msg = this;
     $(msg).click(function(){
       console.log(msg);
@@ -446,27 +446,49 @@ function issue(assertions, cb){
 	  url: assertion
 	},
 	success: function(obj){
-	  console.log('ajax success', obj);
-	  if (obj.exists) { d.reject('EXISTS'); }
-	  else if (!obj.owner) { d.reject('INVALID'); }
-	  else { d.resolve(obj); }
+	  if (obj.exists && false) {
+	    d.reject('EXISTS');
+	  }
+	  else if (!obj.owner) {
+	    d.reject('INVALID');
+	  }
+	  else {
+	    d.resolve(obj.badge);
+	  }
 	},
-	error: function(){
-	  console.log('ajax error');
+	error: function(err){
 	  d.reject('INACCESSIBLE');
 	}
       });
       return d;
     },
-    issue: function(){
-      console.log('issue noop');
-      return {};
+    issue: function(assertion){
+      var d = $.Deferred();
+      var self = this;
+      var post = jQuery.ajax({
+	type: 'POST',
+	url: '/issuer/assertion',
+	data: {
+	  url: assertion
+	},
+	success: function(data, textStatus, jqXHR) {
+	  if (jqXHR.status == 304) {
+	    d.reject('EXISTS');
+	  } else
+	    successes.push(url);
+	    d.resolve();
+	},
+	error: function(req) {
+	  // TODO
+	}
+      });
+      return d;
     }
   });
 
   var badgesProcessed;
 
-  App.on('badges-ready', function(badges){
+  App.on('badges-ready', function(failures, badges){
     badgesProcessed = $.Deferred();
 
     var next = 0;
@@ -484,7 +506,7 @@ function issue(assertions, cb){
       var obj = badge.badgeData();
       var templateArgs = {
 	hostname: badge.assertion,
-	assertion: obj.badge,
+	assertion: obj,
 	recipient: obj.recipient,
 	user: Session.currentUser
       };

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Unit Tests</title>
+<link rel="stylesheet" href="qunit.css">
+
+<h1 id="qunit-header">Unit Tests</h1>
+<h2 id="qunit-banner"></h2>
+<div id="qunit-testrunner-toolbar"></div>
+<h2 id="qunit-userAgent"></h2>
+<ol id="qunit-tests"></ol>
+<div id="qunit-fixture"></div>
+
+<script src="qunit.js"></script>
+<script src="../js/jquery.min.js"></script>
+<script src="../js/underscore-min.js"></script>
+<script src="../js/backbone-min.js"></script>
+<script src="../js/issuer-frame-reboot.js"></script>
+<script>
+
+var FAKE_XHR_DELAY = 10;
+var ASSERTIONS = [
+  "http://foo.org/newbadge.json",
+  "http://foo.org/another_newbadge.json",
+  "http://foo.org/nonexistent.json",
+  "http://bar.org/oldbadge.json",
+  "http://foo.org/notowner.json",
+  "http://foo.org/explodeonissue.json"
+  // TODO: additional cases - duplicate on issue, explode on build
+];
+var RESPONSES = {
+  "http://foo.org/notowner.json": {
+    owner: false,
+    exists: false,
+    badge: {
+      "recipient": "someone_else@example.com",
+      "evidence": "/badges/html9-basic/example",
+      "badge": {
+	"version": "0.5.0",
+	"name": "HTML9 Fundamental",
+	"image": "/_demo/nc.large.png",
+	"description": "Fetchable and validates fine client-side but not server-side",
+	"criteria": "/badges/html9-basic",
+	"issuer": {
+	  "origin": "http://p2pu.org",
+	  "name": "P2PU",
+	  "org": "School of Webcraft",
+	  "contact": "admin@p2pu.org"
+	}
+      }
+    }
+  },
+  "http://foo.org/newbadge.json": {
+    owner: true,
+    exists: false,
+    badge: {
+      "recipient": "example@example.com",
+      "evidence": "/badges/html5-basic/example",
+      "badge": {
+	"version": "0.5.0",
+	"name": "HTML5 Fundamental",
+	"image": "/_demo/by.large.png",
+	"description": "Knows the difference between a <section> and an <article>",
+	"criteria": "/badges/html5-basic",
+	"issuer": {
+	  "origin": "http://p2pu.org",
+	  "name": "P2PU",
+	  "org": "School of Webcraft",
+	  "contact": "admin@p2pu.org"
+	}
+      }
+    }
+  },
+  "http://foo.org/another_newbadge.json": {
+    owner: true,
+    exists: false,
+    badge: {
+      "recipient": "example@example.com",
+      "evidence": "/badges/html6-basic/example",
+      "badge": {
+	"version": "0.5.0",
+	"name": "HTML6 Fundamental",
+	"image": "/_demo/cc.large.png",
+	"description": "Knows the difference between a <sprite> and a <hamster>",
+	"criteria": "/badges/html6-basic",
+	"issuer": {
+	  "origin": "http://p2pu.org",
+	  "name": "P2PU",
+	  "org": "School of Webcraft",
+	  "contact": "admin@p2pu.org"
+	}
+      }
+    }
+  },
+  "http://bar.org/oldbadge.json": {
+    owner: true,
+    exists: true,
+    badge: {
+      "recipient": "example@example.com",
+      "evidence": "/badges/html4-basic/example",
+      "badge": {
+	"version": "0.5.0",
+	"name": "HTML4 Fundamental",
+	"image": "/_demo/cc.large.png",
+	"description": "Knows the difference between a <p> and an <b>",
+	"criteria": "/badges/html4-basic",
+	"issuer": {
+	  "origin": "http://p2pu.org",
+	  "name": "P2PU",
+	  "org": "School of Webcraft",
+	  "contact": "admin@p2pu.org"
+	}
+      }
+    }
+  },
+  "http://foo.org/explodeonissue.json": {
+    owner: true,
+    exists: false,
+    badge: {
+      "recipient": "example@example.com",
+      "evidence": "/badges/html4-basic/example",
+      "badge": {
+	"version": "0.5.0",
+	"name": "HTML4 Fundamental",
+	"image": "/_demo/cc.large.png",
+	"description": "Knows the difference between a <p> and an <b>",
+	"criteria": "/badges/html4-basic",
+	"issuer": {
+	  "origin": "http://p2pu.org",
+	  "name": "P2PU",
+	  "org": "School of Webcraft",
+	  "contact": "admin@p2pu.org"
+	}
+      }
+    }
+  }
+};
+var fakeResponseHandlers = {
+  "POST /backpack/authenticate": function(options, cb) {
+    if (Testing.browseridWorks)
+      cb(200, 'OK', {
+	json: {
+	  email: options.data.assertion
+	}
+      });
+    else
+      cb(400, 'Bad Request');
+  },
+  "POST /issuer/assertion": function(options, cb) {
+    if (options.data.url == "http://foo.org/explodeonissue.json")
+      cb(400, 'Bad Request', {
+	text: JSON.stringify({
+	  message: "blah"
+	})
+      });
+    else
+      cb(200, 'OK');
+  },
+  "GET /issuer/assertion": function(options, cb) {
+    if (options.data.url in RESPONSES) {
+      cb(200, 'OK', {json: RESPONSES[options.data.url]});
+    } else
+      cb(404, 'Not Found');
+  }
+};
+
+jQuery.ajaxTransport("+*", function(options, originalOptions, jqXHR) {
+  return {
+    send: function(headers, completeCallback) {
+      setTimeout(function() {
+	var string = options.type + " " + originalOptions.url;
+	if (string in fakeResponseHandlers) {
+	  fakeResponseHandlers[string]({
+	    data: originalOptions.data
+	  }, completeCallback);
+	} else {
+	  completeCallback(404, 'Not Found');
+	}
+	//console.log("ajax", options.type, originalOptions.url, options, originalOptions, headers);
+      }, FAKE_XHR_DELAY);
+    },
+    abort: function() {
+      console.log('abort');
+      throw new Error("abort() is not implemented!");
+    }
+  };
+});
+
+asyncTest('Test as example@example.com', function(){
+  var app = App(ASSERTIONS);
+
+  app.on('badges-ready', function(failed, ready){
+    deepEqual(_.map(failed, function(badge){ return badge.assertion; }), [
+      'http://foo.org/nonexistent.json',
+      'http://bar.org/oldbadge.json',
+      'http://foo.org/notowner.json'
+    ], 'expected failures from build');
+    ready.forEach(function(badge){
+      badge.issue();
+    });
+  });
+
+  //TODO: test screen/message data
+  var failureEvents = {
+    'http://foo.org/nonexistent.json': { reason: 'INACCESSIBLE' },
+    'http://bar.org/oldbadge.json': { reason: 'EXISTS' },
+    'http://foo.org/notowner.json': { reason: 'INVALID' },
+    'http://foo.org/explodeonissue.json': { reason: 'INVALID' }
+  };
+  app.on('badge-failed', function(badge){
+    var expected = failureEvents[badge.assertion];
+    if (expected){
+      ok(!expected.seen, 'first failure for ' + badge.assertion);
+      expected.seen = true;
+      equal(badge.error.reason, expected.reason, 'expected failure reason for ' + badge.assertion);
+    }
+    else {
+      ok(false, 'unexpected assertion failure on ' + badge.assertion + ' for reason ' + badge.error.reason);
+    }
+  });
+
+  app.on('badges-complete', function(failed, successes, total){
+    equal(total, ASSERTIONS.length, 'all badges complete');
+    deepEqual(_.map(failed, function(badge){ return badge.assertion; }), [
+      'http://foo.org/nonexistent.json',
+      'http://bar.org/oldbadge.json',
+      'http://foo.org/notowner.json',
+      'http://foo.org/explodeonissue.json'
+    ], 'expected failures');
+    deepEqual(_.map(successes, function(badge){ return badge.assertion; }), [
+      'http://foo.org/newbadge.json',
+      'http://foo.org/another_newbadge.json'
+    ], 'expected successes');
+    start();
+  });
+
+  app.start();
+});
+
+</script>

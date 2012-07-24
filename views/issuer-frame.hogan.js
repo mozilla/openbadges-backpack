@@ -61,14 +61,14 @@
     <div class="alert">
       <a class="close">×</a>
       You appear to already have the
-      <em>[[ assertion.badge.name ]]</em> badge in your backpack.
+      <em>[[ badge.name ]]</em> badge in your backpack.
     </div>
   </div>
   <div id="owner-mismatch-template">
     <div class="alert alert-error">
       <a class="close">×</a>
       It appears that the 
-      <em>[[ assertion.badge.name ]]</em> badge was not awarded to you ([[ user ]]).
+      <em>[[ badge.name ]]</em> badge was not awarded to you ([[ user ]]).
     </div>
   </div>
   <div id="inaccessible-template">
