@@ -142,7 +142,7 @@ var Badge = function(assertionUrl, spec){
       if (this.inState('issued', 'complete'))
 	return this.assertionUrl;
       else if (this.inState('failed'))
-	return this.error;
+	return { url: this.error.url, reason: this.error.reason };
       else
 	throw new Error("Can't return result for state " + this.state());
     };
@@ -178,7 +178,7 @@ var App = function(assertionUrls, spec){
 	  build.reject('EXISTS', {}, obj);
 	}
 	else if (!obj.owner) {
-	  build.reject('INVALID', {owner: false}, obj);
+	  build.reject('INVALID', {}, obj);
 	}
 	else {
 	  build.resolve(obj);
@@ -208,7 +208,7 @@ var App = function(assertionUrls, spec){
 	  issue.resolve();
       },
       error: function(req) {
-	issue.reject('INVALID', {owner: true});
+	issue.reject('INVALID');
       }
     });
     return issue;

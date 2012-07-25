@@ -187,7 +187,7 @@ jQuery.ajaxTransport("+*", function(options, originalOptions, jqXHR) {
 
 function checkDataObj(data){
   // badge.badge should really be assertion.badge
-  var expectedElements = ['exists', 'owner', 'badge.evidence', 'badge.recipient', 'badge.badge.name'];
+  var expectedElements = ['exists', 'badge.evidence', 'badge.recipient', 'badge.badge.name'];
   expectedElements.forEach(function(expectedElement){
     var value = _.reduce(expectedElement.split('.'), function(memo, key){ return memo[key]; }, data);
     notEqual(typeof value, undefined, expectedElement + ' is defined');
@@ -222,8 +222,7 @@ asyncTest('Test', function(){
 	equal(badge.assertionUrl, 'http://bar.org/oldbadge.json');
       }
       else if (error.reason === 'INVALID') {
-	notEqual(typeof error.owner, 'undefined', 'owner is defined');
-	if (error.owner) {
+	if (badge.data.owner) {
 	  equal(badge.assertionUrl, 'http://foo.org/explodeonissue.json');
 	}
 	else {

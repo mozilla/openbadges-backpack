@@ -118,7 +118,10 @@ function issue(assertions, cb){
     // We're on our way out. Disable all event handlers on the page,
     // so the user can't do anything.
     $("button, a").unbind();
-    cb(failures, successes);
+    function results(badge) {
+      return badge.result();
+    }
+    cb(_.map(failures, results), _.map(successes, results));
   }
 
   App.on('badges-complete', function(failures, successes, t){

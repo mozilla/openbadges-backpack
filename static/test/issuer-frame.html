@@ -240,7 +240,7 @@ asyncTest('badge.result() for issued', function(){
 
 asyncTest('badge.result() for failed', function(){
   var b = Badge('foo', {
-    build: function(){ return $.Deferred().reject('asplode'); }
+    build: function(){ return $.Deferred().reject('asplode', {more: 'stuff'}); }
   });
   b.start();
   b.always(function(){
