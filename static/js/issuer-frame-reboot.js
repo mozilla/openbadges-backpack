@@ -113,8 +113,9 @@ var Badge = function(assertion, spec){
 	  changeState('built');
 	  Badge.trigger('built');
 	},
-	function buildFailure(reason, data){
-	  Badge.reject(reason, data);
+	function buildFailure(reason, errorData, badgeData){
+	  _badgeData = badgeData;
+	  Badge.reject(reason, errorData);
 	}
       );
     };
@@ -178,18 +179,21 @@ var App = function(assertions, spec){
 	url: assertion
       },
       success: function(obj){
+      var issuedBadge = obj.badge;
+      var badgeData = obj.badge.badge;
 	if (obj.exists) {
-	  build.reject('EXISTS');
+	  build.reject('EXISTS', {}, badgeData);
 	}
 	else if (!obj.owner) {
-	  build.reject('INVALID');
+	  build.reject('INVALID', {owner: false}, badgeData);
 	}
 	else {
-	  build.resolve(obj.badge);
+	  build.resolve(issuedBadge);
 	}
       },
       error: function(err){
-	build.reject('INACCESSIBLE');
+	// TODO: is this the right error?
+	build.reject('INACCESSIBLE', { message: err.statusText });
       }
     });
     return build;
@@ -211,7 +215,7 @@ var App = function(assertions, spec){
 	  issue.resolve();
       },
       error: function(req) {
-	issue.reject('INVALID');
+	issue.reject('INVALID', {owner: true});
       }
     });
     return issue;

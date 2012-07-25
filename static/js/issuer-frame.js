@@ -59,7 +59,6 @@ function showError(template, data) {
   $(template).render(data).appendTo("#messages").hide().slideDown(function(){
     var msg = this;
     $(msg).click(function(){
-      console.log(msg);
       $(msg).slideUp(function(){
         $(this).remove();
       });
@@ -139,6 +138,30 @@ function issue(assertions, cb){
 
   App.on('badges-aborted', function(failures, successes, t){
     exit(failures, successes);
+  });
+
+  App.on('badge-failed', function(badge){
+    var error = badge.error || { reason: 'UNKNOWN' };
+    var templateData = {
+      error: error,
+      badge: badge.badgeData() || {},
+      assertion: badge.assertion,
+      user: Session.currentUser
+    };
+    if (error.reason === 'INVALID') {
+      if (error.owner) {
+	showError('#accept-failure-template', templateData);
+      }
+      else {
+	showError('#owner-mismatch-template', templateData);
+      }
+    }
+    else if (error.reason === 'EXISTS') {
+      showError('#already-exists-template', templateData);
+    }
+    else if (error.reason === 'INACCESSIBLE') {
+      showError('#inaccessible-template', templateData);
+    }
   });
 
   $(".navbar .closeFrame").click(function() {

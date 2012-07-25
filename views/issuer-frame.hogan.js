@@ -54,7 +54,7 @@
     <div class="alert alert-error">
       <a class="close">×</a>
       <strong>Sorry!</strong> An error occurred when trying to add the
-      <em>[[ assertion.badge.name ]]</em> badge to your backpack.
+      <em>[[ badge.name ]]</em> badge to your backpack.
     </div>
   </div>
   <div id="already-exists-template">

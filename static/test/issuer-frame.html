@@ -19,7 +19,7 @@
 
 module("Session");
 
-test('Session.currentUser from &lt;meta http-equiv="X-Current-User"&gt;', function() {
+test('Session.currentUser from meta', function() {
   ok(!Session().currentUser, "No current user");
   $('<meta http-equiv="X-Current-User" content="example@example.com">').appendTo($('body'));
   equal(Session().currentUser, 'example@example.com', "Current user grabbed from meta http-equiv=\"X-Current-User\"");
@@ -74,7 +74,7 @@ asyncTest('Session.login success', function(){
 
 module("Badge");
 
-asyncTest('Successful badge', function(){
+asyncTest('Issuing a single badge', function(){
   var b = Badge('foo', {
     build: function(){ return $.Deferred().resolve(); },
     issue: function(){ return $.Deferred().resolve(); }
@@ -96,7 +96,7 @@ asyncTest('Successful badge', function(){
   b.start();
 });
 
-asyncTest('Failed build', function(){
+asyncTest('Badge fails build', function(){
   var b = Badge('foo', {
     build: function(){ return $.Deferred().reject('asplode'); }
   });
@@ -118,7 +118,7 @@ asyncTest('Failed build', function(){
   b.start();
 });
 
-asyncTest('Failed issue', function(){
+asyncTest('Badge fails issue', function(){
   b = Badge('foo', {
     build: function(){ return $.Deferred().resolve(); },
     issue: function(){ return $.Deferred().reject('asplode'); }
@@ -143,7 +143,7 @@ asyncTest('Failed issue', function(){
   b.start();
 });
 
-asyncTest('User rejected', function(){
+asyncTest('Badge rejected by user', function(){
   b = Badge('foo');
   b.on('built', function(){
     b.reject('DENIED');
@@ -162,7 +162,7 @@ asyncTest('User rejected', function(){
   b.start();
 });
 
-asyncTest('Failure data', function(){
+asyncTest('Rejection reason and data', function(){
   b = Badge('foo', {
     build: function(){ return $.Deferred().resolve(); },
     issue: function(){ return $.Deferred().reject('asplode', {other: 'data', goes: 'here'}); }
@@ -177,7 +177,7 @@ asyncTest('Failure data', function(){
   b.start();
 });
 
-asyncTest('Successful badge states', function(){
+asyncTest('Successful adge state transitions', function(){
   var build = $.Deferred();
   var issue = $.Deferred();
 
@@ -209,7 +209,7 @@ asyncTest('Successful badge states', function(){
   build.resolve();
 });
 
-asyncTest('Badge events', function(){
+asyncTest('Badge built and issued events', function(){
   var b = Badge('foo');
   var events = [];
   b.on('built', function(){
@@ -226,7 +226,7 @@ asyncTest('Badge events', function(){
   b.start();
 });
 
-asyncTest('result for issued', function(){
+asyncTest('badge.result() for issued', function(){
   var b = Badge('foo');
   b.on('built', function(){
     b.issue();
@@ -238,7 +238,7 @@ asyncTest('result for issued', function(){
   });
 });
 
-asyncTest('result for failed', function(){
+asyncTest('badge.result() for failed', function(){
   var b = Badge('foo', {
     build: function(){ return $.Deferred().reject('asplode'); }
   });
@@ -249,7 +249,7 @@ asyncTest('result for failed', function(){
   });
 });
 
-asyncTest('Badge data', function(){
+asyncTest('Building badge data', function(){
   var b = Badge('foo', {
     build: function(assertion){ return {url: assertion, extra: 'stuff'}; }
   });
@@ -261,7 +261,7 @@ asyncTest('Badge data', function(){
   b.start();
 });
 
-asyncTest('Delayed badge data', function(){
+asyncTest('Building badge data with deferred', function(){
   var b = Badge('foo', {
     build: function(assertion){
       var build = $.Deferred();
@@ -279,7 +279,21 @@ asyncTest('Delayed badge data', function(){
   b.start();
 });
 
-test('Badge inState', function(){
+asyncTest('Building badge data and failing', function(){
+  var b = Badge('foo', {
+    build: function(assertion){
+      return $.Deferred().reject('reason', {error: 'data'}, {badge: 'data'});
+    }
+  });
+  b.always(function(){
+    deepEqual(b.error, {url: 'foo', reason: 'reason', error: 'data'});
+    deepEqual(b.badgeData(), {badge: 'data'});
+    start();
+  });
+  b.start();
+});
+
+test('Checking badge state', function(){
   var b = Badge('foo');
   ok(b.inState('pendingBuild'));
   ok(b.inState('pendingBuild', 'somethingElse', 'maybeThis'));
@@ -335,7 +349,7 @@ asyncTest('Run app with no assertions', function(){
   app.start();
 });
 
-asyncTest('Accept a badge', function(){
+asyncTest('Accept a single badge', function(){
   var app = App(['foo'], {
     build: succeed,
     issue: succeed
@@ -363,7 +377,7 @@ asyncTest('Accept a badge', function(){
   app.start();
 });
 
-asyncTest('Reject a badge', function(){
+asyncTest('Reject a single badge', function(){
   var app = App(['foo'], {
     build: succeed,
     issue: succeed
@@ -387,7 +401,7 @@ asyncTest('Reject a badge', function(){
   app.start();
 });
 
-asyncTest('Bad assertion', function(){
+asyncTest('Single badge fails build', function(){
   var app = App(['FAILME'], {
     build: failOne('FAILME', 'you suck')
   });
@@ -405,7 +419,7 @@ asyncTest('Bad assertion', function(){
   app.start();
 });
 
-asyncTest('Issuing failure', function(){
+asyncTest('Single badge fails issue', function(){
   var app = App(['HAZIT'], {
     build: succeed,
     issue: failOne('HAZIT', 'you have that one')
@@ -424,7 +438,7 @@ asyncTest('Issuing failure', function(){
   app.start();
 });
 
-asyncTest('Two good badges', function(){
+asyncTest('Two badges - issue both', function(){
   var app = App(['foo', 'bar'], {
     build: succeed,
     issue: succeed
@@ -444,7 +458,7 @@ asyncTest('Two good badges', function(){
   app.start();
 });
 
-asyncTest('One good, one bad', function(){
+asyncTest('Two badges - one good, one bad', function(){
   var app = App(['foo', 'bar'], {
     build: failOne('bar', 'NO BARS!'),
     issue: succeed
@@ -466,7 +480,7 @@ asyncTest('One good, one bad', function(){
   app.start();
 });
 
-asyncTest('Two bad', function(){
+asyncTest('Two badges - both fail', function(){
   var app = App(['foo', 'bar'], {
     build: failOne('bar', "bar won't build"),
     issue: failOne('foo', "foo won't issue")
@@ -485,7 +499,7 @@ asyncTest('Two bad', function(){
   app.start();
 });
 
-asyncTest('Abort after start', function(){
+asyncTest('Abort after app.start()', function(){
   var app = App(['foo', 'bar', 'baz'], {
     build: function(assertion){
       var d = $.Deferred();
@@ -514,7 +528,7 @@ asyncTest('Abort after start', function(){
   app.abort();
 });
 
-asyncTest('Abort before start', function(){
+asyncTest('Abort before app.start()', function(){
   var app = App(['foo', 'bar', 'baz']);
   app.on('badges-complete', function(){
     ok(false, 'should not complete');
@@ -531,14 +545,19 @@ asyncTest('Abort before start', function(){
   app.abort();
 });
 
-asyncTest('badges-failed event', function(){
+asyncTest('Using badges-failed event', function(){
   var app = App(['foo', 'bar'], {
     build: failOne('foo', 'bad build'),
     issue: failOne('bar', 'bad issue')
   });
   var failed = 0;
+  var expected = {
+    'foo': { reason: 'bad build' },
+    'bar': { reason: 'bad issue' }
+  };
   app.on('badge-failed', function(badge){
     failed++;
+    equal(badge.error.reason, expected[badge.assertion].reason, 'reason good');
   });
   app.on('badges-ready', function(f, badges){
     badges.forEach(function(badge){

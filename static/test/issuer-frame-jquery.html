@@ -199,24 +199,28 @@ asyncTest('Test as example@example.com', function(){
     });
   });
 
-  //TODO: test screen/message data
-  var failureEvents = {
-    'http://foo.org/nonexistent.json': { reason: 'INACCESSIBLE' },
-    'http://bar.org/oldbadge.json': { reason: 'EXISTS' },
-    'http://foo.org/notowner.json': { reason: 'INVALID' },
-    'http://foo.org/explodeonissue.json': { reason: 'INVALID' }
-  };
   app.on('badge-failed', function(badge){
-    var expected = failureEvents[badge.assertion];
-    if (expected){
-      ok(!expected.seen, 'first failure for ' + badge.assertion);
-      expected.seen = true;
-      equal(badge.error.reason, expected.reason, 'expected failure reason for ' + badge.assertion);
+    var error = badge.error;
+    if (error.reason === 'INACCESSIBLE') {
+      equal(badge.assertion, 'http://foo.org/nonexistent.json');
+      ok(error.message, 'has error message');
     }
-    else {
-      ok(false, 'unexpected assertion failure on ' + badge.assertion + ' for reason ' + badge.error.reason);
+    else if (error.reason === 'EXISTS') {
+      equal(badge.assertion, 'http://bar.org/oldbadge.json');
+      ok(badge.badgeData().name, 'has badge name');
     }
-  });
+    else if (error.reason === 'INVALID') {
+      notEqual(typeof error.owner, 'undefined', 'owner is defined');
+      if (error.owner) {
+	equal(badge.assertion, 'http://foo.org/explodeonissue.json');
+	ok(badge.badgeData().name, 'has badge name');
+      }
+      else {
+	equal(badge.assertion, 'http://foo.org/notowner.json');
+	ok(badge.badgeData().name, 'has badge name');
+      }
+    }
+});
 
   app.on('badges-complete', function(failed, successes, total){
     equal(total, ASSERTIONS.length, 'all badges complete');
