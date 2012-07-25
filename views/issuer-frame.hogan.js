@@ -54,21 +54,21 @@
     <div class="alert alert-error">
       <a class="close">×</a>
       <strong>Sorry!</strong> An error occurred when trying to add the
-      <em>[[ badge.name ]]</em> badge to your backpack.
+      <em>[[ assertion.badge.name ]]</em> badge to your backpack.
     </div>
   </div>
   <div id="already-exists-template">
     <div class="alert">
       <a class="close">×</a>
       You appear to already have the
-      <em>[[ badge.name ]]</em> badge in your backpack.
+      <em>[[ assertion.badge.name ]]</em> badge in your backpack.
     </div>
   </div>
   <div id="owner-mismatch-template">
     <div class="alert alert-error">
       <a class="close">×</a>
       It appears that the 
-      <em>[[ badge.name ]]</em> badge was not awarded to you ([[ user ]]).
+      <em>[[ assertion.badge.name ]]</em> badge was not awarded to you ([[ user ]]).
     </div>
   </div>
   <div id="inaccessible-template">
@@ -95,7 +95,7 @@
       <div class="span4 columns badge-details">
         <dl>
           <dt>Recipient</dt>
-          <dd>[[ recipient ]]</dd>
+	  <dd>[[ assertion.recipient ]]</dd>
 
           <dt>Name</dt>
           <dd>[[ assertion.badge.name ]]</dd>

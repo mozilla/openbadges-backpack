@@ -91,24 +91,24 @@ function issue(assertions, cb){
 	return;
       }
 
-      // TODO: clean up the data model/terminology below
       var badge = badges[next++];
-      var obj = badge.badgeData();
       var templateArgs = {
-	hostname: badge.assertion,
-	assertion: obj,
-	recipient: obj.recipient,
+	assertion: badge.data.badge,
 	user: Session.currentUser
       };
-      $("#badge-ask").fadeOut().empty()
-	.append($("#badge-ask-template").render(templateArgs)).fadeIn();
-      $("#badge-ask .accept").click(function(){
-	badge.issue();
-	offerNext();
-      });
-      $("#badge-ask .reject").click(function(){
-	badge.reject('DENIED');
-	offerNext();
+      $("#badge-ask").fadeOut(function(){
+	$(this).empty()
+	  .append($("#badge-ask-template")
+	  .render(templateArgs))
+	  .fadeIn();
+	$("#badge-ask .accept").click(function(){
+	  badge.issue();
+	  offerNext();
+	});
+	$("#badge-ask .reject").click(function(){
+	  badge.reject('DENIED');
+	  offerNext();
+	});
       });
     }
     offerNext();
@@ -141,26 +141,27 @@ function issue(assertions, cb){
   });
 
   App.on('badge-failed', function(badge){
-    var error = badge.error || { reason: 'UNKNOWN' };
-    var templateData = {
-      error: error,
-      badge: badge.badgeData() || {},
-      assertion: badge.assertion,
-      user: Session.currentUser
-    };
-    if (error.reason === 'INVALID') {
-      if (error.owner) {
-	showError('#accept-failure-template', templateData);
-      }
-      else {
-	showError('#owner-mismatch-template', templateData);
-      }
+    var error = badge.error || { reason: 'UNKNOWN' }; // TODO: handle this better
+    if (error.reason === 'INACCESSIBLE') {
+      showError('#inaccessible-template', { error: error });
     }
-    else if (error.reason === 'EXISTS') {
-      showError('#already-exists-template', templateData);
-    }
-    else if (error.reason === 'INACCESSIBLE') {
-      showError('#inaccessible-template', templateData);
+    else if (error.reason !== 'DENIED') {
+      var templateData = {
+	error: error,
+	assertion: badge.data.badge, // data.badge is really the assertion
+	user: Session.currentUser
+      };
+      if (error.reason === 'INVALID') {
+	if (badge.data.owner) {
+	  showError('#accept-failure-template', templateData);
+	}
+	else {
+	  showError('#owner-mismatch-template', templateData);
+	}
+      }
+      else if (error.reason === 'EXISTS') {
+	showError('#already-exists-template', templateData);
+      }
     }
   });
 

@@ -75,7 +75,7 @@ var Session = function(spec) {
  *   The Deferred is resolved if build and issue succeed, and rejected
  *   if either has an error or the badge is rejected by the user.
  */
-var Badge = function(assertion, spec){
+var Badge = function(assertionUrl, spec){
   var spec = spec || {};
   var build = spec.build || function(){ return {}; };
   var issue = spec.issue || function(){ return {}; };
@@ -85,18 +85,17 @@ var Badge = function(assertion, spec){
 
   var Badge = $.Deferred(function(){
     var _state = 'pendingBuild';
-    var _badgeData;
 
     function changeState(to){
       _state = to;
       Badge.trigger('state-change', to);
     }
 
-    this.assertion = assertion;
+    this.assertionUrl = assertionUrl;
 
     this.error;
     this.fail(function(reason, data){
-      this.error = _.extend({url: assertion, reason: reason}, data) ;
+      this.error = _.extend({url: assertionUrl, reason: reason}, data) ;
       changeState('failed');
     });
 
@@ -105,16 +104,16 @@ var Badge = function(assertion, spec){
     });
 
     this.start = function(){
-      buildState = build(assertion);
+      buildState = build(assertionUrl);
 
       $.when(buildState).then(
 	function buildSuccess(data){
-	  _badgeData = data;
+	  Badge.data = data;
 	  changeState('built');
 	  Badge.trigger('built');
 	},
 	function buildFailure(reason, errorData, badgeData){
-	  _badgeData = badgeData;
+	  Badge.data = badgeData;
 	  Badge.reject(reason, errorData);
 	}
       );
@@ -125,7 +124,7 @@ var Badge = function(assertion, spec){
 	throw new Error('Cannot issue unbuilt badge');
 
       changeState('pendingIssue');
-      issueState = issue.call(this, assertion);
+      issueState = issue.call(this, assertionUrl);
 
       $.when(issueState).then(
 	function issueSuccess(){
@@ -139,13 +138,9 @@ var Badge = function(assertion, spec){
       );
     };
 
-    this.badgeData = function(){
-      return _badgeData;
-    };
-
     this.result = function(){
       if (this.inState('issued', 'complete'))
-	return this.assertion;
+	return this.assertionUrl;
       else if (this.inState('failed'))
 	return this.error;
       else
@@ -167,28 +162,26 @@ var Badge = function(assertion, spec){
   return Badge;
 };
 
-var App = function(assertions, spec){
-  var assertions = assertions || [];
+var App = function(assertionUrls, spec){
+  var assertionUrls = assertionUrls || [];
   var spec = spec || {};
 
-  var build = spec.build || function(assertion){
+  var build = spec.build || function(assertionUrl){
     var build = $.Deferred();
     jQuery.ajax({
       url: '/issuer/assertion',
       data: {
-	url: assertion
+	url: assertionUrl
       },
       success: function(obj){
-      var issuedBadge = obj.badge;
-      var badgeData = obj.badge.badge;
 	if (obj.exists) {
-	  build.reject('EXISTS', {}, badgeData);
+	  build.reject('EXISTS', {}, obj);
 	}
 	else if (!obj.owner) {
-	  build.reject('INVALID', {owner: false}, badgeData);
+	  build.reject('INVALID', {owner: false}, obj);
 	}
 	else {
-	  build.resolve(issuedBadge);
+	  build.resolve(obj);
 	}
       },
       error: function(err){
@@ -199,14 +192,14 @@ var App = function(assertions, spec){
     return build;
   };
 
-  var issue = spec.issue || function(assertion){
+  var issue = spec.issue || function(assertionUrl){
     var issue = $.Deferred();
     var self = this;
     var post = jQuery.ajax({
       type: 'POST',
       url: '/issuer/assertion',
       data: {
-	url: assertion
+	url: assertionUrl
       },
       success: function(data, textStatus, jqXHR) {
 	if (jqXHR.status == 304) {
@@ -224,8 +217,8 @@ var App = function(assertions, spec){
   var badges = [];
   var aborted = false;
 
-  assertions.forEach(function(assertion, i, arr){
-    var b = Badge(assertion, {
+  assertionUrls.forEach(function(assertionUrl, i, arr){
+    var b = Badge(assertionUrl, {
       build: build,
       issue: issue
     });
@@ -240,7 +233,7 @@ var App = function(assertions, spec){
 
   var App = {
     start: function(){
-      if (assertions.length === 0) {
+      if (assertionUrls.length === 0) {
 	App.trigger('badges-complete', [], [], 0);
       }
       else {

@@ -18,7 +18,7 @@
 <script>
 
 var FAKE_XHR_DELAY = 10;
-var ASSERTIONS = [
+var ASSERTION_URLS = [
   "http://foo.org/newbadge.json",
   "http://foo.org/another_newbadge.json",
   "http://foo.org/nonexistent.json",
@@ -185,11 +185,20 @@ jQuery.ajaxTransport("+*", function(options, originalOptions, jqXHR) {
   };
 });
 
-asyncTest('Test as example@example.com', function(){
-  var app = App(ASSERTIONS);
+function checkDataObj(data){
+  // badge.badge should really be assertion.badge
+  var expectedElements = ['exists', 'owner', 'badge.evidence', 'badge.recipient', 'badge.badge.name'];
+  expectedElements.forEach(function(expectedElement){
+    var value = _.reduce(expectedElement.split('.'), function(memo, key){ return memo[key]; }, data);
+    notEqual(typeof value, undefined, expectedElement + ' is defined');
+  });
+}
+
+asyncTest('Test', function(){
+  var app = App(ASSERTION_URLS);
 
   app.on('badges-ready', function(failed, ready){
-    deepEqual(_.map(failed, function(badge){ return badge.assertion; }), [
+    deepEqual(_.map(failed, function(badge){ return badge.assertionUrl; }), [
       'http://foo.org/nonexistent.json',
       'http://bar.org/oldbadge.json',
       'http://foo.org/notowner.json'
@@ -201,39 +210,42 @@ asyncTest('Test as example@example.com', function(){
 
   app.on('badge-failed', function(badge){
     var error = badge.error;
+    // This case won't have any real data
     if (error.reason === 'INACCESSIBLE') {
-      equal(badge.assertion, 'http://foo.org/nonexistent.json');
+      equal(badge.assertionUrl, 'http://foo.org/nonexistent.json');
       ok(error.message, 'has error message');
     }
-    else if (error.reason === 'EXISTS') {
-      equal(badge.assertion, 'http://bar.org/oldbadge.json');
-      ok(badge.badgeData().name, 'has badge name');
-    }
-    else if (error.reason === 'INVALID') {
-      notEqual(typeof error.owner, 'undefined', 'owner is defined');
-      if (error.owner) {
-	equal(badge.assertion, 'http://foo.org/explodeonissue.json');
-	ok(badge.badgeData().name, 'has badge name');
+    else {
+      // We expect data here
+      checkDataObj(badge.data);
+      if (error.reason === 'EXISTS') {
+	equal(badge.assertionUrl, 'http://bar.org/oldbadge.json');
       }
-      else {
-	equal(badge.assertion, 'http://foo.org/notowner.json');
-	ok(badge.badgeData().name, 'has badge name');
+      else if (error.reason === 'INVALID') {
+	notEqual(typeof error.owner, 'undefined', 'owner is defined');
+	if (error.owner) {
+	  equal(badge.assertionUrl, 'http://foo.org/explodeonissue.json');
+	}
+	else {
+	  equal(badge.assertionUrl, 'http://foo.org/notowner.json');
+	}
       }
     }
-});
+  });
 
   app.on('badges-complete', function(failed, successes, total){
-    equal(total, ASSERTIONS.length, 'all badges complete');
-    deepEqual(_.map(failed, function(badge){ return badge.assertion; }), [
+    equal(total, ASSERTION_URLS.length, 'all badges complete');
+    deepEqual(_.map(failed, function(badge){ return badge.assertionUrl; }), [
       'http://foo.org/nonexistent.json',
       'http://bar.org/oldbadge.json',
       'http://foo.org/notowner.json',
       'http://foo.org/explodeonissue.json'
     ], 'expected failures');
-    deepEqual(_.map(successes, function(badge){ return badge.assertion; }), [
+    deepEqual(_.map(successes, function(badge){ return badge.assertionUrl; }), [
       'http://foo.org/newbadge.json',
       'http://foo.org/another_newbadge.json'
     ], 'expected successes');
+    _.map(successes, function(success){ checkDataObj(success.data); });
     start();
   });
 
