@@ -118,5 +118,5 @@
 <script src="/js/jschannel.js"></script>
 <script src="/js/underscore.js"></script>
 <script src="/js/backbone.js"></script>
-<script src="/js/issuer-frame-reboot.js"></script>
-<script src="/js/issuer-frame.js"></script>
+<script src="/js/issuer-frame/issuer-frame.js"></script>
+<script src="/js/issuer-frame/main.js"></script>

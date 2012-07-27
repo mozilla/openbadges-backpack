@@ -1,195 +1,300 @@
-// TODO: Make sure we display the origin of the issuer (parent frame).
 
-_.templateSettings = {
-  escape : /\[\[(.+?)\]\]/g
+jQuery.extend({
+  meta: function(name, value) {
+    return $("meta[http-equiv='" + name + "']").attr("content", value);
+  }
+});
+
+var Session = function(spec) {
+  var spec = spec || {};
+
+  var startLogin = spec.startLogin || function(login) {
+    navigator.id.getVerifiedEmail(function(assertion) {
+      jQuery.ajax({
+	url: '/backpack/authenticate',
+	type: 'POST',
+	dataType: 'json',
+	data: {assertion: assertion},
+	success: function(data) {
+	  login.resolve(data);
+	},
+	error: function() {
+	  login.reject();
+	}
+      });
+    });
+  };
+
+  var loginStarted = false;
+  var Session = {
+    CSRF: jQuery.meta("X-CSRF-Token"),
+    currentUser: jQuery.meta("X-Current-User"),
+    login: function() {
+      if (!loginStarted) {
+	var login = jQuery.Deferred();
+	login.done(function(data) {
+	  Session.currentUser = data.email;
+	  Session.trigger("login-complete");
+	});
+	login.fail(function() {
+	  Session.trigger("login-error");
+	});
+	login.always(function() {
+	  loginStarted = false;
+	});
+	loginStarted = true;
+	Session.trigger('login-started');
+	startLogin(login);
+      }
+    }
+  };
+
+  _.extend(Session, Backbone.Events);
+
+  jQuery.ajaxSetup({
+    beforeSend: function (xhr, settings) {
+      if (!settings.crossDomain && settings.type != "GET")
+	xhr.setRequestHeader('X-CSRF-Token', Session.CSRF)
+    }
+  });
+
+  return Session;
 };
 
-jQuery.fn.extend({
-  render: function(args) {
-    var template = _.template(this.html());
-    return $(template(args));
-  }
-});
+/* Badge - an evented Deferred representing a badge
+ *   Takes an assertion url
+ *   Optionally takes build and issue methods in a spec object
+ *     These should return Deferreds or plain objects
+ *     `build` attempts to build a full badge out of the assertion url
+ *     `issue` attempts to issue the badge
+ *
+ *   Events:
+ *     built   - fired when build succeeds
+ *     issued  - fired when issue succeeds
+ *
+ *   The Deferred is resolved if build and issue succeed, and rejected
+ *   if either has an error or the badge is rejected by the user.
+ */
+var Badge = function(assertionUrl, spec){
+  var spec = spec || {};
+  var build = spec.build || function(){ return {}; };
+  var issue = spec.issue || function(){ return {}; };
 
-var Session = Session();
-var App;
+  var buildState;
+  var issueState;
 
-function showBadges() {
-  $("#welcome").fadeOut(App.start);
-}
+  var Badge = $.Deferred(function(){
+    var _state = 'pendingBuild';
 
-$(window).ready(function() {
-  var activeRequests = 0;
-
-  $("#ajax-loader").ajaxSend(function() {
-    $(this).fadeIn();
-    activeRequests++;
-  }).ajaxComplete(function() {
-    if (--activeRequests == 0)
-      $(this).fadeOut();
-  });
-
-  if (!Session.currentUser) {
-    $(".logged-out").show();
-    $(".logged-out .js-browserid-link").click(function() {
-      Session.login();
-      return false;
-    });
-  } else {
-    $(".logged-in").show();
-    $(".logged-in .next").click(showBadges);
-    $(".logged-in .email").text(Session.currentUser);
-    $(".logged-in .logout").click(function() {
-      $(".logged-in .next").unbind("click");
-      Session.login();
-      return false;
-    });
-  }
-
-  Session.on("login-error", function() {
-    showError("#login-error-template");
-  });
-  Session.on("login-complete", showBadges);
-  $(".host").text(window.location.host);
-
-  var channel = buildChannel();
-});
-
-function showError(template, data) {
-  $(template).render(data).appendTo("#messages").hide().slideDown(function(){
-    var msg = this;
-    $(msg).click(function(){
-      $(msg).slideUp(function(){
-	$(this).remove();
-      });
-    });
-  });
-}
-
-function issue(assertions, cb){
-
-  if (assertions.length == 1) {
-    $("#welcome .badge-count").text("1 badge");
-  }
-  else {
-    $("#welcome .badge-count").text(assertions.length + " badges");
-  }
-  $("#welcome").fadeIn();
-
-  App = App(assertions);
-  var badgesProcessed;
-
-  App.on('badges-ready', function(failures, badges){
-    badgesProcessed = $.Deferred();
-
-    var next = 0;
-    function offerNext(){
-      if (next >= badges.length) {
-	$("#badge-ask").fadeOut(function(){
-	  badgesProcessed.resolve();
-	});
-	return;
-      }
-
-      var badge = badges[next++];
-      var templateArgs = {
-	assertion: badge.data.badge,
-	user: Session.currentUser
-      };
-      $("#badge-ask").fadeOut(function(){
-	$(this).empty()
-	  .append($("#badge-ask-template")
-	  .render(templateArgs))
-	  .fadeIn();
-	$("#badge-ask .accept").click(function(){
-	  badge.issue();
-	  offerNext();
-	});
-	$("#badge-ask .reject").click(function(){
-	  badge.reject('DENIED');
-	  offerNext();
-	});
-      });
+    function changeState(to){
+      _state = to;
+      Badge.trigger('state-change', to);
     }
-    offerNext();
-  });
 
-  function exit(failures, successes) {
-    // We're on our way out. Disable all event handlers on the page,
-    // so the user can't do anything.
-    $("button, a").unbind();
-    function results(badge) {
-      return badge.result();
-    }
-    cb(_.map(failures, results), _.map(successes, results));
-  }
+    this.assertionUrl = assertionUrl;
 
-  App.on('badges-complete', function(failures, successes, t){
-    $.when(badgesProcessed).always(function(){
-      if (successes.length < 2)
-	$("#farewell .badges-" + successes.length).show();
-      else {
-	$("#farewell .badges-many").show();
-	$("#farewell .badges-added").text(successes.length);
-      }
-      $("#farewell .next").click(function(){ exit(failures, successes); });
-      $(".navbar .closeFrame").unbind().click(function(){ exit(failures, successes); });
-      $("#farewell").fadeIn();
-      return;
+    this.error;
+    this.fail(function(reason, data){
+      this.error = _.extend({url: assertionUrl, reason: reason}, data) ;
+      changeState('failed');
     });
-  });
 
-  App.on('badges-aborted', function(failures, successes, t){
-    exit(failures, successes);
-  });
+    this.done(function(){
+      changeState('complete');
+    });
 
-  App.on('badge-failed', function(badge){
-    var error = badge.error || { reason: 'UNKNOWN' }; // TODO: handle this better
-    if (error.reason === 'INACCESSIBLE') {
-      showError('#inaccessible-template', { error: error });
+    this.start = function(){
+      buildState = build(assertionUrl);
+
+      $.when(buildState).then(
+	function buildSuccess(data){
+	  Badge.data = data;
+	  changeState('built');
+	  Badge.trigger('built');
+	},
+	function buildFailure(reason, errorData, badgeData){
+	  Badge.data = badgeData;
+	  Badge.reject(reason, errorData);
+	}
+      );
+    };
+
+    this.issue = function(){
+      if (_state != 'built')
+	throw new Error('Cannot issue unbuilt badge');
+
+      changeState('pendingIssue');
+      issueState = issue.call(this, assertionUrl);
+
+      $.when(issueState).then(
+	function issueSuccess(){
+	  changeState('issued');
+	  Badge.trigger('issued');
+	  Badge.resolve();
+	},
+	function issueFailure(reason, data){
+	  Badge.reject(reason, data);
+	}
+      );
+    };
+
+    this.result = function(){
+      if (this.inState('issued', 'complete'))
+	return this.assertionUrl;
+      else if (this.inState('failed'))
+	return { url: this.error.url, reason: this.error.reason };
+      else
+	throw new Error("Can't return result for state " + this.state());
+    };
+
+    this.state = function(){
+      return _state;
+    };
+
+    this.inState = function(){
+      return _.include(arguments, this.state());
     }
-    else if (error.reason !== 'DENIED') {
-      var templateData = {
-	error: error,
-	assertion: badge.data.badge, // data.badge is really the assertion
-	user: Session.currentUser
-      };
-      if (error.reason === 'INVALID') {
-	if (badge.data.owner) {
-	  showError('#accept-failure-template', templateData);
+
+    _.extend(this, Backbone.Events);
+
+  });
+
+  return Badge;
+};
+
+var App = function(assertionUrls, spec){
+  var assertionUrls = assertionUrls || [];
+  var spec = spec || {};
+
+  var build = spec.build || function(assertionUrl){
+    var build = $.Deferred();
+    jQuery.ajax({
+      url: '/issuer/assertion',
+      data: {
+	url: assertionUrl
+      },
+      success: function(obj){
+	if (obj.exists) {
+	  build.reject('EXISTS', {}, obj);
+	}
+	else if (!obj.owner) {
+	  build.reject('INVALID', {}, obj);
 	}
 	else {
-	  showError('#owner-mismatch-template', templateData);
+	  build.resolve(obj);
 	}
+      },
+      error: function(err){
+	// TODO: is this the right error?
+	build.reject('INACCESSIBLE', { message: err.statusText });
       }
-      else if (error.reason === 'EXISTS') {
-	showError('#already-exists-template', templateData);
-      }
-    }
-  });
-
-  $(".navbar .closeFrame").click(function() {
-    App.abort();
-    return false;
-  });
-}
-
-function buildChannel() {
-  if (window.parent === window)
-    return null;
-
-  var channel = Channel.build({
-    window: window.parent,
-    origin: "*",
-    scope: "OpenBadges.issue"
-  });
-
-  channel.bind("issue", function(trans, s) {
-    issue(s, function(errors, successes) {
-      trans.complete([errors, successes]);
     });
-    trans.delayReturn(true);
+    return build;
+  };
+
+  var issue = spec.issue || function(assertionUrl){
+    var issue = $.Deferred();
+    var self = this;
+    var post = jQuery.ajax({
+      type: 'POST',
+      url: '/issuer/assertion',
+      data: {
+	url: assertionUrl
+      },
+      success: function(data, textStatus, jqXHR) {
+	if (jqXHR.status == 304) {
+	  issue.reject('EXISTS');
+	} else
+	  issue.resolve();
+      },
+      error: function(req) {
+	issue.reject('INVALID');
+      }
+    });
+    return issue;
+  };
+
+  var badges = [];
+  var aborted = false;
+
+  assertionUrls.forEach(function(assertionUrl, i, arr){
+    var b = Badge(assertionUrl, {
+      build: build,
+      issue: issue
+    });
+    b.on('state-change', function(to){
+      if (to === 'failed'){
+	App.trigger('badge-failed', b);
+      }
+      App.trigger('state-change', b, to);
+    });
+    badges.push(b);
   });
 
-  return channel;
-}
+  var App = {
+    start: function(){
+      if (assertionUrls.length === 0) {
+	App.trigger('badges-complete', [], [], 0);
+      }
+      else {
+	badges.forEach(function(badge, i, arr){
+	  badge.start();
+	});
+      }
+    },
+    abort: function(){
+      aborted = true;
+      badges.forEach(function(badge){
+	badge.reject('DENIED');
+      });
+    }
+  };
+
+  _.extend(App, Backbone.Events);
+
+  function getAllIn() {
+    var states = Array.prototype.slice.apply(arguments);
+    var results = _.filter(badges, function(badge){ return badge.inState.apply(badge, states); });
+    return results;
+  }
+
+  function checkAllBuilt() {
+    var building = _.find(badges, function(badge){ return badge.inState('pendingBuild'); });
+    if (!building){
+      var built = _.filter(badges, function(badge){ return badge.inState('built'); });
+      var failures = getAllIn('failed');
+      App.off('state-change', checkAllBuilt);
+      App.trigger('badges-ready', failures, built);
+    }
+  }
+
+  function checkAllIssued() {
+    var nonFinal = _.find(badges, function(badge){ return !badge.inState('issued', 'failed', 'complete'); });
+    if (!nonFinal) {
+      var issuedCount = _.reduce(badges, function(memo, badge){ return badge.inState('issued', 'complete') ? memo + 1 : memo; }, 0);
+      App.trigger('badges-issued', issuedCount);
+    }
+  }
+
+  var complete = false;
+  function checkAllDone() {
+    if (complete)
+      return;
+
+    var pending = _.find(badges, function(badge){ return !badge.inState('failed', 'complete'); });
+    if(!pending) {
+      complete = true;
+      var failures = getAllIn('failed');
+      var successes = getAllIn('complete');
+      App.off('state-change', checkAllDone);
+      var evt = aborted ? 'badges-aborted' : 'badges-complete';
+      App.trigger(evt, failures, successes, badges.length);
+    }
+  }
+
+  App.on('state-change', checkAllBuilt);
+  App.on('state-change', checkAllIssued);
+  App.on('state-change', checkAllDone);
+
+  return App;
+};
