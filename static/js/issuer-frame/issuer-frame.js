@@ -20,7 +20,7 @@ function showBadges() {
 
 $(window).ready(function() {
   var activeRequests = 0;
-  
+
   $("#ajax-loader").ajaxSend(function() {
     $(this).fadeIn();
     activeRequests++;
@@ -28,7 +28,7 @@ $(window).ready(function() {
     if (--activeRequests == 0)
       $(this).fadeOut();
   });
-  
+
   if (!Session.currentUser) {
     $(".logged-out").show();
     $(".logged-out .js-browserid-link").click(function() {
@@ -51,7 +51,7 @@ $(window).ready(function() {
   });
   Session.on("login-complete", showBadges);
   $(".host").text(window.location.host);
-  
+
   var channel = buildChannel();
 });
 
@@ -60,7 +60,7 @@ function showError(template, data) {
     var msg = this;
     $(msg).click(function(){
       $(msg).slideUp(function(){
-        $(this).remove();
+	$(this).remove();
       });
     });
   });
@@ -177,7 +177,7 @@ function issue(assertions, cb){
 function buildChannel() {
   if (window.parent === window)
     return null;
-  
+
   var channel = Channel.build({
     window: window.parent,
     origin: "*",
@@ -190,6 +190,6 @@ function buildChannel() {
     });
     trans.delayReturn(true);
   });
-  
+
   return channel;
 }

@@ -1,22 +1,3 @@
-<!DOCTYPE html>
-<meta charset="utf-8">
-<title>Unit Tests</title>
-<link rel="stylesheet" href="qunit.css">
-
-<h1 id="qunit-header">Unit Tests</h1>
-<h2 id="qunit-banner"></h2>
-<div id="qunit-testrunner-toolbar"></div>
-<h2 id="qunit-userAgent"></h2>
-<ol id="qunit-tests"></ol>
-<div id="qunit-fixture"></div>
-
-<script src="qunit.js"></script>
-<script src="../js/jquery.min.js"></script>
-<script src="../js/underscore-min.js"></script>
-<script src="../js/backbone-min.js"></script>
-<script src="../js/issuer-frame-reboot.js"></script>
-<script>
-
 module("Session");
 
 test('Session.currentUser from meta', function() {
@@ -591,5 +572,3 @@ asyncTest('Using badges-failed event', function(){
   });
   app.start();
 });
-
-</script>

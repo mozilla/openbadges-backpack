@@ -1,22 +1,3 @@
-<!DOCTYPE html>
-<meta charset="utf-8">
-<title>Unit Tests</title>
-<link rel="stylesheet" href="qunit.css">
-
-<h1 id="qunit-header">Unit Tests</h1>
-<h2 id="qunit-banner"></h2>
-<div id="qunit-testrunner-toolbar"></div>
-<h2 id="qunit-userAgent"></h2>
-<ol id="qunit-tests"></ol>
-<div id="qunit-fixture"></div>
-
-<script src="qunit.js"></script>
-<script src="../js/jquery.min.js"></script>
-<script src="../js/underscore-min.js"></script>
-<script src="../js/backbone-min.js"></script>
-<script src="../js/issuer-frame-reboot.js"></script>
-<script>
-
 var FAKE_XHR_DELAY = 10;
 var ASSERTION_URLS = [
   "http://foo.org/newbadge.json",
@@ -194,6 +175,8 @@ function checkDataObj(data){
   });
 }
 
+module('Functional test');
+
 asyncTest('Test', function(){
   var app = App(ASSERTION_URLS);
 
@@ -250,5 +233,3 @@ asyncTest('Test', function(){
 
   app.start();
 });
-
-</script>
