@@ -1,15 +1,17 @@
 class nvm {
+  $node_version = "v0.6.14"
+
   Exec {
     path => ['/usr/local/bin','/usr/local/sbin','/usr/bin/','/usr/sbin','/bin','/sbin'],
   }
 
-  exec { "default-node-version": 
-    command => "bash -c \"source /home/vagrant/nvm/nvm.sh && nvm alias default v0.6.14\"",
+  exec { "set-node-version": 
+    command => "bash -c \"source /home/vagrant/nvm/nvm.sh && nvm alias default ${node_version}\"",
     require => Exec["install-node-version"],
   }
 
   exec { "install-node-version": 
-    command => "bash -c \"source /home/vagrant/nvm/nvm.sh && nvm install v0.6.14\"",
+    command => "bash -c \"source /home/vagrant/nvm/nvm.sh && nvm install ${node_version}\"",
     require => Exec["clone-nvm"],
   }
 
