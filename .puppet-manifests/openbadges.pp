@@ -24,7 +24,7 @@ class openbadges::app {
     exec { "install-${name}-npm-package":
       unless => "test -d $directory/$name",
       command => "npm install -g $name",
-      require => Package['npm'],
+      require => Exec['install-node'],
     }
   }
   
@@ -41,7 +41,7 @@ class openbadges::app {
   exec { "npm-install-packages":
     cwd => "/home/vagrant/",
     command => "npm install .",
-    require => Package['npm'],
+    require => Exec['install-node'],
   }
   
   exec { "copy-local-dist":
