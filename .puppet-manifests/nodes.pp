@@ -7,5 +7,6 @@ node lucid32 {
   include openbadges::db
   include nginx
   include nodejs
+  include nvm
   include openbadges::app
 }
