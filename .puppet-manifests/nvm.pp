@@ -1,5 +1,4 @@
-class nvm {
-  $node_version = "v0.6.20"
+class nvm ($node_version) {
 
   Exec {
     path => ['/usr/local/bin','/usr/local/sbin','/usr/bin/','/usr/sbin','/bin','/sbin'],

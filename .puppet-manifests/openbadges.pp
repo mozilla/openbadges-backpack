@@ -17,8 +17,8 @@ class openbadges::db {
   }  
 }
 
-class openbadges::app {
-  Exec { path => ['/usr/local/bin','/usr/local/sbin','/usr/bin/','/usr/sbin','/bin','/sbin'], }
+class openbadges::app ($node_version) {
+  Exec { path => ['/usr/local/bin','/usr/local/sbin','/usr/bin/','/usr/sbin','/bin','/sbin', "/home/vagrant/nvm/${node_version}/bin"], }
   
   define npm( $directory=true ) {
     exec { "install-${name}-npm-package":
