@@ -184,9 +184,9 @@ var App = function(assertionUrls, spec){
           build.resolve(obj);
         }
       },
-      error: function(err){
-        // TODO: is this the right error?
-        build.reject('INACCESSIBLE', { message: err.statusText });
+      error: function(xhr){
+        var err = jQuery.parseJSON(xhr.responseText);
+        build.reject('INACCESSIBLE', { message: err.message });
       }
     });
     return build;
