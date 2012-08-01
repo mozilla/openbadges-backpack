@@ -11,16 +11,16 @@ var Session = function(spec) {
   var startLogin = spec.startLogin || function(login) {
     navigator.id.getVerifiedEmail(function(assertion) {
       jQuery.ajax({
-	url: '/backpack/authenticate',
-	type: 'POST',
-	dataType: 'json',
-	data: {assertion: assertion},
-	success: function(data) {
-	  login.resolve(data);
-	},
-	error: function() {
-	  login.reject();
-	}
+        url: '/backpack/authenticate',
+        type: 'POST',
+        dataType: 'json',
+        data: {assertion: assertion},
+        success: function(data) {
+          login.resolve(data);
+        },
+        error: function() {
+          login.reject();
+        }
       });
     });
   };
@@ -31,20 +31,20 @@ var Session = function(spec) {
     currentUser: jQuery.meta("X-Current-User"),
     login: function() {
       if (!loginStarted) {
-	var login = jQuery.Deferred();
-	login.done(function(data) {
-	  Session.currentUser = data.email;
-	  Session.trigger("login-complete");
-	});
-	login.fail(function() {
-	  Session.trigger("login-error");
-	});
-	login.always(function() {
-	  loginStarted = false;
-	});
-	loginStarted = true;
-	Session.trigger('login-started');
-	startLogin(login);
+        var login = jQuery.Deferred();
+        login.done(function(data) {
+          Session.currentUser = data.email;
+          Session.trigger("login-complete");
+        });
+        login.fail(function() {
+	        Session.trigger("login-error");
+        });
+        login.always(function() {
+          loginStarted = false;
+        });
+        loginStarted = true;
+        Session.trigger('login-started');
+        startLogin(login);
       }
     }
   };
@@ -54,7 +54,7 @@ var Session = function(spec) {
   jQuery.ajaxSetup({
     beforeSend: function (xhr, settings) {
       if (!settings.crossDomain && settings.type != "GET")
-	xhr.setRequestHeader('X-CSRF-Token', Session.CSRF)
+	      xhr.setRequestHeader('X-CSRF-Token', Session.CSRF)
     }
   });
 
@@ -107,44 +107,44 @@ var Badge = function(assertionUrl, spec){
       buildState = build(assertionUrl);
 
       $.when(buildState).then(
-	function buildSuccess(data){
-	  Badge.data = data;
-	  changeState('built');
-	  Badge.trigger('built');
-	},
-	function buildFailure(reason, errorData, badgeData){
-	  Badge.data = badgeData;
-	  Badge.reject(reason, errorData);
-	}
+        function buildSuccess(data){
+          Badge.data = data;
+          changeState('built');
+          Badge.trigger('built');
+        },
+        function buildFailure(reason, errorData, badgeData){
+          Badge.data = badgeData;
+          Badge.reject(reason, errorData);
+        }
       );
     };
 
     this.issue = function(){
       if (_state != 'built')
-	throw new Error('Cannot issue unbuilt badge');
+	      throw new Error('Cannot issue unbuilt badge');
 
       changeState('pendingIssue');
       issueState = issue.call(this, assertionUrl);
 
       $.when(issueState).then(
-	function issueSuccess(){
-	  changeState('issued');
-	  Badge.trigger('issued');
-	  Badge.resolve();
-	},
-	function issueFailure(reason, data){
-	  Badge.reject(reason, data);
-	}
+        function issueSuccess(){
+          changeState('issued');
+          Badge.trigger('issued');
+          Badge.resolve();
+        },
+        function issueFailure(reason, data){
+          Badge.reject(reason, data);
+        }
       );
     };
 
     this.result = function(){
       if (this.inState('issued', 'complete'))
-	return this.assertionUrl;
+	      return this.assertionUrl;
       else if (this.inState('failed'))
-	return { url: this.error.url, reason: this.error.reason };
+	      return { url: this.error.url, reason: this.error.reason };
       else
-	throw new Error("Can't return result for state " + this.state());
+	      throw new Error("Can't return result for state " + this.state());
     };
 
     this.state = function(){
@@ -171,22 +171,22 @@ var App = function(assertionUrls, spec){
     jQuery.ajax({
       url: '/issuer/assertion',
       data: {
-	url: assertionUrl
+        url: assertionUrl
       },
       success: function(obj){
-	if (obj.exists) {
-	  build.reject('EXISTS', {}, obj);
-	}
-	else if (!obj.owner) {
-	  build.reject('INVALID', {}, obj);
-	}
-	else {
-	  build.resolve(obj);
-	}
+        if (obj.exists) {
+          build.reject('EXISTS', {}, obj);
+        }
+        else if (!obj.owner) {
+          build.reject('INVALID', {}, obj);
+        }
+        else {
+          build.resolve(obj);
+        }
       },
       error: function(err){
-	// TODO: is this the right error?
-	build.reject('INACCESSIBLE', { message: err.statusText });
+        // TODO: is this the right error?
+        build.reject('INACCESSIBLE', { message: err.statusText });
       }
     });
     return build;
@@ -199,16 +199,16 @@ var App = function(assertionUrls, spec){
       type: 'POST',
       url: '/issuer/assertion',
       data: {
-	url: assertionUrl
+	      url: assertionUrl
       },
       success: function(data, textStatus, jqXHR) {
-	if (jqXHR.status == 304) {
-	  issue.reject('EXISTS');
-	} else
-	  issue.resolve();
+        if (jqXHR.status == 304) {
+          issue.reject('EXISTS');
+        } else
+          issue.resolve();
       },
       error: function(req) {
-	issue.reject('INVALID');
+        issue.reject('INVALID');
       }
     });
     return issue;
@@ -224,7 +224,7 @@ var App = function(assertionUrls, spec){
     });
     b.on('state-change', function(to){
       if (to === 'failed'){
-	App.trigger('badge-failed', b);
+        App.trigger('badge-failed', b);
       }
       App.trigger('state-change', b, to);
     });
@@ -234,18 +234,18 @@ var App = function(assertionUrls, spec){
   var App = {
     start: function(){
       if (assertionUrls.length === 0) {
-	App.trigger('badges-complete', [], [], 0);
+        App.trigger('badges-complete', [], [], 0);
       }
       else {
-	badges.forEach(function(badge, i, arr){
-	  badge.start();
-	});
+        badges.forEach(function(badge, i, arr){
+          badge.start();
+	      });
       }
     },
     abort: function(){
       aborted = true;
       badges.forEach(function(badge){
-	badge.reject('DENIED');
+        badge.reject('DENIED');
       });
     }
   };
