@@ -77,7 +77,9 @@ var OpenBadges = (function() {
     //   https://github.com/mozilla/openbadges/wiki/Issuer-API
     // The final (undocumented) argument is used for testing.
     issue: function OpenBadges_issue(assertions, callback, hook) {
-      // setup no-op functions if the user doesn't pass in callback or hook
+      // Setup defaults for arguments. I long for the day when javascript
+      // supports defining these in the signature.
+      assertions = typeof assertions === 'string' ? [assertions] : assertions;
       hook = hook || function () {};
       callback = callback || function () {};
 
