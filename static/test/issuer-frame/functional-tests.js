@@ -16,17 +16,17 @@ var RESPONSES = {
       "recipient": "someone_else@example.com",
       "evidence": "/badges/html9-basic/example",
       "badge": {
-	"version": "0.5.0",
-	"name": "HTML9 Fundamental",
-	"image": "/_demo/nc.large.png",
-	"description": "Fetchable and validates fine client-side but not server-side",
-	"criteria": "/badges/html9-basic",
-	"issuer": {
-	  "origin": "http://p2pu.org",
-	  "name": "P2PU",
-	  "org": "School of Webcraft",
-	  "contact": "admin@p2pu.org"
-	}
+        "version": "0.5.0",
+        "name": "HTML9 Fundamental",
+        "image": "/_demo/nc.large.png",
+        "description": "Fetchable and validates fine client-side but not server-side",
+        "criteria": "/badges/html9-basic",
+        "issuer": {
+          "origin": "http://p2pu.org",
+          "name": "P2PU",
+          "org": "School of Webcraft",
+          "contact": "admin@p2pu.org"
+        }
       }
     }
   },
@@ -37,17 +37,17 @@ var RESPONSES = {
       "recipient": "example@example.com",
       "evidence": "/badges/html5-basic/example",
       "badge": {
-	"version": "0.5.0",
-	"name": "HTML5 Fundamental",
-	"image": "/_demo/by.large.png",
-	"description": "Knows the difference between a <section> and an <article>",
-	"criteria": "/badges/html5-basic",
-	"issuer": {
-	  "origin": "http://p2pu.org",
-	  "name": "P2PU",
-	  "org": "School of Webcraft",
-	  "contact": "admin@p2pu.org"
-	}
+        "version": "0.5.0",
+        "name": "HTML5 Fundamental",
+        "image": "/_demo/by.large.png",
+        "description": "Knows the difference between a <section> and an <article>",
+        "criteria": "/badges/html5-basic",
+        "issuer": {
+          "origin": "http://p2pu.org",
+          "name": "P2PU",
+          "org": "School of Webcraft",
+          "contact": "admin@p2pu.org"
+        }
       }
     }
   },
@@ -58,17 +58,17 @@ var RESPONSES = {
       "recipient": "example@example.com",
       "evidence": "/badges/html6-basic/example",
       "badge": {
-	"version": "0.5.0",
-	"name": "HTML6 Fundamental",
-	"image": "/_demo/cc.large.png",
-	"description": "Knows the difference between a <sprite> and a <hamster>",
-	"criteria": "/badges/html6-basic",
-	"issuer": {
-	  "origin": "http://p2pu.org",
-	  "name": "P2PU",
-	  "org": "School of Webcraft",
-	  "contact": "admin@p2pu.org"
-	}
+        "version": "0.5.0",
+        "name": "HTML6 Fundamental",
+        "image": "/_demo/cc.large.png",
+        "description": "Knows the difference between a <sprite> and a <hamster>",
+        "criteria": "/badges/html6-basic",
+        "issuer": {
+          "origin": "http://p2pu.org",
+          "name": "P2PU",
+          "org": "School of Webcraft",
+          "contact": "admin@p2pu.org"
+        }
       }
     }
   },
@@ -79,17 +79,17 @@ var RESPONSES = {
       "recipient": "example@example.com",
       "evidence": "/badges/html4-basic/example",
       "badge": {
-	"version": "0.5.0",
-	"name": "HTML4 Fundamental",
-	"image": "/_demo/cc.large.png",
-	"description": "Knows the difference between a <p> and an <b>",
-	"criteria": "/badges/html4-basic",
-	"issuer": {
-	  "origin": "http://p2pu.org",
-	  "name": "P2PU",
-	  "org": "School of Webcraft",
-	  "contact": "admin@p2pu.org"
-	}
+        "version": "0.5.0",
+        "name": "HTML4 Fundamental",
+        "image": "/_demo/cc.large.png",
+        "description": "Knows the difference between a <p> and an <b>",
+        "criteria": "/badges/html4-basic",
+        "issuer": {
+          "origin": "http://p2pu.org",
+          "name": "P2PU",
+          "org": "School of Webcraft",
+          "contact": "admin@p2pu.org"
+        }
       }
     }
   },
@@ -100,17 +100,17 @@ var RESPONSES = {
       "recipient": "example@example.com",
       "evidence": "/badges/html4-basic/example",
       "badge": {
-	"version": "0.5.0",
-	"name": "HTML4 Fundamental",
-	"image": "/_demo/cc.large.png",
-	"description": "Knows the difference between a <p> and an <b>",
-	"criteria": "/badges/html4-basic",
-	"issuer": {
-	  "origin": "http://p2pu.org",
-	  "name": "P2PU",
-	  "org": "School of Webcraft",
-	  "contact": "admin@p2pu.org"
-	}
+        "version": "0.5.0",
+        "name": "HTML4 Fundamental",
+        "image": "/_demo/cc.large.png",
+        "description": "Knows the difference between a <p> and an <b>",
+        "criteria": "/badges/html4-basic",
+        "issuer": {
+          "origin": "http://p2pu.org",
+          "name": "P2PU",
+          "org": "School of Webcraft",
+          "contact": "admin@p2pu.org"
+        }
       }
     }
   }
@@ -119,9 +119,9 @@ var fakeResponseHandlers = {
   "POST /backpack/authenticate": function(options, cb) {
     if (Testing.browseridWorks)
       cb(200, 'OK', {
-	json: {
-	  email: options.data.assertion
-	}
+        json: {
+          email: options.data.assertion
+        }
       });
     else
       cb(400, 'Bad Request');
@@ -129,9 +129,9 @@ var fakeResponseHandlers = {
   "POST /issuer/assertion": function(options, cb) {
     if (options.data.url == "http://foo.org/explodeonissue.json")
       cb(400, 'Bad Request', {
-	text: JSON.stringify({
-	  message: "blah"
-	})
+	      text: JSON.stringify({
+	        message: "blah"
+	      })
       });
     else
       cb(200, 'OK');
@@ -148,15 +148,15 @@ jQuery.ajaxTransport("+*", function(options, originalOptions, jqXHR) {
   return {
     send: function(headers, completeCallback) {
       setTimeout(function() {
-	var string = options.type + " " + originalOptions.url;
-	if (string in fakeResponseHandlers) {
-	  fakeResponseHandlers[string]({
-	    data: originalOptions.data
-	  }, completeCallback);
-	} else {
-	  completeCallback(404, 'Not Found');
-	}
-	//console.log("ajax", options.type, originalOptions.url, options, originalOptions, headers);
+        var string = options.type + " " + originalOptions.url;
+        if (string in fakeResponseHandlers) {
+          fakeResponseHandlers[string]({
+            data: originalOptions.data
+          }, completeCallback);
+        } else {
+          completeCallback(404, 'Not Found');
+        }
+        //console.log("ajax", options.type, originalOptions.url, options, originalOptions, headers);
       }, FAKE_XHR_DELAY);
     },
     abort: function() {
@@ -181,11 +181,13 @@ asyncTest('Test', function(){
   var app = App(ASSERTION_URLS);
 
   app.on('badges-ready', function(failed, ready){
-    deepEqual(_.map(failed, function(badge){ return badge.assertionUrl; }), [
-      'http://foo.org/nonexistent.json',
-      'http://bar.org/oldbadge.json',
-      'http://foo.org/notowner.json'
-    ], 'expected failures from build');
+    deepEqual(_.map(failed, function(badge){ return badge.assertionUrl; }), 
+      [
+        'http://foo.org/nonexistent.json',
+        'http://bar.org/oldbadge.json',
+        'http://foo.org/notowner.json'
+      ], 'expected failures from build'
+    );
     ready.forEach(function(badge){
       badge.issue();
     });
@@ -202,31 +204,35 @@ asyncTest('Test', function(){
       // We expect data here
       checkDataObj(badge.data);
       if (error.reason === 'EXISTS') {
-	equal(badge.assertionUrl, 'http://bar.org/oldbadge.json');
+	      equal(badge.assertionUrl, 'http://bar.org/oldbadge.json');
       }
       else if (error.reason === 'INVALID') {
-	if (badge.data.owner) {
-	  equal(badge.assertionUrl, 'http://foo.org/explodeonissue.json');
-	}
-	else {
-	  equal(badge.assertionUrl, 'http://foo.org/notowner.json');
-	}
+	      if (badge.data.owner) {
+          equal(badge.assertionUrl, 'http://foo.org/explodeonissue.json');
+        }
+        else {
+          equal(badge.assertionUrl, 'http://foo.org/notowner.json');
+        }
       }
     }
   });
 
   app.on('badges-complete', function(failed, successes, total){
     equal(total, ASSERTION_URLS.length, 'all badges complete');
-    deepEqual(_.map(failed, function(badge){ return badge.assertionUrl; }), [
-      'http://foo.org/nonexistent.json',
-      'http://bar.org/oldbadge.json',
-      'http://foo.org/notowner.json',
-      'http://foo.org/explodeonissue.json'
-    ], 'expected failures');
-    deepEqual(_.map(successes, function(badge){ return badge.assertionUrl; }), [
-      'http://foo.org/newbadge.json',
-      'http://foo.org/another_newbadge.json'
-    ], 'expected successes');
+    deepEqual(_.map(failed, function(badge){ return badge.assertionUrl; }), 
+      [
+        'http://foo.org/nonexistent.json',
+        'http://bar.org/oldbadge.json',
+        'http://foo.org/notowner.json',
+        'http://foo.org/explodeonissue.json'
+      ], 'expected failures'
+    );
+    deepEqual(_.map(successes, function(badge){ return badge.assertionUrl; }), 
+      [
+        'http://foo.org/newbadge.json',
+        'http://foo.org/another_newbadge.json'
+      ], 'expected successes'
+    );
     _.map(successes, function(success){ checkDataObj(success.data); });
     start();
   });

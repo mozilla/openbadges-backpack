@@ -60,7 +60,7 @@ function showError(template, data) {
     var msg = this;
     $(msg).click(function(){
       $(msg).slideUp(function(){
-	$(this).remove();
+	      $(this).remove();
       });
     });
   });
@@ -85,30 +85,30 @@ function issue(assertions, cb){
     var next = 0;
     function offerNext(){
       if (next >= badges.length) {
-	$("#badge-ask").fadeOut(function(){
-	  badgesProcessed.resolve();
-	});
-	return;
+        $("#badge-ask").fadeOut(function(){
+          badgesProcessed.resolve();
+        });
+	      return;
       }
 
       var badge = badges[next++];
       var templateArgs = {
-	assertion: badge.data.badge,
-	user: Session.currentUser
+        assertion: badge.data.badge,
+        user: Session.currentUser
       };
       $("#badge-ask").fadeOut(function(){
-	$(this).empty()
-	  .append($("#badge-ask-template")
-	  .render(templateArgs))
-	  .fadeIn();
-	$("#badge-ask .accept").click(function(){
-	  badge.issue();
-	  offerNext();
-	});
-	$("#badge-ask .reject").click(function(){
-	  badge.reject('DENIED');
-	  offerNext();
-	});
+        $(this).empty()
+          .append($("#badge-ask-template")
+          .render(templateArgs))
+          .fadeIn();
+        $("#badge-ask .accept").click(function(){
+          badge.issue();
+          offerNext();
+        });
+        $("#badge-ask .reject").click(function(){
+          badge.reject('DENIED');
+          offerNext();
+        });
       });
     }
     offerNext();
@@ -127,10 +127,10 @@ function issue(assertions, cb){
   App.on('badges-complete', function(failures, successes, t){
     $.when(badgesProcessed).always(function(){
       if (successes.length < 2)
-	$("#farewell .badges-" + successes.length).show();
+	      $("#farewell .badges-" + successes.length).show();
       else {
-	$("#farewell .badges-many").show();
-	$("#farewell .badges-added").text(successes.length);
+        $("#farewell .badges-many").show();
+        $("#farewell .badges-added").text(successes.length);
       }
       $("#farewell .next").click(function(){ exit(failures, successes); });
       $(".navbar .closeFrame").unbind().click(function(){ exit(failures, successes); });
@@ -150,20 +150,20 @@ function issue(assertions, cb){
     }
     else if (error.reason !== 'DENIED') {
       var templateData = {
-	error: error,
-	assertion: badge.data.badge, // data.badge is really the assertion
-	user: Session.currentUser
+        error: error,
+        assertion: badge.data.badge, // data.badge is really the assertion
+        user: Session.currentUser
       };
       if (error.reason === 'INVALID') {
-	if (badge.data.owner) {
-	  showError('#accept-failure-template', templateData);
-	}
-	else {
-	  showError('#owner-mismatch-template', templateData);
-	}
+        if (badge.data.owner) {
+          showError('#accept-failure-template', templateData);
+        }
+        else {
+          showError('#owner-mismatch-template', templateData);
+        }
       }
       else if (error.reason === 'EXISTS') {
-	showError('#already-exists-template', templateData);
+	      showError('#already-exists-template', templateData);
       }
     }
   });
