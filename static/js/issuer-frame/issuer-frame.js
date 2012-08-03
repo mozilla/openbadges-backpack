@@ -5,10 +5,15 @@ jQuery.extend({
   }
 });
 
+/* Session - an evented login & session helper
+ *  Optionally takes startLogin method in a spec object
+ *    to override default login implementation
+ */
 var Session = function(spec) {
   var spec = spec || {};
 
   var startLogin = spec.startLogin || function(login) {
+    /* default login implementation uses Persona */
     navigator.id.getVerifiedEmail(function(assertion) {
       jQuery.ajax({
         url: '/backpack/authenticate',
@@ -49,28 +54,25 @@ var Session = function(spec) {
     }
   };
 
-  _.extend(Session, Backbone.Events);
-
   jQuery.ajaxSetup({
     beforeSend: function (xhr, settings) {
       if (!settings.crossDomain && settings.type != "GET")
-	      xhr.setRequestHeader('X-CSRF-Token', Session.CSRF)
+        xhr.setRequestHeader('X-CSRF-Token', Session.CSRF)
     }
   });
+
+  _.extend(Session, Backbone.Events);
 
   return Session;
 };
 
-/* Badge - an evented Deferred representing a badge
+/* Badge - represents a badge in the acceptance workflow
  *   Takes an assertion url
  *   Optionally takes build and issue methods in a spec object
- *     These should return Deferreds or plain objects
+ *     These should return Deferreds (or plain objects, which count 
+ *        as a resolved Deferred)
  *     `build` attempts to build a full badge out of the assertion url
  *     `issue` attempts to issue the badge
- *
- *   Events:
- *     built   - fired when build succeeds
- *     issued  - fired when issue succeeds
  *
  *   The Deferred is resolved if build and issue succeed, and rejected
  *   if either has an error or the badge is rejected by the user.
@@ -84,25 +86,30 @@ var Badge = function(assertionUrl, spec){
   var issueState;
 
   var Badge = $.Deferred(function(){
-    var _state = 'pendingBuild';
+    this.state = 'pendingBuild';
 
     function changeState(to){
-      _state = to;
+      Badge.state = to;
       Badge.trigger('state-change', to);
     }
 
     this.assertionUrl = assertionUrl;
-
     this.error;
+
+    /* If the badge is rejected, error contains the url, reason, 
+       and any additional data for the failure. */
     this.fail(function(reason, data){
-      this.error = _.extend({url: assertionUrl, reason: reason}, data) ;
+      this.error = _.extend({url: assertionUrl, reason: reason}, data);
       changeState('failed');
     });
 
+    /* If the badge is resolved, it moves to state complete. */
     this.done(function(){
       changeState('complete');
     });
 
+    /* Kicks off building of the badge.
+       TODO: rename to build */
     this.start = function(){
       buildState = build(assertionUrl);
 
@@ -119,8 +126,9 @@ var Badge = function(assertionUrl, spec){
       );
     };
 
+    /* Kicks off issuing the badge. */
     this.issue = function(){
-      if (_state != 'built')
+      if (this.state != 'built')
 	      throw new Error('Cannot issue unbuilt badge');
 
       changeState('pendingIssue');
@@ -138,21 +146,20 @@ var Badge = function(assertionUrl, spec){
       );
     };
 
+    /* .result is the final "view" of the badge that gets returned
+       to the OpenBadges.issue() callback. */
     this.result = function(){
       if (this.inState('issued', 'complete'))
 	      return this.assertionUrl;
       else if (this.inState('failed'))
 	      return { url: this.error.url, reason: this.error.reason };
       else
-	      throw new Error("Can't return result for state " + this.state());
+	      throw new Error("Can't return result for state " + this.state);
     };
 
-    this.state = function(){
-      return _state;
-    };
-
+    /* Query if badge is in any of the given states */
     this.inState = function(){
-      return _.include(arguments, this.state());
+      return _.include(arguments, this.state);
     }
 
     _.extend(this, Backbone.Events);
@@ -162,10 +169,18 @@ var Badge = function(assertionUrl, spec){
   return Badge;
 };
 
+/* App - watches a collection of badges and emits checkpoint
+ *    events as they move through acceptance workflow
+ *
+ *   Takes a list of assertion urls
+ *   Optionally takes build and issue methods in a spec object
+ *      see Badge
+ */
 var App = function(assertionUrls, spec){
   var assertionUrls = assertionUrls || [];
   var spec = spec || {};
 
+  /* Default build implementation is the "real" one. */
   var build = spec.build || function(assertionUrl){
     var build = $.Deferred();
     jQuery.ajax({
@@ -187,18 +202,25 @@ var App = function(assertionUrls, spec){
       error: function(xhr, textStatus, error){
         var message;
         try {
+          /* If the ajax call was good but the server returned an error
+             from its call, responseText will be a json object. */
           var err = jQuery.parseJSON(xhr.responseText);
           message = err.message;
         }
         catch (ex) {
+          /* Otherwise our ajax call itself failed. */
           message = "Internal error; please try again later.";
         }
+        /* FIXME: INACCESSIBLE is really only appropriate for the case
+           within the try block. */
         build.reject('INACCESSIBLE', { message: message });
       }
     });
     return build;
   };
 
+  /* Default issue implementation is the "real" one used by 
+     the issuer frame. */
   var issue = spec.issue || function(assertionUrl){
     var issue = $.Deferred();
     var self = this;
@@ -215,6 +237,8 @@ var App = function(assertionUrls, spec){
           issue.resolve();
       },
       error: function(req) {
+        /* FIXME: INVALID may not be appropriate here, particularly if
+           the ajax call itself failed. */
         issue.reject('INVALID');
       }
     });
@@ -229,16 +253,22 @@ var App = function(assertionUrls, spec){
       build: build,
       issue: issue
     });
+
+    /* Pass along badge state changes, as well as 
+       calling out failures. */
     b.on('state-change', function(to){
       if (to === 'failed'){
         App.trigger('badge-failed', b);
       }
       App.trigger('state-change', b, to);
     });
+
     badges.push(b);
   });
 
   var App = {
+    
+    /* Begins processing all the badges and emitting events. */
     start: function(){
       if (assertionUrls.length === 0) {
         App.trigger('badges-complete', [], [], 0);
@@ -249,6 +279,8 @@ var App = function(assertionUrls, spec){
 	      });
       }
     },
+
+    /* Aborts all badges, DENYing those that haven't yet failed. */
     abort: function(){
       aborted = true;
       badges.forEach(function(badge){
@@ -259,36 +291,53 @@ var App = function(assertionUrls, spec){
 
   _.extend(App, Backbone.Events);
 
+  /* Helper to get all badges in given states. */
   function getAllIn() {
     var states = Array.prototype.slice.apply(arguments);
-    var results = _.filter(badges, function(badge){ return badge.inState.apply(badge, states); });
+    var results = _.filter(badges, function(badge){ 
+      return badge.inState.apply(badge, states); 
+    });
     return results;
   }
 
+  /* Checks for notification that all badges have built or failed. */
   function checkAllBuilt() {
-    var building = _.find(badges, function(badge){ return badge.inState('pendingBuild'); });
+    var building = _.find(badges, function(badge){ 
+      return badge.inState('pendingBuild'); 
+    });
     if (!building){
-      var built = _.filter(badges, function(badge){ return badge.inState('built'); });
+      var built = _.filter(badges, function(badge){ 
+        return badge.inState('built'); 
+      });
       var failures = getAllIn('failed');
       App.off('state-change', checkAllBuilt);
       App.trigger('badges-ready', failures, built);
     }
   }
 
+  /* Checks for notification that all badges have been issued, 
+     rejected or failed. */
   function checkAllIssued() {
-    var nonFinal = _.find(badges, function(badge){ return !badge.inState('issued', 'failed', 'complete'); });
+    var nonFinal = _.find(badges, function(badge){ 
+      return !badge.inState('issued', 'failed', 'complete'); 
+    });
     if (!nonFinal) {
-      var issuedCount = _.reduce(badges, function(memo, badge){ return badge.inState('issued', 'complete') ? memo + 1 : memo; }, 0);
+      var issuedCount = _.reduce(badges, function(memo, badge){ 
+        return badge.inState('issued', 'complete') ? memo + 1 : memo; 
+      }, 0);
       App.trigger('badges-issued', issuedCount);
     }
   }
 
+  /* Checks that all badges are in a final state, complete or failed. */
   var complete = false;
   function checkAllDone() {
     if (complete)
       return;
 
-    var pending = _.find(badges, function(badge){ return !badge.inState('failed', 'complete'); });
+    var pending = _.find(badges, function(badge){ 
+      return !badge.inState('failed', 'complete'); 
+    });
     if(!pending) {
       complete = true;
       var failures = getAllIn('failed');

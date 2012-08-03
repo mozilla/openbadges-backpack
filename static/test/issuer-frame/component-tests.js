@@ -70,7 +70,7 @@ asyncTest('Issuing a single badge', function(){
     ok(false, 'fail');
   });
   b.always(function(){
-    equal(this.state(), 'complete');
+    equal(this.state, 'complete');
     equal(this.assertionUrl, 'foo');
     start();
   });
@@ -92,7 +92,7 @@ asyncTest('Badge fails build', function(){
     ok(true, 'fail');
   });
   b.always(function(){
-    equal(this.state(), 'failed');
+    equal(this.state, 'failed');
     deepEqual(this.error, {url: 'foo', reason: 'asplode'});
     start();
   });
@@ -117,7 +117,7 @@ asyncTest('Badge fails issue', function(){
   });
   b.always(function(){
     ok(built, 'saw built event');
-    equal(this.state(), 'failed');
+    equal(this.state, 'failed');
     deepEqual(this.error, {url: 'foo', reason: 'asplode'});
     start();
   });
@@ -136,7 +136,7 @@ asyncTest('Badge rejected by user', function(){
     ok(true, 'fail');
   });
   b.always(function(){
-    equal(this.state(), 'failed');
+    equal(this.state, 'failed');
     deepEqual(this.error, {url: 'foo', reason: 'DENIED'});
     start();
   });
@@ -167,15 +167,15 @@ asyncTest('Successful badge state transitions', function(){
     issue: function(){ return issue; }
   });
   var states = [];
-  states.push(b.state());
+  states.push(b.state);
   b.on('built', function(){
-    states.push(b.state());
+    states.push(b.state);
     b.issue();
-    states.push(b.state());
+    states.push(b.state);
     issue.resolve();
   });
   b.on('issued', function(){
-    states.push(b.state());
+    states.push(b.state);
   });
   var stateChanges = 0;
   b.on('state-change', function(){
@@ -319,13 +319,17 @@ asyncTest('Failing a failed badge does nothing', function(){
 
 module("App");
 
+/* A method to trivially fake success for build or issue */
 function succeed(){
   return {};
 }
 
-function failOne(fail, reason){
+/* Returns a method that will simulate build or issue failure on 
+   a single assertion url.
+ */
+function failOne(url, reason){
   return function(assertionUrl) {
-    if (assertionUrl === fail) {
+    if (assertionUrl === url) {
       console.log('failing', assertionUrl);
       return $.Deferred().reject(reason);
     }
@@ -334,6 +338,7 @@ function failOne(fail, reason){
   };
 }
 
+/* A test helper to get result objects from a list of badges */
 function results(list){
   return _.map(list, function(badge){ return badge.result(); });
 }
