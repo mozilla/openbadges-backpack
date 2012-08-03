@@ -184,9 +184,16 @@ var App = function(assertionUrls, spec){
           build.resolve(obj);
         }
       },
-      error: function(xhr){
-        var err = jQuery.parseJSON(xhr.responseText);
-        build.reject('INACCESSIBLE', { message: err.message });
+      error: function(xhr, textStatus, error){
+        var message;
+        try {
+          var err = jQuery.parseJSON(xhr.responseText);
+          message = err.message;
+        }
+        catch (ex) {
+          message = "Internal error; please try again later.";
+        }
+        build.reject('INACCESSIBLE', { message: message });
       }
     });
     return build;
