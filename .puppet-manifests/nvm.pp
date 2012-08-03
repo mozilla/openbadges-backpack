@@ -24,5 +24,6 @@ class nvm ($node_version) {
 
   exec { "source-nvm":
     command => "echo 'source /home/vagrant/nvm/nvm.sh' >> /home/vagrant/.bashrc",
+    onlyif => "grep -q 'source /home/vagrant/nvm/nvm.sh' /home/vagrant/.bashrc; test $? -eq 1",
   }
 }
