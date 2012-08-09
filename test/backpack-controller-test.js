@@ -9,22 +9,36 @@ var _ = require('underscore')
   , request = utils.conn.request
   , response = utils.conn.response
 
-var user, badge, group;
+function makeHash (email, salt) {
+  var sha = require('crypto').createHash('sha256');
+  return 'sha256$' + sha.update(email + salt).digest('hex');
+}
+
+var user, anotherUser, badge, hashedBadge, group;
 function setupDatabase (callback) {
   var User = require('../models/user.js')
   var Badge = require('../models/badge.js')
   var Group = require('../models/group.js')
-  var badgedata = require('../lib/utils').fixture({recipient: 'brian@example.com'})
+  var fixture = require('../lib/utils').fixture;
   mysql.prepareTesting();
   function saver (m, cb) { m.save(cb) };
-  user = new User({ email: 'brian@example.com' })
+  user = new User({ email: 'brian@example.com' });
+  anotherUser = new User({ email: 'someoneelse@example.com' });
   badge = new Badge({
     user_id: 1,
     type: 'hosted',
     endpoint: 'endpoint',
     image_path: 'image_path',
     body_hash: 'body_hash',
-    body: badgedata
+    body: fixture({recipient: 'brian@example.com'})
+  });
+  hashedBadge = new Badge({
+    user_id: 2,
+    type: 'hosted',
+    endpoint: 'endpoint',
+    image_path: 'image_path',
+    body_hash: 'body_hash',
+    body: fixture({recipient: makeHash('brian@example.com', 'hashbrowns')})
   });
   group = new Group({
     user_id: 1,
@@ -33,7 +47,7 @@ function setupDatabase (callback) {
     'public': 1,
     badges: [1]
   });
-  map.async(saver, [user, badge, group], callback);
+  map.async(saver, [user, anotherUser, badge, hashedBadge, group], callback);
 }
 
 var backpack = require('../controllers/backpack.js')
@@ -74,6 +88,16 @@ vows.describe('basic login controller test').addBatch({
         opts.badges[0].serializedAttributes.should.match(/"recipient":"brian@example.com"/)
         opts.groups.should.have.lengthOf(1);
         opts.groups[0].attributes.name.should.equal('name');
+      }
+    },
+    '#manage for hashed badge recipient' : {
+      topic: function () {
+        var req = request({ user: anotherUser });
+        backpack.manage(req, response(req, this.callback))
+      },
+      'should replace hashed recipient with user email' : function (conn, render, opts) {
+        opts.badges.should.have.lengthOf(1);
+        opts.badges[0].serializedAttributes.should.match(/"recipient":"someoneelse@example.com"/)
       }
     }
   }
