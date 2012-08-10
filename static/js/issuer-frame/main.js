@@ -42,6 +42,9 @@ $(window).ready(function() {
     $(".logged-in .logout").click(function() {
       $(".logged-in .next").unbind("click");
       Session.login();
+      Session.on("login-abort", function(){
+        $(".logged-in .next").click(showBadges);
+      });
       return false;
     });
   }

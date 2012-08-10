@@ -15,18 +15,23 @@ var Session = function(spec) {
   var startLogin = spec.startLogin || function(login) {
     /* default login implementation uses Persona */
     navigator.id.getVerifiedEmail(function(assertion) {
-      jQuery.ajax({
-        url: '/backpack/authenticate',
-        type: 'POST',
-        dataType: 'json',
-        data: {assertion: assertion},
-        success: function(data) {
-          login.resolve(data);
-        },
-        error: function() {
-          login.reject();
-        }
-      });
+      if (assertion) {
+        jQuery.ajax({
+          url: '/backpack/authenticate',
+          type: 'POST',
+          dataType: 'json',
+          data: {assertion: assertion},
+          success: function(data) {
+            login.resolve(data);
+          },
+          error: function() {
+            login.reject({userAbort: false});
+          }
+        });
+      }
+      else {
+        login.reject({userAbort: true});
+      }
     });
   };
 
@@ -41,8 +46,11 @@ var Session = function(spec) {
           Session.currentUser = data.email;
           Session.trigger("login-complete");
         });
-        login.fail(function() {
-	        Session.trigger("login-error");
+        login.fail(function(data) {
+          if (data.userAbort) 
+            Session.trigger("login-abort");
+          else
+	          Session.trigger("login-error");
         });
         login.always(function() {
           loginStarted = false;

@@ -10,7 +10,7 @@ asyncTest('Session.login failure', function(){
   var s = Session({
     startLogin: function(deferred){
       // Always fail
-      deferred.reject();
+      deferred.reject({userAbort: false});
     }
   });
   var started = false;
@@ -20,6 +20,33 @@ asyncTest('Session.login failure', function(){
   s.on('login-error', function(){
     ok(started, 'Saw login-started');
     ok(true, 'Saw login-error');
+    start();
+  });
+  s.on('login-complete', function(){
+    ok(false, 'Saw login-complete');
+    start();
+  });
+  s.login();
+});
+
+asyncTest('User abort', function(){
+  var s = Session({
+    startLogin: function(deferred){
+      // Always abort
+      deferred.reject({userAbort: true});
+    }
+  });
+  var started = false;
+  s.on('login-started', function(){
+    started = true;
+  });
+  s.on('login-abort', function(){
+    ok(started, 'Saw login-started');
+    ok(true, 'Saw login-abort');
+    start();
+  });
+  s.on('login-error', function(){
+    ok(false, 'Saw login-error');
     start();
   });
   s.on('login-complete', function(){
