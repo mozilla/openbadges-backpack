@@ -68,7 +68,7 @@ Ensure that your PATH variable contains the VirtualBox binaries folder: Go to yo
 
     C:\...\Openbadges>"c:\Program Files (x86)\Vagrant\bin\vagrant.bat" up
 
-This will do all the VM building. You may be prompted by the windows firewall to allow VirtualBox network access: you'll have to allow this, otherwise things won't work. When the VM creation is done, let vagrant discover that it can't actually do SSH on windows:
+This will do all the VM building. You may be prompted by the windows firewall and UAC to allow VirtualBox network and disk access: you'll have to allow this, otherwise things won't work. When the VM creation is done, let vagrant discover that it can't actually do SSH on windows:
 
     C:\...\Openbadges>"c:\Program Files (x86)\Vagrant\bin\vagrant.bat" ssh
 
@@ -85,19 +85,11 @@ This will generate an output similar to the following:
 
 If you don't already have it installed, get [PuTTY](http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html) or another SSH client and log into 127.0.0.1:2229 with the username "vagrant" and password "vagrant", using the SSH key that vagrant generated in the indicated directory (Connection -> SSH -> Auth -> "browse" button). Putty will expect a .ppk file, so just tell it to show all files (*.*) and select the insecure_private_key file. Connect, and you should get into the Vagrant VM just fine.
 
-Before we can run everything, we need to ensure all the requirements are installed. In the VM, type:
-
-    vagrant@lucid32:~$ sudo apt-get update
-
-This will update the package manager list, so that we can tell vagrant to force-check everything; when it's done running, go back to the windows command line and run:
-
-    C:\...\Openbadges>"c:\Program Files (x86)\Vagrant\bin\vagrant.bat" provision
-
-This will run through the requirement list and sets everything up for us to finally get down, get open-badging. Once it's done, in the VM you can now start the server:
+Once connected to the VM, you can now start the server using:
 
     vagrant@lucid32:~$ start-server
 
-and then in windows, using your favourite browser, connect to the OpenBadges server you now have running on localhost:
+and then back in windows you can fire up your favourite browser and connect to the OpenBadges server you now have running on localhost:
 
     http://localhost:8888
 
