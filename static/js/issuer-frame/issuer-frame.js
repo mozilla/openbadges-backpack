@@ -93,7 +93,7 @@ var Badge = function(assertionUrl, spec){
   var buildState;
   var issueState;
 
-  var Badge = $.Deferred(function(){
+  var Badge = jQuery.Deferred(function(){
     this.state = 'pendingBuild';
 
     function changeState(to){
@@ -121,7 +121,7 @@ var Badge = function(assertionUrl, spec){
     this.start = function(){
       buildState = build(assertionUrl);
 
-      $.when(buildState).then(
+      jQuery.when(buildState).then(
         function buildSuccess(data){
           Badge.data = data;
           changeState('built');
@@ -142,7 +142,7 @@ var Badge = function(assertionUrl, spec){
       changeState('pendingIssue');
       issueState = issue.call(this, assertionUrl);
 
-      $.when(issueState).then(
+      jQuery.when(issueState).then(
         function issueSuccess(){
           changeState('issued');
           Badge.trigger('issued');
@@ -190,7 +190,7 @@ var App = function(assertionUrls, spec){
 
   /* Default build implementation is the "real" one. */
   var build = spec.build || function(assertionUrl){
-    var build = $.Deferred();
+    var build = jQuery.Deferred();
     jQuery.ajax({
       url: '/issuer/assertion',
       data: {
@@ -230,7 +230,7 @@ var App = function(assertionUrls, spec){
   /* Default issue implementation is the "real" one used by 
      the issuer frame. */
   var issue = spec.issue || function(assertionUrl){
-    var issue = $.Deferred();
+    var issue = jQuery.Deferred();
     var self = this;
     var post = jQuery.ajax({
       type: 'POST',
