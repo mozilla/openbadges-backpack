@@ -1,8 +1,6 @@
 node lucid32 {
 
-  exec { 'apt-get update':
-    command => '/usr/bin/apt-get update'
-  }
+  include aptupdate
   include essentials
   include mysql::server
   include openbadges::db
