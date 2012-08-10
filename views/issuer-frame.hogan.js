@@ -95,7 +95,7 @@
       <div class="span4 columns badge-details">
         <dl>
           <dt>Recipient</dt>
-          <dd>[[ recipient ]]</dd>
+	        <dd>[[ assertion.recipient ]]</dd>
 
           <dt>Name</dt>
           <dd>[[ assertion.badge.name ]]</dd>
@@ -118,4 +118,5 @@
 <script src="/js/jschannel.js"></script>
 <script src="/js/underscore.js"></script>
 <script src="/js/backbone.js"></script>
-<script src="/js/issuer-frame.js"></script>
+<script src="/js/issuer-frame/issuer-frame.js"></script>
+<script src="/js/issuer-frame/main.js"></script>
