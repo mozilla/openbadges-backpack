@@ -9,9 +9,15 @@ class nvm ($node_version) {
     require => Exec["install-node"],
   }
 
+  notify { "begin-install":
+    message => "Starting to install node ${node_version}; this can take a while.",
+    before => Exec["install-node"],
+  }
+
   exec { "install-node": 
     command => "bash -c \"source /home/vagrant/nvm/nvm.sh && nvm install ${node_version}\"",
     require => Exec["clone-nvm"],
+    timeout => 0,
   }
 
   exec { "clone-nvm":
