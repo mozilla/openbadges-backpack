@@ -53,7 +53,7 @@ expect in case of error.
 
 ### The easy way
 
-[Use Vagrant](http://vagrantup.com/). `vagrant up` in the project root will spin
+[Use Vagrant](http://vagrantup.com/v1/docs/getting-started/index.html). `vagrant up` in the project root will spin
 up a fully provisioned VM (it'll take about two or three minutes, longer if
 you don't have a `lucid32` box), `vagrant ssh` to get into the VM, then
 `start-server` will start up the server at
@@ -62,7 +62,7 @@ changes, so you don't have to manually reload it.
 
 #### For Windows users
 
-[Install Vagrant](http://vagrantup.com/) and [VirtualBox](https://www.virtualbox.org/). Vagrant will try to install in C:\vagrant, which is a protected location in Windows. Instead, tell it to install in C:\Program Files (if you're on 32 bit windows) or C:\Program Files (x86) (if you're on 64 bit windows) instead - don't worry, this will actually create a C:\Program Files\vagrant folder.
+[Install Vagrant](http://vagrantup.com/v1/docs/getting-started/index.html) and [VirtualBox](https://www.virtualbox.org/). Vagrant will try to install in C:\vagrant, which is a protected location in Windows. Instead, tell it to install in C:\Program Files (if you're on 32 bit windows) or C:\Program Files (x86) (if you're on 64 bit windows) instead - don't worry, this will actually create a C:\Program Files\vagrant folder.
 
 Ensure that your PATH variable contains the VirtualBox binaries folder: Go to your Control Panel -> System -> Advanced system settings -> "Environment Variables" button -> in the system variable section scroll down to the PATH variable, hit "edit" and add C:\Program Files\VirtualBox. After making sure this is the case, in the openbadges repo, run:
 
