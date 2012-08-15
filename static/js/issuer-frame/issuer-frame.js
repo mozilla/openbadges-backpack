@@ -87,8 +87,8 @@ var Session = function Session(spec) {
  */
 var Badge = function Badge(assertionUrl, spec) {
   var spec = spec || {};
-  var build = spec.build || function() { return {}; };
-  var issue = spec.issue || function() { return {}; };
+  var _build = spec.build || function() { return {}; };
+  var _issue = spec.issue || function() { return {}; };
 
   var buildState;
   var issueState;
@@ -115,10 +115,9 @@ var Badge = function Badge(assertionUrl, spec) {
       changeState('complete');
     });
 
-    /* Kicks off building of the badge.
-       TODO: rename to build */
-    this.start = function start() {
-      buildState = build(assertionUrl);
+    /* Kicks off building of the badge. */
+    this.build = function build() {
+      buildState = _build(assertionUrl);
 
       jQuery.when(buildState).then(
         function buildSuccess(data) {
@@ -139,7 +138,7 @@ var Badge = function Badge(assertionUrl, spec) {
 	      throw new Error('Cannot issue unbuilt badge');
 
       changeState('pendingIssue');
-      issueState = issue.call(this, assertionUrl);
+      issueState = _issue.call(this, assertionUrl);
 
       jQuery.when(issueState).then(
         function issueSuccess() {
@@ -282,7 +281,7 @@ var App = function App(assertionUrls, spec) {
       }
       else {
         badges.forEach(function(badge, i, arr) {
-          badge.start();
+          badge.build();
 	      });
       }
     },
