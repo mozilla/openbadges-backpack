@@ -38,7 +38,7 @@ var Session = function Session(spec) {
         siteName: 'Open Badge Backpack',
         termsOfService: '/tou.html',
         privacyPolicy: '/privacy.html',
-        returnTo: '/'
+        returnTo: '/issuer/welcome'
       }
     );
   };

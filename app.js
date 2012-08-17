@@ -66,6 +66,7 @@ router(app)
 
   .get('/issuer/validator',           'issuer.validator')
   .post('/issuer/validator',          'issuer.validator')
+  .get('/issuer/welcome',             'issuer.welcome')
 
 
   .get('/displayer/:dUserId/groups.:format?',          'displayer.userGroups')
