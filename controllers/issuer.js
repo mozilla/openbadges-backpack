@@ -333,6 +333,7 @@ exports.validator = function (request, response) {
 
 exports.welcome = function(request, response, next) {
   var user = request.user;
+  if (!user) return response.redirect(reverse('backpack.login'), 303);
 
   function makeResponse(err, badges) {
     if (err) return next(err);
