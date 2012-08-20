@@ -15,7 +15,7 @@
 //begin login handler
   
   function launchBrowserId(callback) {
-    return function() { navigator.id.getVerifiedEmail(callback); }
+    return function() { navigator.id.get(callback); }
   }
   function handleResponse(assertion) {
     if (!assertion) return false;
