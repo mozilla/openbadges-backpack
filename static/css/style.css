@@ -588,3 +588,15 @@ table.information {
 body {
   cursor: default;
 }
+
+
+/**
+  badge "popinfo" multi block styling (description span + issuer span)
+**/
+.popover-content p span {
+  display: block;
+}
+
+.popover-content p span + span {
+  margin-top: 1em;
+}

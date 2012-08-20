@@ -24,7 +24,7 @@
     <h1><span data-title="Badges" data-content="These are the badges you've earned so far! Click on one to see its details." rel="popover">Badges{{#tooltips}}<i class="icon-info-sign"></i>{{/tooltips}}</span></h1>
     <div id="badges" class="js-badges">
       {{#badges}}
-        <span draggable="true" class="openbadge" data-id="{{attributes.id}}">
+        <span draggable="true" class="openbadge" data-id="{{attributes.id}}" rel="popinfo" data-title="{{attributes.body.badge.name}}" data-content="<span>{{attributes.body.badge.description}}</span><span>Issuer: {{attributes.body.badge.issuer.name}}</span>">
           <img src="{{attributes.image_path}}" width="64px"/>
         </span>
       {{/badges}}
@@ -63,7 +63,7 @@
         </span>
           
           {{#attributes.badgeObjects}}
-            <span draggable="true" class="openbadge" data-id="{{attributes.id}}">
+            <span draggable="true" class="openbadge" data-id="{{attributes.id}}" rel="popinfo" data-title="{{attributes.body.badge.name}}" data-content="<span>{{attributes.body.badge.description}}</span><span>Issuer: {{attributes.body.badge.issuer.name}}</span>">
               <img src="{{attributes.image_path}}" width="64px"/>
             </span>
           {{/attributes.badgeObjects}}
@@ -88,9 +88,12 @@
   {{/badges}}
 </script>
 
-{{#tooltips}}
 <script>
   $(function(){
+    $('[rel="popinfo"]').popover({
+      animation: false
+    });
+{{#tooltips}}
     $('[rel="popover"]').popover({
       animation: false,
       placement: 'right'
@@ -98,9 +101,9 @@
     $('[rel="tooltip"]').tooltip({
       animation: false
     });
+{{/tooltips}}
   });
 </script>
-{{/tooltips}}
 
 {{=|| ||=}} <!-- need to change delimeter so hogan doesn't parse these --->
 
@@ -223,7 +226,7 @@
 </script>
 
 <script type='text/html' class='partial' id='badgeTpl'>
-  <span draggable="true" class="openbadge">
+  <span draggable="true" class="openbadge" data-id="{{attributes.id}}" rel="popinfo" data-title="{{attributes.body.badge.name}}" data-content="<span>{{attributes.body.badge.description}}</span><span>Issuer: {{attributes.body.badge.issuer.name}}</span>">
     <img src="{{image_path}}" width="64px"/>
   </span>
 </script>
