@@ -29,7 +29,7 @@ exports.login = function login(request, response) {
 /**
  * Authenticate the user using a browserID assertion.
  *
- * @param {String} assertion returned by `navigator.id.getVerifiedEmail`
+ * @param {String} assertion returned by browserID login
  * @return {HTTP 303}
  *   on error: redirect one page back
  *   on success: redirect to `backpack.manage`

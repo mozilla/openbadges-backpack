@@ -113,7 +113,7 @@
     </div>
   </div>
 </div>
-<script src="https://browserid.org/include.js"></script>
+<script src="https://login.persona.org/include.js"></script>
 <script src="/js/jquery.min.js"></script>
 <script src="/js/jschannel.js"></script>
 <script src="/js/underscore.js"></script>

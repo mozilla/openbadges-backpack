@@ -14,25 +14,33 @@ var Session = function Session(spec) {
 
   var startLogin = spec.startLogin || function(login) {
     /* default login implementation uses Persona */
-    navigator.id.getVerifiedEmail(function(assertion) {
-      if (assertion) {
-        jQuery.ajax({
-          url: '/backpack/authenticate',
-          type: 'POST',
-          dataType: 'json',
-          data: {assertion: assertion},
-          success: function(data) {
-            login.resolve(data);
-          },
-          error: function() {
-            login.reject({userAbort: false});
-          }
-        });
+    navigator.id.get(
+      function(assertion) {
+        if (assertion) {
+          jQuery.ajax({
+            url: '/backpack/authenticate',
+            type: 'POST',
+            dataType: 'json',
+            data: {assertion: assertion},
+            success: function(data) {
+              login.resolve(data);
+            },
+            error: function() {
+              login.reject({userAbort: false});
+            }
+          });
+        }
+        else {
+          login.reject({userAbort: true});
+        }
+      },
+      {
+        siteName: 'Open Badge Backpack',
+        termsOfService: '/tou.html',
+        privacyPolicy: '/privacy.html',
+        returnTo: '/'
       }
-      else {
-        login.reject({userAbort: true});
-      }
-    });
+    );
   };
 
   var loginStarted = false;
