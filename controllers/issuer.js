@@ -85,15 +85,28 @@ exports.generateScript = function (req, res) {
   });
 };
 
+/* TODO: issuer-frame.hogan.js should really be accept-badges.hogan.js
+   or something (it's not always a frame anymore) */
 exports.frame = function (req, res) {
   res.header('Cache-Control', 'no-cache, must-revalidate');
   res.render('issuer-frame', {
     layout: null,
+    framed: true,
     csrfToken: req.session._csrf,
     email: req.session.emails && req.session.emails[0]
   });
 };
 
+exports.frameless = function (req, res) {
+  res.header('Cache-Control', 'no-cache, must-revalidate');
+  res.render('issuer-frame', {
+    layout: null,
+    framed: false,
+    assertions: "[]",
+    csrfToken: req.session._csrf,
+    email: req.session.emails && req.session.emails[0]
+  });
+};
 
 exports.issuerBadgeAddFromAssertion = function (req, res, next) {
   /* the issuer api, flawed in that it needs to query to badge assertion

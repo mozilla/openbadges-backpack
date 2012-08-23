@@ -22,7 +22,7 @@
       <h3><a class="brand" href="/" target="_blank">Open Badge Backpack</a></h3>
       <img src="/images/ajax-loader.gif" id="ajax-loader">
       <a id="moztab" href="http://mozilla.org" target="_blank">a mozilla.org joint</a>
-      <a class="close closeFrame" href="#">&times;</a>
+      {{#framed}}<a class="close closeFrame" href="#">&times;</a>{{/framed}}
     </div>
   </div>
 </div>
@@ -130,9 +130,20 @@
 <script src="/js/backbone.js"></script>
 <script src="/js/issuer-frame/issuer-frame.js"></script>
 <script src="/js/issuer-frame/main.js"></script>
-<script src="/js/issuer-frame/build-channel.js"></script>
-<script>
-  $(window).ready(function(){
-    var channel = buildChannel();
-  });
-</script>
+{{#framed}}
+  <script src="/js/issuer-frame/build-channel.js"></script>
+  <script>
+    $(window).ready(function(){
+      var channel = buildChannel();
+    });
+  </script>
+{{/framed}}
+{{^framed}}
+  <script>
+    $(window).ready(function(){
+      window.issue({{{assertions}}}, function(){
+        window.location = "{{#reverse}}backpack.manage{{/reverse}}";
+      });
+    });
+  </script>
+{{/framed}}

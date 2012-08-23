@@ -61,6 +61,7 @@ router(app)
   .delete('/badge/:badgeId',          'badge.destroy')
   .get('/issuer.js',                  'issuer.generateScript')
   .get('/issuer/frame',               'issuer.frame')
+  .get('/issuer/frameless',           'issuer.frameless')
   .get('/issuer/assertion',           'issuer.issuerBadgeAddFromAssertion')
   .post('/issuer/assertion',          'issuer.issuerBadgeAddFromAssertion')
 
