@@ -98,11 +98,13 @@ exports.frame = function (req, res) {
 };
 
 exports.frameless = function (req, res) {
+  var assertions = req.body.assertions || [];
+  assertions = typeof assertions === 'string' ? [assertions] : assertions;
   res.header('Cache-Control', 'no-cache, must-revalidate');
   res.render('issuer-frame', {
     layout: null,
     framed: false,
-    assertions: "[]",
+    assertions: JSON.stringify(assertions),
     csrfToken: req.session._csrf,
     email: req.session.emails && req.session.emails[0]
   });
