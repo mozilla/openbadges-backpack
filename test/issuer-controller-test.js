@@ -177,6 +177,69 @@ vows.describe('issuer controller test').addBatch({
           }
         },
       }
+    },
+    '#frame': {
+      topic: function () {
+        conmock(issuer.frame, {}, this.callback);
+      },
+      'renders issuer frame with framed option' : function (err, mock) {
+        mock.fntype.should.equal('render');
+        mock.path.should.equal('issuer-frame');
+        mock.options.framed.should.be.true;
+      },
+    },
+    '#frameless': {
+      'without assertions': {
+        topic: function () {
+          var req = { body: { assertions: [] } };
+          conmock(issuer.frameless, req, this.callback);
+        },
+        'renders issuer frame with unframed option' : function (err, mock) {
+          mock.fntype.should.equal('render');
+          mock.path.should.equal('issuer-frame');
+          mock.options.framed.should.not.be.true;
+          mock.options.assertions.should.equal('[]');
+        },
+      },
+      'with one good assertion': {
+        topic: function () {
+          var req = { body: { assertions: 'http://something.com/good' } };
+          conmock(issuer.frameless, req, this.callback);
+        },
+        'renders issuer frame with unframed option' : function (err, mock) {
+          mock.fntype.should.equal('render');
+          mock.path.should.equal('issuer-frame');
+          mock.options.framed.should.not.be.true;
+        },
+        'assertion is stringified in assertions option': function (err, mock) {
+          mock.options.assertions.should.equal('["http://something.com/good"]');
+        },
+      },
+      'with many good assertions': {
+        topic: function () {
+          var req = { body: { assertions: ['http://something.com/good/1', 'http://something.com/good/2'] } };
+          conmock(issuer.frameless, req, this.callback);
+        },
+        'renders issuer frame with unframed option' : function (err, mock) {
+          mock.fntype.should.equal('render');
+          mock.path.should.equal('issuer-frame');
+          mock.options.framed.should.not.be.true;
+        },
+        'assertions are stringified in assertions option': function (err, mock) {
+          mock.options.assertions.should.equal('["http://something.com/good/1","http://something.com/good/2"]');
+        },
+      },
+      'with bad assertion': {
+        topic: function () {
+          var req = { body: { assertions: ['bad!', 'http://something.com/good/2'] } };
+          conmock(issuer.frameless, req, this.callback);
+        },
+        'sends back 400 error' : function (err, mock) {
+          mock.fntype.should.equal('send');
+          mock.status.should.equal(400);
+          mock.body.should.equal('malformed url');
+        },
+      }
     }
   },
 }).export(module)
