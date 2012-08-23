@@ -130,3 +130,9 @@
 <script src="/js/backbone.js"></script>
 <script src="/js/issuer-frame/issuer-frame.js"></script>
 <script src="/js/issuer-frame/main.js"></script>
+<script src="/js/issuer-frame/build-channel.js"></script>
+<script>
+  $(window).ready(function(){
+    var channel = buildChannel();
+  });
+</script>
