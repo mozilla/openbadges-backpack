@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="/css/bootstrap-2.0.2.min.css" />
 <link rel="stylesheet" href="/css/style.css" type="text/css" media="all" />
 <link rel="stylesheet" href="/css/issuer-frame.css" type="text/css" media="all" />
-<title>Issuer Frame</title>
+<title>Accept Your Badges</title>
 <div class="navbar navbar-fixed-top">
   <div class="navbar-inner">
     <div class="container-fluid" style="position: relative;">
