@@ -1,9 +1,35 @@
 var vows = require('vows')
+  , app = require('../app.js')
   , assert = require('assert')
   , should = require('should')
   , issuer = require('../controllers/issuer.js')
   , conmock = require('./conmock.js')
   , _ = require('underscore')
+  , utils = require('./utils')
+  , request = utils.conn.request
+  , response = utils.conn.response
+  , mysql = require('../lib/mysql.js')
+  , map = require('functools').map
+
+var newUser, oldUser, badge;
+function setupDatabase (callback) {
+  var User = require('../models/user.js');
+  var Badge = require('../models/badge.js')
+  mysql.prepareTesting();
+  function saver (m, cb) { m.save(cb) };
+  newUser = new User({ email: 'new@example.com' });
+  oldUser = new User({ email: 'old@example.com' });
+  var badgedata = require('../lib/utils').fixture({recipient: 'old@example.com'})
+  badge = new Badge({
+    user_id: 2,
+    type: 'hosted',
+    endpoint: 'endpoint',
+    image_path: 'image_path',
+    body_hash: 'body_hash',
+    body: badgedata
+  });
+  map.async(saver, [newUser, oldUser, badge], callback);
+}
 
 vows.describe('issuer controller test').addBatch({
   'Issuer Controller': {
@@ -116,5 +142,41 @@ vows.describe('issuer controller test').addBatch({
         },
       },
     },
+    '#welcome': {
+      'with no user logged in': {
+        topic: function () {
+          var req = request();
+          issuer.welcome(req, response(req, this.callback))
+        },
+        'redirects to login': function (conn, path, status) {
+          path.should.equal('/backpack/login');
+          status.should.equal(303);
+        }
+      },
+      'with logged in user': {
+        topic: function () {
+          setupDatabase(this.callback);
+        },
+        'that has no badges yet': {
+          topic: function () {
+            var req = request({ user: newUser });
+            issuer.welcome(req, response(req, this.callback))
+          },
+          'renders new user welcome': function (conn, render, opts) {
+            render.should.equal('issuer-welcome');
+          }
+        },
+        'that has badges already': {
+          topic: function () {
+            var req = request({ user: oldUser });
+            issuer.welcome(req, response(req, this.callback))
+          },
+          'redirects to backpack': function (conn, path, status) {
+            path.should.equal('/');
+            status.should.equal(303);
+          }
+        },
+      }
+    }
   },
 }).export(module)

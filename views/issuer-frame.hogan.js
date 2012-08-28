@@ -2,6 +2,16 @@
 <meta charset="utf-8">
 <meta http-equiv="X-CSRF-Token" content="{{ csrfToken }}">
 <meta http-equiv="X-Current-User" content="{{ email }}">
+<script>
+  /* This screen should only legitimately be loaded in an iframe
+   * for now. If we hit it directly, chances are it's because of
+   * Persona's redirect on account creation. Let's kick over to
+   * the welcome screen instead.
+   */
+   if (window.top === window.self) {
+    window.location = "{{#reverse}}issuer.welcome{{/reverse}}";
+  }
+</script>
 <link rel="stylesheet" href="/css/bootstrap-2.0.2.min.css" />
 <link rel="stylesheet" href="/css/style.css" type="text/css" media="all" />
 <link rel="stylesheet" href="/css/issuer-frame.css" type="text/css" media="all" />
