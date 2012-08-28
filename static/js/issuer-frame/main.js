@@ -135,8 +135,14 @@ function issue(assertions, cb){
         $("#farewell .badges-many").show();
         $("#farewell .badges-added").text(successes.length);
       }
+
+      // bind/rebind all the ways to exit
       $("#farewell .next").click(function(){ exit(failures, successes); });
       $(".navbar .closeFrame").unbind().click(function(){ exit(failures, successes); });
+      $('body').unbind('keydown').keydown(function (event) {
+        if (event.keyCode === 27) exit(failures, successes);
+      });
+
       $("#farewell").fadeIn();
       return;
     });
@@ -171,9 +177,13 @@ function issue(assertions, cb){
     }
   });
 
+  // set up all the ways to bail out
   $(".navbar .closeFrame").click(function() {
     App.abort();
     return false;
+  });
+  $('body').keydown(function (event) {
+    if (event.keyCode === 27) App.abort();
   });
 }
 
