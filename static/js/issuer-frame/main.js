@@ -97,7 +97,8 @@ function issue(assertions, cb){
       var badge = badges[next++];
       var templateArgs = {
         assertion: badge.data.badge,
-        user: Session.currentUser
+        user: Session.currentUser,
+        unhashedRecipient: badge.data.recipient
       };
       $("#badge-ask").fadeOut(function(){
         $(this).empty()
