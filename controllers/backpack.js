@@ -171,6 +171,8 @@ exports.manage = function manage(request, response, next) {
 
       if (criteria[0] === '/') body.badge.criteria = origin + criteria;
       if (evidence && evidence[0] === '/') body.evidence = origin + evidence;
+      // Nobody wants to see the hash in the UI, apparently. 
+      if (body.recipient.match(/\w+(\d+)?\$.+/)) body.recipient = user.get('email');
 
       badgeIndex[badge.get('id')] = badge;
       badge.serializedAttributes = JSON.stringify(badge.attributes);
