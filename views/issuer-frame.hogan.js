@@ -8,7 +8,7 @@
    * Persona's redirect on account creation. Let's kick over to
    * the welcome screen instead.
    */
-   if (top === self) {
+   if (window.top === window.self) {
     window.location = "{{#reverse}}issuer.welcome{{/reverse}}";
   }
 </script>
