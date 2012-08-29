@@ -30,6 +30,19 @@ function qualifyUrl(pathOrUrl, origin) {
   return url.format(parts);
 }
 
+function validUrl(url) {
+  //check if the assertion url is malformed
+  if (!regex.url.test(url)) {
+    // try one pass of decoding
+    logger.debug('url did not pass, trying to decodeURIComponent');
+    url = decodeURIComponent(url);
+    if (!regex.url.test(url)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 var myFiles = [
   "issuer-parts/issuer-script-intro.js",
   "jquery.min.js",
@@ -85,15 +98,37 @@ exports.generateScript = function (req, res) {
   });
 };
 
+/* TODO: issuer-frame.hogan.js should really be accept-badges.hogan.js
+   or something (it's not always a frame anymore) */
 exports.frame = function (req, res) {
   res.header('Cache-Control', 'no-cache, must-revalidate');
   res.render('issuer-frame', {
     layout: null,
+    framed: true,
     csrfToken: req.session._csrf,
     email: req.session.emails && req.session.emails[0]
   });
 };
 
+exports.frameless = function (req, res) {
+  var assertionUrls = req.body.assertions || [];
+  assertionUrls = typeof assertionUrls === 'string' ? [assertionUrls] : assertionUrls;
+  for (var i = 0; i < assertionUrls.length; i++) {
+    var url = assertionUrls[i];
+    if (!validUrl(url)) {
+      logger.error("malformed url " + url + " returning 400");
+      return res.send('malformed url', 400);
+    }
+  }
+  res.header('Cache-Control', 'no-cache, must-revalidate');
+  res.render('issuer-frame', {
+    layout: null,
+    framed: false,
+    assertions: JSON.stringify(assertionUrls),
+    csrfToken: req.session._csrf,
+    email: req.session.emails && req.session.emails[0]
+  });
+};
 
 exports.issuerBadgeAddFromAssertion = function (req, res, next) {
   /* the issuer api, flawed in that it needs to query to badge assertion
@@ -138,15 +173,9 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
     return res.json({message: 'url is a required param'}, 400);
   }
 
-  //check if the assertion url is malformed
-  if (!regex.url.test(assertionUrl)) {
-    // try one pass of decoding
-    logger.debug('url did not pass, trying to decodeURIComponent');
-    assertionUrl = decodeURIComponent(assertionUrl);
-    if (!regex.url.test(assertionUrl)) {
-      logger.error("malformed url " + assertionUrl + " returning 400");
-      return res.json({ message: 'malformed url' }, 400);
-    }
+  if (!validUrl(assertionUrl)) {
+    logger.error("malformed url " + assertionUrl + " returning 400");
+    return res.json({ message: 'malformed url' }, 400);
   }
 
   /* grabbing the remote assertion, 3 nested steps -

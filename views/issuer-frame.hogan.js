@@ -2,27 +2,28 @@
 <meta charset="utf-8">
 <meta http-equiv="X-CSRF-Token" content="{{ csrfToken }}">
 <meta http-equiv="X-Current-User" content="{{ email }}">
+{{#framed}}
 <script>
-  /* This screen should only legitimately be loaded in an iframe
-   * for now. If we hit it directly, chances are it's because of
-   * Persona's redirect on account creation. Let's kick over to
-   * the welcome screen instead.
+  /* Requesting the framed badge acceptance screen from outside
+   * an iframe probably means we're coming from Persona's redirect
+   * on account creation. Let's kick over to the welcome screen instead.
    */
    if (window.top === window.self) {
     window.location = "{{#reverse}}issuer.welcome{{/reverse}}";
   }
 </script>
+{{/framed}}
 <link rel="stylesheet" href="/css/bootstrap-2.0.2.min.css" />
 <link rel="stylesheet" href="/css/style.css" type="text/css" media="all" />
 <link rel="stylesheet" href="/css/issuer-frame.css" type="text/css" media="all" />
-<title>Issuer Frame</title>
+<title>Accept Your Badges</title>
 <div class="navbar navbar-fixed-top">
   <div class="navbar-inner">
     <div class="container-fluid" style="position: relative;">
       <h3><a class="brand" href="/" target="_blank">Open Badge Backpack</a></h3>
       <img src="/images/ajax-loader.gif" id="ajax-loader">
       <a id="moztab" href="http://mozilla.org" target="_blank">a mozilla.org joint</a>
-      <a class="close closeFrame" href="#">&times;</a>
+      {{#framed}}<a class="close closeFrame" href="#">&times;</a>{{/framed}}
     </div>
   </div>
 </div>
@@ -130,3 +131,20 @@
 <script src="/js/backbone.js"></script>
 <script src="/js/issuer-frame/issuer-frame.js"></script>
 <script src="/js/issuer-frame/main.js"></script>
+{{#framed}}
+  <script src="/js/issuer-frame/build-channel.js"></script>
+  <script>
+    $(window).ready(function(){
+      var channel = buildChannel();
+    });
+  </script>
+{{/framed}}
+{{^framed}}
+  <script>
+    $(window).ready(function(){
+      window.issue({{{assertions}}}, function(){
+        window.location = "{{#reverse}}backpack.manage{{/reverse}}";
+      });
+    });
+  </script>
+{{/framed}}
