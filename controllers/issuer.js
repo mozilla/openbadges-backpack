@@ -113,7 +113,7 @@ exports.frame = function (req, res) {
 exports.frameless = function (req, res) {
   var assertionUrls = req.body.assertions || [];
   assertionUrls = typeof assertionUrls === 'string' ? [assertionUrls] : assertionUrls;
-  for (var i=0; i<assertionUrls.length; i++) {
+  for (var i = 0; i < assertionUrls.length; i++) {
     var url = assertionUrls[i];
     if (!validUrl(url)) {
       logger.error("malformed url " + url + " returning 400");

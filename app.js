@@ -45,7 +45,14 @@ app.use(express.methodOverride());
 app.use(middleware.logRequests());
 app.use(middleware.cookieSessions());
 app.use(middleware.userFromSession());
-app.use(middleware.csrf({ whitelist: ['/backpack/authenticate', '/issuer/validator/?', '/displayer/convert/.+', '/issuer/frameless.*'] }));
+app.use(middleware.csrf({ 
+  whitelist: [
+    '/backpack/authenticate', 
+    '/issuer/validator/?', 
+    '/displayer/convert/.+', 
+    '/issuer/frameless.*'
+  ] 
+}));
 app.use(middleware.cors({ whitelist: ['/_badges.*', '/issuer.*', '/baker', '/displayer/.+/group.*'] }));
 
 app.configure('development', function () {
