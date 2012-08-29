@@ -11,6 +11,7 @@
   </head>
   <body>
     <label>Email: <input id='email'></label>
+    <label>Modaless: <input id='modaless' type='checkbox'></label>
     <button id='unhashed'>Unhashed</button>
     <button id='hashed'>Hashed</button>
     <button id='invalid'>Invalid</button>
@@ -21,21 +22,29 @@
       function getEmail() {
         return document.getElementById('email').value;
       }
+      function issue(assertions) {
+        if(document.getElementById('modaless').checked) {
+          OpenBadges.issue_no_modal(assertions);
+        }
+        else {
+          OpenBadges.issue(assertions);
+        }
+      }
       
       unhashed.addEventListener('click', function(){
         var url = 'http://localhost:8889/raw.json?email=' + encodeURIComponent(getEmail());
-        OpenBadges.issue(url);
+        issue(url)
       },false)
     
       hashed.addEventListener('click', function(){
         var url = 'http://localhost:8889/hashed.json?email=' + encodeURIComponent(getEmail())
-        OpenBadges.issue([url]);
+        issue([url]);
       },false)
 
       // added to test whether proper error message is thrown for invalid assertion 
       invalid.addEventListener('click', function(){
         var url = 'http://localhost:8889/invalid.json?email=' + encodeURIComponent(getEmail());
-        OpenBadges.issue(url);
+        issue(url);
       },false)
     
     </script>
