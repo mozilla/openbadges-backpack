@@ -78,7 +78,7 @@
   <div id="owner-mismatch-template">
     <div class="alert alert-error">
       <a class="close">×</a>
-      It appears that the 
+      It appears that the
       <em>[[ assertion.badge.name ]]</em> badge was not awarded to you ([[ user ]]).
     </div>
   </div>
