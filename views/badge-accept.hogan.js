@@ -129,10 +129,10 @@
 <script src="/js/jschannel.js"></script>
 <script src="/js/underscore.js"></script>
 <script src="/js/backbone.js"></script>
-<script src="/js/issuer-frame/issuer-frame.js"></script>
-<script src="/js/issuer-frame/main.js"></script>
+<script src="/js/badge-accept/issuer-frame.js"></script>
+<script src="/js/badge-accept/main.js"></script>
 {{#framed}}
-  <script src="/js/issuer-frame/build-channel.js"></script>
+  <script src="/js/badge-accept/build-channel.js"></script>
   <script>
     $(window).ready(function(){
       var channel = buildChannel();

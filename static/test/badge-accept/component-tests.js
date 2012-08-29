@@ -351,7 +351,7 @@ function succeed(){
   return {};
 }
 
-/* Returns a method that will simulate build or issue failure on 
+/* Returns a method that will simulate build or issue failure on
    a single assertion url.
  */
 function failOne(url, reason){
