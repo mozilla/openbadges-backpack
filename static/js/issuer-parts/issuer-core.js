@@ -133,9 +133,10 @@ var OpenBadges = (function() {
     // This function is not yet documented publicly.
     // It provides a modaless alternative to the classic issuer frame at the cost of the callback.
     issue_no_modal: function OpenBadges_issue_no_modal(assertions) {
+      assertions = typeof assertions === 'string' ? [assertions] : assertions;
       var root = this.ROOT = findRoot();
       var url = root + "issuer/frameless?" + Date.now();
-      var form = $('<form method="POST"></form>').attr('action', url).appendTo($('body'));
+      var form = $('<form method="POST"></form>').attr('action', url).appendTo($('body')).hide();
       assertions.forEach(function(val, i, arr){
         $('<input type="text" name="assertions">').val(val).appendTo(form);
       });
