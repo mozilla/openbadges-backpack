@@ -15,7 +15,7 @@
 {{/framed}}
 <link rel="stylesheet" href="/css/bootstrap-2.0.2.min.css" />
 <link rel="stylesheet" href="/css/style.css" type="text/css" media="all" />
-<link rel="stylesheet" href="/css/issuer-frame.css" type="text/css" media="all" />
+<link rel="stylesheet" href="/css/badge-accept.css" type="text/css" media="all" />
 <title>Accept Your Badges</title>
 <div class="navbar navbar-fixed-top">
   <div class="navbar-inner">
@@ -78,7 +78,7 @@
   <div id="owner-mismatch-template">
     <div class="alert alert-error">
       <a class="close">×</a>
-      It appears that the 
+      It appears that the
       <em>[[ assertion.badge.name ]]</em> badge was not awarded to you ([[ user ]]).
     </div>
   </div>
@@ -129,10 +129,10 @@
 <script src="/js/jschannel.js"></script>
 <script src="/js/underscore.js"></script>
 <script src="/js/backbone.js"></script>
-<script src="/js/issuer-frame/issuer-frame.js"></script>
-<script src="/js/issuer-frame/main.js"></script>
+<script src="/js/badge-accept/badge-accept.js"></script>
+<script src="/js/badge-accept/main.js"></script>
 {{#framed}}
-  <script src="/js/issuer-frame/build-channel.js"></script>
+  <script src="/js/badge-accept/build-channel.js"></script>
   <script>
     $(window).ready(function(){
       var channel = buildChannel();

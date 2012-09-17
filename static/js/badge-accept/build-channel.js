@@ -2,7 +2,7 @@
  *
  * When issuer frame is loaded in an iframe, this
  * builds the child-side channel to bind OpenBadges.issue()
- * to the issue() defined in issuer-frame/main.js.
+ * to the issue() defined in main.js.
  */
 function buildChannel() {
   if (window.parent === window)

@@ -98,11 +98,9 @@ exports.generateScript = function (req, res) {
   });
 };
 
-/* TODO: issuer-frame.hogan.js should really be accept-badges.hogan.js
-   or something (it's not always a frame anymore) */
 exports.frame = function (req, res) {
   res.header('Cache-Control', 'no-cache, must-revalidate');
-  res.render('issuer-frame', {
+  res.render('badge-accept', {
     layout: null,
     framed: true,
     csrfToken: req.session._csrf,
@@ -121,7 +119,7 @@ exports.frameless = function (req, res) {
     }
   }
   res.header('Cache-Control', 'no-cache, must-revalidate');
-  res.render('issuer-frame', {
+  res.render('badge-accept', {
     layout: null,
     framed: false,
     assertions: JSON.stringify(assertionUrls),
