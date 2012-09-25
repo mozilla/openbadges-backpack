@@ -282,7 +282,10 @@
       paginator.addPage(set);
     }
 
-    container.appendChild(paginator.finish());
+    var paginationWidget = paginator.finish();
+    if(paginator.size>1) {
+      container.appendChild(paginationWidget);
+    }
   }
 
   /**
