@@ -249,35 +249,30 @@
 
   // ============================================
 
+  var PAGE_SET_SIZE = 8;
+
   /**
-   * Generate a wad of badges (HTML)
+   * Get the set of on-page badges
    */
-  function generateBadges() {
-    var i, last=123,
-        badges = [],
-        title="badges!";
-    for(i=0; i<last; i++) {
-      badges[i] = $("<div class='badge'>" + 
-                    title[(Math.random()*7)|0] +
-                    "</div>")[0]; }
-    return badges;
+  function getBadges() {
+    // straight pull, no processing
+    return $('.backpack .collection .badge');
   }
-  
+
   /**
    * Add badges to a collection container
    */
   function addToContainer(container, badges) {
     var paginator = new Paginator(),
         s, set,
-        setSize = 16,
-        setCount = 1 + ((badges.length/setSize)|0),
+        setCount = 1 + ((badges.length/PAGE_SET_SIZE)|0),
         runner = 0, runTotal=0, badge;
 
     // create sets
     for(s=0; s<setCount; s++) {
       set = $("<div class='set'></div>")[0];
-      runTotal = s*setSize;
-      for(runner=0; runner<setSize; runner++) {
+      runTotal = s*PAGE_SET_SIZE;
+      for(runner=0; runner<PAGE_SET_SIZE; runner++) {
         badge = badges[runner + runTotal];
         if(!badge) break;
         set.appendChild(badge);
@@ -298,7 +293,7 @@
   function test() {
     document.removeEventListener("DOMContentLoaded",test,false);
     var container = $('.badges .collection')[0],
-        badges = generateBadges();
+        badges = getBadges();
     addToContainer(container, badges);
   }
 
