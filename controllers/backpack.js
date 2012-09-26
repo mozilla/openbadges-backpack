@@ -179,16 +179,6 @@ exports.manage = function manage(request, response, next) {
     });
   }
 
-  function getGroups() {
-    Group.find({user_id: user.get('id')}, getBadges);
-  }
-
-  function getBadges(err, results) {
-    if (err) return next(err);
-    groups = results;
-    Badge.find({email: user.get('email')}, makeResponse);
-  }
-
   function modifyGroups(groups) {
     groups.forEach(function (group) {
       var badgeObjects = [];
@@ -214,6 +204,11 @@ exports.manage = function manage(request, response, next) {
     });
   }
 
+  /**
+   * Preprocess the badges, by calling prepareBadgeIndex,
+   * and the groups, by calling modifyGroups, then
+   * render the page's view with the massaged data.
+   */
   function makeResponse(err, badges) {
     if (err) return next(err);
     prepareBadgeIndex(badges);
@@ -226,6 +221,24 @@ exports.manage = function manage(request, response, next) {
       groups: groups,
       tooltips: request.param('tooltips')
     });
+  }
+
+  /**
+   * Find all badges for a user, then call
+   * the above makeResponse function.
+   */
+  function getBadges(err, results) {
+    if (err) return next(err);
+    groups = results;
+    Badge.find({email: user.get('email')}, makeResponse);
+  }
+  
+  /**
+   * Find all groups for a user, then call
+   * the above getBadges function.
+   */
+  function getGroups() {
+    Group.find({user_id: user.get('id')}, getBadges);
   }
 
   var startResponse = getGroups;
