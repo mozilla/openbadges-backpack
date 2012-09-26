@@ -137,8 +137,9 @@
   }
   
   .boxed {
-    background: #EEE;
-    border: 1px solid black;
+    background: white;
+    border: 1px solid grey;
+    border-radius: 4px;
     width: 25px;
     height: 25px;
     text-align: center;
@@ -151,15 +152,24 @@
 
   .boxed.previous,
   .boxed.next {
-    background: #FFD !important;
+    background: #999 !important;
+    color: white;
   }
-  
+
+  .boxed.previous + .boxed {
+    margin-left: 0.7em;
+  }
+  .boxed + .boxed.next {
+    margin-left: 0.7em;
+  }
+
   .boxed:hover {
-    background: white !important;
+    background: #CCC !important;
   }
   
   .boxed.highlight {
-    border: 3px solid black;
+    border: 1px solid #444;
+    background: #EEE;
   }
 </style>
 
