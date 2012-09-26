@@ -6,22 +6,15 @@
       <div class="addendum">Looking a bit bare? <a href="badges!">Earn more badges!</a></div>
     </header>
 
+    {{#badges.length}}
     <div class="collection">
-      <div class="badge">b</div>
-      <div class="badge">a</div>
-      <div class="badge">d</div>
-      <div class="badge">g</div>
-      <div class="badge">e</div>
-      <div class="badge">s</div>
-      <div class="badge">!</div>
-      <div class="badge">b</div>
-      <div class="badge">a</div>
-      <div class="badge">d</div>
-      <div class="badge">g</div>
-      <div class="badge">e</div>
-      <div class="badge">s</div>
-      <div class="badge">!</div>
+      {{#badges}}
+      <div class="badge"
+           data-id="{{attributes.id}}"
+           style="background: url('{{attributes.image_path}}'); background-size: 100% 100%"></div>
+      {{/badges}}
     </div>
+    {{/badges.length}}
     
     <div class="footer">
      <p>badge footer. With toes (also, an <span class="btn">upload</span> button)</p>
@@ -95,9 +88,8 @@
   .badges .collection {
     background: white;
     border-radius: 15px;
-    padding-top: 20px;
+    padding: 10px 0;
     margin: 1em 0;
-    line-height: 120px;
   }
 
   .backpack .footer h1 {
@@ -118,9 +110,8 @@
     padding: 0; /* override */;
     width: 110px;
     height: 110px;
-    margin: 0 20px;
+    margin: 10px 20px;
     border-radius: 100px;
-    border: 1px solid #494949;
     display: inline-block;
     background: #d6d6d6;
     text-align: center;
