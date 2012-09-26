@@ -22,16 +22,19 @@
   </div>
   
   <div class="span4 column groups">
+    {{#groups.length}}
     <section>
       <header>
         <div class="title">Groups</div>
       </header>
       
       <ul>
-        <li>Placeholder</li>
-        <li>Another Placeholder</li>
+        {{#groups}}
+        <li class="group" data-id="{{group.id}}"><a href="share/{{attributes.url}}/">{{attributes.name}}</a></li>
+        {{/groups}}
       </ul>
     </section>
+    {{/groups.length}}
 
     <section>
       <header>
@@ -128,5 +131,13 @@
 
   .groups ul {
     margin-top: 1em;
+    list-style: none;
+    margin-left: 0;
+  }
+  
+  .groups .group a {
+    color: black;
+    text-decoration: underline;
+    font-weight: bold;
   }
 </style>
