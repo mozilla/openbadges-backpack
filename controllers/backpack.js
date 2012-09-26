@@ -213,13 +213,13 @@ exports.manage = function manage(request, response, next) {
     if (err) return next(err);
     prepareBadgeIndex(badges);
     modifyGroups(groups);
+    debugger;
     response.render('backpack', {
+      badges: badges,
+      groups: groups,
       error: error,
       success: success,
-      badges: badges,
-      csrfToken: request.session._csrf,
-      groups: groups,
-      tooltips: request.param('tooltips')
+      csrfToken: request.session._csrf
     });
   }
 

@@ -10,12 +10,13 @@
     <div class="collection">
       {{#badges}}
       <div draggable="true"
-            class="badge"
-            data-id="{{attributes.id}}"
-            rel="popover"
-            data-content="Badge: {{attributes.id}}<br>Description: {{attributes.badge.description}}<br>Supplier: {{attributes.badge.supplier}}"
-            data-original-title="Badgemonger"
-            style="background: url('{{attributes.image_path}}'); background-size: 100% 100%"></div>
+           class="badge"
+           data-id="{{attributes.id}}"
+           rel="popover"
+           data-content="Description: {{attributes.body.badge.description}}<br>
+                         Issuer: {{attributes.body.badge.issuer.name}}"
+           data-original-title="{{attributes.body.badge.name}}"
+           style="background: url('{{attributes.image_path}}'); background-size: 100% 100%"></div>
       {{/badges}}
     </div>
     {{/badges.length}}
@@ -143,12 +144,12 @@
      Bootstrap.js is loaded in layout.hogan.js
   **/
 
-  function init() {
-    document.removeEventListener("DOMContentLoaded",init,false);
+  function badgePopOvers() {
+    document.removeEventListener("DOMContentLoaded",badgePopOvers,false);
     $(".badge").popover({delay: 200});
   }
 
-  document.addEventListener("DOMContentLoaded",init,false);
+  document.addEventListener("DOMContentLoaded",badgePopOvers,false);
 
 }());
 </script>
