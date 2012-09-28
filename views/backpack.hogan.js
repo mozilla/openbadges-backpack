@@ -149,6 +149,14 @@
     font-weight: bold;
   }
 
+  .groups .group.new {
+    border: 1px solid black;
+    background: white;
+    color: black;
+    border-radius: 15px;
+    padding: 5px;
+  }
+
   .pages {
     text-align: right;
     line-height: 1em;
@@ -356,8 +364,9 @@
   function init() {
     document.removeEventListener("DOMContentLoaded", init, false);
 
+
     function loadTemplate() {
-      var newGroup = $("<li>Pretended to load the new group 'template'." +
+      var newGroup = $("<li class='group new'>Pretended to load the new group 'template'." +
                         "<span class='editable'><br>" +
                         "<button class='btn save'>save</button> " +
                         "<button class='btn cancel'>cancel</button> " +
@@ -389,6 +398,7 @@
 
       $(".save", template).click(function() {
         $(".editable", template).remove();
+        $(template).removeClass("new");
         enableButton();
       });
 
