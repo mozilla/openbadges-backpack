@@ -1,0 +1,14 @@
+{
+  "dev": {
+    "driver": "mysql",
+    "user": "badgemaker",
+    "password": "secret",
+    "database": "openbadges"
+  },
+  "test": {
+    "driver": "mysql",
+    "user": "badgemaker",
+    "password": "secret",
+    "database": "test_openbadges"
+  }
+}

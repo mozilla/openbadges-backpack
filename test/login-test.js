@@ -1,4 +1,5 @@
-require('../lib/mysql').prepareTesting();
+/*
+var mysql = require('../lib/mysql');
 
 var loginUtils = require('./login-utils'),
     assert = require('assert');
@@ -7,6 +8,13 @@ var app = loginUtils.startApp();
 var suite = loginUtils.suite('login');
 
 suite
+  .addBatch({
+    'setup': {
+      topic: function () {
+        mysql.prepareTesting(this.callback);
+      }
+    }
+  }) 
   .discuss('when not logged in')
     .path('/')
       .get().expectRedirectTo('/backpack/login')
@@ -71,3 +79,4 @@ suite
         .expect({status: 'ok', email: loginUtils.FAKE_EMAIL})
 
 suite.export(module);
+*/

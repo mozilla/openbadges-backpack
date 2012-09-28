@@ -6,39 +6,39 @@ var displayer = require('../controllers/displayer.js');
 var User = require('../models/user.js')
 var Badge = require('../models/badge.js')
 var Group = require('../models/group.js')
+var map = require('functools').map;
 
 var user, otherUser, badge, group, privateGroup;
 function setupDatabase (callback) {
-  var badgedata = require('../lib/utils').fixture({recipient: 'brian@example.com'})
-  var map = require('functools').map;
+  var badgedata = require('../lib/utils').fixture({recipient: 'brian@example.com'})  
   function saver (m, cb) { m.save(cb) };
-  require('../lib/mysql.js').prepareTesting();
-  
-  user = new User({ email: 'brian@example.com' })
-  otherUser = new User({ email: 'yo@example.com' })
-  badge = new Badge({
-    user_id: 1,
-    type: 'hosted',
-    endpoint: 'endpoint',
-    image_path: 'image_path',
-    body_hash: 'body_hash',
-    body: badgedata
+  require('../lib/mysql.js').prepareTesting(function() {
+    user = new User({ email: 'brian@example.com' })
+    otherUser = new User({ email: 'yo@example.com' })
+    badge = new Badge({
+      user_id: 1,
+      type: 'hosted',
+      endpoint: 'endpoint',
+      image_path: 'image_path',
+      body_hash: 'body_hash',
+      body: badgedata
+    });
+    group = new Group({
+      user_id: 1,
+      name: 'Public Group',
+      url: 'Public URL',
+      'public': 1,
+      badges: [1]
+    });
+    privateGroup = new Group({
+      user_id: 1,
+      name: 'Private Group',
+      url: 'Private URL',
+      'public': 0,
+      badges: [1]
+    });
+    map.async(saver, [user, otherUser, badge, group, privateGroup], callback);
   });
-  group = new Group({
-    user_id: 1,
-    name: 'Public Group',
-    url: 'Public URL',
-    'public': 1,
-    badges: [1]
-  });
-  privateGroup = new Group({
-    user_id: 1,
-    name: 'Private Group',
-    url: 'Private URL',
-    'public': 0,
-    badges: [1]
-  });
-  map.async(saver, [user, otherUser, badge, group, privateGroup], callback);
 }
 
 vows.describe('displayer controller tests').addBatch({

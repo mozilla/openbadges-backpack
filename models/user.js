@@ -12,7 +12,7 @@ var User = function (attributes) {
 
 Base.apply(User, 'user');
 
-User.findOrCreate = function (email, callback) {
+User.findOrCreate = function (email, callback) {  
   var newUser = new User({ email: email });
   User.findOne({ email: email }, function (err, user) {
     if (err) { return callback(err); }

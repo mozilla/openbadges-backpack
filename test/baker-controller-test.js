@@ -56,9 +56,13 @@ var scope = nock('http://example.com')
   }), { 'Content-Type': 'application/json' })
 ;
 
-mysql.prepareTesting();
-vows.describe('baker controller testing').addBatch({
+vows.describe('baker controller testing').addBatch({  
   '#baker called with a' : {
+    topic: function() {
+      mysql.prepareTesting(this.callback);
+    },
+    'complete': function() {
+    },
     'missing assertion url': {
       topic : function () {
         conmock(controller.baker, {}, this.callback);

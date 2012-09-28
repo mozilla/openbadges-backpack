@@ -9,9 +9,13 @@ Object.values = function (obj) { return Object.keys(obj).map(function (k) { retu
 var extractFirstValues = function (arr) { return arr.map(function (a) { return Object.values(a).pop(); }) }
 var toObj = function (arr) { var r = {}; arr.forEach(function (a) { r[a] = 1; }); return r; }
 
-mysql.prepareTesting();
 vows.describe('Testing database').addBatch({
   "After running test prep": {
+    topic: function() {
+      mysql.prepareTesting(this.callback);
+    },
+    'complete': function(err, results) {
+    },
     'proper database': {
       topic: function () {
         client.query('show databases', this.callback);
@@ -36,9 +40,8 @@ vows.describe('Testing database').addBatch({
       },
       'are created': function (err, results) {
         var tables = extractFirstValues(results);
-        assert.equal(mysql.schemas.length, tables.length);
         // #TODO: should not hardcode these.
-        ['badge', 'user', 'group' ].forEach(function (t) {
+        ['badge', 'user', 'group', 'portfolio'].forEach(function (t) {
           assert.includes(tables, t);
         })
       }

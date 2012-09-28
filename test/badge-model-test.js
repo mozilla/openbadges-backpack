@@ -114,14 +114,15 @@ var makeMissingTest = function (field) {
   test['should fail with error on `' + field + '`'] = assertErrors([field], 'missing');
   return test;
 };
-var createDbFixtures = function () {
+var createDbFixtures = function (cb) {
   var addUser = "INSERT INTO `user` (email) VALUES ('brian@example.com')";
   var addBadge = "INSERT INTO `badge`"
     + "(user_id, type, endpoint, image_path, body, body_hash)"
     + "VALUES"
     + "(1, 'hosted', 'http://example.com', '/dev/null', '{\"wut\":\"lol\"}', 'sha256$lol')";
-  mysql.client.query(addUser);
-  mysql.client.query(addBadge);
+  mysql.client.query(addUser, function() {
+    mysql.client.query(addBadge, cb);
+  });  
 };
 var assertFixtureBadge = function (err, results) {
   var badge;
@@ -135,9 +136,9 @@ var assertFixtureBadge = function (err, results) {
 vows.describe('Badge model').addBatch({
   'Badge testing:': {
     topic: function () {
-      mysql.prepareTesting();
-      createDbFixtures();
-      return true;
+      mysql.prepareTesting(createDbFixtures.bind(undefined, this.callback));
+    },
+    'complete': function() {
     },
 
     'Finding badges': {

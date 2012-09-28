@@ -4,6 +4,32 @@ var vows = require('vows')
   , issuer = require('../controllers/issuer.js')
   , conmock = require('./conmock.js')
   , _ = require('underscore')
+  , utils = require('./utils')
+  , request = utils.conn.request
+  , response = utils.conn.response
+  , mysql = require('../lib/mysql.js')
+  , map = require('functools').map
+
+var newUser, oldUser, badge;
+function setupDatabase (callback) {
+  var User = require('../models/user.js');
+  var Badge = require('../models/badge.js')
+  function saver (m, cb) { m.save(cb) };
+  mysql.prepareTesting(function() {
+    newUser = new User({ email: 'new@example.com' });
+    oldUser = new User({ email: 'old@example.com' });
+    var badgedata = require('../lib/utils').fixture({recipient: 'old@example.com'})
+    badge = new Badge({
+      user_id: 2,
+      type: 'hosted',
+      endpoint: 'endpoint',
+      image_path: 'image_path',
+      body_hash: 'body_hash',
+      body: badgedata
+    });
+    map.async(saver, [newUser, oldUser, badge], callback);
+  });  
+}
 
 vows.describe('issuer controller test').addBatch({
   'Issuer Controller': {

@@ -25,25 +25,25 @@ Base.apply = function apply(Model, table) {
 
   Model.find = function find(criteria, callback) {
     var finders = Model.finders || {};
-    var keys = Object.keys(criteria);
+    var keys = Object.keys(criteria);    
     var firstKey = keys[0];
     var values = keys.map(function (key) { return criteria[key] });
     var qstring = 'SELECT * FROM `' + table + '` WHERE ' + keys.map(function (key) { return (key + ' = ?')}).join(' AND ');
 
-    function parseResults(err, results) {
+    function parseResults(err, results) {      
       if (err) callback(err);
       else callback(null, results.map(Model.fromDbResult));
     }
 
     if (keys.length == 1 && firstKey in finders) {
       return Model.finders[firstKey](criteria[firstKey], parseResults);
-    }
+    }    
     client.query(qstring, values, parseResults);
   };
 
-  Model.findOne = function (criteria, callback) {
+  Model.findOne = function (criteria, callback) {    
     Model.find(criteria, function (err, results) {
-      if (err) callback(err);
+      if (err) return callback(err);
       callback(null, results.pop());
     });
   };
@@ -100,7 +100,6 @@ Base.prototype.save = function save(callback) {
 
   if ('function' === typeof this.presave)
     this.presave();
-  
   client._upsert(table, attributes, parseResult.bind(this));
 };
 

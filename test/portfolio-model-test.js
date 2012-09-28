@@ -23,8 +23,10 @@ var createDbFixtures = function (callback) {
 vows.describe('Portfolio model').addBatch({
   'A portfolio': {
     topic: function () {
-      mysql.prepareTesting();
-      createDbFixtures(this.callback);
+      var callback = this.callback;
+      mysql.prepareTesting(function() {
+        createDbFixtures(callback);
+      });      
     },
     'with unicode characters in its title': {
       topic: function () {

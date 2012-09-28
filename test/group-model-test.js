@@ -32,8 +32,12 @@ var createGroup = function () {
 vows.describe('Group Model').addBatch({
   'Group testing:': {
     topic: function () {
-      mysql.prepareTesting();
-      createDbFixtures(this.callback);
+      var callback = this.callback;
+      mysql.prepareTesting(function() {
+        createDbFixtures(callback);
+      });      
+    },
+    'complete': function() {      
     },
     'A valid new group': {
       topic: createGroup(),

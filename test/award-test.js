@@ -14,9 +14,8 @@ var PNGFILE = path.join(__dirname, '/utils/images/no-badge-data.png')
 
 vows.describe('Awarding Badges').addBatch({
   'Awarding:': {
-    topic: function () {
-      mysql.prepareTesting();
-      return true;
+    topic: function () {      
+      mysql.prepareTesting(this.callback);
     },
     'An awarded badge' : {
       topic: function() {
