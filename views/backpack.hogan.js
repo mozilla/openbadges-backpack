@@ -336,6 +336,9 @@
   document.addEventListener("DOMContentLoaded",test,false);
 
 
+  // ============================================
+
+
   /**
     Bootstrap popover detail panels for badges
     (Bootstrap.js is loaded in layout.hogan.js)
@@ -347,4 +350,30 @@
   document.addEventListener("DOMContentLoaded",badgePopOvers,false);
 
 
+  // ============================================
+
+
+  function init() {
+    document.removeEventListener("DOMContentLoaded", init, false);
+    var creating = false;
+    var createButton = $(".groups button.create");
+    createButton.click(function(btn) {
+      if(creating) return;
+      createButton.hide();
+      creating = true;
+      var newGroup = $("<li>Loaded new Group 'template'.<br>Click <button class='cancel'>here</button> to kill it off again.</li>");
+      var listing = $(".groups .listing");
+      listing.append(newGroup);
+      $(".cancel", newGroup).click(function() {
+        var li = this.parentNode,
+            ul = li.parentNode;
+        ul.removeChild(li);
+        creating = false;
+        createButton.fadeIn();
+      });
+    });
+  }
+  document.addEventListener("DOMContentLoaded", init, false);
+
 }());
+</script>
