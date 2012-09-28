@@ -33,7 +33,7 @@
         <div class="title">Groups</div>
       </header>
 
-      <ul>
+      <ul class="listing">
         {{#groups}}
         <li class="group" data-id="{{group.id}}"><a href="share/{{attributes.url}}/">{{attributes.name}}</a></li>
         {{/groups}}
@@ -355,22 +355,44 @@
 
   function init() {
     document.removeEventListener("DOMContentLoaded", init, false);
-    var creating = false;
-    var createButton = $(".groups button.create");
+
+    function loadTemplate() {
+      var newGroup = $("<li>Pretended to load the new group 'template'." +
+                        "<span class='editable'><br>" +
+                        "<button class='btn save'>save</button> " +
+                        "<button class='btn cancel'>cancel</button> " +
+                        "</span></li>");
+      return newGroup;
+    }
+
+    function loadTemplateInto(template, selector) {
+      var listing = $(selector);
+      listing.append(template);
+    }
+
+    var createButton = $(".groups button.create"),
+        creating = false,
+        enableButton = function() { creating = false; createButton.fadeIn(); };
+
     createButton.click(function(btn) {
       if(creating) return;
       createButton.hide();
       creating = true;
-      var newGroup = $("<li>Loaded new Group 'template'.<br>Click <button class='cancel'>here</button> to kill it off again.</li>");
-      var listing = $(".groups .listing");
-      listing.append(newGroup);
-      $(".cancel", newGroup).click(function() {
-        var li = this.parentNode,
-            ul = li.parentNode;
-        ul.removeChild(li);
-        creating = false;
-        createButton.fadeIn();
+
+      var template = loadTemplate();
+
+      $(".cancel", template).click(function() {
+        var li = $(this).closest("li");
+        li.remove();
+        enableButton();
       });
+
+      $(".save", template).click(function() {
+        $(".editable", template).remove();
+        enableButton();
+      });
+
+      loadTemplateInto(template, ".groups .listing");
     });
   }
   document.addEventListener("DOMContentLoaded", init, false);
