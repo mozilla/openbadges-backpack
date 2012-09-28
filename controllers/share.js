@@ -115,8 +115,13 @@ exports.show = function (request, response, next) {
 
   // if this is the user's page, show SocialShare button
   if (owner)
-    message = '<p style="float: left;">This is how your portfolio page looks like to the public.</p>'
-      + '<div class="socialshare" style="float: right;" data-type="small-bubbles" data-tweet-at="openbadges"></div>';
+    message = '<p style="float: left;">This is what your portfolio page looks like to the public.</p>'
+      + '<div id="fb-like"></div>'
+      + '<div class="socialshare" style="float: right;" tabindex="0" onclick="injectSocialMedia(this)">Social Media'
+      + '<div class="twitter">T</div>'
+      + '<div class="google">G</div>'
+      + '<div class="facebook">F</div>'
+      + '</div>';
 
 
   request.group.getBadgeObjects(function (err, badges) {

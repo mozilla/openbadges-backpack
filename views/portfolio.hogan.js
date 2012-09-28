@@ -15,7 +15,7 @@
     <a href="edit" class='edit btn btn-primary'>Edit this page</a>
   </div>
   {{/owner}}
-  
+
   <header>
     {{#attributes.title}}<h1>{{attributes.title}}</h1>{{/attributes.title}}
     {{#attributes.subtitle}}<h2>{{attributes.subtitle}}</h1>{{/attributes.subtitle}}
@@ -33,9 +33,9 @@
         <li>
           {{#body}}
           <h3>{{badge.name}}</h3>
-          
+
           <p class='story'>{{_userStory}}</p>
-          
+
           <table class='information'>
             <tr>
               <td rowspan="100" class='image'>
@@ -81,7 +81,7 @@
               <td><a href='{{evidence}}'>{{evidence}}</a></td>
             </tr>
             {{/evidence}}
-            
+
             {{#issued_on}}
             <tr>
               <td class='fieldlabel'>Issued</td>
@@ -111,3 +111,23 @@
 </div>
 
 {{/portfolio}}
+
+
+<style>
+  .socialshare div {
+    display: block;
+  }
+</style>
+
+{{=|| ||=}} <!-- need to change delimeter so hogan doesn't parse these --->
+
+<script type="text/javascript" src="/js/social-media.js"></script>
+<script>
+function injectSocialMedia(container) {
+  var socialMedia = new SocialMedia();
+  var url = window.location.toString();
+  socialMedia.hotLoad(container.querySelector(".twitter"), socialMedia.twitter, url);
+  socialMedia.hotLoad(container.querySelector(".google"), socialMedia.google, url);
+  socialMedia.hotLoad(container.querySelector(".facebook"), socialMedia.facebook, url);
+}
+</script>
