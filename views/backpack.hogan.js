@@ -1,6 +1,6 @@
 <div class="row backpack">
   <div class="span8 column badges">
-  
+
     <header>
       <div class="title">Badges</div>
       <div class="addendum">Looking a bit bare? <a href="badges!">Earn more badges!</a></div>
@@ -25,19 +25,22 @@
      <p>badge footer. With toes (also, an <span class="btn">upload</span> button)</p>
     </div>
   </div>
-  
+
   <div class="span4 column groups">
     {{#groups.length}}
     <section>
       <header>
         <div class="title">Groups</div>
       </header>
-      
+
       <ul>
         {{#groups}}
         <li class="group" data-id="{{group.id}}"><a href="share/{{attributes.url}}/">{{attributes.name}}</a></li>
         {{/groups}}
       </ul>
+
+      <button class="create btn">Create New Group</button>
+
     </section>
     {{/groups.length}}
 
@@ -51,7 +54,7 @@
         <li>Another tag</li>
         <li>Lolcat</li>
         <li>Badges</li>
-      </ul>      
+      </ul>
     <section>
 
   </div>
@@ -72,7 +75,7 @@
     /* larges font size is 220% */
     height: 2.2em;
   }
-  
+
   .backpack header .title {
     font-size: 220%;
     font-weight: bold;
@@ -92,7 +95,7 @@
     color: black;
     text-decoration: underline;
   }
-  
+
   .badges .collection {
     background: white;
     border-radius: 15px;
@@ -103,7 +106,7 @@
   .backpack .footer h1 {
     font-size: 200%;
   }
-  
+
   .badges p {
     font-weight: bold;
     margin: 0;
@@ -113,7 +116,7 @@
   .badges p+p {
     margin-top: 1em;
   }
-  
+
   .badges .badge {
     padding: 0; /* override */;
     width: 110px;
@@ -129,7 +132,7 @@
     font-size: 100px;
     line-height: 100px;
   }
-  
+
   .groups section + section {
     margin-top: 3em;
   }
@@ -139,19 +142,19 @@
     list-style: none;
     margin-left: 0;
   }
-  
+
   .groups .group a {
     color: black;
     text-decoration: underline;
     font-weight: bold;
   }
-  
+
   .pages {
     text-align: right;
     line-height: 1em;
     padding: 1em;
   }
-  
+
   .boxed {
     background: white;
     border: 1px solid grey;
@@ -161,7 +164,7 @@
     text-align: center;
     cursor: pointer;
   }
-  
+
   .boxed + .boxed {
     margin-left: 0.2em;
   }
@@ -182,10 +185,16 @@
   .boxed:hover {
     background: #CCC !important;
   }
-  
+
   .boxed.highlight {
     border: 1px solid #444;
     background: #EEE;
+  }
+
+  .btn {
+    border-radius: 2em;
+    padding: 0.5em 1.5em;
+
   }
 </style>
 
@@ -195,7 +204,7 @@
   /**
    * THE PAGINATOR
    *
-   * Pagination widget that is addPage(target)'d 
+   * Pagination widget that is addPage(target)'d
    * for each element that should be part of a pagination
    * set, returning the widget as DOM fragment when calling
    * finish(). Comes with prev/next controllers
@@ -245,7 +254,7 @@
         });
         node.appendChild(element);
       });
-      
+
       var initial = node.childNodes[0],
            previous = $("<button class='boxed page previous'>&lt;</button>")[0],
            next = $("<button class='boxed page next'>&gt;</button>")[0];
@@ -315,7 +324,7 @@
 
   /**
    * Test pagination
-   */        
+   */
   function test() {
     document.removeEventListener("DOMContentLoaded",test,false);
     var container = $('.badges .collection')[0],
@@ -339,4 +348,3 @@
 
 
 }());
-</script>
