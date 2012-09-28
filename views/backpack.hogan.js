@@ -9,8 +9,13 @@
     {{#badges.length}}
     <div class="collection">
       {{#badges}}
-      <div class="badge"
+      <div draggable="true"
+           class="badge"
            data-id="{{attributes.id}}"
+           rel="popover"
+           data-content="Description: {{attributes.body.badge.description}}<br>
+                         Issuer: {{attributes.body.badge.issuer.name}}"
+           data-original-title="{{attributes.body.badge.name}}"
            style="background: url('{{attributes.image_path}}'); background-size: 100% 100%"></div>
       {{/badges}}
     </div>
@@ -321,5 +326,17 @@
   // kickstart
   document.addEventListener("DOMContentLoaded",test,false);
 
+
+  /**
+    Bootstrap popover detail panels for badges
+    (Bootstrap.js is loaded in layout.hogan.js)
+  **/
+  function badgePopOvers() {
+    document.removeEventListener("DOMContentLoaded",badgePopOvers,false);
+    $(".badge").popover({delay: 200});
+  }
+  document.addEventListener("DOMContentLoaded",badgePopOvers,false);
+
+
 }());
-</script>    
+</script>

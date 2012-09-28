@@ -65,6 +65,7 @@
     <script src="//www.mozilla.org/tabzilla/media/js/tabzilla.js"></script> 
     
     <!-- my libraries -->
-      
+    <script src="js/bootstrap-2.0.2.min.js"></script>
+
   </body>
 </html>
