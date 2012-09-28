@@ -114,20 +114,48 @@
 
 
 <style>
+  .socialshare {
+    opacity: 0.8;
+  }
+
+  .socialshare:focus {
+    outline: 0;
+  }
+
   .socialshare div {
-    display: block;
+    display: table-cell;
+    vertical-align: top;
+    height: 20px;
+  }
+
+  .socialshare div.twitter {
+  }
+
+  .socialshare div.google {
+  }
+
+  .socialshare div.facebook {
   }
 </style>
 
 {{=|| ||=}} <!-- need to change delimeter so hogan doesn't parse these --->
 
 <script type="text/javascript" src="/js/social-media.js"></script>
+
 <script>
 function injectSocialMedia(container) {
+  // prevent this element from injecting social media again
+  container.onclick = function() { return false; }
   var socialMedia = new SocialMedia();
   var url = window.location.toString();
-  socialMedia.hotLoad(container.querySelector(".twitter"), socialMedia.twitter, url);
-  socialMedia.hotLoad(container.querySelector(".google"), socialMedia.google, url);
+
+  // inject twitter, g+ and facebook
+  socialMedia.hotLoad(container.querySelector(".twitter"),  socialMedia.twitter,  url);
+  socialMedia.hotLoad(container.querySelector(".google"),   socialMedia.google,   url);
   socialMedia.hotLoad(container.querySelector(".facebook"), socialMedia.facebook, url);
+
+  // kill off the text label
+  var label = container.querySelector("span");
+  $(label).remove();
 }
 </script>

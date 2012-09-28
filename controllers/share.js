@@ -116,11 +116,11 @@ exports.show = function (request, response, next) {
   // if this is the user's page, show SocialShare button
   if (owner)
     message = '<p style="float: left;">This is what your portfolio page looks like to the public.</p>'
-      + '<div id="fb-like"></div>'
-      + '<div class="socialshare" style="float: right;" tabindex="0" onclick="injectSocialMedia(this)">Social Media'
-      + '<div class="twitter">T</div>'
-      + '<div class="google">G</div>'
-      + '<div class="facebook">F</div>'
+      + '<div class="socialshare" style="float: right;" tabindex="0" onclick="injectSocialMedia(this)">'
+      + '<span>TweetBook+ this link!</span>'
+      + '<div class="twitter"></div>'
+      + '<div class="google"></div>'
+      + '<div class="facebook"></div>'
       + '</div>';
 
 
