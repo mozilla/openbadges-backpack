@@ -43,7 +43,7 @@ vows.describe('issuer controller test').addBatch({
           },
           'renders validator html without options' : function (err, mock) {
             mock.fntype.should.equal('render');
-            mock.path.should.equal('validator');
+            mock.path.should.equal('validator.hogan.js');
           },
         },
         'and "Accept: text/html"' : {
@@ -53,7 +53,7 @@ vows.describe('issuer controller test').addBatch({
           },
           'renders validator html without options' : function (err, mock) {
             mock.fntype.should.equal('render');
-            mock.path.should.equal('validator');
+            mock.path.should.equal('validator.hogan.js');
           },
         },
         'and "Accept: text/plain"' : {
@@ -99,7 +99,7 @@ vows.describe('issuer controller test').addBatch({
           },
           'renders validator html with some options' : function (err, mock) {
             mock.fntype.should.equal('render');
-            mock.path.should.equal('validator');
+            mock.path.should.equal('validator.hogan.js');
             var errors = _.pluck(mock.options.errors, 'field');
             assert.include(errors, 'recipient');
             assert.include(errors, 'badge.version');
@@ -148,7 +148,7 @@ vows.describe('issuer controller test').addBatch({
           var req = request();
           issuer.welcome(req, response(req, this.callback))
         },
-        'redirects to login': function (conn, path, status) {
+        'redirects to login': function (conn, status, path) {
           path.should.equal('/backpack/login');
           status.should.equal(303);
         }
@@ -163,7 +163,7 @@ vows.describe('issuer controller test').addBatch({
             issuer.welcome(req, response(req, this.callback))
           },
           'renders new user welcome': function (conn, render, opts) {
-            render.should.equal('issuer-welcome');
+            render.should.equal('issuer-welcome.hogan.js');
           }
         },
         'that has badges already': {
@@ -171,7 +171,7 @@ vows.describe('issuer controller test').addBatch({
             var req = request({ user: oldUser });
             issuer.welcome(req, response(req, this.callback))
           },
-          'redirects to backpack': function (conn, path, status) {
+          'redirects to backpack': function (conn, status, path) {
             path.should.equal('/');
             status.should.equal(303);
           }
@@ -184,7 +184,7 @@ vows.describe('issuer controller test').addBatch({
       },
       'renders issuer frame with framed option' : function (err, mock) {
         mock.fntype.should.equal('render');
-        mock.path.should.equal('badge-accept');
+        mock.path.should.equal('badge-accept.hogan.js');
         mock.options.framed.should.be.true;
       },
     },
@@ -196,7 +196,7 @@ vows.describe('issuer controller test').addBatch({
         },
         'renders issuer frame with unframed option' : function (err, mock) {
           mock.fntype.should.equal('render');
-          mock.path.should.equal('badge-accept');
+          mock.path.should.equal('badge-accept.hogan.js');
           mock.options.framed.should.not.be.true;
           mock.options.assertions.should.equal('[]');
         },
@@ -208,7 +208,7 @@ vows.describe('issuer controller test').addBatch({
         },
         'renders issuer frame with unframed option' : function (err, mock) {
           mock.fntype.should.equal('render');
-          mock.path.should.equal('badge-accept');
+          mock.path.should.equal('badge-accept.hogan.js');
           mock.options.framed.should.not.be.true;
         },
         'assertion is stringified in assertions option': function (err, mock) {
@@ -222,7 +222,7 @@ vows.describe('issuer controller test').addBatch({
         },
         'renders issuer frame with unframed option' : function (err, mock) {
           mock.fntype.should.equal('render');
-          mock.path.should.equal('badge-accept');
+          mock.path.should.equal('badge-accept.hogan.js');
           mock.options.framed.should.not.be.true;
         },
         'assertions are stringified in assertions option': function (err, mock) {
