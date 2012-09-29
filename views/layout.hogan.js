@@ -19,36 +19,37 @@
           <h3><a class="brand" href="/">Open Badge Backpack</a></h3>
           <a href="http://www.mozilla.org/" id="tabzilla">a mozilla.org joint</a> 
           <ul class="nav">
-            <li><a href="{{#reverse}}backpack.manage{{/reverse}}">Home</a></li>
+            <li><a href="{{ reverse('backpack.manage') }}">Home</a></li>
           </ul>
-          {{#user}}
+          {% if user %}
             <ul class="nav pull-right">
-              <li class="user">{{attributes.email}}</li>
-              <li><a href="{{#reverse}}backpack.signout{{/reverse}}">Sign Out</a></li>
+              <li class="user">{{user.attributes.email}}</li>
+              <li><a href="{{ reverse('backpack.signout') }}">Sign Out</a></li>
             </ul>
-          {{/user}}
+          {% endif %}
         </div>
       </div>
     </div>
 
     <div id="body" class="container">
       <div class='message-container'>
-      {{#error.length}}
+      {% for e in error %}
         <div class="alert alert-error">
           <a class="close" data-dismiss="alert">×</a>
-          {{error}}
+          {{e}}
         </div>
-      {{/error.length}}
+      {% endfor %}
       
-      {{#success.length}}
+      {% for s in success %}
         <div class="alert alert-success">
           <a class="close" data-dismiss="alert">×</a>
-          {{success}}
+          {{s}}
         </div>
-      {{/success.length}}
+      {% endfor %}
       </div>
 
-      {{{body}}}
+      {% block body %}
+      {% endblock %}
     </div>
 
     <div id="footer" class="container">

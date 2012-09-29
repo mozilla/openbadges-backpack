@@ -360,12 +360,12 @@ exports.validator = function (request, response) {
 
 exports.welcome = function(request, response, next) {
   var user = request.user;
-  if (!user) return response.redirect(reverse('backpack.login'), 303);
+  if (!user) return response.redirect(303, reverse('backpack.login'));
 
   function makeResponse(err, badges) {
     if (err) return next(err);
     if (badges && badges.length)
-      return response.redirect(reverse('backpack.manage'), 303);
+      return response.redirect(303, reverse('backpack.manage'));
     else
       return response.render('issuer-welcome');
   }

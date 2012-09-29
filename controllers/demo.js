@@ -57,7 +57,7 @@ exports.massAward = function (req, res) {
         recipient: email
       });
     });
-  res.redirect(reverse('backpack.manage'), 303);
+  res.redirect(303, reverse('backpack.manage'));
 };
 
 // Create a demo badge. Optionally override default values by providing GET

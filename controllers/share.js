@@ -162,6 +162,6 @@ exports.createOrUpdate = function (request, response) {
   });
 
   portfolio.save(function (err, p) {
-    return response.redirect(request.url, '303');
+    return response.redirect(303, request.url);
   });
 };
