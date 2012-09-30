@@ -184,7 +184,7 @@ vows.describe('issuer controller test').addBatch({
       },
       'renders issuer frame with framed option' : function (err, mock) {
         mock.fntype.should.equal('render');
-        mock.path.should.equal('badge-accept.hogan.js');
+        mock.path.should.equal('badge-accept.html');
         mock.options.framed.should.be.true;
       },
     },
@@ -196,7 +196,7 @@ vows.describe('issuer controller test').addBatch({
         },
         'renders issuer frame with unframed option' : function (err, mock) {
           mock.fntype.should.equal('render');
-          mock.path.should.equal('badge-accept.hogan.js');
+          mock.path.should.equal('badge-accept.html');
           mock.options.framed.should.not.be.true;
           mock.options.assertions.should.equal('[]');
         },
@@ -208,7 +208,7 @@ vows.describe('issuer controller test').addBatch({
         },
         'renders issuer frame with unframed option' : function (err, mock) {
           mock.fntype.should.equal('render');
-          mock.path.should.equal('badge-accept.hogan.js');
+          mock.path.should.equal('badge-accept.html');
           mock.options.framed.should.not.be.true;
         },
         'assertion is stringified in assertions option': function (err, mock) {
@@ -222,7 +222,7 @@ vows.describe('issuer controller test').addBatch({
         },
         'renders issuer frame with unframed option' : function (err, mock) {
           mock.fntype.should.equal('render');
-          mock.path.should.equal('badge-accept.hogan.js');
+          mock.path.should.equal('badge-accept.html');
           mock.options.framed.should.not.be.true;
         },
         'assertions are stringified in assertions option': function (err, mock) {

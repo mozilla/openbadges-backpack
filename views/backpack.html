@@ -1,4 +1,4 @@
-{% extends "layout.hogan.js" %}
+{% extends "layout.html" %}
 {% block body %}
 <div class="row backpack">
   <div class="span8 column badges">
@@ -347,7 +347,6 @@
 
   /**
     Bootstrap popover detail panels for badges
-    (Bootstrap.js is loaded in layout.hogan.js)
   **/
   function badgePopOvers() {
     document.removeEventListener("DOMContentLoaded",badgePopOvers,false);

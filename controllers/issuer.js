@@ -100,7 +100,7 @@ exports.generateScript = function (req, res) {
 
 exports.frame = function (req, res) {
   res.header('Cache-Control', 'no-cache, must-revalidate');
-  res.render('badge-accept.hogan.js', {
+  res.render('badge-accept.html', {
     layout: null,
     framed: true,
     csrfToken: req.session._csrf,
@@ -119,7 +119,7 @@ exports.frameless = function (req, res) {
     }
   }
   res.header('Cache-Control', 'no-cache, must-revalidate');
-  res.render('badge-accept.hogan.js', {
+  res.render('badge-accept.html', {
     layout: null,
     framed: false,
     assertions: JSON.stringify(assertionUrls),

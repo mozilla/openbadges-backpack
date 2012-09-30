@@ -62,7 +62,7 @@ vows.describe('basic login controller test').addBatch({
         backpack.login(req, response(req, this.callback))
       },
       'tries to render login page and passes csrf' : function (conn, render, opts) {
-        render.should.equal('login.hogan.js');
+        render.should.equal('login.html');
         opts.csrfToken.should.equal('default-csrf');
       },
     },
@@ -83,7 +83,7 @@ vows.describe('basic login controller test').addBatch({
         backpack.manage(req, response(req, this.callback))
       },
       'should pull badges and groups, render `backpack`' : function (conn, render, opts) {
-        render.should.equal('backpack.hogan.js');
+        render.should.equal('backpack.html');
         opts.badges.should.have.lengthOf(1);
         opts.badges[0].serializedAttributes.should.match(/"recipient":"brian@example.com"/)
         opts.groups.should.have.lengthOf(1);
