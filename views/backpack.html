@@ -115,7 +115,8 @@
     margin-top: 1em;
   }
 
-  .badges .badge {
+  .badges .badge,
+  .newGroup .badgeArea .badge {
     padding: 0; /* override */;
     width: 110px;
     height: 110px;
@@ -129,6 +130,12 @@
     color: white;
     font-size: 100px;
     line-height: 100px;
+  }
+
+  .newGroup .badgeArea .badge {
+    width: 80px;
+    height: 80px;
+    margin: 2px 4px;
   }
 
   .groups section + section {
@@ -202,7 +209,71 @@
     padding: 0.5em 1.5em;
 
   }
+  
+  /* ------------------ */
+  
+  .newGroup {
+  }
+  
+  .newGroup input {
+    width: 100%;
+    line-height: 1.5em;
+    height: 2em;
+    margin: 0.5em 0;
+    padding: 0;
+    text-indent: 0.5em;
+  }
+
+  .newGroup .badgeArea {
+    background-color: white;
+    border: 1px solid #DDD;
+    border-radius: 10px;
+    margin: 0 0 0.5em;
+    padding: 0.5em;
+    min-height: 220px;
+
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;    
+    color: #666;
+    font-weight: bold;
+    font-size: 115%;
+  }
+  
+  .newGroup .cancel {
+    color: #444;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .newGroup .editable {
+    padding-left: 0.5em;
+  }
 </style>
+
+<!--
+  Temporary create group template, this should use a partial.
+-->
+<script type="text/html" id="newGroupTemplate">
+<li>
+  <div class="newGroup">
+    <input type="text" placeholder="Enter Title for New Badge Group">
+    <div class="badgeArea">
+      <span class="instructions">Drag badges here to add to group, or check boxes at left and click "Add Checked Badges"</span>
+    </div>
+    <span class="editable">
+      <button class="btn save">Save Group</button>
+      <span class="cancel">cancel</span>
+    </span>
+  </div>
+</li>
+</script>
+
+<!--
+  Same as the group iterator, we should be able to use a partial for this.
+-->
+<script type="text/html" id="groupListItem">
+  <li class="group" data-id=""><a href="share//"></a></li>
+</script>
+
 
 <script type="text/javascript">
 (function(){
@@ -350,7 +421,11 @@
   **/
   function badgePopOvers() {
     document.removeEventListener("DOMContentLoaded",badgePopOvers,false);
-    $(".badge").popover({delay: 200});
+    var badges = $(".badge");
+    //  spawn popovers on a 200ms delay
+    badges.popover({delay: 200});
+    // but, remove them when a badge starts getting click-dragged
+    badges.mousedown(function() { $(this).popover('hide'); });
   }
   document.addEventListener("DOMContentLoaded",badgePopOvers,false);
 
@@ -361,25 +436,43 @@
   function init() {
     document.removeEventListener("DOMContentLoaded", init, false);
 
-
+    /**
+     * stub
+     */
     function loadTemplate() {
-      var newGroup = $("<li class='group new'>Pretended to load the new group 'template'." +
-                        "<span class='editable'><br>" +
-                        "<button class='btn save'>save</button> " +
-                        "<button class='btn cancel'>cancel</button> " +
-                        "</span></li>");
+      var newGroup = $($("#newGroupTemplate").html());    
       return newGroup;
     }
 
+    /**
+     * stub
+     */
     function loadTemplateInto(template, selector) {
       var listing = $(selector);
       listing.append(template);
+      listing.find("input").focus();
+    }
+    
+    /**
+     * stub
+     */
+    function convertToReadOnly(template, saveResult) {
+      var readOnly = $($("#groupListItem").html());
+      readOnly.attr("data-id", saveResult.id);
+      readOnly.find("a").attr("href", "share/", saveResult.url);
+      readOnly.find("a").text(saveResult.name);
+      return readOnly;
     }
 
     var createButton = $(".groups button.create"),
         creating = false,
         enableButton = function() { creating = false; createButton.fadeIn(); };
 
+    /**
+     * When the create button is clicked, load a
+     * "new group" template, and bind save/cancel
+     * behaviour to the button/link span.
+     */
     createButton.click(function(btn) {
       if(creating) return;
       createButton.hide();
@@ -387,16 +480,56 @@
 
       var template = loadTemplate();
 
+      // make badges drag-and-droppable 
+      $(".badge").each(function(){
+        this.ondragstart = function(e) {
+          e.dataTransfer.setData("data-id", this.getAttribute("data-id"));
+        }
+      });
+      
+      var badgeArea = $('.badgeArea',template)[0];
+      badgeArea.ondragover = function(e) { e.preventDefault(); };
+      badgeArea.ondrop = function(e) {
+        e.preventDefault();
+        $(".instructions",this).remove();
+        var dataId = e.dataTransfer.getData("data-id");        
+        var badge = $(".badge[data-id="+dataId+"]")[0].cloneNode();
+        $(badge).hide();
+        this.appendChild(badge);
+        $(badge).fadeIn();
+      };
+
+      // cancel simply discards everything done so far
       $(".cancel", template).click(function() {
         var li = $(this).closest("li");
         li.remove();
         enableButton();
       });
 
+      // save tells the server to save this group,
+      // and then converst the group's "new" template 
+      // to a normal group listing entry, instead.
       $(".save", template).click(function() {
-        $(".editable", template).remove();
-        $(template).removeClass("new");
-        enableButton();
+
+        // prevent further save/cancel
+        $(".editable",template).remove();
+
+        // mock save-result        
+        var saveResult = {
+          id: 123456,
+          url: "a1b2c3d4e5f6g7h8i9j0",
+          name: template.find("input").val()
+        };
+
+        // Pretend to save this group, using
+        // a long timeout "callback". This lets
+        // us test what happens on a slow
+        // connection.
+        setTimeout(function(){
+          var readOnly = convertToReadOnly(template, saveResult);
+          template.replaceWith(readOnly);
+          enableButton();
+        }, 500);
       });
 
       loadTemplateInto(template, ".groups .listing");
