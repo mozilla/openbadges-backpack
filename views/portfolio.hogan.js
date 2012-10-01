@@ -1,4 +1,5 @@
 {{#portfolio}}
+<link rel="stylesheet" href="/css/socialmedia.css">
 
 <div class='portfolio'>
 {{#message}}
@@ -111,40 +112,6 @@
 </div>
 
 {{/portfolio}}
-
-
-<style>
-  .socialshare {
-    opacity: 0.8;
-    text-shadow: 2px 2px 4px rgba(0, 200, 160, 0.2);
-    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-  }
-
-  .socialshare:focus {
-    outline: 0;
-  }
-  
-  .socialshare span {
-    cursor: pointer;
-    display: table-cell;
-  }
-
-  .social-medium {
-    display: table-cell;
-    vertical-align: top;
-    height: 20px;
-  }
-
-  .social-medium + .social-medium {
-    padding-left: 1em;
-  }
-
-  .social-medium iframe {
-    height: 20px;
-    box-shadow: 4px 4px 3px rgba(100, 190, 180, 0.3);
-    background-color: rgba(100, 190, 180, 0.3);
-  }
-</style>
 
 {{=|| ||=}} <!-- need to change delimeter so hogan doesn't parse these --->
 
