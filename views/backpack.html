@@ -247,6 +247,17 @@
   .newGroup .editable {
     padding-left: 0.5em;
   }
+
+  .badge input.addToGroup {
+    position: relative;
+    top: 3em;
+    left: -50%
+  }
+
+  .badge label.addToGroup {
+    position: relative;
+    top: 8.6em
+  }
 </style>
 
 <!--
@@ -469,6 +480,28 @@
         enableButton = function() { creating = false; createButton.fadeIn(); };
 
     /**
+     * add checkboxes to each badge 
+     */
+    var addCheckboxes = function() {
+      $(".badge").each(function(){
+        var create = "<span class='instructions'>"
+                   + "<label class='addToGroup'>Add to Group</label>"
+                   + "<input type='checkbox' class='addToGroup' data-id'='"+$(this).attr("data-id")+"'>"
+                   + "</span>";
+        $(this).append($(create));
+      });
+    };
+
+    /**
+     * remove the badge checkboxes
+     */
+    var removeCheckboxes = function() {
+      $(".badge").each(function(){
+        $(".instructions",this).remove();
+      });
+    };
+
+    /**
      * When the create button is clicked, load a
      * "new group" template, and bind save/cancel
      * behaviour to the button/link span.
@@ -479,6 +512,8 @@
       creating = true;
 
       var template = loadTemplate();
+
+      addCheckboxes();
 
       // make badges drag-and-droppable 
       $(".badge").each(function(){
@@ -492,6 +527,7 @@
       badgeArea.ondrop = function(e) {
         e.preventDefault();
         $(".instructions",this).remove();
+
         var dataId = e.dataTransfer.getData("data-id");        
         var badge = $(".badge[data-id="+dataId+"]")[0].cloneNode();
         $(badge).hide();
@@ -504,6 +540,7 @@
         var li = $(this).closest("li");
         li.remove();
         enableButton();
+        removeCheckboxes();
       });
 
       // save tells the server to save this group,
@@ -513,6 +550,7 @@
 
         // prevent further save/cancel
         $(".editable",template).remove();
+        removeCheckboxes();
 
         // mock save-result        
         var saveResult = {
