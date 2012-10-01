@@ -367,7 +367,7 @@ exports.welcome = function(request, response, next) {
     if (badges && badges.length)
       return response.redirect(303, reverse('backpack.manage'));
     else
-      return response.render('issuer-welcome.hogan.js');
+      return response.render('issuer-welcome.html');
   }
 
   Badge.find({email: user.get('email')}, makeResponse);

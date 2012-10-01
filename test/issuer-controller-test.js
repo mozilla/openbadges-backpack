@@ -163,7 +163,7 @@ vows.describe('issuer controller test').addBatch({
             issuer.welcome(req, response(req, this.callback))
           },
           'renders new user welcome': function (conn, render, opts) {
-            render.should.equal('issuer-welcome.hogan.js');
+            render.should.equal('issuer-welcome.html');
           }
         },
         'that has badges already': {
