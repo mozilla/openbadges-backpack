@@ -14,7 +14,7 @@ var ORIGIN = protocol + '://' + configuration.get('hostname') + (port ? ':' + po
 
 // Render the view for the demo badge issuer.
 exports.issuer = function (req, res) {
-  res.render('issuer', {
+  res.render('issuer.html', {
     login: false,
     title: 'Demo Issuer',
     csrfToken: req.session._csrf
@@ -27,7 +27,8 @@ exports.award = function (req, res) {
   var bakeURL = ORIGIN + '/baker?award=true&assertion=' + assertionURL;
 
   request({url: bakeURL, encoding: 'binary'},  function (err, resp, body) {
-    res.send(Buffer(body, 'binary'), {'content-type': 'image/png'});
+    res.set('Content-Type', 'image/png');
+    res.send(Buffer(body, 'binary'));
   });
 };
 
