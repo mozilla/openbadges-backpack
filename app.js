@@ -1,39 +1,28 @@
 // Configure & start express.
 var express = require('express');
+var http = require('http'); // TODO: https?
 var fs = require('fs');
 var path = require('path');
 var middleware = require('./middleware');
 var logger = require('./lib/logging').logger;
 var configuration = require('./lib/configuration');
 var router = require('./lib/router');
-var hogan = require('hogan.js');
-var hoganadapter = require('./lib/hogan-express.js');
+var flash = require('connect-flash');
+var nunjucks = require('nunjucks');
 
-var app = express.createServer();
+var app = express();
 app.logger = logger;
 app.config = configuration;
 
-// default view engine
-app.set('view engine', 'hogan.js');
-app.register('hogan.js', hoganadapter.init(hogan));
-
-// View helpers. `user` and `badges` are set so we can use them in `if`
-// statements without getting undefined errors and without having to use typeof
-// checks.
-app.helpers({
-  login: true,
-  title: 'Backpack',
-  error: [],
-  success: [],
-  badges: {},
+// View helpers. 
+// 'user' local set by userFromSession middleware.
+app.locals({
   reverse: router.reverse
 });
 
-app.dynamicHelpers({
-  user: function (req, res) {
-    return req.user || null;
-  }
-});
+// default view engine
+var env = new nunjucks.Environment(new nunjucks.FileSystemLoader('views'));
+env.express(app);
 
 // Middleware. See `middleware.js`
 app.use(express.static(path.join(__dirname, "static")));
@@ -45,6 +34,7 @@ app.use(express.methodOverride());
 app.use(middleware.logRequests());
 app.use(middleware.cookieSessions());
 app.use(middleware.userFromSession());
+app.use(flash());
 app.use(middleware.csrf({ 
   whitelist: [
     '/backpack/authenticate', 
@@ -132,5 +122,5 @@ if (!module.parent) {
   };
   start_server(app);
 } else {
-  module.exports = app;
+  module.exports = http.createServer(app);
 }

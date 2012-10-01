@@ -100,7 +100,7 @@ exports.generateScript = function (req, res) {
 
 exports.frame = function (req, res) {
   res.header('Cache-Control', 'no-cache, must-revalidate');
-  res.render('badge-accept', {
+  res.render('badge-accept.html', {
     layout: null,
     framed: true,
     csrfToken: req.session._csrf,
@@ -119,7 +119,7 @@ exports.frameless = function (req, res) {
     }
   }
   res.header('Cache-Control', 'no-cache, must-revalidate');
-  res.render('badge-accept', {
+  res.render('badge-accept.html', {
     layout: null,
     framed: false,
     assertions: JSON.stringify(assertionUrls),
@@ -343,7 +343,7 @@ exports.validator = function (request, response) {
 
     'default': function () {
       var fielderrors = _.map(fields, humanize);
-      return response.render('validator', {
+      return response.render('validator.html', {
         status: 200,
         errors: fielderrors,
         csrfToken: request.session._csrf,
@@ -360,14 +360,14 @@ exports.validator = function (request, response) {
 
 exports.welcome = function(request, response, next) {
   var user = request.user;
-  if (!user) return response.redirect(reverse('backpack.login'), 303);
+  if (!user) return response.redirect(303, reverse('backpack.login'));
 
   function makeResponse(err, badges) {
     if (err) return next(err);
     if (badges && badges.length)
-      return response.redirect(reverse('backpack.manage'), 303);
+      return response.redirect(303, reverse('backpack.manage'));
     else
-      return response.render('issuer-welcome');
+      return response.render('issuer-welcome.html');
   }
 
   Badge.find({email: user.get('email')}, makeResponse);

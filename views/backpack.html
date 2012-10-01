@@ -1,3 +1,5 @@
+{% extends "layout.html" %}
+{% block body %}
 <div class="row backpack">
   <div class="span8 column badges">
 
@@ -6,20 +8,18 @@
       <div class="addendum">Looking a bit bare? <a href="badges!">Earn more badges!</a></div>
     </header>
 
-    {{#badges.length}}
     <div class="collection">
-      {{#badges}}
+      {% for badge in badges %}
       <div draggable="true"
            class="badge"
-           data-id="{{attributes.id}}"
+           data-id="{{badge.attributes.id}}"
            rel="popover"
-           data-content="Description: {{attributes.body.badge.description}}<br>
-                         Issuer: {{attributes.body.badge.issuer.name}}"
-           data-original-title="{{attributes.body.badge.name}}"
-           style="background: url('{{attributes.image_path}}'); background-size: 100% 100%"></div>
-      {{/badges}}
+           data-content="Description: {{badge.attributes.body.badge.description}}<br>
+                         Issuer: {{badge.attributes.body.badge.issuer.name}}"
+           data-original-title="{{badge.attributes.body.badge.name}}"
+           style="background: url('{{badge.attributes.image_path}}'); background-size: 100% 100%"></div>
+      {% endfor %}
     </div>
-    {{/badges.length}}
 
     <div class="footer">
      <p>badge footer. With toes (also, an <span class="btn">upload</span> button)</p>
@@ -27,22 +27,20 @@
   </div>
 
   <div class="span4 column groups">
-    {{#groups.length}}
     <section>
       <header>
         <div class="title">Groups</div>
       </header>
 
       <ul class="listing">
-        {{#groups}}
-        <li class="group" data-id="{{group.id}}"><a href="share/{{attributes.url}}/">{{attributes.name}}</a></li>
-        {{/groups}}
+        {% for group in groups %}
+          <li class="group" data-id="{{group.id}}"><a href="share/{{group.attributes.url}}/">{{group.attributes.name}}</a></li>
+        {% endfor %}
       </ul>
 
       <button class="create btn">Create New Group</button>
 
     </section>
-    {{/groups.length}}
 
     <section>
       <header>
@@ -349,7 +347,6 @@
 
   /**
     Bootstrap popover detail panels for badges
-    (Bootstrap.js is loaded in layout.hogan.js)
   **/
   function badgePopOvers() {
     document.removeEventListener("DOMContentLoaded",badgePopOvers,false);
@@ -409,3 +406,4 @@
 
 }());
 </script>
+{% endblock %}

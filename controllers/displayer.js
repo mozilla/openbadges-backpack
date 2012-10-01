@@ -107,7 +107,7 @@ function displayerAPIVersion(request, response, next) {
 }
 
 function emailToUserIdView(request, response, next) {
-  return response.render('email-converter');
+  return response.render('email-converter.html');
 }
 
 function emailToUserId(request, response, next) {

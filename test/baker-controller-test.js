@@ -65,7 +65,7 @@ vows.describe('baker controller testing').addBatch({
       },
       'renders the creator' : function (error, mock) {
         mock.fntype.should.equal('render');
-        mock.path.should.equal('baker');
+        mock.path.should.equal('baker.html');
       }
     },
     'bogus assertion url': {

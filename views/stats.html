@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block body %}
+<h1>Backpack Facts</h1>
+
+{% if stats %}
+<p>There are {{stats.totalBadges}} badges in the system.</p>
+<p>Some details per issuer,
+  <ul>
+    {% for total in stats.totalPerIssuer %}
+    <li>{{total.name}} (<a href='{{total.url}}'>{{total.url}}</a>) has {{total.total}} badges</li>
+    {% endfor %}
+  </ul>
+</p>
+{% endif %}
+{% endblock %}
