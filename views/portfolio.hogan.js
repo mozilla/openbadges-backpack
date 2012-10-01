@@ -126,6 +126,7 @@
   
   .socialshare span {
     cursor: pointer;
+    display: table-cell;
   }
 
   .social-medium {
