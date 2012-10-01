@@ -343,7 +343,7 @@ exports.validator = function (request, response) {
 
     'default': function () {
       var fielderrors = _.map(fields, humanize);
-      return response.render('validator.hogan.js', {
+      return response.render('validator.html', {
         status: 200,
         errors: fielderrors,
         csrfToken: request.session._csrf,

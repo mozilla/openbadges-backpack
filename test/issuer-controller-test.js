@@ -43,7 +43,7 @@ vows.describe('issuer controller test').addBatch({
           },
           'renders validator html without options' : function (err, mock) {
             mock.fntype.should.equal('render');
-            mock.path.should.equal('validator.hogan.js');
+            mock.path.should.equal('validator.html');
           },
         },
         'and "Accept: text/html"' : {
@@ -53,7 +53,7 @@ vows.describe('issuer controller test').addBatch({
           },
           'renders validator html without options' : function (err, mock) {
             mock.fntype.should.equal('render');
-            mock.path.should.equal('validator.hogan.js');
+            mock.path.should.equal('validator.html');
           },
         },
         'and "Accept: text/plain"' : {
@@ -99,7 +99,7 @@ vows.describe('issuer controller test').addBatch({
           },
           'renders validator html with some options' : function (err, mock) {
             mock.fntype.should.equal('render');
-            mock.path.should.equal('validator.hogan.js');
+            mock.path.should.equal('validator.html');
             var errors = _.pluck(mock.options.errors, 'field');
             assert.include(errors, 'recipient');
             assert.include(errors, 'badge.version');
