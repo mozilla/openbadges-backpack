@@ -117,10 +117,10 @@ exports.show = function (request, response, next) {
   if (owner)
     message = '<p style="float: left;">This is what your portfolio page looks like to the public.</p>'
       + '<div class="socialshare" style="float: right;" tabindex="0" onclick="injectSocialMedia(this)">'
-      + '<span>TweetBook+ this link!</span>'
-      + '<div class="twitter"></div>'
-      + '<div class="google"></div>'
-      + '<div class="facebook"></div>'
+      + '<span>Share this on twitter, google+ or facebook</span>'
+      + '<div class="social-medium twitter"></div>'
+      + '<div class="social-medium google"></div>'
+      + '<div class="social-medium facebook"></div>'
       + '</div>';
 
 
