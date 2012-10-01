@@ -14,38 +14,15 @@ var app = express();
 app.logger = logger;
 app.config = configuration;
 
+// View helpers. 
+// 'user' local set by userFromSession middleware.
 app.locals({
-  login: true,
-  title: 'Backpack',
-  error: [],
-  success: [],
-  badges: {},
   reverse: router.reverse
 });
 
 // default view engine
 var env = new nunjucks.Environment(new nunjucks.FileSystemLoader('views'));
 env.express(app);
-
-/* Express 2 stuff
-// View helpers. `user` and `badges` are set so we can use them in `if`
-// statements without getting undefined errors and without having to use typeof
-// checks.
-app.helpers({
-  login: true,
-  title: 'Backpack',
-  error: [],
-  success: [],
-  badges: {},
-  reverse: router.reverse
-});
-
-app.dynamicHelpers({
-  user: function (req, res) {
-    return req.user || null;
-  }
-});
-*/
 
 // Middleware. See `middleware.js`
 app.use(express.static(path.join(__dirname, "static")));
