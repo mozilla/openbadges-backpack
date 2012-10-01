@@ -9,7 +9,7 @@
     {{/opengraph}}
     <link rel="stylesheet" href="/css/socialshare.min.css" type="text/css" media="all" />
     <link rel="stylesheet" href="/css/bootstrap-2.0.2.min.css" />
-    <link href="//www.mozilla.org/tabzilla/media/css/tabzilla.css" rel="stylesheet" /> 
+    <link href="//www.mozilla.org/tabzilla/media/css/tabzilla.css" rel="stylesheet" />
     <link rel="stylesheet" href="/css/style.css" type="text/css" media="all" />
     <title dir="ltr">Open Badge Backpack</title>
 
@@ -22,7 +22,7 @@
       <div class="navbar-inner">
         <div class="container" style="position: relative;">
           <h3><a class="brand" href="/">Open Badge Backpack</a></h3>
-          <a href="http://www.mozilla.org/" id="tabzilla">a mozilla.org joint</a> 
+          <a href="http://www.mozilla.org/" id="tabzilla">a mozilla.org joint</a>
           <ul class="nav">
             <li><a href="{{#reverse}}backpack.manage{{/reverse}}">Home</a></li>
             <li><a href="{{#reverse}}backpack.manage{{/reverse}}{{^tooltips}}?tooltips{{/tooltips}}">Help: {{#tooltips}}Off{{/tooltips}}{{^tooltips}}On{{/tooltips}}</a></li>
@@ -45,7 +45,7 @@
           {{error}}
         </div>
       {{/error.length}}
-      
+
       {{#success.length}}
         <div class="alert alert-success">
           <a class="close" data-dismiss="alert">×</a>
@@ -66,27 +66,26 @@
         </ul>
       </aside>
     </div>
-      
-      
+
+
       {{=|| ||=}} <!-- need to change delimeter so hogan doesn't parse these -->
       <script type="text/html" id="messageTpl">
         <div class="alert alert-{{type}}">
           <p><strong>{{message}}</strong></p>
         </div>
       </script>
-    
-      
+
+
       <!-- third party -->
       <script type="text/javascript" src="/js/ICanHaz.js"></script>
       <script type="text/javascript" src="/js/underscore.js"></script>
       <script type="text/javascript" src="/js/backbone.js"></script>
       <script type="text/javascript" src="/js/bootstrap-2.0.2.min.js"></script>
-      <script src="//www.mozilla.org/tabzilla/media/js/tabzilla.js"></script> 
-      
+      <script src="//www.mozilla.org/tabzilla/media/js/tabzilla.js"></script>
+
       <!-- my libraries -->
       <script type="text/javascript" src="/js/jquery.sync.js"></script>
       <script type="text/javascript" src="/js/backpack.js"></script>
-      <script type="text/javascript" src="/js/socialshare.min.js"></script>
-      
+
   </body>
 </html>
