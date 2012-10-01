@@ -18,7 +18,7 @@
   , "mime": "~1.2.5"
   , "mysql": "~0.9.5"
   , "nock": "~0.11.6"
-  , "nunjucks": "git://github.com/jlongster/nunjucks.git#d7a59ca3c12e63299983b4bee3f8888c29812623"
+  , "nunjucks": "~0.1.3"
   , "request": "~2.9.200"
   , "soda": "~0.2.5"
   , "should": "~0.5.1"

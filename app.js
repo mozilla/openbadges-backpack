@@ -1,6 +1,6 @@
 // Configure & start express.
 var express = require('express');
-var http = require('http'); // TODO: https?
+var http = require('http'); 
 var fs = require('fs');
 var path = require('path');
 var middleware = require('./middleware');
