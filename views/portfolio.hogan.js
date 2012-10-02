@@ -32,73 +32,79 @@
     {{#badges}}
       {{#attributes}}
         <li>
-          {{#body}}
+        {{#body}}
           <h3>{{badge.name}}</h3>
 
           <p class='story'>{{_userStory}}</p>
 
           <table class='information'>
-            <tr>
-              <td rowspan="100" class='image'>
-                <img src="{{image_path}}">
-              </td>
+            <colgroup>
+              <col class="imageCol">
+              <col class="fieldLabelCol">
+              <col class="dataCol">
+            </colgroup>
+            <tbody>
+              <tr>
+                <td rowspan="100" class='image'>
+                  <img src="{{image_path}}">
+                </td>
 
-              <td class='section-head' colspan='2'>Issuer Details</td>
-            </tr>
-            <tr>
-              <td class='fieldlabel issuer-name'>Name</td>
-              <td>{{badge.issuer.name}}</td>
-            </tr>
-            <tr>
-              <td class='fieldlabel issuer-name'>URL</td>
-              <td><a href="{{badge.issuer.origin}}">{{badge.issuer.origin}}</a></td>
-            </tr>
-            {{#badge.issuer.org}}
-            <tr>
-              <td class='fieldlabel issuer-name'>Organization</td>
-              <td>{{badge.issuer.org}}</td>
-            </tr>
-            {{/badge.issuer.org}}
+                <td class='section-head' colspan='2'>Issuer Details</td>
+              </tr>
+              <tr>
+                <td class='fieldlabel issuer-name'>Name</td>
+                <td>{{badge.issuer.name}}</td>
+              </tr>
+              <tr>
+                <td class='fieldlabel issuer-name'>URL</td>
+                <td><a href="{{badge.issuer.origin}}">{{badge.issuer.origin}}</a></td>
+              </tr>
+              {{#badge.issuer.org}}
+              <tr>
+                <td class='fieldlabel issuer-name'>Organization</td>
+                <td>{{badge.issuer.org}}</td>
+              </tr>
+              {{/badge.issuer.org}}
 
-            <tr>
-              <td class='section-head' colspan='2'>Badge Details</td>
-            </tr>
-            <tr>
-              <td class='fieldlabel'>Name</td>
-              <td>{{badge.name}}</td>
-            </tr>
-            <tr>
-              <td class='fieldlabel'>Description</td>
-              <td>{{badge.description}}</td>
-            </tr>
-            <tr>
-              <td class='fieldlabel'>Criteria</td>
-              <td><a href='{{badge.criteria}}'>{{badge.criteria}}</a></td>
-            </tr>
+              <tr>
+                <td class='section-head' colspan='2'>Badge Details</td>
+              </tr>
+              <tr>
+                <td class='fieldlabel'>Name</td>
+                <td>{{badge.name}}</td>
+              </tr>
+              <tr>
+                <td class='fieldlabel'>Description</td>
+                <td>{{badge.description}}</td>
+              </tr>
+              <tr>
+                <td class='fieldlabel'>Criteria</td>
+                <td><a href='{{badge.criteria}}'>{{badge.criteria}}</a></td>
+              </tr>
 
-            {{#evidence}}
-            <tr>
-              <td class='fieldlabel evidence'>Evidence</td>
-              <td><a href='{{evidence}}'>{{evidence}}</a></td>
-            </tr>
-            {{/evidence}}
+              {{#evidence}}
+              <tr>
+                <td class='fieldlabel evidence'>Evidence</td>
+                <td><a href='{{evidence}}'>{{evidence}}</a></td>
+              </tr>
+              {{/evidence}}
 
-            {{#issued_on}}
-            <tr>
-              <td class='fieldlabel'>Issued</td>
-              <td>{{issued_on}}</td>
-            </tr>
-            {{/issued_on}}
+              {{#issued_on}}
+              <tr>
+                <td class='fieldlabel'>Issued</td>
+                <td>{{issued_on}}</td>
+              </tr>
+              {{/issued_on}}
 
-            {{#expires}}
-            <tr>
-              <td class='fieldlabel'>Expiration</td>
-              <td>{{expires}}</td>
-            </tr>
-            {{/expires}}
-
-            {{/body}}
+              {{#expires}}
+              <tr>
+                <td class='fieldlabel'>Expiration</td>
+                <td>{{expires}}</td>
+              </tr>
+              {{/expires}}
+            </tbody>
           </table>
+        {{/body}}
         </li>
       {{/attributes}}
     {{/badges}}
