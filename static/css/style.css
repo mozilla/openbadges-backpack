@@ -405,6 +405,8 @@ form.baker #assertion {
 }
 
 table.information {
+  table-layout: fixed;
+  word-wrap: break-word;
   margin-bottom: 0;
   padding: 10px 3px;
   border-collapse: separate;
@@ -416,8 +418,11 @@ table.information {
   padding: 2px 12px;
 }
 
+.information .fieldLabelCol {
+  width: 120px;
+}
+
 .information td.fieldlabel {
-  padding-left: 50px;
   white-space: nowrap;
   font-weight: bold;
   text-align: right;
@@ -445,10 +450,13 @@ table.information {
   vertical-align: middle;
 }
 
+.information .imageCol {
+  width: 148px;
+}
 .information img {
   max-height: 128px;
   max-width: 128px;
-  margin: auto 10px; 
+  margin: auto; 
 }
 
 .information button {
