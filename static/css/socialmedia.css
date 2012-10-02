@@ -1,5 +1,4 @@
 .socialshare {
-  opacity: 0.8;
   text-shadow: 2px 2px 4px rgba(0, 200, 160, 0.2);
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 }
@@ -25,6 +24,20 @@
 
 .social-medium iframe {
   height: 20px;
-  box-shadow: 4px 4px 3px rgba(100, 190, 180, 0.3);
-  background-color: rgba(100, 190, 180, 0.3);
+  box-shadow: 4px 4px 3px rgba(100, 190, 180, 0.2);
+  background-color: rgba(100, 190, 180, 0.2);
+}
+
+/* override on the alert styling, since visibility should not be hidden */
+
+.portfolio .message-container .alert {
+  overflow: visible !important;
+  min-height: 1.5em;
+}
+
+/* override for the facebook iframe when there's a widget box, for non-blue/shadowed element */
+
+.fb_iframe_widget_lift {
+  background-color: transparent !important;
+  box-shadow: none !important;
 }
