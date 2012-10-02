@@ -20,7 +20,7 @@ var SocialMedia = function() {};
     google: {
       id: "google-plus",
       src: "//apis.google.com/js/plusone.js",
-      html: "<div class='g-plusone' data-size='medium' data-annotation='none'></div>" // figures out the URL itself
+      html: "<div class='g-plusone' data-size='medium' data-annotation='none' data-href='"+urlPlaceHolder+"'></div>"
     },
 
     twitter: {
