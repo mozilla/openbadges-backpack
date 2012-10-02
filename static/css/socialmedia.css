@@ -28,14 +28,14 @@
   background-color: rgba(100, 190, 180, 0.2);
 }
 
-/* override on the alert styling */
+/* override on the alert styling, since visibility should not be hidden */
 
 .portfolio .message-container .alert {
   overflow: visible !important;
   min-height: 1.5em;
 }
 
-/* override on facebook iframe when there's  */
+/* override for the facebook iframe when there's a widget box, for non-blue/shadowed element */
 
 .fb_iframe_widget_lift {
   background-color: transparent !important;
