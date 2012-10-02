@@ -258,6 +258,10 @@
     position: relative;
     top: 8.6em
   }
+  
+  .badge.seethrough {
+    opacity: 0.5;
+  }
 </style>
 
 <!--
@@ -435,8 +439,6 @@
     var badges = $(".badge");
     //  spawn popovers on a 200ms delay
     badges.popover({delay: 200});
-    // but, remove them when a badge starts getting click-dragged
-    badges.mousedown(function() { $(this).popover('hide'); });
   }
   document.addEventListener("DOMContentLoaded",badgePopOvers,false);
 
@@ -502,6 +504,80 @@
     };
 
     /**
+     * setup up badge drop behaviour for
+     * drag-and-drop'ing badges onto the
+     * new group area.
+     */
+    var setupBadgeDropping = function(template) {
+      var badgeArea = $('.badgeArea',template)[0];
+
+      // make badges droppable on the badgeArea
+      $(".badge").each(function(){
+        this["oldDragStart"] = this.ondragstart;
+        this.ondragstart = function(e) {
+          e.dataTransfer.setData("data-id", this.getAttribute("data-id"));
+          $(this).popover('hide',{delay:0});
+        };
+      });
+
+      // required to make ondrop work for the badge area
+      badgeArea.ondragover = function(e) { e.preventDefault(); };
+
+      // When a badge is dropped, find out which
+      // badge is supposed to be added, and clone it
+      // into the badge area.
+      badgeArea.ondrop = function(e) {
+        e.preventDefault();
+        $(".instructions",this).remove();
+
+        var dataId = e.dataTransfer.getData("data-id"),
+            badgeSelector = ".badge[data-id="+dataId+"]";
+        // check whether we already have this badge
+        if($(badgeSelector, badgeArea).length>0) {
+          return;
+        }
+
+        // we don't, add it to the badge area from the 
+        // collection of badges.
+        var badge = $(badgeSelector)[0];
+        if(!badge) {
+          return;
+        }
+        badge = $(badge.cloneNode());
+        
+        // give this badge "remove" drag and drop behaviour
+        badge[0].ondragstart = function(e) {
+          e.dataTransfer.setData("data-id", this.getAttribute("data-id"));
+          badge.addClass("seethrough");
+          badge.popover('hide',{delay:0});
+        };
+        badge[0].ondragend = function(e) {
+          var mx = e.clientX, my = e.clientY;
+          var bbox = badgeArea.getBoundingClientRect();
+          
+          if(mx < bbox.left || mx > bbox.right ||  my < bbox.top || my > bbox.bottom) {
+            badge.remove();
+          } else {
+          badge.removeClass("seethrough");
+          }
+        }
+
+        // add it to the badge area
+        badge.hide().appendTo($(this)).fadeIn().popover({delay: 200});
+      };
+    }
+
+    /**
+     * disable drag-and-drop for badges, for when there
+     * is no "new group" to work with.
+     */
+    var disableBadgeDropping = function(template) {
+      $(".badge").each(function(){
+        this.ondragstart = this["oldDragStart"];
+      });
+    }
+
+    /**
      * When the create button is clicked, load a
      * "new group" template, and bind save/cancel
      * behaviour to the button/link span.
@@ -513,27 +589,8 @@
 
       var template = loadTemplate();
 
+      setupBadgeDropping(template);
       addCheckboxes();
-
-      // make badges drag-and-droppable 
-      $(".badge").each(function(){
-        this.ondragstart = function(e) {
-          e.dataTransfer.setData("data-id", this.getAttribute("data-id"));
-        }
-      });
-      
-      var badgeArea = $('.badgeArea',template)[0];
-      badgeArea.ondragover = function(e) { e.preventDefault(); };
-      badgeArea.ondrop = function(e) {
-        e.preventDefault();
-        $(".instructions",this).remove();
-
-        var dataId = e.dataTransfer.getData("data-id");        
-        var badge = $(".badge[data-id="+dataId+"]")[0].cloneNode();
-        $(badge).hide();
-        this.appendChild(badge);
-        $(badge).fadeIn();
-      };
 
       // cancel simply discards everything done so far
       $(".cancel", template).click(function() {
@@ -541,6 +598,7 @@
         li.remove();
         enableButton();
         removeCheckboxes();
+        disableBadgeDropping();
       });
 
       // save tells the server to save this group,
@@ -551,6 +609,7 @@
         // prevent further save/cancel
         $(".editable",template).remove();
         removeCheckboxes();
+        disableBadgeDropping();
 
         // mock save-result        
         var saveResult = {
