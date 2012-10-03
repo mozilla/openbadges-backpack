@@ -20,13 +20,13 @@ var SocialMedia = function() {};
     google: {
       id: "google-plus",
       src: "//apis.google.com/js/plusone.js",
-      html: "<div class='g-plusone' data-size='medium' data-annotation='none'></div>" // figures out the URL itself
+      html: "<div class='g-plusone' data-size='medium' data-annotation='none' data-href='"+urlPlaceHolder+"'></div>"
     },
 
     twitter: {
       id: "twitter-wjs",
       src: "//platform.twitter.com/widgets.js",
-      html: "<a href='https://twitter.com/share' class='twitter-share-button' data-count='none' data-text='Check out my OpenBadges at "+urlPlaceHolder+"!' data-via='OpenBadges' data-dnt='true'>Tweet</a>"
+      html: "<a href='https://twitter.com/share' class='twitter-share-button' data-count='none' data-text='Check out my OpenBadges at ' data-via='OpenBadges' data-dnt='true'>Tweet</a>"
     },
 
     /**

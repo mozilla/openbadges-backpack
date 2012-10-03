@@ -7,6 +7,7 @@
     {{#opengraph}}
       <meta property="og:{{property}}" content="{{content}}" />
     {{/opengraph}}
+    <link rel="icon" href="favicon.ico">
     <link rel="stylesheet" href="/css/socialshare.min.css" type="text/css" media="all" />
     <link rel="stylesheet" href="/css/bootstrap-2.0.2.min.css" />
     <link href="//www.mozilla.org/tabzilla/media/css/tabzilla.css" rel="stylesheet" />
