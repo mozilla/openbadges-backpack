@@ -1,6 +1,10 @@
 @badgeSize: 110px;
+
 @sectionSpacing: 16px;
 @elementSpacing: 8px;
+
+@separator: 1px solid #999;
+
 
 .badgeImg {
   width: @badgeSize;
@@ -27,7 +31,7 @@
     table {
       width: 100%;
       margin-bottom: @elementSpacing;
-      border-bottom: 1px solid #999;
+      border-bottom: @separator;
 
       tr {
         th {
@@ -35,13 +39,13 @@
           font-size: 1.2em;
           text-align: left;
         }
-        /* label cells */
         td:first-child {
+          /* label cells */
           padding-right: @sectionSpacing;
           font-weight: bold;
         }
-        /* data cells */
         td:last-child {
+          /* data cells */
           width: 100%; /* shrinks label cells to contents */
         }
       }
@@ -68,9 +72,12 @@ textarea.panel {
   padding: 0.5em;
 }
 
+/* Bootstrap tweaks/fixes */
+
 textarea[class*="span"] {
   resize: vertical;
 }
+
 
 /* Header classes
  * Right now a bunch of header styling comes from Bootstrap,
@@ -79,10 +86,15 @@ textarea[class*="span"] {
 
 h2 { margin-bottom: @elementSpacing; }
 
+
 /* Margin classes
  * Use these in your html to set spacing as appropriate,
  * if it doesn't make sense to apply the margins to a
  * more semantically named element.
  */
+
 .st { margin-top: @sectionSpacing; }
 .sb { margin-bottom: @sectionSpacing; }
+
+.et { margin-top: @elementSpacing; }
+.eb { margin-bottom: @elementSpacing; }
