@@ -12,6 +12,10 @@ lint:
 clean:
 	rm -rf node_modules rpmbuild *.rpm *.tar.gz
 
+css:
+	recess --compile less/backpack.less > static/css/backpack.css
+	recess --compress less/backpack.less > static/css/backpack.min.css
+
 npm:
 	npm install
 
