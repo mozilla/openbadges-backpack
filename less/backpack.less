@@ -72,12 +72,17 @@ textarea[class*="span"] {
   resize: vertical;
 }
 
+/* Header classes
+ * Right now a bunch of header styling comes from Bootstrap,
+ * but you can add more here.
+ */
+
+h2 { margin-bottom: @elementSpacing; }
+
 /* Margin classes
  * Use these in your html to set spacing as appropriate,
- * if that's easier than styling with the variables set
- * up top.
+ * if it doesn't make sense to apply the margins to a
+ * more semantically named element.
  */
 .st { margin-top: @sectionSpacing; }
 .sb { margin-bottom: @sectionSpacing; }
-.et { margin-top: @elementSpacing; }
-.eb { margin-bottom: @elementSpacing; }
