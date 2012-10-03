@@ -119,7 +119,6 @@
   .newGroup .badgeArea .badge {
     padding: 0; /* override */;
     width: 110px;
-    height: 110px;
     margin: 10px 20px;
     border-radius: 100px;
     display: inline-block;
@@ -131,10 +130,27 @@
     font-size: 100px;
     line-height: 100px;
   }
+  
+  .badges .badge {
+    height: auto;
+    min-height: 110px;
+    background-size: 110px 110px !important;
+    background-repeat: no-repeat !important;
+  }
+
+  .badgeArea .badge {
+    height: auto;
+    min-height: 80px;
+    background-size: 80px 80px !important;
+    background-repeat: no-repeat !important;
+  }
 
   .newGroup .badgeArea .badge {
     width: 80px;
-    height: 80px;
+    height: auto;
+    min-height: 80px;
+    background-size: 80px 80px !important;
+    background-repeat: no-repeat !important;
     margin: 2px 4px;
   }
 
@@ -248,24 +264,25 @@
     padding-left: 0.5em;
   }
 
-  .badge input.addToGroup {
-    position: relative;
-    top: 2.65em;
-    left: -70%
-  }
-
-  .badge label.addToGroup {
-    position: relative;
-    top: 8.6em
-  }
-  
   .badge.seethrough {
     opacity: 0.5;
   }
 
-  .badge .instructions {
-    display: inline-block;
-    line-height: 1.1em;
+  .badge .actions {
+    font-size: 12%;
+  }
+  
+  .badge .actions .btn {
+    padding: 0px inherit;
+    box-shadow: 0 0 15px rgba(127, 127, 127, 0.7);
+    font-size: 0.9em;
+    opacity: 0.9;
+    width: 100%;
+    margin-top: 115px;
+  }
+
+  .badgeArea .badge .actions .btn {
+    margin-top: 85px;
   }
 </style>
 
@@ -485,26 +502,101 @@
     var createButton = $(".groups button.create"),
         creating = false,
         enableButton = function() { creating = false; createButton.fadeIn(); };
+    
+    /**
+     * is this badge already in the new group's badge area?
+     */
+    var isBadgeInArea = function(dataId) {
+      var badgeArea = $('.badgeArea'),
+          badgeSelector = ".badge[data-id="+dataId+"]";
+      return $(badgeSelector, badgeArea).length>0;
+    }
+
+    /**
+     * remove a badge from the new group badge area
+     */
+    var removeFromBadgeArea = function(badgeArea, dataId) {
+      var badgeSelector = ".badge[data-id="+dataId+"]";
+      $(badgeSelector, badgeArea).remove();
+    };
+    
+    /**
+     * add a "remove" button to the badgearea copy of the badge
+     */
+    var addRemoveButton = function(badgeArea, badge) {
+      var dataId = badge.attr("data-id"),
+          created = $("<div class='actions'>"
+                   + "  <button class='btn removeFromGroup' data-id='"+dataId+"'>Remove</button>"
+                   + "</div>");
+      $("button",created).click(function(){
+        badge.popover('hide');
+        removeFromBadgeArea(badgeArea, dataId);
+      });
+      console.log(badge, created);
+      badge.append(created);
+    };
+    
+    /**
+     * add a badge to the badge area for a new group
+     */
+    var addToBadgeArea = function(badgeArea, badge) {
+      badge.appendTo(badgeArea).fadeIn().popover({delay: 200});
+
+      // give this badge "remove" drag and drop behaviour
+      badge[0].ondragstart = function(e) {
+        e.dataTransfer.setData("data-id", this.getAttribute("data-id"));
+        badge.addClass("seethrough");
+        badge.popover('hide',{delay:0});
+      };
+      badge[0].ondragend = function(e) {
+        var mx = e.clientX, my = e.clientY;
+        var bbox = badgeArea[0].getBoundingClientRect();
+        if(mx < bbox.left || mx > bbox.right ||  my < bbox.top || my > bbox.bottom) {
+          badge.remove();
+        } else {
+          badge.removeClass("seethrough");
+        }
+      }
+
+      // kill off instructions. If they're already
+      // killed off, this just does nothing.
+      $(".instructions",badgeArea).remove();
+      addRemoveButton(badgeArea, badge);
+    };
+
 
     /**
      * add checkboxes to each badge 
      */
-    var addCheckboxes = function() {
+    var addBadgePickers = function(badgeArea) {
       $(".badge").each(function(){
-        var create = "<span class='instructions'>"
-                   + "<label class='addToGroup'>Add to Group</label>"
-                   + "<input type='checkbox' class='addToGroup' data-id'='"+$(this).attr("data-id")+"'>"
-                   + "</span>";
-        $(this).append($(create));
+        var created = $("<div class='actions'>"
+                     + "  <button class='btn addToGroup' data-id='"+$(this).attr("data-id")+"'>Add to Group</button>"
+                     + "</div>");
+        $("button",created).click(function(){
+          // add to the new group
+          var dataId = $(this).attr("data-id");
+          // check whether we already have this badge
+          if(isBadgeInArea(dataId)) {
+            return;
+          }
+          var badgeSelector = ".badges .badge[data-id="+dataId+"]",
+              badge = $(badgeSelector);
+          badge.popover('hide');
+          badge = badge.clone();
+          $(".actions",badge).remove();
+          addToBadgeArea(badgeArea, badge);
+        });
+        $(this).append(created);
       });
     };
 
     /**
      * remove the badge checkboxes
      */
-    var removeCheckboxes = function() {
+    var removeBadgePickers = function() {
       $(".badge").each(function(){
-        $(".instructions",this).remove();
+        $(".actions",this).remove();
       });
     };
 
@@ -514,7 +606,7 @@
      * new group area.
      */
     var setupBadgeDropping = function(template) {
-      var badgeArea = $('.badgeArea',template)[0];
+      var badgeArea = $('.badgeArea',template);
 
       // make badges droppable on the badgeArea
       $(".badge").each(function(){
@@ -526,19 +618,19 @@
       });
 
       // required to make ondrop work for the badge area
-      badgeArea.ondragover = function(e) { e.preventDefault(); };
+      badgeArea[0].ondragover = function(e) { e.preventDefault(); };
 
       // When a badge is dropped, find out which
       // badge is supposed to be added, and clone it
       // into the badge area.
-      badgeArea.ondrop = function(e) {
+      badgeArea[0].ondrop = function(e) {
         e.preventDefault();
-        $(".instructions",this).remove();
 
         var dataId = e.dataTransfer.getData("data-id"),
             badgeSelector = ".badge[data-id="+dataId+"]";
+            
         // check whether we already have this badge
-        if($(badgeSelector, badgeArea).length>0) {
+        if(isBadgeInArea(dataId)) {
           return;
         }
 
@@ -549,26 +641,9 @@
           return;
         }
         badge = $(badge.cloneNode());
-        
-        // give this badge "remove" drag and drop behaviour
-        badge[0].ondragstart = function(e) {
-          e.dataTransfer.setData("data-id", this.getAttribute("data-id"));
-          badge.addClass("seethrough");
-          badge.popover('hide',{delay:0});
-        };
-        badge[0].ondragend = function(e) {
-          var mx = e.clientX, my = e.clientY;
-          var bbox = badgeArea.getBoundingClientRect();
-          
-          if(mx < bbox.left || mx > bbox.right ||  my < bbox.top || my > bbox.bottom) {
-            badge.remove();
-          } else {
-          badge.removeClass("seethrough");
-          }
-        }
 
         // add it to the badge area
-        badge.hide().appendTo($(this)).fadeIn().popover({delay: 200});
+        addToBadgeArea(badgeArea, badge);
       };
     }
 
@@ -595,14 +670,15 @@
       var template = loadTemplate();
 
       setupBadgeDropping(template);
-      addCheckboxes();
+      var badgeArea = $(".badgeArea",template);
+      addBadgePickers(badgeArea);
 
       // cancel simply discards everything done so far
       $(".cancel", template).click(function() {
         var li = $(this).closest("li");
         li.remove();
         enableButton();
-        removeCheckboxes();
+        removeBadgePickers();
         disableBadgeDropping();
       });
 
@@ -613,7 +689,7 @@
 
         // prevent further save/cancel
         $(".editable",template).remove();
-        removeCheckboxes();
+        removeBadgePickers();
         disableBadgeDropping();
 
         // mock save-result        
