@@ -461,6 +461,8 @@
     var badges = $(".badge");
     //  spawn popovers on a 200ms delay
     badges.popover({delay: 200});
+    // but kill them off on mouse clicks
+    badges.mousedown(function() { $(this).popover('hide'); });
   }
   document.addEventListener("DOMContentLoaded",badgePopOvers,false);
 
