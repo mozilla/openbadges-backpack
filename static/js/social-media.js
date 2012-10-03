@@ -26,7 +26,7 @@ var SocialMedia = function() {};
     twitter: {
       id: "twitter-wjs",
       src: "//platform.twitter.com/widgets.js",
-      html: "<a href='https://twitter.com/share' class='twitter-share-button' data-count='none' data-text='Check out my OpenBadges at "+urlPlaceHolder+"!' data-via='OpenBadges' data-dnt='true'>Tweet</a>"
+      html: "<a href='https://twitter.com/share' class='twitter-share-button' data-count='none' data-text='Check out my OpenBadges at ' data-via='OpenBadges' data-dnt='true'>Tweet</a>"
     },
 
     /**
