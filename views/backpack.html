@@ -292,7 +292,7 @@
 <script type="text/html" id="newGroupTemplate">
 <li>
   <div class="newGroup">
-    <input type="text" placeholder="Enter Title for New Badge Group">
+    <input class="groupName" type="text" placeholder="Enter Title for New Badge Group">
     <div class="badgeArea">
       <span class="instructions">Drag badges here to add to group, or check boxes at left and click "Add Checked Badges"</span>
     </div>
@@ -688,6 +688,13 @@
       // and then converst the group's "new" template 
       // to a normal group listing entry, instead.
       $(".save", template).click(function() {
+      
+        // make sure we have a group title.
+        var input = $(".groupName",template);
+        if(input.val().trim() === "") {
+          input.focus();
+          return;
+        }
 
         // prevent further save/cancel
         $(".editable",template).remove();
