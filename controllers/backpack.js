@@ -29,7 +29,7 @@ exports.login = function login(request, response) {
 /**
  * Authenticate the user using a browserID assertion.
  *
- * @param {String} assertion returned by `navigator.id.getVerifiedEmail`
+ * @param {String} assertion returned by browserID login
  * @return {HTTP 303}
  *   on error: redirect one page back
  *   on success: redirect to `backpack.manage`
@@ -171,6 +171,8 @@ exports.manage = function manage(request, response, next) {
 
       if (criteria[0] === '/') body.badge.criteria = origin + criteria;
       if (evidence && evidence[0] === '/') body.evidence = origin + evidence;
+      // Nobody wants to see the hash in the UI, apparently. 
+      if (body.recipient.match(/\w+(\d+)?\$.+/)) body.recipient = user.get('email');
 
       badgeIndex[badge.get('id')] = badge;
       badge.serializedAttributes = JSON.stringify(badge.attributes);

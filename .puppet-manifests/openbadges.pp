@@ -3,6 +3,7 @@ class openbadges::db {
     exec { "create-${name}-db":
       unless => "/usr/bin/mysql -u${user} -p${password} ${name}",
       command => "/usr/bin/mysql -uroot -p$mysql_password -e \"create database ${name} character set ${encoding}; grant all on ${name}.* to ${user}@localhost identified by '$password';\"",
+      require => [ Package['mysql-server'], Package['mysql-client'] ],
     }
   }
   mysqldb { "openbadges":
@@ -17,14 +18,14 @@ class openbadges::db {
   }  
 }
 
-class openbadges::app {
-  Exec { path => ['/usr/local/bin','/usr/local/sbin','/usr/bin/','/usr/sbin','/bin','/sbin'], }
+class openbadges::app ($node_version) {
+  Exec { path => ['/usr/local/bin','/usr/local/sbin','/usr/bin/','/usr/sbin','/bin','/sbin', "/home/vagrant/nvm/${node_version}/bin"], }
   
   define npm( $directory=true ) {
     exec { "install-${name}-npm-package":
       unless => "test -d $directory/$name",
       command => "npm install -g $name",
-      require => Package['npm'],
+      require => Exec['install-node'],
     }
   }
   
@@ -41,7 +42,7 @@ class openbadges::app {
   exec { "npm-install-packages":
     cwd => "/home/vagrant/",
     command => "npm install .",
-    require => Package['npm'],
+    require => Exec['install-node'],
   }
   
   exec { "copy-local-dist":

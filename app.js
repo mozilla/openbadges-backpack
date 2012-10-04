@@ -45,7 +45,14 @@ app.use(express.methodOverride());
 app.use(middleware.logRequests());
 app.use(middleware.cookieSessions());
 app.use(middleware.userFromSession());
-app.use(middleware.csrf({ whitelist: ['/backpack/authenticate', '/issuer/validator/?', '/displayer/convert/.+'] }));
+app.use(middleware.csrf({ 
+  whitelist: [
+    '/backpack/authenticate', 
+    '/issuer/validator/?', 
+    '/displayer/convert/.+', 
+    '/issuer/frameless.*'
+  ] 
+}));
 app.use(middleware.cors({ whitelist: ['/_badges.*', '/issuer.*', '/baker', '/displayer/.+/group.*'] }));
 
 app.configure('development', function () {
@@ -61,11 +68,13 @@ router(app)
   .delete('/badge/:badgeId',          'badge.destroy')
   .get('/issuer.js',                  'issuer.generateScript')
   .get('/issuer/frame',               'issuer.frame')
+  .post('/issuer/frameless',          'issuer.frameless')
   .get('/issuer/assertion',           'issuer.issuerBadgeAddFromAssertion')
   .post('/issuer/assertion',          'issuer.issuerBadgeAddFromAssertion')
 
   .get('/issuer/validator',           'issuer.validator')
   .post('/issuer/validator',          'issuer.validator')
+  .get('/issuer/welcome',             'issuer.welcome')
 
 
   .get('/displayer/:dUserId/groups.:format?',          'displayer.userGroups')

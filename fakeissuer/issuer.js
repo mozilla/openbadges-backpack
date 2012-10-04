@@ -61,7 +61,5 @@ app.get('/invalid.json', function (request, response) {
   });
 });
 
-
-
-console.log('starting fake issuer');
+console.log(process.pid);
 app.listen(8889);

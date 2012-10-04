@@ -15,7 +15,12 @@
 //begin login handler
   
   function launchBrowserId(callback) {
-    return function() { navigator.id.getVerifiedEmail(callback); }
+    return function() { navigator.id.get(callback, {
+      siteName: 'Open Badge Backpack',
+      termsOfService: '/tou.html',
+      privacyPolicy: '/privacy.html',
+      returnTo: '/'
+    }); }
   }
   function handleResponse(assertion) {
     if (!assertion) return false;

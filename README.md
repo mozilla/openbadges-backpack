@@ -53,12 +53,45 @@ expect in case of error.
 
 ### The easy way
 
-[Use Vagrant](http://vagrantup.com/). `vagrant up` in the project root will spin
+[Use Vagrant](http://vagrantup.com/v1/docs/getting-started/index.html). `vagrant up` in the project root will spin
 up a fully provisioned VM (it'll take about two or three minutes, longer if
 you don't have a `lucid32` box), `vagrant ssh` to get into the VM, then
 `start-server` will start up the server at
 [http://localhost:8888](http://localhost:8888). The server will also watch for
 changes, so you don't have to manually reload it.
+
+#### For Windows users
+
+[Install Vagrant](http://vagrantup.com/v1/docs/getting-started/index.html) and [VirtualBox](https://www.virtualbox.org/). Vagrant will try to install in C:\vagrant, which is a protected location in Windows. Instead, tell it to install in C:\Program Files (if you're on 32 bit windows) or C:\Program Files (x86) (if you're on 64 bit windows) instead - don't worry, this will actually create a C:\Program Files\vagrant folder.
+
+Ensure that your PATH variable contains the VirtualBox binaries folder: Go to your Control Panel -> System -> Advanced system settings -> "Environment Variables" button -> in the system variable section scroll down to the PATH variable, hit "edit" and add C:\Program Files\VirtualBox. After making sure this is the case, in the openbadges repo, run:
+
+    C:\...\Openbadges>"c:\Program Files (x86)\Vagrant\bin\vagrant.bat" up
+
+This will do all the VM building. You may be prompted by the windows firewall and UAC to allow VirtualBox network and disk access: you'll have to allow this, otherwise things won't work. When the VM creation is done, let vagrant discover that it can't actually do SSH on windows:
+
+    C:\...\Openbadges>"c:\Program Files (x86)\Vagrant\bin\vagrant.bat" ssh
+
+This will generate an output similar to the following:
+
+    `vagrant ssh` isn't available on the Windows platform. You are still able
+    to SSH into the virtual machine if you get a Windows SSH client (such as
+    PuTTY). The authentication information is shown below:
+
+    Host: 127.0.0.1
+    Port: 2229
+    Username: vagrant
+    Private key: C:/Users/You/.vagrant.d/insecure_private_key
+
+If you don't already have it installed, get [PuTTY](http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html) or another SSH client and log into 127.0.0.1:2229 with the username "vagrant" and password "vagrant", using the SSH key that vagrant generated in the indicated directory (Connection -> SSH -> Auth -> "browse" button). Putty will expect a .ppk file, so just tell it to show all files (*.*) and select the insecure_private_key file. Connect, and you should get into the Vagrant VM just fine.
+
+Once connected to the VM, you can now start the server using:
+
+    vagrant@lucid32:~$ start-server
+
+and then back in windows you can fire up your favourite browser and connect to the OpenBadges server you now have running on localhost:
+
+    http://localhost:8888
 
 ### The hard way
 
