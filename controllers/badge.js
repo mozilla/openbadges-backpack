@@ -58,9 +58,45 @@ exports.destroy = function destroy(request, response) {
 };
 
 /**
- * Individual badge view
+ * Right now we just chuck the badge in there; in the future we
+ * should normalize the data here for presentation.
+ */
+function showPage(response, opts) {
+  response.render('badge-details.html', {
+    attributes: opts.badge.attributes,
+    assertion: opts.badge.attributes.body,
+    badge: opts.badge.attributes.body.badge,
+    issuer: opts.badge.attributes.body.badge.issuer,
+    owner: opts.owner,
+    editing: opts.editing
+  });
+}
+
+/**
+ * STUB: Individual badge view
+ * Show the public view, logged in or not
+ * Owner will see a preview message
  */
 exports.show = function show(request, response) {
-  response.render('badge-details.html');
+  var owner = request.user && request.badge.get('user_id') === request.user.get('id');
+  showPage(response, {
+    badge: request.badge,
+    owner: owner,
+    editing: false
+  });
+};
+
+/**
+ * STUB: Individual badge edit view
+ * Show the badge with edit fields, owner only
+ * Non-owner should be denied/redirected
+ */
+exports.edit = function show(request, response) {
+  var owner = request.user && request.badge.get('user_id') === request.user.get('id');
+  showPage(response, {
+    badge: request.badge,
+    owner: owner,
+    editing: true
+  });
 };
 
