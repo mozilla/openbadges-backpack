@@ -1,15 +1,25 @@
+.shareMessage {
+  float: right;
+  margin-right: 25%;
+  font-size: 110%;
+  font-weight: bold;
+}
+
 .socialshare {
+  float: left;
   text-shadow: 2px 2px 4px rgba(0, 200, 160, 0.2);
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  margin-right: -2em;
 }
 
 .socialshare:focus {
   outline: 0;
 }
 
-.socialshare span {
+.socialshare span.msg {
   cursor: pointer;
   display: table-cell;
+  border-bottom: 1px dotted #00A5DA;
 }
 
 .social-medium {
@@ -40,4 +50,8 @@
 .fb_iframe_widget_lift {
   background-color: transparent !important;
   box-shadow: none !important;
+}
+
+/* iframe container */
+.social-medium.facebook .fb-like.fb_edge_widget_with_comment.fb_iframe_widget iframe {
 }
