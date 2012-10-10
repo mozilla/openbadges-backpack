@@ -63,6 +63,89 @@
   </div>
 </div>
 
+<!-- NOTE: for dev only. For deployment, this needs to use the -min.js version, with the templates compiled to file -->
+<script src="js/nunjucks-dev.js"></script>
+<script>
+if(!nunjucks.env) { nunjucks.env = new nunjucks.Environment(new nunjucks.HttpLoader('/js/templates')); }
+var env = nunjucks.env;
+</script>
+<script src="js/underscore.js"></script>
+<script src="js/backbone.js"></script>
+<script src="js/backbone/group.js"></script>
+
+<!--
+  On-page behaviour for groups. Most of the UX code is found in the abovementioned group.js file, instead.
+-->
+<script>
+(function(){
+
+  function setupGroups() {
+    document.removeEventListener("DOMContentLoaded", setupGroups, false);
+
+    // "New Group" button handles
+    var createButton = $(".groups button.create"),
+        creating = false,
+        enableButton = function() { creating = false; createButton.fadeIn(); },
+        nogroup = $(".noGroups");
+
+    // group-specific Backbone events
+    window.on("group-saved", function()      { nogroup.remove();    });
+    window.on("group-cancelled", function()  { nogroup.show();      });
+    window.on("group-edit-start", function() { createButton.hide(); });
+    window.on("group-edit-end", function()   { enableButton();      });
+
+    // Create groups for server-generated groups.
+    // This uses the code found in group.js
+    $(".groups .listing li").each(function() {
+      Group.fromElement(this);
+    });
+
+    /**
+     * When the create button is clicked, load a
+     * "new group" template, and bind save/cancel
+     * behaviour to the button/link span.
+     */
+    createButton.click(function(btn) {
+      if(creating) return;
+      createButton.hide();
+      nogroup.hide();
+      creating = true;
+
+      (function(){ 
+            // TODO: make collection handle this?
+            var newGroup = new Group();
+            newGroup.asEditableEntry();
+            var $el = newGroup.currentView.$el;
+            $(".groups .listing").append($el);
+
+            // cancel simply discards everything done so far
+            $el.find(".cancel").click(function() {
+              nogroup.show();
+              enableButton();
+            });
+
+            // save tells the server to save this group,
+            // and then converst the group's "new" template 
+            // to a normal group listing entry, instead.
+            $el.find(".save").click(function() {
+              nogroup.remove();
+              enableButton();
+            });
+
+      }());
+    });
+  }
+  document.addEventListener("DOMContentLoaded", setupGroups, false);
+
+}());
+</script>
+
+<!--
+
+============ THE FOLLOWING STILL NEEDS RELOCATING/CLEANUP ===============
+
+-->
+
 <style>
 
   html {
@@ -296,94 +379,6 @@
     margin-top: 85px;
   }
 </style>
-
-<!-- =========================================================== -->
-
-<script src="js/nunjucks-dev.js"></script>
-<script>
-// FOR DEV ONLY!!!
-//
-  if(!nunjucks.env) {
-    // If not precompiled, create an environment with an HTTP loader
-    nunjucks.env = new nunjucks.Environment(new nunjucks.HttpLoader('/js/templates'));
-  }
-  var env = nunjucks.env;
-//
-// Define a shortcut
-</script>
-<script src="js/underscore.js"></script>
-<script src="js/backbone.js"></script>
-<script src="js/backbone/group.js"></script>
-
-<!--
-  On-page behaviour for groups. Most of the UX code
-  is found in the abovementioned group.js file, instead.
--->
-<script>
-(function(){
-
-  function setupGroups() {
-    document.removeEventListener("DOMContentLoaded", setupGroups, false);
-
-    // "New Group" button handles
-    var createButton = $(".groups button.create"),
-        creating = false,
-        enableButton = function() { creating = false; createButton.fadeIn(); },
-        nogroup = $(".noGroups");
-
-    // group-specific Backbone events
-    window.on("group-saved", function()      { nogroup.remove();    });
-    window.on("group-cancelled", function()  { nogroup.show();      });
-    window.on("group-edit-start", function() { createButton.hide(); });
-    window.on("group-edit-end", function()   { enableButton();      });
-
-    // Create groups for server-generated groups.
-    // This uses the code found in group.js
-    $(".groups .listing li").each(function() {
-      Group.fromElement(this);
-    });
-
-    /**
-     * When the create button is clicked, load a
-     * "new group" template, and bind save/cancel
-     * behaviour to the button/link span.
-     */
-    createButton.click(function(btn) {
-      if(creating) return;
-      createButton.hide();
-      nogroup.hide();
-      creating = true;
-
-      (function(){ 
-            // TODO: make collection handle this?
-            var newGroup = new Group();
-            newGroup.asEditableEntry();
-            var $el = newGroup.currentView.$el;
-            $(".groups .listing").append($el);
-
-            // cancel simply discards everything done so far
-            $el.find(".cancel").click(function() {
-              nogroup.show();
-              enableButton();
-            });
-
-            // save tells the server to save this group,
-            // and then converst the group's "new" template 
-            // to a normal group listing entry, instead.
-            $el.find(".save").click(function() {
-              nogroup.remove();
-              enableButton();
-            });
-
-      }());
-    });
-  }
-  document.addEventListener("DOMContentLoaded", setupGroups, false);
-
-}());
-</script>
-
-
 
 <script type="text/javascript">
 (function(){
