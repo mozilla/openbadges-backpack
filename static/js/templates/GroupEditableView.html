@@ -1,1 +1,10 @@
-<li>GroupEditableView</li>
+<li class="group editable" data-id="{{id}}" data-url="{{url}}">
+  <input class="groupName" type="text" placeholder="Enter Title for New Badge Group" value="{{name}}">
+  <div class="badgeArea">
+    <span class="instructions">Drag badges or click their "Add to Group" button to add them to this group</span>
+  </div>
+  <span class="editable">
+    <button class="btn save">Save Group</button>
+    <span class="cancel">cancel</span>
+  </span>
+</li>
