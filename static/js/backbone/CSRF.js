@@ -1,6 +1,6 @@
 (function(){
   // global var
-  CSRF = $("input[name='_csrf']").val();
+  var CSRF = $("input[name='_csrf']").val();
 
   $.ajaxSetup({
     beforeSend: function (xhr, settings) {

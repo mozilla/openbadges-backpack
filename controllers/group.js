@@ -4,7 +4,7 @@ var Portfolio = require('../models/portfolio.js');
 var Badge = require('../models/badge.js');
 var logger = require('../lib/logging').logger;
 
-function makeBadgeObj(attr) { return new Badge(attr) }
+function makeBadgeObj(attr) { return parseInt(attr); } // TEST COMMENTED OFF: new Badge(attr) } - POMAX
 
 exports.param = {
   groupId: function (request, response, next, id) {
