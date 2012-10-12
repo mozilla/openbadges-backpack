@@ -16,11 +16,10 @@ GroupModel = Backbone.Model.extend({
   urlRoot: '/group',
   defaults: {
     name: "",
-    id: -1,
-    url: "",
     badges: [],
     pending: true
   },
+
   /**
    * Form a server-side compatible object representation.
    */
@@ -30,44 +29,43 @@ GroupModel = Backbone.Model.extend({
   /**
    * Save this model: send a CREATE or UPDATE to the server
    */
-  save: function(callback) {
+  saveModel: function(callback) {
     console.log("saving model...");
+
+    var sucFn = (function(model, callback) {
+      return function() {
+        console.log("saving succeeded");
+        model.set("pending",false);
+        if(callback) callback();
+      }
+    }(this, callback));
+
+    var errFn = (function(model, callback) {
+      return function() {
+        console.log("saving failed!");
+        if(callback) callback();
+      }
+    }(this, callback));
+
     if (this.get("pending")) {
       console.log("CREATE: must use callback to obtain real id, post-saving");
-
-      // TODO: replace mockup placeholder with real "save" code + callback
-      (function(model){
-        var savedModel = new GroupModel({
-          name: model.get("name"),
-          id: parseInt(1000*Math.random()),
-          url: "some random url from database",
-          badges: [],
-          pending: false        
-        });
-        callback(savedModel);
-      }(this));
-
+      this.save(null, { success : sucFn, error: errFn });
     } else {
-      console.log("UPDATE: communicating differences");
-      callback();
+      console.log("UPDATE: updating the server");
+      this.save(null, { success : sucFn, error: errFn });
     }
   },
-  /**
-   * Sync this model: send a READ to the server
-   */
-  sync: function() {
-    console.log("syncing model...");
-    console.log("READ: obtaining differences");
-  },
+
   /**
    * Destroy this model: send a DELETE
    */
-  destroy: function() {
+  destroyModel: function() {
     console.log("destroying model...");
     if(this.get("pending")) {
-      console.log("model had not been saved on the server. Discarding.");
+      console.log("model had not been saved on the server. Simply discarding.");
     } else {
       console.log("DELETE: we never want to see this group again");
+      this.destroy();
     }
   }
 });
@@ -102,10 +100,15 @@ GroupEntryView = Backbone.View.extend({
   setupUX: function() {
     var controller = this.controller,
         $el = this.$el,
-        edit = $el.find(".editGroup");
+        edit = $el.find(".editGroup"),
+        x = $el.find(".deleteGroup");
     // when we click edit, switch to the edit view
     edit.click(function() {
       controller.asEditableEntry();
+    });
+    // when we click (X), delete the group
+    x.click(function() {
+      controller.destroy();
     });
   }
 });
@@ -306,23 +309,16 @@ Group.prototype = {
   save: function(callback) {
     var group = this;
     var update = callback;
+    
     if(this.model.get("pending")) {
-      update = function(newModel) {
-        // Destroy temporary model
-        var oldEl = group.currentView.$el;
-        group.destroy(true);
-        // Bind new, server-correct model
-        group.setModel(newModel);
-        // Update the page by adding the
-        // group as normal entry.
+      update = function() {
         group.asEntry();
-        var newEl = group.currentView.$el;
-        oldEl.replaceWith(newEl);
         // fall through to original callback
         callback();
       };
     }
-    this.model.save(update);
+
+    this.model.saveModel(update);
   },
   
   /**
@@ -343,7 +339,7 @@ Group.prototype = {
    * Destroy this group (delegated to model and view)
    */
   destroy: function(keepView) {
-    this.model.destroy();
+    this.model.destroyModel();
     if (!keepView) {
       this.currentView.$el.remove();
     }

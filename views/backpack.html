@@ -1,6 +1,8 @@
 {% extends "layout.html" %}
 {% block body %}
 <div class="row backpack">
+  <input type="hidden" name="_csrf" value="{{ csrfToken }}"></input>
+
   <div class="span8 column badges">
 
     <header>
@@ -52,6 +54,7 @@
   <script src="js/backbone.js"></script>
 
   <!-- backbone group and group listing MVC code -->
+  <script src="js/backbone/CSRF.js"></script>
   <script src="js/backbone/group.js"></script>
   <script src="js/backbone/groupListing.js"></script>
 
@@ -245,10 +248,18 @@
 
   /* ------------------ */
 
-  .editGroup {
+  .editGroup, .deleteGroup {
     font-style: italic;
     cursor: pointer;
     color: rgba(0,0,0,0.4);
+  }
+  
+  .deleteGroup {
+    font-style: normal;
+    font-variant: small-caps;
+  }
+  .deleteGroup:hover {
+    color: red;
   }
 
   .group.editable {
