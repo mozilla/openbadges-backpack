@@ -14,6 +14,7 @@ _.extend(window, Backbone.Events);
  */
 GroupModel = Backbone.Model.extend({
   urlRoot: '/group',
+
   defaults: {
     name: "",
     badges: [],
@@ -95,6 +96,13 @@ GroupModel = Backbone.Model.extend({
       badges.splice(pos,1);
     }
     console.log("list after removing: "+badges);
+  },
+  
+  /**
+   * Get the list of badges
+   */
+  getBadgeList: function() {
+    return this.get("badges");
   }
 });
 
@@ -350,7 +358,11 @@ var Group = function(name, id, url, badges) {
       badges: badges,
       pending: false
     });
-  } else { groupModel = new GroupModel(); }
+  } else {
+    groupModel = new GroupModel();
+    // FIXME: THIS SHOULD NOT BE NECESSARY
+    groupModel.set("badges",[]);
+  }
   this.setModel(groupModel);
 };
 
@@ -505,7 +517,7 @@ Group.prototype = {
    * Get the list of contained badges
    */
   getBadgeList: function() {
-    return this.model.get("badges");
+    return this.model.getBadgeList();
   }
 };
 
