@@ -29,123 +29,52 @@
   </div>
 
   <div class="span4 column groups">
-    <section>
-      <header>
-        <div class="title">Groups</div>
-      </header>
-
-      <ul class="listing">
-        {% if groups.length == 0 %}
-        <p class="noGroups">You have no groups yet!</p>
-        {% endif %}
-        {% for group in groups %}
-          <li class="group" data-id="{{group.attributes.id}}" data-url="{{group.attributes.url}}"><a class="groupName" href="share/{{group.attributes.url}}/">{{group.attributes.name}}</a></li>
-        {% endfor %}
-      </ul>
-
-      <button class="create btn">Create New Group</button>
-
-    </section>
-
-    <section>
-      <header>
-        <div class="title">Tags</div>
-      </header>
-
-      <ul>
-        <li>Tag</li>
-        <li>Another tag</li>
-        <li>Lolcat</li>
-        <li>Badges</li>
-      </ul>
-    <section>
-
+     {% include "views/GroupListingView.html" %}
   </div>
 </div>
 
-<!-- NOTE: for dev only. For deployment, this needs to use the -min.js version, with the templates compiled to file -->
-<script src="js/nunjucks-dev.js"></script>
-<script>
-if(!nunjucks.env) { nunjucks.env = new nunjucks.Environment(new nunjucks.HttpLoader('/js/templates')); }
-var env = nunjucks.env;
-</script>
-<script src="js/underscore.js"></script>
-<script src="js/backbone.js"></script>
-<script src="js/backbone/group.js"></script>
+
 
 <!--
-  On-page behaviour for groups. Most of the UX code is found in the abovementioned group.js file, instead.
+  NOTE: for dev only. For deployment, this needs to use the -min.js
+        version, with the templates compiled to file
 -->
-<script>
-(function(){
+<div style="display: none;" id="scriptLoads">
+  <script src="js/nunjucks-dev.js"></script>
 
-  function setupGroups() {
-    document.removeEventListener("DOMContentLoaded", setupGroups, false);
+  <script>
+    // Nunjucks environment variable
+    if(!nunjucks.env) { nunjucks.env = new nunjucks.Environment(new nunjucks.HttpLoader('/views')); }
+    var env = nunjucks.env;
+  </script>
 
-    // "New Group" button handles
-    var createButton = $(".groups button.create"),
-        creating = false,
-        enableButton = function() { creating = false; createButton.fadeIn(); },
-        nogroup = $(".noGroups");
+  <script src="js/underscore.js"></script>
+  <script src="js/backbone.js"></script>
 
-    // group-specific Backbone events
-    window.on("group-saved", function()      { nogroup.remove();    });
-    window.on("group-cancelled", function()  { nogroup.show();      });
-    window.on("group-edit-start", function() { createButton.hide(); });
-    window.on("group-edit-end", function()   { enableButton();      });
+  <!-- backbone group and group listing MVC code -->
+  <script src="js/backbone/group.js"></script>
+  <script src="js/backbone/groupListing.js"></script>
 
-    // Create groups for server-generated groups.
-    // This uses the code found in group.js
-    $(".groups .listing li").each(function() {
-      Group.fromElement(this);
-    });
+  <!-- setup the UX, using the backbone code -->
+  <script>
+  (function() { function setupUX() { document.removeEventListener("DOMContentLoaded", setupUX, false);
 
-    /**
-     * When the create button is clicked, load a
-     * "new group" template, and bind save/cancel
-     * behaviour to the button/link span.
-     */
-    createButton.click(function(btn) {
-      if(creating) return;
-      createButton.hide();
-      nogroup.hide();
-      creating = true;
+      // all the code required to set up backbone UX:
+      var listing = GroupListing.fromElement($(".groups"));
 
-      (function(){ 
-            // TODO: make collection handle this?
-            var newGroup = new Group();
-            newGroup.asEditableEntry();
-            var $el = newGroup.currentView.$el;
-            $(".groups .listing").append($el);
+  }; document.addEventListener("DOMContentLoaded", setupUX, false); }());
+  </script>
+</div>
 
-            // cancel simply discards everything done so far
-            $el.find(".cancel").click(function() {
-              nogroup.show();
-              enableButton();
-            });
 
-            // save tells the server to save this group,
-            // and then converst the group's "new" template 
-            // to a normal group listing entry, instead.
-            $el.find(".save").click(function() {
-              nogroup.remove();
-              enableButton();
-            });
-
-      }());
-    });
-  }
-  document.addEventListener("DOMContentLoaded", setupGroups, false);
-
-}());
-</script>
 
 <!--
 
-============ THE FOLLOWING STILL NEEDS RELOCATING/CLEANUP ===============
+  ============================================
+  THE FOLLOWING STILL NEEDS RELOCATING/CLEANUP
+  ============================================
 
 -->
-
 <style>
 
   html {
@@ -218,7 +147,7 @@ var env = nunjucks.env;
     font-size: 100px;
     line-height: 100px;
   }
-  
+
   .badges .badge {
     height: auto;
     min-height: 110px;
@@ -313,18 +242,18 @@ var env = nunjucks.env;
     padding: 0.5em 1.5em;
 
   }
-  
+
   /* ------------------ */
-  
+
   .editGroup {
     font-style: italic;
     cursor: pointer;
     color: rgba(0,0,0,0.4);
   }
-  
+
   .group.editable {
   }
-  
+
   .group.editable input {
     width: 100%;
     line-height: 1.5em;
@@ -342,12 +271,12 @@ var env = nunjucks.env;
     padding: 0.5em;
     min-height: 220px;
 
-    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;    
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
     color: #666;
     font-weight: bold;
     font-size: 115%;
   }
-  
+
   .group.editable .cancel {
     color: #444;
     text-decoration: underline;
@@ -365,7 +294,7 @@ var env = nunjucks.env;
   .badge .actions {
     font-size: 12%;
   }
-  
+
   .badge .actions .btn {
     padding: 0px inherit;
     box-shadow: 0 0 15px rgba(127, 127, 127, 0.7);
@@ -555,7 +484,7 @@ var env = nunjucks.env;
       var badgeSelector = ".badge[data-id="+dataId+"]";
       $(badgeSelector, badgeArea).remove();
     };
-    
+
     /**
      * add a "remove" button to the badgearea copy of the badge
      */
@@ -571,7 +500,7 @@ var env = nunjucks.env;
       console.log(badge, created);
       badge.append(created);
     };
-    
+
     /**
      * add a badge to the badge area for a new group
      */
@@ -602,7 +531,7 @@ var env = nunjucks.env;
 
 
     /**
-     * add checkboxes to each badge 
+     * add checkboxes to each badge
      */
     var addBadgePickers = function(badgeArea) {
       $(".badge").each(function(){
@@ -664,13 +593,13 @@ var env = nunjucks.env;
 
         var dataId = e.dataTransfer.getData("data-id"),
             badgeSelector = ".badge[data-id="+dataId+"]";
-            
+
         // check whether we already have this badge
         if(isBadgeInArea(dataId)) {
           return;
         }
 
-        // we don't, add it to the badge area from the 
+        // we don't, add it to the badge area from the
         // collection of badges.
         var badge = $(badgeSelector)[0];
         if(!badge) {
@@ -722,7 +651,7 @@ var env = nunjucks.env;
       });
 
       // save tells the server to save this group,
-      // and then converst the group's "new" template 
+      // and then converst the group's "new" template
       // to a normal group listing entry, instead.
       $(".save", template).click(function() {
         nogroup.remove();
@@ -739,7 +668,7 @@ var env = nunjucks.env;
         removeBadgePickers();
         disableBadgeDropping();
 
-        // mock save-result        
+        // mock save-result
         var saveResult = {
           id: 123456,
           url: "a1b2c3d4e5f6g7h8i9j0",

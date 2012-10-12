@@ -22,6 +22,12 @@ GroupModel = Backbone.Model.extend({
     pending: true
   },
   /**
+   * Form a server-side compatible object representation.
+   */
+  toGroupAttributes: function() {
+    return { group: { attributes: this.toJSON() }};
+  },
+  /**
    * Save this model: send a CREATE or UPDATE to the server
    */
   save: function(callback) {
@@ -79,12 +85,11 @@ GroupModel = Backbone.Model.extend({
  */
 GroupEntryView = Backbone.View.extend({
   parent: $('.groups .listing'),
-  tagName: false,
   /**
    * Render this view to the page
    */
   render: function() {
-    var values = this.model.toJSON(),
+    var values = this.model.toGroupAttributes(),
         html = env.render('GroupView.html', values);
     this.setElement($(html));
     this.setupUX();
@@ -111,12 +116,11 @@ GroupEntryView = Backbone.View.extend({
  */
 GroupEditableEntryView = Backbone.View.extend({
   parent: $('.groups .listing'),
-  tagName: false,
   /**
    * Render this view to the page
    */
   render: function() {
-    var values = this.model.toJSON(),
+    var values = this.model.toGroupAttributes(),
         html = env.render('GroupEditableView.html', values);
     this.setElement($(html));
     this.setupUX();
@@ -165,21 +169,6 @@ GroupEditableEntryView = Backbone.View.extend({
       });
     });
   }
-});
-
-
-// =======================
-// =                     =
-// = CONTROLLERS: Groups =
-// =                     =
-// =======================
-
-
-/**
- * Collection object for all groups
- */
-GroupCollection = Backbone.Collection.extend({
-  model: GroupModel
 });
 
 
@@ -241,8 +230,6 @@ Group.fromElement = function (element) {
  * Group object representation - prototype
  */
 Group.prototype = {
-  // shared by all instances
-  collection: new GroupCollection(),
 
   // local model and views (filled by constructor)
   model: null,
@@ -279,9 +266,6 @@ Group.prototype = {
     
     this.currentView = this.views.entry;
     this.render();
-
-    // make sure to add this group to the group collection, too
-    this.collection.add(groupModel);
   },
 
   /**
@@ -359,7 +343,6 @@ Group.prototype = {
    * Destroy this group (delegated to model and view)
    */
   destroy: function(keepView) {
-    this.collection.remove(this.model);
     this.model.destroy();
     if (!keepView) {
       this.currentView.$el.remove();
