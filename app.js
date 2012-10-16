@@ -56,6 +56,7 @@ app.configure('production', function () {
 router(app)
   .get('/baker',                      'baker.baker')
   .delete('/badge/:badgeId',          'badge.destroy')
+  .get('/badge/:badgeId',             'badge.show')
   .get('/issuer.js',                  'issuer.generateScript')
   .get('/issuer/frame',               'issuer.frame')
   .post('/issuer/frameless',          'issuer.frameless')

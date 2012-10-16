@@ -1,0 +1,58 @@
+.badgeImg {
+  width: 110px;
+  height: 110px;
+}
+
+.badgeInfo {
+  header {
+    overflow: hidden;
+
+    .badgeImg {
+      float: left;
+      margin-right: 16px;
+    }
+    .description {
+      overflow: hidden;
+    }
+  }
+
+  .details {
+    margin-top: 1em;
+    overflow: hidden;
+
+    table {
+      width: 100%;
+      margin-bottom: 0.5em;
+      border-bottom: 1px solid #999;
+
+      tr {
+        th {
+          padding-bottom: 0.5em;
+          font-size: 1.2em;
+          text-align: left;
+        }
+        td:first-child {
+          padding-right: 1em;
+          font-weight: bold;
+        }
+        td:last-child {
+          width: 100%;
+        }
+      }
+      tr:last-child {
+        td {
+          padding-bottom: 0.5em;
+        }
+      }
+    }
+    table:last-child {
+      border-bottom: none;
+    }
+  }
+}
+
+.panel {
+  background: #eee;
+  padding: 1em;
+  border-radius: 6px;
+}

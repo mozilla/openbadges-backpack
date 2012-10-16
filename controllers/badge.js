@@ -57,4 +57,10 @@ exports.destroy = function destroy(request, response) {
   });
 };
 
+/**
+ * Individual badge view
+ */
+exports.show = function show(request, response) {
+  response.render('badge-details.html');
+};
 

@@ -24,3 +24,6 @@
 /test.json
 /bin/badges.json
 /acceptance-test/local-config.js
+
+/static/css/backpack.css
+/static/css/backpack.min.css
