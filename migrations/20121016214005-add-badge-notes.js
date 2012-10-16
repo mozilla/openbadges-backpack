@@ -2,14 +2,14 @@ var dbm = require('db-migrate');
 var type = dbm.dataType;
 
 exports.up = function(db, callback) {
-  var query = "ALTER TABLE badge ADD notes TEXT DEFAULT NULL";
+  var query = "ALTER TABLE `badge` ADD notes TEXT DEFAULT NULL";
   db.all(query, function(err, results) {
     callback();
   });
 };
 
 exports.down = function(db, callback) {
-  var query = "ALTER TABLE badge DROP notes";
+  var query = "ALTER TABLE `badge` DROP notes";
   db.all(query, function(err, results) {
     callback();
   });
