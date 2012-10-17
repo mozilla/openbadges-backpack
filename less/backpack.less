@@ -1,6 +1,10 @@
+@badgeSize: 110px;
+@sectionSpacing: 16px;
+@elementSpacing: 8px;
+
 .badgeImg {
-  width: 110px;
-  height: 110px;
+  width: @badgeSize;
+  height: @badgeSize;
 }
 
 .badgeInfo {
@@ -9,7 +13,7 @@
 
     .badgeImg {
       float: left;
-      margin-right: 16px;
+      margin-right: @sectionSpacing;
     }
     .description {
       overflow: hidden;
@@ -17,31 +21,33 @@
   }
 
   .details {
-    margin-top: 1em;
+    margin-top: @sectionSpacing;
     overflow: hidden;
 
     table {
       width: 100%;
-      margin-bottom: 0.5em;
+      margin-bottom: @elementSpacing;
       border-bottom: 1px solid #999;
 
       tr {
         th {
-          padding-bottom: 0.5em;
+          padding-bottom: @elementSpacing;
           font-size: 1.2em;
           text-align: left;
         }
+        /* label cells */
         td:first-child {
-          padding-right: 1em;
+          padding-right: @sectionSpacing;
           font-weight: bold;
         }
+        /* data cells */
         td:last-child {
-          width: 100%;
+          width: 100%; /* shrinks label cells to contents */
         }
       }
       tr:last-child {
         td {
-          padding-bottom: 0.5em;
+          padding-bottom: @elementSpacing; /* spacing above bottom border */
         }
       }
     }
@@ -54,5 +60,29 @@
 .panel {
   background: #eee;
   padding: 1em;
+  border: 0;
   border-radius: 6px;
 }
+textarea.panel {
+  /* FF pads textareas incorrectly, so make it less obvious */
+  padding: 0.5em;
+}
+
+textarea[class*="span"] {
+  resize: vertical;
+}
+
+/* Header classes
+ * Right now a bunch of header styling comes from Bootstrap,
+ * but you can add more here.
+ */
+
+h2 { margin-bottom: @elementSpacing; }
+
+/* Margin classes
+ * Use these in your html to set spacing as appropriate,
+ * if it doesn't make sense to apply the margins to a
+ * more semantically named element.
+ */
+.st { margin-top: @sectionSpacing; }
+.sb { margin-bottom: @sectionSpacing; }
