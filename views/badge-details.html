@@ -1,6 +1,8 @@
 {% extends "layout.html" %}
 {% block body %}
 <div class="row">
+
+  <!-- left column -->
   <div class="span8 column">
 
     <div class="badgeInfo">
@@ -37,17 +39,28 @@
     </div>
 
     <div class="row st">
+
       <div class="span4">
         <h2>Badge Notes</h2>
         <textarea class="panel span4" rows="6"
           placeholder="Enter your own notes for this badge"></textarea>
         <button class="btn">Save Notes</button>
       </div>
+
+      <div class="span4 et">
+        <button class="btn">Disown This Badge</button>
+        <a href="#">What is this?</a>
+      </div>
     </div>
+
   </div>
-  
+  <!-- end left column -->
+
+  <!-- right column -->
   <div class="span4 column">
     Right.
   </div>
+  <!-- end right column -->
+
 </div>
 {% endblock %}
