@@ -1,5 +1,7 @@
 var Badge = require('../models/badge');
 var logger = require('../lib/logging').logger;
+var reverse = require('../lib/router').reverse;
+var _ = require('lodash');
 
 function respond(status, message) {
   return { status: status, message: message };
@@ -35,18 +37,23 @@ exports.param['badgeId'] = function (request, response, next, id) {
  */
 
 exports.destroy = function destroy(request, response) {
-  var badge = request.badge;
+  var badge = request.badge;  
   var user = request.user;
   function failNow() {
     return response.send(respond('forbidden', "Cannot delete a badge you don't own"), 403);
   }
+
+  if(request.headers['accept'] && _(request.headers['accept']).contains('text/html')) {
+    //console.warn(request, "!!!", response);
+    return response.redirect(reverse('backpack.login'), 303);
+  }
   
   if (!badge)
     return response.send(respond('missing', "Cannot delete a badge that doesn't exist"), 404);
-  
+
   if (!user || badge.get('user_id') !== user.get('id'))
     return failNow();
-  
+
   badge.destroy(function (err, badge) {
     if (err) {
       logger.warn('Failed to delete badge');

@@ -3,7 +3,11 @@ var vows = require('vows');
 var assert = require('assert');
 var should = require('should');
 var conmock = require('./conmock.js');
-var mysql = require('../lib/mysql.js')
+var mysql = require('../lib/mysql.js');
+var app = require('../app.js');
+var utils = require('./utils')
+  , request = utils.conn.request
+  , response = utils.conn.response;
 
 var user, otherUser, badgeRaw, badgeHash;
 
@@ -106,6 +110,17 @@ vows.describe('badge controller test').addBatch({
         mock.status.should.equal(200);
         mock.body.status = 'okay';
       },
+    },
+    '#destroy: request for text/html': {
+      'topic': function() {
+        var req = { user: user, badge: badgeHash, headers: { accept: ['text/html'] } };
+        badgecontroller.destroy(req, response(req, this.callback));
+      },
+      'get back status 303' : function(err, path, status) {
+        console.warn(err, path, status);
+        status.should.equal(303);
+        path.should.equal('/backpack/login');
+      }
     }
   }
 }).export(module);
