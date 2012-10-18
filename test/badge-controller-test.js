@@ -226,4 +226,108 @@ vows.describe('badge controller test').addBatch({
       }
     },
   }
+}).addBatch({
+  'setup' : {
+    topic: function () {
+      setupDatabase(this.callback);
+    },
+    '#notes: given no user ': {
+      'topic' : function () {
+        var req = { badge: badgeRaw, text: "new notes!" };
+        conmock(badgecontroller.notes, req, this.callback);
+      },
+      'get back status 403' : function (err, mock) {
+        mock.status.should.equal(403);
+        mock.body.status = 'forbidden';
+      },
+    },
+    '#notes: given wrong user ': {
+      'topic' : function () {
+        var req = { user: otherUser, badge: badgeRaw, text: "new notes!" };
+        conmock(badgecontroller.notes, req, this.callback);
+      },
+      'get back status 403' : function (err, mock) {
+        mock.status.should.equal(403);
+        mock.body.status = 'forbidden';
+      },
+    },
+    '#notes: given no badge': {
+      'topic' : function () {
+        var req = { user: user, text: "new notes!" };
+        conmock(badgecontroller.notes, req, this.callback);
+      },
+      'get back status 404' : function (err, mock) {
+        mock.status.should.equal(404);
+        mock.body.status = 'missing';
+      },
+    },
+    '#notes: given correct user and a raw email badge with new notes': {
+      'topic' : function () {
+        var req = { user: user, badge: badgeRaw, text: "new notes!" };
+        conmock(badgecontroller.notes, req, this.callback);
+      },
+      'get back status 200' : function (err, mock) {
+        mock.status.should.equal(200);
+        mock.body.status = 'okay';
+      },
+    },
+    '#notes: given correct user and a raw email badge with null notes': {
+      'topic' : function () {
+        var req = { user: user, badge: badgeRaw, text: null };
+        conmock(badgecontroller.notes, req, this.callback);
+      },
+      'get back status 200' : function (err, mock) {
+        mock.status.should.equal(200);
+        mock.body.status = 'okay';
+      },
+    },
+    '#notes: given correct user and a raw email badge with invalid': {
+      'topic' : function () {
+        var req = { user: user, badge: badgeRaw, text: 100 };
+        conmock(badgecontroller.notes, req, this.callback);
+      },
+      'get back status 500' : function (err, mock) {
+        mock.status.should.equal(500);
+      },
+    },
+    '#notes: given correct user and a hashed email badge with new notes': {
+      'topic' : function () {
+        var req = { user: user, badge: badgeHash, text: "new notes!" };
+        conmock(badgecontroller.notes, req, this.callback);
+      },
+      'get back status 200' : function (err, mock) {
+        mock.status.should.equal(200);
+        mock.body.status = 'okay';
+      },
+    },
+    '#notes: given correct user and a hashed email badge with null notes': {
+      'topic' : function () {
+        var req = { user: user, badge: badgeHash, text: null };
+        conmock(badgecontroller.notes, req, this.callback);
+      },
+      'get back status 200' : function (err, mock) {
+        mock.status.should.equal(200);
+        mock.body.status = 'okay';
+      },
+    },
+    '#notes: given correct user and a hashed email badge with invalid': {
+      'topic' : function () {
+        var req = { user: user, badge: badgeHash, text: false };
+        conmock(badgecontroller.notes, req, this.callback);
+      },
+      'get back status 500' : function (err, mock) {
+        mock.status.should.equal(500);
+      },
+    },
+    '#notes: request for text/html': {
+      'topic': function() {
+        var req = { user: user, badge: badgeHash, headers: { accept: ['text/html'] }, text: "new notes!" };
+        badgecontroller.notes(req, response(req, this.callback));
+      },
+      'get back status 303' : function(err, path, status) {
+        status.should.equal(303);
+        path.should.equal('/backpack/login');
+      }
+    },
+  }
 }).export(module);

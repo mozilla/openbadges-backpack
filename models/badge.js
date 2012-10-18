@@ -79,6 +79,23 @@ Badge.prototype.privacy = function privacy(value, callback) {
   });
 };
 
+Badge.prototype.notes = function notes(text, callback) {
+  if("string" !== typeof text && null !== text) {
+    return callback(new Error("text must be string or null"), null);
+  }
+  var self = this;
+  var attributes = this.attributes;
+  var table = this.getTableName();
+  var querySQL = 'UPDATE `' + table + '` SET `notes` = ? WHERE `id` = ? LIMIT 1';
+
+  callback = callback || function () {};
+
+  mysql.client.query(querySQL, [text, attributes.id], function (err, resp) {
+    if (err) { return callback(err); }
+    return callback(null, self);
+  });
+};
+
 // Validators called by `save()` (see mysql-base) in preparation for saving.
 // A valid pass returns nothing (or a falsy value); an invalid pass returns a
 // message about why a thing was invalid.

@@ -132,4 +132,32 @@ exports.privacy = function privacy(request, response) {
     }
     return response.send({ status: 'okay' }, 200);
   });
-}
+};
+
+exports.notes = function notes(request, response) {
+  var badge = request.badge;  
+  var user = request.user;
+  var text = request.text;
+  function failNow() {
+    return response.send(respond('forbidden', "Cannot update notes for a badge you don't own"), 403);
+  }
+
+  if(request.headers['accept'] && _(request.headers['accept']).contains('text/html')) {
+    return response.redirect(reverse('backpack.login'), 303);
+  }
+  
+  if (!badge)
+    return response.send(respond('missing', "Cannot update notes for a badge that doesn't exist"), 404);
+
+  if (!user || badge.get('user_id') !== user.get('id'))
+    return failNow();
+
+  badge.notes(text, function (err, badge) {
+    if (err) {
+      logger.warn('Failed to update notes badge');
+      logger.warn(err);
+      return response.send(respond('error', 'Could not update notes for badge: ' + err), 500);
+    }
+    return response.send({ status: 'okay' }, 200);
+  });
+};
