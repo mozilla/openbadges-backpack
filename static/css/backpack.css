@@ -1,0 +1,238 @@
+html {
+  background: none;
+}
+
+body {
+  background: #EEE;
+}
+
+.backpack header {
+  width: 100%;
+  /* larges font size is 220% */
+  height: 2.2em;
+}
+
+.backpack header .title {
+  font-size: 220%;
+  font-weight: bold;
+}
+
+.backpack header .title {
+  float: left;
+}
+
+.backpack header .addendum {
+  float: right;
+  font-weight: bold;
+  line-height: 2.2em;
+}
+
+.backpack header .addendum a {
+  color: black;
+  text-decoration: underline;
+}
+
+.badges .collection {
+  background: white;
+  border-radius: 15px;
+  padding: 10px 0;
+  margin: 1em 0;
+}
+
+.backpack .footer h1 {
+  font-size: 200%;
+}
+
+.badges p {
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
+}
+
+.badges p+p {
+  margin-top: 1em;
+}
+
+.badges .badge,
+.group.editable .badgeArea .badge {
+  padding: 0; /* override */;
+  width: 110px;
+  margin: 10px 20px;
+  border-radius: 100px;
+  display: inline-block;
+  background: #d6d6d6;
+  text-align: center;
+
+  /* TESTING ONLY */
+  color: white;
+  font-size: 100px;
+  line-height: 100px;
+}
+
+.badges .badge {
+  height: auto;
+  min-height: 110px;
+  background-size: 110px 110px !important;
+  background-repeat: no-repeat !important;
+}
+
+.badgeArea .badge {
+  height: auto;
+  min-height: 80px;
+  background-size: 80px 80px !important;
+  background-repeat: no-repeat !important;
+}
+
+.group.editable .badgeArea .badge {
+  width: 80px;
+  height: auto;
+  min-height: 80px;
+  background-size: 80px 80px !important;
+  background-repeat: no-repeat !important;
+  margin: 2px 4px;
+}
+
+.groups section + section {
+  margin-top: 3em;
+}
+
+.groups ul {
+  margin-top: 1em;
+  list-style: none;
+  margin-left: 0;
+}
+
+.groups .group a {
+  color: black;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+.groups .group.new {
+  border: 1px solid black;
+  background: white;
+  color: black;
+  border-radius: 15px;
+  padding: 5px;
+}
+
+.pages {
+  text-align: right;
+  line-height: 1em;
+  padding: 1em;
+}
+
+.boxed {
+  background: white;
+  border: 1px solid grey;
+  border-radius: 4px;
+  width: 25px;
+  height: 25px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.boxed + .boxed {
+  margin-left: 0.2em;
+}
+
+.boxed.previous,
+.boxed.next {
+  background: #999 !important;
+  color: white;
+}
+
+.boxed.previous + .boxed {
+  margin-left: 0.7em;
+}
+.boxed + .boxed.next {
+  margin-left: 0.7em;
+}
+
+.boxed:hover {
+  background: #CCC !important;
+}
+
+.boxed.highlight {
+  border: 1px solid #444;
+  background: #EEE;
+}
+
+.btn {
+  border-radius: 2em;
+  padding: 0.5em 1.5em;
+
+}
+
+/* ------------------ */
+
+.editGroup, .deleteGroup {
+  font-style: italic;
+  cursor: pointer;
+  color: rgba(0,0,0,0.4);
+}
+
+.deleteGroup {
+  font-style: normal;
+  font-variant: small-caps;
+}
+.deleteGroup:hover {
+  color: red;
+}
+
+.group.editable {
+}
+
+.group.editable input {
+  width: 100%;
+  line-height: 1.5em;
+  height: 2em;
+  margin: 0.5em 0;
+  padding: 0;
+  text-indent: 0.5em;
+}
+
+.group.editable .badgeArea {
+  background-color: white;
+  border: 1px solid #DDD;
+  border-radius: 10px;
+  margin: 0 0 0.5em;
+  padding: 0.5em;
+  min-height: 220px;
+
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  color: #666;
+  font-weight: bold;
+  font-size: 115%;
+}
+
+.group.editable .cancel {
+  color: #444;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.group.editable .editable {
+  padding-left: 0.5em;
+}
+
+.badge.seethrough {
+  opacity: 0.5;
+}
+
+.badge .actions {
+  font-size: 12%;
+}
+
+.badge .actions .btn {
+  padding: 0px inherit;
+  box-shadow: 0 0 15px rgba(127, 127, 127, 0.7);
+  font-size: 0.9em;
+  opacity: 0.9;
+  width: 100%;
+  margin-top: 115px;
+}
+
+.badgeArea .badge .actions .btn {
+  margin-top: 85px;
+}

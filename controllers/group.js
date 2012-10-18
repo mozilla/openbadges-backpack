@@ -4,8 +4,6 @@ var Portfolio = require('../models/portfolio.js');
 var Badge = require('../models/badge.js');
 var logger = require('../lib/logging').logger;
 
-function makeBadgeObj(attr) { return parseInt(attr); } // TEST COMMENTED OFF: new Badge(attr) } - POMAX
-
 exports.param = {
   groupId: function (request, response, next, id) {
     Group.findById(id, function (err, group) {
@@ -45,7 +43,7 @@ exports.create = function (request, response) {
   var group = new Group({
     user_id: user.get('id'),
     name: body.name,
-    badges: badges.map(makeBadgeObj)
+    badges: badges
   });
 
   group.save(function (err, group) {
@@ -99,7 +97,7 @@ exports.update = function (request, response) {
   }
 
   if (body.badges) {
-    group.set('badges', body.badges.map(makeBadgeObj));
+    group.set('badges', body.badges);
   }
 
   group.save(function (err) {

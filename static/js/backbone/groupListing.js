@@ -52,23 +52,28 @@ GroupListingView = Backbone.View.extend({
    */
   render: function() {
     var values = this.model.toJSON(),
-        html = env.render('GroupListingView.html', values);
+        html = env.render('Backpack.Group.ListingView.html', values);
     this.setElement($(html));
     this.setupUX();
     return this;
   },
+
+  enableButton: function(){},
+
   /**
    * Set up the UX for this view's element(s),
    * tied to a specific controller for the logic.
    */
   setupUX: function() {
     var $el = this.$el,
+        view = this;
         controller = this.controller;
     var createButton = $el.find("button.create"),
         creating = false,
-        enableButton = function() { creating = false; createButton.fadeIn(); },
         nogroup = $el.find(".noGroups"),
         editViews = 0;
+        
+    this.enableButton = function() { creating = false; createButton.fadeIn(); };
 
     /**
      * When the create button is clicked, load a
@@ -92,7 +97,7 @@ GroupListingView = Backbone.View.extend({
 
     // Track open "edit" views:
     window.on("group-edit-start", function() { editViews++; createButton.hide(); });
-    window.on("group-edit-end",   function() { if (--editViews==0) { enableButton(); }});
+    window.on("group-edit-end",   function() { if (--editViews==0) { view.enableButton(); }});
   },
   
   /**
@@ -100,6 +105,14 @@ GroupListingView = Backbone.View.extend({
    */
   removeNoGroupNotice: function() {
     this.$el.find(".noGroups").remove();
+  },
+
+  /**
+   * Cancelling an edit means we must show the
+   * "create group" button again.
+   */
+  editCancelled: function(group) {
+    this.enableButton();
   }
 });
 
@@ -137,7 +150,7 @@ GroupListing.fromElement = function (element) {
     listing.removeNoGroupNotice();
     groups.each(function(){
       var group = listing.createGroupFromElement(this);
-      group.owner = this;
+      group.owner = listing;
       newSection.find("ul").append(group.currentView.$el);
     });
   }
@@ -168,7 +181,6 @@ GroupListing.prototype = {
     this.render();
   },
 
-
   /**
    * Render this listing (delegated to current view)
    */
@@ -183,6 +195,7 @@ GroupListing.prototype = {
     var group;
     if(name && id && url && badges) { group = new Group(name, id, url, badges); }
     else { group = new Group(); }
+    group.owner = this;
     this.model.addGroup(group);
     return group;
   },
@@ -192,6 +205,7 @@ GroupListing.prototype = {
    */
   createGroupFromElement: function(element) {
     var group = Group.fromElement(element);
+    group.owner = this;
     this.model.addGroup(group);    
     return group;
   },
@@ -201,6 +215,33 @@ GroupListing.prototype = {
    */
   removeNoGroupNotice: function() {
     this.currentView.removeNoGroupNotice();
+  },
+
+  /**
+   * Ensure we only have one group open for editing:
+   * administrative variable.
+   */
+  currentlyEditing: null,
+
+  /**
+   * Ensure we only have one group open for editing:
+   * when a group notifies us that it has changed
+   * to edit view, and another group's already in
+   * edit view, change the already open group to
+   * normal listing view again.
+   */
+  setEditGroup: function(group) {
+    if (this.currentlyEditing !== null) {
+      this.currentlyEditing.asEntry();
+    }
+    this.currentlyEditing = group;
+  },
+
+  /**
+   * Delegate to view
+   */
+  editCancelled: function(group) {
+    this.currentView.editCancelled();
   }
 };
 

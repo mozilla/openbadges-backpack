@@ -124,7 +124,7 @@ GroupEntryView = Backbone.View.extend({
    */
   render: function() {
     var values = this.model.toGroupAttributes(),
-        html = env.render('GroupView.html', values);
+        html = env.render('Backpack.Group.View.html', values);
     this.setElement($(html));
     this.setupUX();
     return this;
@@ -160,7 +160,7 @@ GroupEditableEntryView = Backbone.View.extend({
    */
   render: function() {
     var values = this.model.toGroupAttributes(),
-        html = env.render('GroupEditableView.html', values);
+        html = env.render('BAckpack.Group.EditableView.html', values);
     this.setElement($(html));
     this.setupUX();
     return this;
@@ -388,6 +388,9 @@ Group.fromElement = function (element) {
  */
 Group.prototype = {
 
+  // owning GroupListing object
+  owner: null,
+
   // local model and views (filled by constructor)
   model: null,
   views: null,
@@ -443,6 +446,9 @@ Group.prototype = {
    * Switch to editable entry view for this Group
    */
   asEditableEntry: function() {
+    if (this.owner !== null) {
+      this.owner.setEditGroup(this);
+    }
     return this.replaceView(this.views.editableEntry);
   },
 
@@ -486,7 +492,10 @@ Group.prototype = {
       this.destroy();
     } else {
       this.asEntry();
-    }      
+    }
+    if (this.owner !== null) {
+      this.owner.editCancelled(this);
+    }
   },
 
   /**
