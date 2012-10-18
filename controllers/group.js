@@ -1,8 +1,9 @@
-var _ = require('underscore');
+var _ = require('lodash');
 var Group = require('../models/group.js');
 var Portfolio = require('../models/portfolio.js');
 var Badge = require('../models/badge.js');
 var logger = require('../lib/logging').logger;
+var reverse = require('../lib/router').reverse;
 
 function makeBadgeObj(attr) { return new Badge(attr) }
 
@@ -138,6 +139,10 @@ exports.destroy = function (request, response) {
       status: 'forbidden',
       error: 'you cannot modify a group you do not own'
     }, 403);
+
+  if(request.headers['accept'] && _(request.headers['accept']).contains('text/html')) {   
+    return response.redirect(reverse('backpack.login'), 303);
+  }
 
   // find any profile associated with this group and delete it
   Portfolio.findOne({group_id: group.get('id')}, function (err, folio) {

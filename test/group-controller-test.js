@@ -11,6 +11,10 @@ var User = require('../models/user.js')
 var Badge = require('../models/badge.js')
 var Group = require('../models/group.js')
 var Portfolio = require('../models/portfolio.js')
+var app = require('../app.js');
+var utils = require('./utils')
+  , request = utils.conn.request
+  , response = utils.conn.response;
 
 var user, otherUser, badge, group, otherGroup, portfolio;
 function setupDatabase (callback) {
@@ -144,6 +148,16 @@ vows.describe('group controller test').addBatch({
       'succeeds with a 200' : function (err, mock) {
         mock.status.should.equal(200);
       },
+    },
+    '#destroy: request for text/html': {
+      'topic': function() {
+        var req = { group: group, user: user, headers: { accept: ['text/html'] } };
+        groupcontroller.destroy(req, response(req, this.callback));
+      },
+      'get back status 303' : function(err, path, status) {
+        status.should.equal(303);
+        path.should.equal('/backpack/login');
+      }
     },
     '#update' : {
       'when missing user' : {
