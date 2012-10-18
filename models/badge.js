@@ -62,6 +62,23 @@ Badge.prototype.checkHash = function checkHash() {
   return sha256(JSON.stringify(this.get('body'))) === this.get('body_hash');
 };
 
+Badge.prototype.privacy = function privacy(value, callback) {
+  if("boolean" !== typeof value) {
+    return callback(new Error("value is not boolean"), null);
+  }
+  var self = this;
+  var attributes = this.attributes;
+  var table = this.getTableName();
+  var querySQL = 'UPDATE `' + table + '` SET `public` = ? WHERE `id` = ? LIMIT 1';
+
+  callback = callback || function () {};
+
+  mysql.client.query(querySQL, [value, attributes.id], function (err, resp) {
+    if (err) { return callback(err); }
+    return callback(null, self);
+  });
+};
+
 // Validators called by `save()` (see mysql-base) in preparation for saving.
 // A valid pass returns nothing (or a falsy value); an invalid pass returns a
 // message about why a thing was invalid.

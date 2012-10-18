@@ -37,7 +37,7 @@ function setupDatabase (callback) {
         criteria: '/ohsup.html'
       })
     });
-    
+
     badgeHash = new Badge({
       user_id: 1,
       type: 'hosted',
@@ -117,10 +117,113 @@ vows.describe('badge controller test').addBatch({
         badgecontroller.destroy(req, response(req, this.callback));
       },
       'get back status 303' : function(err, path, status) {
-        console.warn(err, path, status);
         status.should.equal(303);
         path.should.equal('/backpack/login');
       }
-    }
+    },
+  }
+}).addBatch({
+  'setup' : {
+    topic: function () {
+      setupDatabase(this.callback);
+    },
+    '#privacy: given no user ': {
+      'topic' : function () {
+        var req = { badge: badgeRaw, value: false };
+        conmock(badgecontroller.privacy, req, this.callback);
+      },
+      'get back status 403' : function (err, mock) {
+        mock.status.should.equal(403);
+        mock.body.status = 'forbidden';
+      },
+    },
+    '#privacy: given wrong user ': {
+      'topic' : function () {
+        var req = { user: otherUser, badge: badgeRaw, value: false };
+        conmock(badgecontroller.privacy, req, this.callback);
+      },
+      'get back status 403' : function (err, mock) {
+        mock.status.should.equal(403);
+        mock.body.status = 'forbidden';
+      },
+    },
+    '#privacy: given no badge': {
+      'topic' : function () {
+        var req = { user: user, value: false };
+        conmock(badgecontroller.privacy, req, this.callback);
+      },
+      'get back status 404' : function (err, mock) {
+        mock.status.should.equal(404);
+        mock.body.status = 'missing';
+      },
+    },
+    '#privacy: given correct user and a raw email badge with privacy false': {
+      'topic' : function () {
+        var req = { user: user, badge: badgeRaw, value: false };
+        conmock(badgecontroller.privacy, req, this.callback);
+      },
+      'get back status 200' : function (err, mock) {
+        mock.status.should.equal(200);
+        mock.body.status = 'okay';
+      },
+    },
+    '#privacy: given correct user and a raw email badge with privacy true': {
+      'topic' : function () {
+        var req = { user: user, badge: badgeRaw, value: true };
+        conmock(badgecontroller.privacy, req, this.callback);
+      },
+      'get back status 200' : function (err, mock) {
+        mock.status.should.equal(200);
+        mock.body.status = 'okay';
+      },
+    },
+    '#privacy: given correct user and a raw email badge with non-boolean privacy': {
+      'topic' : function () {
+        var req = { user: user, badge: badgeRaw, value: "18x" };
+        conmock(badgecontroller.privacy, req, this.callback);
+      },
+      'get back status 500' : function (err, mock) {
+        mock.status.should.equal(500);
+      },
+    },
+    '#privacy: given correct user and a hashed email badge with privacy false': {
+      'topic' : function () {
+        var req = { user: user, badge: badgeHash, value: false };
+        conmock(badgecontroller.privacy, req, this.callback);
+      },
+      'get back status 200' : function (err, mock) {
+        mock.status.should.equal(200);
+        mock.body.status = 'okay';
+      },
+    },
+    '#privacy: given correct user and a hashed email badge with privacy true': {
+      'topic' : function () {
+        var req = { user: user, badge: badgeHash, value: true };
+        conmock(badgecontroller.privacy, req, this.callback);
+      },
+      'get back status 200' : function (err, mock) {
+        mock.status.should.equal(200);
+        mock.body.status = 'okay';
+      },
+    },
+    '#privacy: given correct user and a hashed email badge with non-boolean privacy': {
+      'topic' : function () {
+        var req = { user: user, badge: badgeHash, value: 1 };
+        conmock(badgecontroller.privacy, req, this.callback);
+      },
+      'get back status 500' : function (err, mock) {
+        mock.status.should.equal(500);
+      },
+    },
+    '#privacy: request for text/html': {
+      'topic': function() {
+        var req = { user: user, badge: badgeHash, headers: { accept: ['text/html'] }, value: false };
+        badgecontroller.privacy(req, response(req, this.callback));
+      },
+      'get back status 303' : function(err, path, status) {
+        status.should.equal(303);
+        path.should.equal('/backpack/login');
+      }
+    },
   }
 }).export(module);
