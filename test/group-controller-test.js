@@ -235,6 +235,16 @@ vows.describe('group controller test').addBatch({
             group.get('description').should.equal('group description!');
           },
         },
+        'and a `notes` field': {
+          topic: function() {
+            var req = { user: user, group: group, body: { 'notes': 'group notes!' } };
+            conmock(groupcontroller.update, req, this.callback)
+          },
+          'respond with 200, update the description field' : function (err, mock) {
+            mock.status.should.equal(200)
+            group.get('notes').should.equal('group notes!');
+          },
+        },
         'and a `public` field' : {
           topic : function () {
             group.set('public', false)

@@ -107,6 +107,10 @@ exports.update = function (request, response) {
     group.set('description', body['description']);
   }
 
+  if(null === body['notes'] || "string" === typeof body['notes']) {
+    group.set('notes', body['notes']);
+  }
+
   group.save(function (err) {
     if (err) {
       logger.debug('there was an error updating a group:');
