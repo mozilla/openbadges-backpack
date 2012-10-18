@@ -159,6 +159,23 @@ vows.describe('group controller test').addBatch({
         path.should.equal('/backpack/login');
       }
     },
+  }
+}).addBatch({
+  'setup' : {
+    topic: function () {
+      setupDatabase(this.callback);
+    },
+    '#create: given a user and correct input': {
+      topic : function () {
+        var req = { user: user, body: {name: 'awesometown', badges: []} }
+        conmock(groupcontroller.create, req, this.callback);
+      },
+      'creates a new group and returns id and url': function (err, mock) {
+        mock.body.id.should.equal(3);
+        should.exist(mock.body.url);
+        mock.body.url.length.should.be.greaterThan(10);
+      }
+    },
     '#update' : {
       'when missing user' : {
         topic : function () {
@@ -206,6 +223,16 @@ vows.describe('group controller test').addBatch({
           'respond with 200, update the name' : function (err, mock) {
             mock.status.should.equal(200)
             group.get('name').should.equal('huh')
+          },
+        },
+        'and a `description` field': {
+          topic: function() {
+            var req = { user: user, group: group, body: { 'description': 'group description!' } };
+            conmock(groupcontroller.update, req, this.callback)
+          },
+          'respond with 200, update the description field' : function (err, mock) {
+            mock.status.should.equal(200)
+            group.get('description').should.equal('group description!');
           },
         },
         'and a `public` field' : {

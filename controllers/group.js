@@ -103,6 +103,10 @@ exports.update = function (request, response) {
     group.set('badges', body.badges.map(makeBadgeObj));
   }
 
+  if(null === body['description'] || "string" === typeof body['description']) {
+    group.set('description', body['description']);
+  }
+
   group.save(function (err) {
     if (err) {
       logger.debug('there was an error updating a group:');
