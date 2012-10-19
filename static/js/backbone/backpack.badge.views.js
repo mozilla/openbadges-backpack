@@ -30,6 +30,6 @@ BadgeView = Backbone.View.extend({
    * tied to a specific controller for the logic.
    */
   setupUX: function() {
-    // code goes here
+    /** no UX **/
   }
 });

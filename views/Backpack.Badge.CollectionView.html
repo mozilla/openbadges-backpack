@@ -1,7 +1,16 @@
 <div class="collection">
-{% for badge in badges %}
-  {% include "views/Backpack.Badge.View.html" %}
-{% endfor %}
+  <div class="set" data-id="1">
+  {% for badge in badges %}
+    {% include "views/Backpack.Badge.View.html" %}
+  {% endfor %}
+  </div>
+  
+  <!-- pagination controls -->
+  <div class="pages" style="display:none" data-set-size="8">
+    <button class="boxed page previous">&lt;</button>
+    <button class="boxed page" data-page="1">1</button>
+    <button class="boxed page next">&gt;</button>
+  </div>
 </div>
 
 <!-- Backbone definitions -->

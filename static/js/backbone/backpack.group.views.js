@@ -68,7 +68,7 @@ GroupEditableEntryView = Backbone.View.extend({
         $el = this.$el,
         controller = this.controller;
 
-    window.trigger("group-edit-start","");
+    window.trigger("group-edit-start", {group: controller});
 
     // cancel simply discards everything done so far
     $el.find(".cancel").click(function() {
@@ -82,7 +82,6 @@ GroupEditableEntryView = Backbone.View.extend({
     // and then converst the group's "new" template 
     // to a normal group listing entry, instead.
     $el.find(".save").click(function() {
-      console.log("save pressed");
       // make sure we have a group title.
       var input = $el.find(".groupName");
       if(input.val().trim() === "") {

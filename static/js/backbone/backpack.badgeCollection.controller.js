@@ -18,7 +18,7 @@ BadgeCollection.fromElement = function (element) {
   var badges = element.find(".badge");
 
   // replace the collection with the backbone'd collection
-  var $newEl = collection.render().$el;
+  var $newEl = collection.currentView.$el;
   $el.replaceWith($newEl);
 
   // if more than 0 badges, create badges inside
@@ -29,6 +29,7 @@ BadgeCollection.fromElement = function (element) {
       collection.addBadge(badge);
     });
   }
+  collection.currentView.selectSet(1);
 
   // done
   return collection;

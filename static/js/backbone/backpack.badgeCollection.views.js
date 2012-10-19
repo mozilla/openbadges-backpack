@@ -6,6 +6,9 @@ _.extend(window, Backbone.Events);
  */
 BadgeCollectionView = Backbone.View.extend({
   parent: $('.collection'),
+  currentSet: null,
+  currentSetId: -1,
+  setSize: 9999,
 
   /**
    * Render this view to the page
@@ -23,15 +26,87 @@ BadgeCollectionView = Backbone.View.extend({
    * tied to a specific controller for the logic.
    */
   setupUX: function() {
-    /** there is no special UX for this view **/
+    window.on("group-edit-start", (function(controller) {
+      return function(evt) {
+        controller.addBadgePickers(evt.group);
+      };
+    }(this.controller)));
+
+    window.on("group-edit-end", (function(controller) {
+      return function(evt) {
+        controller.removeBadgePickers();
+      };
+    }(this.controller)));
+    
+    this.setSize = parseInt(this.$el.find(".pages").data("set-size"));
+    this.currentSet = this.$el.find(".set").last();
+    this.currentSetId = parseInt(this.currentSet.data("id"));
+    
+    var view = this;
+    this.$el.find(".next").click(function() { view.nextSet();     });
+    this.$el.find(".previous").click(function() { view.previousSet(); });
+    this.$el.find(".boxed[data-page=1]").click(function() { view.selectSet(1); });
   },
   
   /**
    * Add a badge to this view
    */
   addBadgeElement: function(element) {
-    this.$el.append(element);
+    var set = this.currentSet;
+    if(set.find(".badge").length >= this.setSize) {
+      set.hide();
+      this.newSet(set);
+    }
+    this.currentSet.append(element);
   },
+  
+  /**
+   * Set up a new set
+   */
+  newSet: function(oldSet) {
+    var pages = this.$el.find(".pages");
+    pages.show();
+
+    var newId = this.currentSetId + 1;
+    var newSet = $('<div class="set" data-id="'+newId+'"></div>');
+    this.currentSetId = newId;
+    this.currentSet = newSet;
+    this.el.insertBefore(this.currentSet[0], pages[0]);
+    
+    var view = this;
+    var pagebutton = $('<button class="boxed page highlight" data-page="'+newId+'">'+newId+'</button>');
+    pagebutton.click(function() { view.selectSet(newId); });
+    var next = pages.find(".next");
+    pages[0].insertBefore(pagebutton[0], next[0]);
+  },
+  
+  /**
+   * Show set no. ...
+   */
+  selectSet: function(id) {
+    var button = this.$el.find(".pages .boxed[data-page="+this.currentSetId+"]");
+    button.removeClass("highlight");
+    this.currentSet.hide();
+
+    this.currentSet = this.$el.find(".set[data-id="+id+"]");
+    this.currentSet.show();
+    this.currentSetId = id;
+    button = this.$el.find(".pages .boxed[data-page="+this.currentSetId+"]");
+    button.addClass("highlight");
+  },
+  
+  nextSet: function() {
+    var sets = this.$el.find(".set");
+    if(this.currentSetId >= sets.length) return;
+    this.selectSet(this.currentSetId + 1);
+  },
+
+  previousSet: function() {
+    if(this.currentSetId === 1) return;
+    this.selectSet(this.currentSetId - 1);
+  },
+
+  // ------
 
   badgePickersPresent: false,
 
