@@ -1,0 +1,17 @@
+<div class="collection">
+{% for badge in badges %}
+  {% include "views/Backpack.Badge.View.html" %}
+{% endfor %}
+</div>
+
+<!-- Backbone definitions -->
+<div class="scripts" style="display:none">
+  <!-- badges -->
+  <script src="js/backbone/backpack.badge.model.js"></script>
+  <script src="js/backbone/backpack.badge.views.js"></script>
+  <script src="js/backbone/backpack.badge.controller.js"></script>
+  <!-- badge collection -->
+  <script src="js/backbone/backpack.badgeCollection.model.js"></script>
+  <script src="js/backbone/backpack.badgeCollection.views.js"></script>
+  <script src="js/backbone/backpack.badgeCollection.controller.js"></script>
+</div>

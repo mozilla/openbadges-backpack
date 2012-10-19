@@ -1,115 +1,59 @@
 {% extends "layout.html" %}
 {% block body %}
+<!-- script loads (must go before template includes -->
+
+<!-- we can't save without this -->
+<input type="hidden" name="_csrf" value="{{ csrfToken }}"></input>
+<script src="js/backbone/CSRF.js"></script>
+
+
+<!-- nunjucks templating -->
+<script src="js/nunjucks-dev.js"></script>
+<!-- NOTE: for dev only. For deployment, this needs to use the -min.js version, with the templates compiled to file -->
+<script> if(!nunjucks.env) {
+  nunjucks.env = new nunjucks.Environment(new nunjucks.HttpLoader('/views'));
+}; var env = nunjucks.env; </script>
+
+
+<!-- Backbone definitions -->
+<script src="js/underscore.js"></script>
+<script src="js/backbone.js"></script>
+<script src="js/paginator.js"></script>
+
+
+<!-- stylesheet -->
 <link rel="stylesheet" href="css/backpack.css">
 
+
+<!-- HTML content -->
 <div class="row backpack">
-  <input type="hidden" name="_csrf" value="{{ csrfToken }}"></input>
 
+  <!-- badge column -->
   <div class="span8 column badges">
-
     <header>
       <div class="title">Badges</div>
       {% if badges.length < 16 %}
       <div class="addendum">Looking a bit bare? <a href="badges!">Earn more badges!</a></div>
       {% endif %}
     </header>
-
-    <div class="collection">
-      {% for badge in badges %}
-        {% include "views/Backpack.Badge.View.html" %}
-      {% endfor %}
-    </div>
-
+    <!-- badge collection area -->
+    {% include "views/Backpack.Badge.CollectionView.html" %}
     <div class="footer">
-     <p>badge footer. With toes (also, an <span class="btn">upload</span> button)</p>
+     <!-- empty for now -->
     </div>
   </div>
 
+  <!-- groups column -->
   <div class="span4 column groups">
-     {% include "views/Backpack.Group.ListingView.html" %}
+    <!-- group listing area -->
+    {% include "views/Backpack.Group.ListingView.html" %}
   </div>
+
 </div>
 
 
-
-<!--
-  NOTE: for dev only. For deployment, this needs to use the -min.js
-        version, with the templates compiled to file
--->
-<div style="display: none;" id="scriptLoads">
-  <script src="js/nunjucks-dev.js"></script>
-
-  <script>
-    // Nunjucks environment variable
-    if(!nunjucks.env) { nunjucks.env = new nunjucks.Environment(new nunjucks.HttpLoader('/views')); }
-    var env = nunjucks.env;
-  </script>
-
-  <script src="js/underscore.js"></script>
-  <script src="js/backbone.js"></script>
-
-  <!-- backbone group and group listing MVC code -->
-  <script src="js/backbone/CSRF.js"></script>
-  <script src="js/backbone/group.js"></script>
-  <script src="js/backbone/groupListing.js"></script>
-  <script>
-    // FIXME: THIS CODE MAY NEED RELOCATION, OR AT LEAST NAMESPACING
-    var badgePickersPresent = false;
-
-    /**
-     * Add checkboxes to each badge, for adding badges
-     * to specific group badge areas. 
-     */
-    var addBadgePickers = function(view, badgeArea) {
-      if (badgePickersPresent) {
-        return;
-      }
-      
-      badgePickersPresent = true;
-      $(".badge").each(function(){
-        var created = $("<div class='actions'>"
-                     + "  <button class='btn addToGroup' data-id='"+$(this).attr("data-id")+"'>Add to Group</button>"
-                     + "</div>");
-        $("button",created).click(function(){
-          // add to the new group
-          var dataId = $(this).attr("data-id");
-          // check whether we already have this badge
-          if(view.isBadgeInArea(dataId)) {
-            return;
-          }
-          var badgeSelector = ".badges .badge[data-id="+dataId+"]",
-              badge = $(badgeSelector);
-          badge.popover('hide');
-          badge = badge.clone();
-          $(".actions",badge).remove();
-          view.addToBadgeArea(badgeArea, badge);
-          view.controller.addBadge(dataId);
-        });
-        $(this).append(created);
-      });
-    };
-
-    /**
-     * Remove the badge checkboxes
-     */
-    var removeBadgePickers = function() {
-      $(".badge").each(function(){
-        $(".actions",this).remove();
-      });
-      badgePickersPresent = false;
-    };
-    
-    /**
-     * Set up the page UX, by letting the backbone group listing
-     * implementation take over from the static page content.
-     */
-    (function() {
-      function setupUX() {
-        document.removeEventListener("DOMContentLoaded", setupUX, false);
-        var listing = GroupListing.fromElement($(".groups")); };
-      document.addEventListener("DOMContentLoaded", setupUX, false);
-    }());
-  </script>
+<!-- temporary script include - should be refactored out of existence -->
+<div style="display: none;" class="scripts">
   <script src="js/backpack.js"></script>
 </div>
 {% endblock %}
