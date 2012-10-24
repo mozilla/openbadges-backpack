@@ -138,9 +138,6 @@ vows.describe('Badge model').addBatch({
     topic: function () {
       mysql.prepareTesting(createDbFixtures.bind(undefined, this.callback));
     },
-    'complete': function() {
-    },
-
     'Finding badges': {
       'by user id': {
         topic: function () {
