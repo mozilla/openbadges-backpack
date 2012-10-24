@@ -63,7 +63,7 @@ vows.describe('basic login controller test').addBatch({
         backpack.login(req, response(req, this.callback))
       },
       'tries to render login page and passes csrf' : function (conn, render, opts) {
-        render.should.equal('login');
+        render.should.equal('login.html');
         opts.csrfToken.should.equal('default-csrf');
       },
     },
@@ -72,7 +72,7 @@ vows.describe('basic login controller test').addBatch({
         var req = request();
         backpack.signout(req, response(req, this.callback))
       },
-      'deletes session and redirects to login with 303' : function (conn, path, status) {
+      'deletes session and redirects to login with 303' : function (conn, status, path) {
        path.should.equal('/backpack/login');
        status.should.equal(303);
        _.keys(conn.request.session).length.should.equal(0);
@@ -84,7 +84,7 @@ vows.describe('basic login controller test').addBatch({
         backpack.manage(req, response(req, this.callback))
       },
       'should pull badges and groups, render `backpack`' : function (conn, render, opts) {
-        render.should.equal('backpack');
+        render.should.equal('backpack.html');
         opts.badges.should.have.lengthOf(1);
         opts.badges[0].serializedAttributes.should.match(/"recipient":"brian@example.com"/)
         opts.groups.should.have.lengthOf(1);

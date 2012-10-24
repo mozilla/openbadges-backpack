@@ -46,7 +46,9 @@ module.exports = {
       var url = this.url(path);
       return this.expect(303)
         .expect('redirects to ' + path, function(err, res) {
-          assert.equal(res.headers['location'], url);
+          /* FIXME: include instead of equals seems janky, but 
+             Express 3 doesn't include protocol in location header */
+          assert.include(url, res.headers['location']);
         });
     };
     suite._requestFormData = function(method, data) {

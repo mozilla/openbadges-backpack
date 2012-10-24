@@ -1,4 +1,5 @@
 var vows = require('vows')
+  , app = require('../app.js')
   , assert = require('assert')
   , should = require('should')
   , issuer = require('../controllers/issuer.js')
@@ -43,7 +44,7 @@ vows.describe('issuer controller test').addBatch({
           },
           'renders validator html without options' : function (err, mock) {
             mock.fntype.should.equal('render');
-            mock.path.should.equal('validator');
+            mock.path.should.equal('validator.html');
           },
         },
         'and "Accept: text/html"' : {
@@ -53,7 +54,7 @@ vows.describe('issuer controller test').addBatch({
           },
           'renders validator html without options' : function (err, mock) {
             mock.fntype.should.equal('render');
-            mock.path.should.equal('validator');
+            mock.path.should.equal('validator.html');
           },
         },
         'and "Accept: text/plain"' : {
@@ -99,7 +100,7 @@ vows.describe('issuer controller test').addBatch({
           },
           'renders validator html with some options' : function (err, mock) {
             mock.fntype.should.equal('render');
-            mock.path.should.equal('validator');
+            mock.path.should.equal('validator.html');
             var errors = _.pluck(mock.options.errors, 'field');
             assert.include(errors, 'recipient');
             assert.include(errors, 'badge.version');
@@ -142,5 +143,104 @@ vows.describe('issuer controller test').addBatch({
         },
       },
     },
+    '#welcome': {
+      'with no user logged in': {
+        topic: function () {
+          var req = request();
+          issuer.welcome(req, response(req, this.callback))
+        },
+        'redirects to login': function (conn, status, path) {
+          path.should.equal('/backpack/login');
+          status.should.equal(303);
+        }
+      },
+      'with logged in user': {
+        topic: function () {
+          setupDatabase(this.callback);
+        },
+        'that has no badges yet': {
+          topic: function () {
+            var req = request({ user: newUser });
+            issuer.welcome(req, response(req, this.callback))
+          },
+          'renders new user welcome': function (conn, render, opts) {
+            render.should.equal('issuer-welcome.html');
+          }
+        },
+        'that has badges already': {
+          topic: function () {
+            var req = request({ user: oldUser });
+            issuer.welcome(req, response(req, this.callback))
+          },
+          'redirects to backpack': function (conn, status, path) {
+            path.should.equal('/');
+            status.should.equal(303);
+          }
+        },
+      }
+    },
+    '#frame': {
+      topic: function () {
+        conmock(issuer.frame, {}, this.callback);
+      },
+      'renders issuer frame with framed option' : function (err, mock) {
+        mock.fntype.should.equal('render');
+        mock.path.should.equal('badge-accept.html');
+        mock.options.framed.should.be.true;
+      },
+    },
+    '#frameless': {
+      'without assertions': {
+        topic: function () {
+          var req = { body: { assertions: [] } };
+          conmock(issuer.frameless, req, this.callback);
+        },
+        'renders issuer frame with unframed option' : function (err, mock) {
+          mock.fntype.should.equal('render');
+          mock.path.should.equal('badge-accept.html');
+          mock.options.framed.should.not.be.true;
+          mock.options.assertions.should.equal('[]');
+        },
+      },
+      'with one good assertion': {
+        topic: function () {
+          var req = { body: { assertions: 'http://something.com/good' } };
+          conmock(issuer.frameless, req, this.callback);
+        },
+        'renders issuer frame with unframed option' : function (err, mock) {
+          mock.fntype.should.equal('render');
+          mock.path.should.equal('badge-accept.html');
+          mock.options.framed.should.not.be.true;
+        },
+        'assertion is stringified in assertions option': function (err, mock) {
+          mock.options.assertions.should.equal('["http://something.com/good"]');
+        },
+      },
+      'with many good assertions': {
+        topic: function () {
+          var req = { body: { assertions: ['http://something.com/good/1', 'http://something.com/good/2'] } };
+          conmock(issuer.frameless, req, this.callback);
+        },
+        'renders issuer frame with unframed option' : function (err, mock) {
+          mock.fntype.should.equal('render');
+          mock.path.should.equal('badge-accept.html');
+          mock.options.framed.should.not.be.true;
+        },
+        'assertions are stringified in assertions option': function (err, mock) {
+          mock.options.assertions.should.equal('["http://something.com/good/1","http://something.com/good/2"]');
+        },
+      },
+      'with bad assertion': {
+        topic: function () {
+          var req = { body: { assertions: ['bad!', 'http://something.com/good/2'] } };
+          conmock(issuer.frameless, req, this.callback);
+        },
+        'sends back 400 error' : function (err, mock) {
+          mock.fntype.should.equal('send');
+          mock.status.should.equal(400);
+          mock.body.should.equal('malformed url');
+        },
+      }
+    }
   },
 }).export(module)

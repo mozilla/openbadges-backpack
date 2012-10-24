@@ -1,0 +1,91 @@
+{% extends "layout.html" %}
+{% block body %}
+
+{% if owner %}
+{% if not editing %}
+<div class="row">
+  <div class="span12 alert alert-success preview">
+    <p>
+      This is how your badge will look to the public.
+      {{id}}
+      <a href="{{ reverse('badge.edit', { badgeId: attributes.id }) }} ">Return to editing mode.</a>
+    </p>
+  </div>
+</div>
+{% endif %}
+{% endif %}
+
+<div class="row st">
+
+  <!-- left column -->
+  <div class="span8 column">
+
+    <div class="badgeInfo">
+      <header>
+        <img class="badgeImg" src="{{ attributes.image_path }}"
+          alt="Image for {{ badge.name }}" />
+        <div class="description">
+          <h1>{{ badge.name }}</h1>
+          <p>{{ badge.description }}</p>
+        </div>
+      </header>
+      <div class="details panel">
+        <table>
+          <thead><tr><th colspan="2" >Issuer Details</th></tr></thead>
+          <tbody>
+            <tr><td>Name</td><td>{{ issuer.name }}</td></tr>
+            <tr><td>URL</td><td><a href="#">{{ issuer.origin }}</a></td></tr>
+            {% if issuer.org %}
+              <tr><td>Organization</td><td>{{ issuer.org }}</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+        <table>
+          <thead><tr><th colspan="2" >Badge Details</th></tr></thead>
+          <tbody>
+            <tr><td>Criteria</td><td><a href="#">{{ badge.criteria }}</a></td></tr>
+            {% if assertion.evidence %}
+              <tr><td>Evidence</td><td><a href="#">{{ assertion.evidence }}</a></td></tr>
+            {% endif %}
+            {% if assertion.issued_on %}
+              <tr><td>Issued on</td><td><a href="#">{{ assertion.issued_on }}</a></td></tr>
+            {% endif %}
+            {% if assertion.expires %}
+              <tr><td>Expires on</td><td><a href="#">{{ assertion.expires }}</a></td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    {% if editing %}
+    <div class="row st">
+
+      <div class="span4">
+        <h2>Badge Notes</h2>
+        <textarea class="panel span4" rows="6"
+          placeholder="Enter your own notes for this badge"></textarea>
+        <button class="btn">Save Notes</button>
+      </div>
+
+      <div class="span4 et">
+        <button class="btn">Disown This Badge</button>
+        <a href="#">What is this?</a>
+      </div>
+
+    </div>
+    {% endif %}
+
+  </div>
+  <!-- end left column -->
+
+  <!-- right column -->
+  {% if editing %}
+  <div class="span4 column">
+    Right.
+  </div>
+  {% endif %}
+  <!-- end right column -->
+
+</div>
+{% endblock %}

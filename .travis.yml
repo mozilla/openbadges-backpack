@@ -18,4 +18,4 @@ before_script:
 script:
   - npm test
   - phantomjs static/test/phantom-qunit.js http://localhost:8888/test/
-  - phantomjs static/test/phantom-qunit.js http://localhost:8888/test/issuer-frame/
+  - phantomjs static/test/phantom-qunit.js http://localhost:8888/test/badge-accept/

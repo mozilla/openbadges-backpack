@@ -1,4 +1,6 @@
-<form action="{{#reverse}}demo.award{{/reverse}}" method="post">
+{% extends "layout.html" %}
+{% block body %}
+<form action="{{ reverse('demo.award') }}" method="post">
   <input type="hidden" name="_csrf" value="{{ csrfToken }}">
   <fieldset>
     <div class="clearfix">
@@ -20,4 +22,4 @@
     </div>
     
   </fieldset>
-
+{% endblock %}

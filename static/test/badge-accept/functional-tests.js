@@ -181,7 +181,7 @@ asyncTest('Test', function(){
   var app = App(ASSERTION_URLS);
 
   app.on('badges-ready', function(failed, ready){
-    deepEqual(_.map(failed, function(badge){ return badge.assertionUrl; }), 
+    deepEqual(_.map(failed, function(badge){ return badge.assertionUrl; }),
       [
         'http://foo.org/nonexistent.json',
         'http://bar.org/oldbadge.json',
@@ -219,7 +219,7 @@ asyncTest('Test', function(){
 
   app.on('badges-complete', function(failed, successes, total){
     equal(total, ASSERTION_URLS.length, 'all badges complete');
-    deepEqual(_.map(failed, function(badge){ return badge.assertionUrl; }), 
+    deepEqual(_.map(failed, function(badge){ return badge.assertionUrl; }),
       [
         'http://foo.org/nonexistent.json',
         'http://bar.org/oldbadge.json',
@@ -227,7 +227,7 @@ asyncTest('Test', function(){
         'http://foo.org/explodeonissue.json'
       ], 'expected failures'
     );
-    deepEqual(_.map(successes, function(badge){ return badge.assertionUrl; }), 
+    deepEqual(_.map(successes, function(badge){ return badge.assertionUrl; }),
       [
         'http://foo.org/newbadge.json',
         'http://foo.org/another_newbadge.json'

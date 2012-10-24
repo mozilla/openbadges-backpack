@@ -20,7 +20,7 @@ var Group = require('../models/group');
 exports.login = function login(request, response) {
   // request.flash returns an array. Pass on the whole thing to the view and
   // decide there if we want to display all of them or just the first one.
-  response.render('login', {
+  response.render('login.html', {
     error: request.flash('error'),
     csrfToken: request.session._csrf
   });
@@ -45,7 +45,7 @@ exports.authenticate = function authenticate(request, response) {
     } else {
       if (humanReadableError)
         request.flash('error', humanReadableError);
-      return response.redirect(to, 303);
+      return response.redirect(303, to);
     }
   }
 
@@ -86,7 +86,7 @@ exports.authenticate = function authenticate(request, response) {
 
 exports.signout = function signout(request, response) {
   request.session = {};
-  response.redirect(reverse('backpack.login'), 303);
+  response.redirect(303, reverse('backpack.login'));
 };
 
 /**
@@ -113,7 +113,7 @@ exports.stats = function stats(request, response, next) {
   function startResponse(err, badges) {
     if (err) return next(err);
     var data = computeStats(badges);
-    response.render('stats', { stats: data });
+    response.render('stats.html', { stats: data });
   }
 
   function computeStats(badges) {
@@ -158,7 +158,7 @@ exports.manage = function manage(request, response, next) {
   var success = request.flash('success');
   var groups = [];
   var badgeIndex = {};
-  if (!user) return response.redirect(reverse('backpack.login'), 303);
+  if (!user) return response.redirect(303, reverse('backpack.login'));
 
   response.header('Cache-Control', 'no-cache, must-revalidate');
 
@@ -177,16 +177,6 @@ exports.manage = function manage(request, response, next) {
       badgeIndex[badge.get('id')] = badge;
       badge.serializedAttributes = JSON.stringify(badge.attributes);
     });
-  }
-
-  function getGroups() {
-    Group.find({user_id: user.get('id')}, getBadges);
-  }
-
-  function getBadges(err, results) {
-    if (err) return next(err);
-    groups = results;
-    Badge.find({email: user.get('email')}, makeResponse);
   }
 
   function modifyGroups(groups) {
@@ -214,18 +204,41 @@ exports.manage = function manage(request, response, next) {
     });
   }
 
+  /**
+   * Preprocess the badges, by calling prepareBadgeIndex,
+   * and the groups, by calling modifyGroups, then
+   * render the page's view with the massaged data.
+   */
   function makeResponse(err, badges) {
     if (err) return next(err);
     prepareBadgeIndex(badges);
     modifyGroups(groups);
-    response.render('backpack', {
+    debugger;
+    response.render('backpack.html', {
+      badges: badges,
+      groups: groups,
       error: error,
       success: success,
-      badges: badges,
-      csrfToken: request.session._csrf,
-      groups: groups,
-      tooltips: request.param('tooltips')
+      csrfToken: request.session._csrf
     });
+  }
+
+  /**
+   * Find all badges for a user, then call
+   * the above makeResponse function.
+   */
+  function getBadges(err, results) {
+    if (err) return next(err);
+    groups = results;
+    Badge.find({email: user.get('email')}, makeResponse);
+  }
+  
+  /**
+   * Find all groups for a user, then call
+   * the above getBadges function.
+   */
+  function getGroups() {
+    Group.find({user_id: user.get('id')}, getBadges);
   }
 
   var startResponse = getGroups;
@@ -255,11 +268,11 @@ exports.userBadgeUpload = function userBadgeUpload(request, response) {
       logger.debug(err);
       request.flash('error', err.message);
     }
-    return response.redirect(reverse('backpack.manage'), 303);
+    return response.redirect(303, reverse('backpack.manage'));
   }
 
   if (!user)
-    return response.redirect(reverse('backpack.login'), 303);
+    return response.redirect(303, reverse('backpack.login'));
 
   if (!tmpfile.size)
     return redirect(new Error('You must choose a badge to upload.'));
