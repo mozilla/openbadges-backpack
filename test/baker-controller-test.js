@@ -61,8 +61,6 @@ vows.describe('baker controller testing').addBatch({
     topic: function() {
       mysql.prepareTesting(this.callback);
     },
-    'complete': function() {
-    },
     'missing assertion url': {
       topic : function () {
         conmock(controller.baker, {}, this.callback);

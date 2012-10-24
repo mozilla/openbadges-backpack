@@ -14,8 +14,6 @@ vows.describe('Testing database').addBatch({
     topic: function() {
       mysql.prepareTesting(this.callback);
     },
-    'complete': function(err, results) {
-    },
     'proper database': {
       topic: function () {
         client.query('show databases', this.callback);

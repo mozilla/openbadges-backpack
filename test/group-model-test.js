@@ -37,8 +37,6 @@ vows.describe('Group Model').addBatch({
         createDbFixtures(callback);
       });      
     },
-    'complete': function() {      
-    },
     'A valid new group': {
       topic: createGroup(),
       'can be saved': {
