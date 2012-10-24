@@ -1,3 +1,4 @@
+// FIXME: disabled because the async test setup isn't working
 /*var loginUtils = require('./login-utils'),
     assert = require('assert'),
     validator = require('validator');

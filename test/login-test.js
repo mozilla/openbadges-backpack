@@ -1,3 +1,4 @@
+// FIXME: disabled because the async test setup isn't working
 /*
 var mysql = require('../lib/mysql');
 
