@@ -15,46 +15,46 @@ var Portfolio = require('../models/portfolio.js')
 var user, otherUser, badge, group, otherGroup, portfolio;
 function setupDatabase (callback) {
   var badgedata = require('../lib/utils').fixture({recipient: 'brian@example.com'})
-  mysql.prepareTesting();
   function saver (m, cb) { m.save(cb) };
-  
-  user = new User({ email: 'brian@example.com' })
-  
-  otherUser = new User({ email: 'lolwut@example.com' })
-  
-  badge = new Badge({
-    user_id: 1,
-    type: 'hosted',
-    endpoint: 'endpoint',
-    image_path: 'image_path',
-    body_hash: 'body_hash',
-    body: badgedata
+  mysql.prepareTesting(function() {
+    user = new User({ email: 'brian@example.com' })
+    
+    otherUser = new User({ email: 'lolwut@example.com' })
+    
+    badge = new Badge({
+      user_id: 1,
+      type: 'hosted',
+      endpoint: 'endpoint',
+      image_path: 'image_path',
+      body_hash: 'body_hash',
+      body: badgedata
+    });
+    
+    group = new Group({
+      user_id: 1,
+      name: 'name',
+      url: 'url',
+      'public': 0,
+      badges: [1]
+    });
+    
+    otherGroup = new Group({
+      user_id: 1,
+      name: 'name',
+      url: 'url2',
+      'public': 1,
+      badges: []
+    });
+    
+    portfolio = new Portfolio({
+      group_id: 2,
+      url: 'url',
+      title: 'wut',
+      stories: '{"1": "oh hey"}'
+    });
+    
+    map.async(saver, [user, otherUser, badge, group, otherGroup, portfolio], callback);
   });
-  
-  group = new Group({
-    user_id: 1,
-    name: 'name',
-    url: 'url',
-    'public': 0,
-    badges: [1]
-  });
-  
-  otherGroup = new Group({
-    user_id: 1,
-    name: 'name',
-    url: 'url2',
-    'public': 1,
-    badges: []
-  });
-  
-  portfolio = new Portfolio({
-    group_id: 2,
-    url: 'url',
-    title: 'wut',
-    stories: '{"1": "oh hey"}'
-  });
-  
-  map.async(saver, [user, otherUser, badge, group, otherGroup, portfolio], callback);
 }
 
 var groupcontroller = require('../controllers/group.js')

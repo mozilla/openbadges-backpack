@@ -15,20 +15,21 @@ var newUser, oldUser, badge;
 function setupDatabase (callback) {
   var User = require('../models/user.js');
   var Badge = require('../models/badge.js')
-  mysql.prepareTesting();
   function saver (m, cb) { m.save(cb) };
-  newUser = new User({ email: 'new@example.com' });
-  oldUser = new User({ email: 'old@example.com' });
-  var badgedata = require('../lib/utils').fixture({recipient: 'old@example.com'})
-  badge = new Badge({
-    user_id: 2,
-    type: 'hosted',
-    endpoint: 'endpoint',
-    image_path: 'image_path',
-    body_hash: 'body_hash',
-    body: badgedata
-  });
-  map.async(saver, [newUser, oldUser, badge], callback);
+  mysql.prepareTesting(function() {
+    newUser = new User({ email: 'new@example.com' });
+    oldUser = new User({ email: 'old@example.com' });
+    var badgedata = require('../lib/utils').fixture({recipient: 'old@example.com'})
+    badge = new Badge({
+      user_id: 2,
+      type: 'hosted',
+      endpoint: 'endpoint',
+      image_path: 'image_path',
+      body_hash: 'body_hash',
+      body: badgedata
+    });
+    map.async(saver, [newUser, oldUser, badge], callback);
+  });  
 }
 
 vows.describe('issuer controller test').addBatch({

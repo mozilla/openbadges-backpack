@@ -20,34 +20,35 @@ function setupDatabase (callback) {
   var Badge = require('../models/badge.js')
   var Group = require('../models/group.js')
   var fixture = require('../lib/utils').fixture;
-  mysql.prepareTesting();
   function saver (m, cb) { m.save(cb) };
-  user = new User({ email: 'brian@example.com' });
-  anotherUser = new User({ email: 'someoneelse@example.com' });
-  badge = new Badge({
-    user_id: 1,
-    type: 'hosted',
-    endpoint: 'endpoint',
-    image_path: 'image_path',
-    body_hash: 'body_hash',
-    body: fixture({recipient: 'brian@example.com'})
+  mysql.prepareTesting(function() {
+    user = new User({ email: 'brian@example.com' });
+    anotherUser = new User({ email: 'someoneelse@example.com' });
+    badge = new Badge({
+      user_id: 1,
+      type: 'hosted',
+      endpoint: 'endpoint',
+      image_path: 'image_path',
+      body_hash: 'body_hash',
+      body: fixture({recipient: 'brian@example.com'})
+    });
+    hashedBadge = new Badge({
+      user_id: 2,
+      type: 'hosted',
+      endpoint: 'endpoint',
+      image_path: 'image_path',
+      body_hash: 'body_hash',
+      body: fixture({recipient: makeHash('brian@example.com', 'hashbrowns')})
+    });
+    group = new Group({
+      user_id: 1,
+      name: 'name',
+      url: 'url',
+      'public': 1,
+      badges: [1]
+    });
+    map.async(saver, [user, anotherUser, badge, hashedBadge, group], callback);
   });
-  hashedBadge = new Badge({
-    user_id: 2,
-    type: 'hosted',
-    endpoint: 'endpoint',
-    image_path: 'image_path',
-    body_hash: 'body_hash',
-    body: fixture({recipient: makeHash('brian@example.com', 'hashbrowns')})
-  });
-  group = new Group({
-    user_id: 1,
-    name: 'name',
-    url: 'url',
-    'public': 1,
-    badges: [1]
-  });
-  map.async(saver, [user, anotherUser, badge, hashedBadge, group], callback);
 }
 
 var backpack = require('../controllers/backpack.js')

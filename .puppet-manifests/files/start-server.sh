@@ -1,1 +1,1 @@
-cd /home/vagrant/openbadges && $NVM_BIN/up -w -p 8888 /home/vagrant/openbadges/app.js
+cd /home/vagrant/openbadges && /home/vagrant/node_modules/db-migrate/bin/db-migrate up && $NVM_BIN/up -w -p 8888 /home/vagrant/openbadges/app.js
