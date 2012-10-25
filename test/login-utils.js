@@ -3,6 +3,8 @@ var browserid = require('../lib/browserid'),
     APIeasy = require('api-easy'),
     assert = require('assert');
 
+var mysql = require('../lib/mysql');
+
 function fakeBrowseridVerify(uri, assertion, audience, cb) {
   var expected = module.exports.FAKE_ASSERTION;
   if (assertion == expected)
@@ -77,6 +79,18 @@ module.exports = {
         .expect('sets a session cookie', function(err, res, body) {
           assert.ok('set-cookie' in res.headers);
         }).next().unpath();
+    };
+    suite.setupTestDatabase = function(){
+      return this.addBatch({
+        'prepare database for testing': {
+          topic: function() {
+            mysql.prepareTesting(this.callback);
+          },
+          'does not error': function(err) {
+            assert.ok(!err);
+          }
+        }
+      });
     };
     suite.use('localhost', port).followRedirect(false);
     return suite;
