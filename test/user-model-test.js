@@ -1,6 +1,7 @@
 var vows = require('vows')
   , assert = require('assert')
   , mysql = require('../lib/mysql')
+  , events = require('events')
   , User = require('../models/user');
 
 var EMAILS = {
@@ -16,9 +17,13 @@ var createUser = function (email) {
 var makeInvalidEmailTests = function (badData) {
   var tests = {};
   badData.forEach(function (badValue) {
-    var test = tests['like "' + badValue + '"'] = {}
+    var test = tests['like "' + badValue + '"'] = {};
     test['topic'] = function () {
-      createUser(badValue).save(this.callback);
+      var promise = new(events.EventEmitter);
+      createUser(badValue).save(function(err, res){
+        promise.emit('success', err, res);
+      });
+      return promise;
     };
     test['should fail with error on `email`'] = assertErrors(['email'], 'invalid');
   })
@@ -29,7 +34,11 @@ var makeValidEmailTests = function (goodData) {
   goodData.forEach(function (goodValue) {
     var test = tests['like "' + goodValue + '"'] = {}
     test['topic'] = function () {
-      createUser(goodValue).save(this.callback);
+      var promise = new(events.EventEmitter);
+      createUser(goodValue).save(function(err, res){
+        promise.emit('success', err, res);
+      });
+      return promise;
     };
     test['should succeed'] = function (err, user) { assert.ifError(err); };
   })
@@ -37,10 +46,6 @@ var makeValidEmailTests = function (goodData) {
 };
 var assertErrors = function (fields, msgContains) {
   return function (err, res) {
-    if (res instanceof Error) {
-      err = res;
-      res = null;
-    }
     assert.isNull(res);
     assert.instanceOf(err, Error);
     assert.isObject(err.fields);
@@ -106,7 +111,6 @@ vows.describe('User model').addBatch({
       }
     },
     'Trying to save a user with valid `recipient`': makeValidEmailTests(EMAILS.good),
-    // FIXME: disabled this test because it causes vows to hang
-    // 'Trying to save a user with bogus `recipient`': makeInvalidEmailTests(EMAILS.bad)
+    'Trying to save a user with bogus `recipient`': makeInvalidEmailTests(EMAILS.bad)
   },    
 }).export(module);
