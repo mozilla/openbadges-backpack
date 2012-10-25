@@ -83,7 +83,6 @@ suite
             })
           .undiscuss()
         .discuss('that the user does not have in their backpack')
-          // FIXME: this test is failing, not sure why
           .get("?url=" + EXAMPLE_BADGE_URL)
             .expect(200, {
               owner:  true,
