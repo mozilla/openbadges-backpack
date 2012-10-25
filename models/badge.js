@@ -62,40 +62,6 @@ Badge.prototype.checkHash = function checkHash() {
   return sha256(JSON.stringify(this.get('body'))) === this.get('body_hash');
 };
 
-Badge.prototype.privacy = function privacy(value, callback) {
-  if("boolean" !== typeof value) {
-    return callback(new Error("value is not boolean"), null);
-  }
-  var self = this;
-  var attributes = this.attributes;
-  var table = this.getTableName();
-  var querySQL = 'UPDATE `' + table + '` SET `public` = ? WHERE `id` = ? LIMIT 1';
-
-  callback = callback || function () {};
-
-  mysql.client.query(querySQL, [value, attributes.id], function (err, resp) {
-    if (err) { return callback(err); }
-    return callback(null, self);
-  });
-};
-
-Badge.prototype.notes = function notes(text, callback) {
-  if("string" !== typeof text && null !== text) {
-    return callback(new Error("text must be string or null"), null);
-  }
-  var self = this;
-  var attributes = this.attributes;
-  var table = this.getTableName();
-  var querySQL = 'UPDATE `' + table + '` SET `notes` = ? WHERE `id` = ? LIMIT 1';
-
-  callback = callback || function () {};
-
-  mysql.client.query(querySQL, [text, attributes.id], function (err, resp) {
-    if (err) { return callback(err); }
-    return callback(null, self);
-  });
-};
-
 // Validators called by `save()` (see mysql-base) in preparation for saving.
 // A valid pass returns nothing (or a falsy value); an invalid pass returns a
 // message about why a thing was invalid.
@@ -141,9 +107,9 @@ Badge.validators = {
   },
   body: function (value) {
     if (!value) { return "Must have a body."; }
-    if (String(value) !== '[object Object]') { return "body must be an object"; }
+    if ('object' !== typeof value) { return "body must be an object"; }
     if (Badge.validateBody(value) instanceof Error) { return "invalid body"; }
-  }
+  },
 };
 
 // Prepare a field as it goes into or comes out of the database.

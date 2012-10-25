@@ -106,58 +106,71 @@ exports.edit = function show(request, response) {
   });
 };
 
-exports.privacy = function privacy(request, response) {
-  var badge = request.badge;  
-  var user = request.user;
-  var value = request.value;
-  function failNow() {
-    return response.send(respond('forbidden', "Cannot update privacy for a badge you don't own"), 403);
+exports.update = function update(request, response) {
+  if (!request.user) {
+    return response.send({
+      status: 'forbidden',
+      error: 'user required'
+    }, 403);
   }
 
-  if(request.headers['accept'] && _(request.headers['accept']).contains('text/html')) {
-    return response.redirect(reverse('backpack.login'), 303);
+  if (!request.badge) {
+    return response.send({
+      status: 'missing-required',
+      error: 'missing badge to update'
+    }, 404);
   }
-  
-  if (!badge)
-    return response.send(respond('missing', "Cannot update privacy for a badge that doesn't exist"), 404);
 
-  if (!user || badge.get('user_id') !== user.get('id'))
-    return failNow();
+  if (request.user.get('id') !== request.badge.get('user_id')) {
+    return response.send({
+      status: 'forbidden',
+      error: 'you cannot modify a group you do not own'
+    }, 403);
+  }
 
-  badge.privacy(value, function (err, badge) {
-    if (err) {
-      logger.warn('Failed to update privacy badge');
-      logger.warn(err);
-      return response.send(respond('error', 'Could not update privacy for badge: ' + err), 500);
+  if (!request.body) {
+    return response.send({
+      status: 'missing-required',
+      error: 'missing fields to update'
+    }, 400);
+  }
+
+  var badge = request.badge;
+  var body = request.body;
+
+  if(body.hasOwnProperty('public')) {
+    if('boolean' === typeof body['public']) {
+      badge.set('public', body['public']);
+    } else {
+      return response.send({
+        status: 'invalid-field',
+        error: 'privacy value is non-boolean'
+      }, 400);
     }
-    return response.send({ status: 'okay' }, 200);
-  });
-};
-
-exports.notes = function notes(request, response) {
-  var badge = request.badge;  
-  var user = request.user;
-  var text = request.text;
-  function failNow() {
-    return response.send(respond('forbidden', "Cannot update notes for a badge you don't own"), 403);
   }
 
-  if(request.headers['accept'] && _(request.headers['accept']).contains('text/html')) {
-    return response.redirect(reverse('backpack.login'), 303);
-  }
-  
-  if (!badge)
-    return response.send(respond('missing', "Cannot update notes for a badge that doesn't exist"), 404);
-
-  if (!user || badge.get('user_id') !== user.get('id'))
-    return failNow();
-
-  badge.notes(text, function (err, badge) {
-    if (err) {
-      logger.warn('Failed to update notes badge');
-      logger.warn(err);
-      return response.send(respond('error', 'Could not update notes for badge: ' + err), 500);
+  if(body.hasOwnProperty('notes')) {
+    if(null === body['notes'] || 'string' === typeof body['notes']) {
+      badge.set('notes', body['notes']);
+    } else {
+      return response.send({
+        status: 'invalid-field',
+        error: 'notes must be either string or null'
+      }, 400);
     }
-    return response.send({ status: 'okay' }, 200);
+  }
+
+  badge.save(function (err) {
+    if (err) {
+      logger.debug('there was an error updating a badge:');
+      logger.debug(err);
+      return response.send({
+        status: 'error',
+        error: 'there was an unknown error. it has been logged.'
+      }, 500);
+    }
+
+    response.contentType('json');
+    response.send({status: 'okay'});
   });
 };
