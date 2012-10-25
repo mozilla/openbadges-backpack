@@ -1,8 +1,9 @@
-var _ = require('underscore');
+var _ = require('lodash');
 var Group = require('../models/group.js');
 var Portfolio = require('../models/portfolio.js');
 var Badge = require('../models/badge.js');
 var logger = require('../lib/logging').logger;
+var reverse = require('../lib/router').reverse;
 
 function makeBadgeObj(attr) { return new Badge(attr) }
 
@@ -102,6 +103,14 @@ exports.update = function (request, response) {
     group.set('badges', body.badges.map(makeBadgeObj));
   }
 
+  if(null === body['description'] || "string" === typeof body['description']) {
+    group.set('description', body['description']);
+  }
+
+  if(null === body['notes'] || "string" === typeof body['notes']) {
+    group.set('notes', body['notes']);
+  }
+
   group.save(function (err) {
     if (err) {
       logger.debug('there was an error updating a group:');
@@ -138,6 +147,10 @@ exports.destroy = function (request, response) {
       status: 'forbidden',
       error: 'you cannot modify a group you do not own'
     }, 403);
+
+  if(request.headers['accept'] && _(request.headers['accept']).contains('text/html')) {   
+    return response.redirect(reverse('backpack.login'), 303);
+  }
 
   // find any profile associated with this group and delete it
   Portfolio.findOne({group_id: group.get('id')}, function (err, folio) {

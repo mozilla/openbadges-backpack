@@ -11,6 +11,10 @@ var User = require('../models/user.js')
 var Badge = require('../models/badge.js')
 var Group = require('../models/group.js')
 var Portfolio = require('../models/portfolio.js')
+var app = require('../app.js');
+var utils = require('./utils')
+  , request = utils.conn.request
+  , response = utils.conn.response;
 
 var user, otherUser, badge, group, otherGroup, portfolio;
 function setupDatabase (callback) {
@@ -145,6 +149,33 @@ vows.describe('group controller test').addBatch({
         mock.status.should.equal(200);
       },
     },
+    '#destroy: request for text/html': {
+      'topic': function() {
+        var req = { group: group, user: user, headers: { accept: ['text/html'] } };
+        groupcontroller.destroy(req, response(req, this.callback));
+      },
+      'get back status 303' : function(err, path, status) {
+        status.should.equal(303);
+        path.should.equal('/backpack/login');
+      }
+    },
+  }
+}).addBatch({
+  'setup' : {
+    topic: function () {
+      setupDatabase(this.callback);
+    },
+    '#create: given a user and correct input': {
+      topic : function () {
+        var req = { user: user, body: {name: 'awesometown', badges: []} }
+        conmock(groupcontroller.create, req, this.callback);
+      },
+      'creates a new group and returns id and url': function (err, mock) {
+        mock.body.id.should.equal(3);
+        should.exist(mock.body.url);
+        mock.body.url.length.should.be.greaterThan(10);
+      }
+    },
     '#update' : {
       'when missing user' : {
         topic : function () {
@@ -192,6 +223,26 @@ vows.describe('group controller test').addBatch({
           'respond with 200, update the name' : function (err, mock) {
             mock.status.should.equal(200)
             group.get('name').should.equal('huh')
+          },
+        },
+        'and a `description` field': {
+          topic: function() {
+            var req = { user: user, group: group, body: { 'description': 'group description!' } };
+            conmock(groupcontroller.update, req, this.callback)
+          },
+          'respond with 200, update the description field' : function (err, mock) {
+            mock.status.should.equal(200)
+            group.get('description').should.equal('group description!');
+          },
+        },
+        'and a `notes` field': {
+          topic: function() {
+            var req = { user: user, group: group, body: { 'notes': 'group notes!' } };
+            conmock(groupcontroller.update, req, this.callback)
+          },
+          'respond with 200, update the description field' : function (err, mock) {
+            mock.status.should.equal(200)
+            group.get('notes').should.equal('group notes!');
           },
         },
         'and a `public` field' : {

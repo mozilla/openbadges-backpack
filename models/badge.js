@@ -107,9 +107,9 @@ Badge.validators = {
   },
   body: function (value) {
     if (!value) { return "Must have a body."; }
-    if (String(value) !== '[object Object]') { return "body must be an object"; }
+    if ('object' !== typeof value) { return "body must be an object"; }
     if (Badge.validateBody(value) instanceof Error) { return "invalid body"; }
-  }
+  },
 };
 
 // Prepare a field as it goes into or comes out of the database.

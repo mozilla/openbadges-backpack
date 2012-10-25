@@ -1,5 +1,7 @@
 var Badge = require('../models/badge');
 var logger = require('../lib/logging').logger;
+var reverse = require('../lib/router').reverse;
+var _ = require('lodash');
 
 function respond(status, message) {
   return { status: status, message: message };
@@ -35,18 +37,22 @@ exports.param['badgeId'] = function (request, response, next, id) {
  */
 
 exports.destroy = function destroy(request, response) {
-  var badge = request.badge;
+  var badge = request.badge;  
   var user = request.user;
   function failNow() {
     return response.send(respond('forbidden', "Cannot delete a badge you don't own"), 403);
   }
+
+  if(request.headers['accept'] && _(request.headers['accept']).contains('text/html')) {
+    return response.redirect(reverse('backpack.login'), 303);
+  }
   
   if (!badge)
     return response.send(respond('missing', "Cannot delete a badge that doesn't exist"), 404);
-  
+
   if (!user || badge.get('user_id') !== user.get('id'))
     return failNow();
-  
+
   badge.destroy(function (err, badge) {
     if (err) {
       logger.warn('Failed to delete badge');
@@ -100,3 +106,71 @@ exports.edit = function show(request, response) {
   });
 };
 
+exports.update = function update(request, response) {
+  if (!request.user) {
+    return response.send({
+      status: 'forbidden',
+      error: 'user required'
+    }, 403);
+  }
+
+  if (!request.badge) {
+    return response.send({
+      status: 'missing-required',
+      error: 'missing badge to update'
+    }, 404);
+  }
+
+  if (request.user.get('id') !== request.badge.get('user_id')) {
+    return response.send({
+      status: 'forbidden',
+      error: 'you cannot modify a group you do not own'
+    }, 403);
+  }
+
+  if (!request.body) {
+    return response.send({
+      status: 'missing-required',
+      error: 'missing fields to update'
+    }, 400);
+  }
+
+  var badge = request.badge;
+  var body = request.body;
+
+  if(body.hasOwnProperty('public')) {
+    if('boolean' === typeof body['public']) {
+      badge.set('public', body['public']);
+    } else {
+      return response.send({
+        status: 'invalid-field',
+        error: 'privacy value is non-boolean'
+      }, 400);
+    }
+  }
+
+  if(body.hasOwnProperty('notes')) {
+    if(null === body['notes'] || 'string' === typeof body['notes']) {
+      badge.set('notes', body['notes']);
+    } else {
+      return response.send({
+        status: 'invalid-field',
+        error: 'notes must be either string or null'
+      }, 400);
+    }
+  }
+
+  badge.save(function (err) {
+    if (err) {
+      logger.debug('there was an error updating a badge:');
+      logger.debug(err);
+      return response.send({
+        status: 'error',
+        error: 'there was an unknown error. it has been logged.'
+      }, 500);
+    }
+
+    response.contentType('json');
+    response.send({status: 'okay'});
+  });
+};
