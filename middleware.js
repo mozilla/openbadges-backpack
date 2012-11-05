@@ -72,11 +72,6 @@ exports.userFromSession = function userFromSession() {
         logger.error(err);
         return next(err);
       }
-
-      logger.debug('This is the user email: ' + email);
-      logger.debug('This is the user: ' + JSON.stringify(user));
-      console.dir(user);
-
       req.user = user;
       return next();
     });
