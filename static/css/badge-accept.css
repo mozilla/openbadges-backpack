@@ -52,4 +52,5 @@ body {
 
 .badge-image {
   max-width: 100%;
+  padding-top: 15px;
 }
