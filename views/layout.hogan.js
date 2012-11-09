@@ -82,6 +82,7 @@
       <script type="text/javascript" src="/js/underscore.js"></script>
       <script type="text/javascript" src="/js/backbone.js"></script>
       <script type="text/javascript" src="/js/bootstrap-2.0.2.min.js"></script>
+      <script type="text/javascript" src="/js/bootstrap-popover.js"></script>
       <script src="//www.mozilla.org/tabzilla/media/js/tabzilla.js"></script>
 
       <!-- my libraries -->

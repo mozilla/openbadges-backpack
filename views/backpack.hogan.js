@@ -91,12 +91,14 @@
 <script>
   $(function(){
     $('[rel="popinfo"]').popover({
-      animation: false
+      animation: false,
+      trigger: 'hover'
     });
 {{#tooltips}}
     $('[rel="popover"]').popover({
       animation: false,
-      placement: 'right'
+      placement: 'right',
+      trigger: 'hover'
     });
     $('[rel="tooltip"]').tooltip({
       animation: false
