@@ -1,16 +1,16 @@
 const test = require('tap').test;
-const testutils = require('./');
+const testUtils = require('./');
 const fs = require('fs');
 const path = require('path');
 const awardBadge = require('../lib/award');
 const mysql = require('../lib/mysql');
 const Badge = require('../models/badge');
 
-const TEST_ASSERTION = require('../lib/utils').fixture();
+const TEST_ASSERTION = testUtils.makeAssertion();
 const BADGE_DIRECTORY = path.basename(require('../lib/configuration').get('badge_path'));
 const PNG_DATA = fs.readFileSync(path.join(__dirname, '/utils/images/no-badge-data.png'));
 
-testutils.prepareDatabase(function (done) {
+testUtils.prepareDatabase(function (done) {
   test('awardBadge', function (t) {
     const endpoint = 'http://example.com/badge';
     const badgeData = {
@@ -32,5 +32,5 @@ testutils.prepareDatabase(function (done) {
     })
   });
 
-  testutils.finish();
+  testUtils.finish();
 });

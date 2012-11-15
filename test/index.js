@@ -37,7 +37,57 @@ exports.prepareDatabase = function prepareDatabase(fixtures, callback) {
   });
 };
 
+/**
+ * Generate a valid-looking assertion object
+ *
+ * @param {Object} changes
+ *   An object with potential changes. For deep changes, you can use a
+ *   dotted path to select, i.e. `badge.version`.
+ * @return {Object} assertion object
+ */
+
+exports.makeAssertion = function makeAssertion(changes) {
+  changes = changes || {};
+  var assertion = makeValidAssertion();
+
+  _.keys(changes).forEach(function (k) {
+    const fields = k.split('.');
+    var current = assertion;
+    var previous = null;
+
+    fields.forEach(function (f) {
+      previous = current;
+      current = current[f];
+    });
+
+    previous[fields.pop()] = changes[k];
+  });
+  return assertion;
+}
+
 // private
+
+function makeValidAssertion() {
+  return {
+    recipient: 'bimmy@example.com',
+    evidence: '/bimmy-badge.json',
+    expires: '2040-08-13',
+    issued_on: '2011-08-23',
+    badge: {
+      version: 'v0.5.0',
+      name: 'Open Source Contributor',
+      description: 'For rocking in the free world',
+      image: '/badge.png',
+      criteria: 'http://example.com/criteria.html',
+      issuer: {
+        origin: 'http://p2pu.org',
+        name: 'p2pu',
+        org: 'school of webcraft',
+        contact: 'admin@p2pu.org'
+      }
+    }
+  };
+}
 
 function recreateDatabase(callback) {
   async.series([
