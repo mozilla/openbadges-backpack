@@ -1,14 +1,15 @@
 const _ = require('underscore');
 const mysql = require('../lib/mysql');
-const test = require('tap').test;
 const async = require('async');
 
 /**
  * Make a cleanup test that closes the database connection
  *
+ * @param {Object} test
+ *   A tap test object
  */
 
-exports.finish = function closeDatabase () {
+exports.finish = function closeDatabase (test) {
   test('cleaning up', function (t) {
     mysql.client.destroy(); t.end();
   });

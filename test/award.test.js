@@ -32,5 +32,5 @@ testUtils.prepareDatabase(function (done) {
     })
   });
 
-  testUtils.finish();
+  testUtils.finish(test);
 });
