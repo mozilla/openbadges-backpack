@@ -2,6 +2,22 @@ const _ = require('underscore');
 const mysql = require('../lib/mysql');
 const async = require('async');
 
+const ALPHABET = 'abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_';
+
+/**
+ * Generate a random string
+ *
+ * @param {Integer} length
+ * @return {String}
+ */
+
+exports.randomstring = function randomstring(length) {
+  const str = [];
+  while (length--)
+    str.push(randomchar(ALPHABET))
+  return str.join('');
+};
+
 /**
  * Make a cleanup test that closes the database connection
  *
@@ -111,7 +127,6 @@ function sortedValues(obj) {
 }
 
 function itemSaver(item, callback) {
-  console.dir(callback);
   return item.save(callback);
 }
 
@@ -121,5 +136,10 @@ function insertFixtures(fixtures, callback) {
     if (err) throw err;
     callback(null, fixtures);
   })
+}
+
+function randomchar(charset) {
+  const length = charset.length;
+  return charset[Math.random() * length | 0];
 }
 
