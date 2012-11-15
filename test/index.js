@@ -8,8 +8,8 @@ const async = require('async');
  *
  */
 
-test.closeDatabase = function closeDatabase () {
-  test('closing database', function (t) {
+exports.finish = function closeDatabase () {
+  test('cleaning up', function (t) {
     mysql.client.destroy(); t.end();
   });
 };
@@ -21,7 +21,7 @@ test.closeDatabase = function closeDatabase () {
  * @return {Object} whatever fixtures were passed into it
  */
 
-test.prepareDatabase = function prepareDatabase(fixtures, callback) {
+exports.prepareDatabase = function prepareDatabase(fixtures, callback) {
   if (typeof fixtures === 'function')
     callback = fixtures, fixtures = {};
   callback = callback || function(){};
@@ -37,7 +37,7 @@ test.prepareDatabase = function prepareDatabase(fixtures, callback) {
   });
 };
 
-module.exports = test;
+// private
 
 function recreateDatabase(callback) {
   async.series([
