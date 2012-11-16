@@ -43,14 +43,12 @@ module.exports = function conmock (options, callback) {
       this.fntype = 'send';
       this.body = data;
       this.status = status || 200;
-      this.request = request;
       callback(null, this, request);
     },
     json: function (data, status) {
       this.fntype = 'json';
       this.body = data;
       this.status = status;
-      this.request = request;
       callback(null, this, request);
     },
     render: function (path, options) {
@@ -58,8 +56,12 @@ module.exports = function conmock (options, callback) {
       this.fntype = 'render';
       this.path = path;
       this.status = options.status || 200;
-      this.request = request;
       this.options = options;
+      callback(null, this, request);
+    },
+    redirect: function (path, status) {
+      this.path = path;
+      this.status = status || 301;
       callback(null, this, request);
     },
   };
