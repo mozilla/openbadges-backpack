@@ -1,13 +1,20 @@
 const _ = require('underscore');
 const mime = require('mime');
 
-module.exports = function conmock (fn, request, paramVal, callback) {
-  if (typeof paramVal === 'function') {
-    callback = paramVal;
-    paramVal = callback;
-  }
-  const mock = {};
-  request = _.defaults(request, {
+/**
+ * Mock a request to a handler.
+ *
+ * @asynchronous
+ * @param {Object} options
+ *   - handler: Request handler. Should accept `req`, `res`, and `next`.
+ *   - request: Incoming request object.
+ * @return {Error}
+ * @return {Object}
+ *   - The result of the attempted response.
+ */
+
+module.exports = function conmock (options, callback) {
+  const requestDefaults = {
     url: '',
     headers: {},
     params: {},
@@ -15,9 +22,10 @@ module.exports = function conmock (fn, request, paramVal, callback) {
     query: {},
     flash: function (){},
     param: function (key) { return this.params[key] }
-  });
-
-  const response = {
+  };
+  const handler = options.handler;
+  const request = _.defaults(options.request || {}, requestDefaults);
+  const mock = {
     headers: {},
     header: function (key, value) {
       if (value) return this.headers[key] = value;
@@ -34,14 +42,14 @@ module.exports = function conmock (fn, request, paramVal, callback) {
       this.body = data;
       this.status = status || 200;
       this.request = request;
-      callback(null, this);
+      callback(null, this, request);
     },
     json: function (data, status) {
       this.fntype = 'json';
       this.body = data;
       this.status = status;
       this.request = request;
-      callback(null, this);
+      callback(null, this, request);
     },
     render: function (path, options) {
       options = options || {};
@@ -50,14 +58,13 @@ module.exports = function conmock (fn, request, paramVal, callback) {
       this.status = options.status || 200;
       this.request = request;
       this.options = options;
-      callback(null, this);
+      callback(null, this, request);
     },
   };
-  response._request = request;
-
+  mock.request = request;
   function next () {
-    response.fntype = 'next';
-    callback(null, response);
+    mock.fntype = 'next';
+    callback(null, mock, request);
   }
-  return fn(request, response, next, paramVal);
+  return handler(request, mock, next);
 };
