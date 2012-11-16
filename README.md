@@ -118,7 +118,7 @@ and then back in windows you can fire up your favourite browser and connect to t
 
 3. Install local dependencies: `npm install`
 
-4. Run the test suite: `./node_modules/.bin/vows -i`
+4. Run the test suite: `npm test`
 
 5. Start your server: `./node_modules/.bin/up -w -p 8888 app.js`
 
