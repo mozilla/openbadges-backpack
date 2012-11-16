@@ -1,13 +1,13 @@
-var _ = require('underscore')
-  , mime = require('mime')
+const _ = require('underscore');
+const mime = require('mime');
 
-conmock = function (fn, request, paramVal, callback) {
+module.exports = function conmock (fn, request, paramVal, callback) {
   if (typeof paramVal === 'function') {
     callback = paramVal;
     paramVal = callback;
   }
-  var mock = {};
-  var request = _.defaults(request, {
+  const mock = {};
+  request = _.defaults(request, {
     url: '',
     headers: {},
     params: {},
@@ -16,8 +16,8 @@ conmock = function (fn, request, paramVal, callback) {
     flash: function (){},
     param: function (key) { return this.params[key] }
   });
-  
-  var response = {
+
+  const response = {
     headers: {},
     header: function (key, value) {
       if (value) return this.headers[key] = value;
@@ -54,12 +54,10 @@ conmock = function (fn, request, paramVal, callback) {
     },
   };
   response._request = request;
-  
+
   function next () {
     response.fntype = 'next';
     callback(null, response);
   }
   return fn(request, response, next, paramVal);
 };
-
-module.exports = conmock;
