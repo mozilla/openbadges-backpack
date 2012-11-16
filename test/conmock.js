@@ -60,6 +60,7 @@ module.exports = function conmock (options, callback) {
       callback(null, this, request);
     },
     redirect: function (path, status) {
+      this.fntype = 'redirect';
       this.path = path;
       this.status = status || 301;
       callback(null, this, request);
