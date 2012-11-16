@@ -53,7 +53,7 @@ exports.authenticate = function authenticate(request, response) {
                      request.headers['accept'].indexOf('application/json') != -1;
 
   if (!request.body || !request.body['assertion']) {
-    return formatResponse(reverse('backpack.login'), "assertion expected");
+    return formatResponse('/backpack/login', "assertion expected");
   }
 
   var ident = configuration.get('identity');
@@ -86,7 +86,7 @@ exports.authenticate = function authenticate(request, response) {
 
 exports.signout = function signout(request, response) {
   request.session = {};
-  response.redirect(reverse('backpack.login'), 303);
+  response.redirect('/backpack/login', 303);
 };
 
 /**
@@ -171,7 +171,7 @@ exports.manage = function manage(request, response, next) {
 
       if (criteria[0] === '/') body.badge.criteria = origin + criteria;
       if (evidence && evidence[0] === '/') body.evidence = origin + evidence;
-      // Nobody wants to see the hash in the UI, apparently. 
+      // Nobody wants to see the hash in the UI, apparently.
       if (body.recipient.match(/\w+(\d+)?\$.+/)) body.recipient = user.get('email');
 
       badgeIndex[badge.get('id')] = badge;
