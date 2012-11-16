@@ -17,7 +17,6 @@ function mockResponse(status, length, type) {
 }
 
 function testThrows(t, fn, errorName) {
-  console.dir(typeof error);
   try {
     fn();
     t.fail('should have thrown');
