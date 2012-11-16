@@ -14,6 +14,8 @@ const mime = require('mime');
  */
 
 module.exports = function conmock (options, callback) {
+  if (typeof options == 'function')
+    options = { handler: options };
   const requestDefaults = {
     url: '',
     headers: {},
