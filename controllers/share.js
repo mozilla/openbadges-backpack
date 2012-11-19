@@ -155,6 +155,7 @@ exports.createOrUpdate = function (request, response) {
   var stories = {};
   var submitted = request.body;
 
+  // #TODO: don't assume any stories have been submitted
   for (var i = 0; i < submitted.stories.length; i++)
     if (submitted.stories[i]) stories[i] = submitted.stories[i];
 

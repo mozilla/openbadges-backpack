@@ -1,287 +1,142 @@
-var vows = require('vows');
-var assert = require('assert');
-var should = require('should');
-var conmock = require('./conmock.js');
-var displayer = require('../controllers/displayer.js');
-var User = require('../models/user.js')
-var Badge = require('../models/badge.js')
-var Group = require('../models/group.js')
+const test = require('tap').test;
+const testUtils = require('./');
+const conmock = require('./conmock');
+const displayer = require('../controllers/displayer');
 
-var user, otherUser, badge, group, privateGroup;
-function setupDatabase (callback) {
-  var badgedata = require('../lib/utils').fixture({recipient: 'brian@example.com'})
-  var map = require('functools').map;
-  function saver (m, cb) { m.save(cb) };
-  require('../lib/mysql.js').prepareTesting();
-  
-  user = new User({ email: 'brian@example.com' })
-  otherUser = new User({ email: 'yo@example.com' })
-  badge = new Badge({
+const User =  require('../models/user');
+const Badge = require('../models/badge');
+const Group = require('../models/group');
+
+testUtils.prepareDatabase({
+  '1-user': new User({
+    email: 'brian@example.org'
+  }),
+  '2-other-user': new User({
+    email: 'yo@example.org'
+  }),
+  '3-badge': new Badge({
     user_id: 1,
     type: 'hosted',
     endpoint: 'endpoint',
     image_path: 'image_path',
     body_hash: 'body_hash',
-    body: badgedata
-  });
-  group = new Group({
+    body: testUtils.makeAssertion({ recipient: 'brian@example.org' })
+  }),
+  '4-group': new Group({
     user_id: 1,
     name: 'Public Group',
     url: 'Public URL',
     'public': 1,
     badges: [1]
-  });
-  privateGroup = new Group({
+  }),
+  '5-private-group': new Group({
     user_id: 1,
     name: 'Private Group',
     url: 'Private URL',
     'public': 0,
     badges: [1]
+  }),
+}, function (fixtures) {
+
+  test('displayer#emailToUserId', function (t) {
+    const user = fixtures['1-user'];
+    const handler = displayer.emailToUserId;
+
+    t.plan(3);
+
+    conmock({
+      handler: handler,
+      request: { body: { email: user.get('email') }}
+    }, function (err, mock) {
+      t.same(mock.body.userId, user.get('id'), 'should get correct id back');
+    });
+
+    conmock({
+      handler: handler,
+      request: {}
+    }, function (err, mock) {
+      t.same(mock.status, 400, 'should get 400 if no email passed in');
+    });
+
+    conmock({
+      handler: handler,
+      request: { body: { email: 'missing-email@example.org' }}
+    }, function (err, mock) {
+      t.same(mock.status, 404, 'should get 404 if email is not in the db');
+    });
   });
-  map.async(saver, [user, otherUser, badge, group, privateGroup], callback);
-}
 
-vows.describe('displayer controller tests').addBatch({
-  'displayer' : {
-    topic: function () {
-      setupDatabase(this.callback);
-    },
-    
-    'param handler: dUserId': {
-      'given real userId':  {
-        topic: function () {
-          var userId = 1;
-          conmock(displayer.param['dUserId'], { }, userId, this.callback);
-        },
-        'returns real user' : function (err, mock) {
-          var request = mock._request;
-          should.exist(request.user);
-          request.user.get('id').should.equal(1);
-        },
-      },
-      
-      'given missing userId' : {
-        'normal request':  {
-          topic: function () {
-            var userId = 100;
-            conmock(displayer.param['dUserId'], { }, userId, this.callback);
-          },
-          'returns 404, error message' : function (err, mock) {
-            mock.status.should.equal(404);
-            mock.body.status.should.equal('missing');
-            should.not.exist(mock._request.user);
-          },
-        },
-        
-        'jsonp request':  {
-          topic: function () {
-            var userId = 100;
-            var req = { query: { callback : 'wut' } };
-            conmock(displayer.param['dUserId'], req, userId, this.callback);
-          },
-          'returns 200, error message' : function (err, mock) {
-            mock.status.should.equal(200);
-            mock.body.should.match(/missing/);
-            should.not.exist(mock._request.user);
-          },
-        }
-      }
-    },
-    
-    'param handler: dGroupId': {
-      'given real groupId':  {
-        topic: function () {
-          var groupId = 1;
-          conmock(displayer.param['dGroupId'], { }, groupId, this.callback);
-        },
-        'returns real group' : function (err, mock) {
-          var request = mock._request;
-          should.exist(request.group);
-          request.group.get('id').should.equal(1);
-        },
-      },
-      
-      'given missing groupId' : {
-        'normal request':  {
-          topic: function () {
-            var groupId = 100;
-            conmock(displayer.param['dGroupId'], { }, groupId, this.callback);
-          },
-          'returns 404, error message' : function (err, mock) {
-            mock.status.should.equal(404);
-            mock.body.status.should.equal('missing');
-            should.not.exist(mock._request.group);
-          },
-        },
-        
-        'jsonp request':  {
-          topic: function () {
-            var groupId = 100;
-            var req = { query: { callback : 'wut' } };
-            conmock(displayer.param['dGroupId'], req, groupId, this.callback);
-          },
-          'returns 200, error message' : function (err, mock) {
-            mock.status.should.equal(200);
-            mock.body.should.match(/missing/);
-            should.not.exist(mock._request.group);
-          },
-        }
-      }
-    },
-    
-    
-    '#version' : {
-      topic: function () {
-        conmock(displayer.version, {}, this.callback);
-      },
-      'should 200, return API version' : function (err, mock) {
-        // #TODO: don't hardcode this. hell, maybe don't even include it.
-        mock.status.should.equal(200);
-        mock.body['version'].should.equal('0.5.0');
-      },
-    },
-    
-    '#emailToUserId' : {
-      'given an email address in query' : {
-        topic: function () {
-          var req = { body: { email: 'brian@example.com'  } };
-          conmock(displayer.emailToUserId, req, this.callback);
-        },
-        'return 200, proper user id' : function (err, mock) {
-          mock.status.should.equal(200);
-          mock.body['email'].should.equal('brian@example.com');
-          mock.body['userId'].should.equal(1);
-        },
-      },
-      'given no email address to convert' : {
-        topic : function () {
-          conmock(displayer.emailToUserId, {}, this.callback);
-        },
-        'return 400, error message' : function (err, mock) {
-          mock.status.should.equal(400);
-          mock.body.error.should.match(/missing/);
-        }
-      },
-      'given an email address not in the database' : {
-        topic : function () {
-          var req = { body: { email: 'kangaroo@example.com'  } };
-          conmock(displayer.emailToUserId, req, this.callback);
-        },
-        'return 404, error message' : function (err, mock) {
-          mock.status.should.equal(404);
-          mock.body.error.should.match(/find/);
-        }
-      }
-    },
+  test('displayer#userGroups', function (t) {
+    const user = fixtures['1-user'];
+    const group = fixtures['4-group'];
+    const handler = displayer.userGroups;
 
-    '#userGroups': {
-      'given a userId, no callback': {
-        topic: function () {
-          var req = { user: user };
-          conmock(displayer.userGroups, req, this.callback);
-        },
-        'return 200, group data' : function (err, mock) {
-          mock.status.should.equal(200);
-          mock.body['userId'].should.equal(1);
-          mock.body['groups'].length.should.equal(1);
-          var group = mock.body['groups'][0];
+    conmock({
+      handler: handler,
+      request: { user: user }
+    }, function (err, mock) {
+      t.same(mock.status, 200, 'should have 200');
+      t.same(mock.body.userId, 1, 'should have the correct user');
+      t.same(mock.body.groups.length, 1, 'should have a group');
+      const result = mock.body.groups[0];
+      t.same(result.groupId, group.get('id'), 'should be the right group');
+    });
 
-          group.name.should.equal('Public Group');
-          group.badges.should.equal(1);
-        },
-      },
-      'given a userId and a jsonp callback': {
-        topic: function () {
-          var req = {
-            url: "/yep.json",
-            query: { callback : 'wutlol' },
-            user: user,
-          }
-          conmock(displayer.userGroups, req, this.callback);
-        },
-        'return 200, group data' : function (err, mock) {
-          mock.status.should.equal(200);
-          mock.body.should.match(/^wutlol\(/);
-        },
-      },
-      'given a missing userId and a jsonp callback': {
-        topic: function () {
-          var req = {
-            url: "/yep.json",
-            query: { callback : 'wutlol' },
-            user: new User({ email: 'unsaved@example.com' })
-          }
-          conmock(displayer.userGroups, req, this.callback);
-        },
-        'return 200, `missing` status' : function (err, mock) {
-          mock.status.should.equal(200);
-          mock.body.should.match(/^wutlol\(/);
-          mock.body.should.match(/missing/);
-        },
-      },
-      'given some strange format': {
-        topic: function () {
-          var req = {
-            url: "/yep.umad",
-            user: user,
-            headers: { 'accept' : '*/*' }
-          }
-          conmock(displayer.userGroups, req, this.callback);
-        },
-        'do not crash, return 400' : function (err, mock) {
-          mock.status.should.equal(400);
-          mock.body.should.match(/format/);
-        },
+    // jsonp
+    conmock({
+      handler: handler,
+      request: {
+        user: user,
+        query: { callback: 'cats' }
       }
-      
-    },
-    '#userGroupBadges' : {
-      'given a valid, public group': {
-        'normal request' : {
-          topic: function () {
-            var req = { user: user, group: group }
-            conmock(displayer.userGroupBadges, req, this.callback)
-          },
-          'return 200, sweet sweet data' : function (err, mock) {
-            mock.status.should.equal(200)
-            mock.body.badges.length.should.equal(1)
-            var badge = mock.body.badges[0] 
-            badge.hostedUrl = 'endpoint'
-            badge.assertionType = 'hosted'
-          },
-        },
-        'jsonp request' : {
-          topic: function () {
-            var req = { user: user, group: group, query: { callback: 'saucesome' } }
-            conmock(displayer.userGroupBadges, req, this.callback)
-          },
-          'return 200, sweet sweet data' : function (err, mock) {
-            mock.status.should.equal(200)
-            mock.body.should.match(/^saucesome\(/)
-          },
-        }
-      },
-      'given a valid, private group': {
-        'normal request' : {
-          topic: function () {
-            var req = { user: user, group: privateGroup }
-            conmock(displayer.userGroupBadges, req, this.callback)
-          },
-          'return 404, public group not found' : function (err, mock) {
-            mock.status.should.equal(404)
-          },
-        },
-        'jsonp request' : {
-          topic: function () {
-            var req = { user: user, group: group, query: { callback: 'saucesome' } }
-            conmock(displayer.userGroupBadges, req, this.callback)
-          },
-          'return 200, sweet sweet data' : function (err, mock) {
-            mock.status.should.equal(200)
-            mock.body.should.match(/^saucesome\(/)
-          },
-        },
-      },
-    },
-  }
-}).export(module)
+    }, function (err, mock) {
+      t.ok(mock.body.match(/^cats/), 'should have jsonp callback');
+    });
+
+    // unknown format
+    conmock({
+      handler: handler,
+      request: {
+        url: '/hi.yolo',
+        user: user,
+        headers: { 'accept': '*/*' }
+      }
+    }, function (err, mock) {
+      t.same(mock.status, 400);
+      t.ok(mock.body.match(/format/i), 'should be a format error');
+      t.end();
+    });
+  });
+
+  test('displayer#userGroupBadges', function (t) {
+    const user = fixtures['1-user'];
+    const badge = fixtures['3-badge'];
+    const publicGroup = fixtures['4-group'];
+    const privateGroup = fixtures['5-private-group'];
+    const handler = displayer.userGroupBadges;
+    var request;
+
+    request = { user: user, group: publicGroup };
+    conmock({
+      handler: handler,
+      request: request,
+    }, function (err, mock) {
+      t.same(mock.body.groupId, publicGroup.get('id'));
+      t.same(mock.body.userId, user.get('id'));
+      t.same(mock.body.badges.length, 1, 'should have one badge');
+      const result = mock.body.badges[0];
+      t.same(result.name, badge.get('name'), 'should have the right badge');
+    });
+
+    request = { user: user, group: privateGroup };
+    conmock({
+      handler: handler,
+      request: request,
+    }, function (err, mock) {
+      t.same(mock.status, 404, 'should not find a group when it is private');
+      t.end();
+    });
+  });
+
+  testUtils.finish(test);
+});
