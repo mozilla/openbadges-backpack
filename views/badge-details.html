@@ -1,7 +1,7 @@
 <div class='lightbox' data-id='{{id}}'>
   <div class='contents badge-details'>
     <header>
-      <h2>{{body.badge.name}}</h2>
+      <h2>{{badge.attributes.body.badge.name}}</h2>
       <span class='close'>&times;</span>
     </header>
     <div class='body'>
@@ -11,7 +11,7 @@
           This will remove the badge from your account. It will also be
           removed from all groups. The only way to get this badge back will be
           to go to the place where it was issued
-          (<a href='{{body.badge.issuer.origin}}'>{{body.badge.issuer.name}}</a>)
+          (<a href='{{badge.attributes.body.badge.issuer.origin}}'>{{badge.attributes.body.badge.issuer.name}}</a>)
           and get it re-issued.
         </p>
 
@@ -20,81 +20,7 @@
           <button class='btn yep btn-danger'>Yes, remove this badge</button>
         </div>
       </div>
-
-      <table class='information table'>
-        <colgroup>
-          <col class="imageCol">
-          <col class="fieldLabelCol">
-          <col class="dataCol">
-        </colgroup>
-        <tbody>
-          <tr>
-            <td rowspan="100" class='image'>
-              <img src="{{image_path}}" class='badge-image'>
-              <button class='btn btn-danger disown'>Disown this Badge</button>
-            </td>
-
-            <td class='section-head' colspan='2'>Issuer Details</td>
-          </tr>
-          <tr>
-            <td class='fieldlabel issuer-name'>Name</td>
-            <td>{{body.badge.issuer.name}}</td>
-          </tr>
-          <tr>
-            <td class='fieldlabel issuer-name'>URL</td>
-            <td><a href="{{body.badge.issuer.origin}}">{{body.badge.issuer.origin}}</a></td>
-          </tr>
-          {% if body.badge.issuer.org %}
-          <tr>
-            <td class='fieldlabel issuer-name'>Organization</td>
-            <td>{{body.badge.issuer.org}}</td>
-          </tr>
-          {% endif %}
-
-          <tr>
-            <td class='section-head' colspan='2'>Badge Details</td>
-          </tr>
-          <tr>
-            <td class='fieldlabel'>Name</td>
-            <td>{{body.badge.name}}</td>
-          </tr>
-          <tr>
-            <td class='fieldlabel'>Description</td>
-            <td>{{body.badge.description}}</td>
-          </tr>
-          <tr>
-            <td class='fieldlabel'>Criteria</td>
-            <td><a href='{{body.badge.criteria}}'>{{body.badge.criteria}}</a></td>
-          </tr>
-
-          <tr>
-            <td class='section-head' colspan='2'>Issuance Details</td>
-          </tr>
-          <tr>
-            <td class='fieldlabel recipient'>Recipient</td>
-            <td>{{body.recipient}}</td>
-          </tr>
-          {% if body.evidence %}
-          <tr>
-            <td class='fieldlabel evidence'>Evidence</td>
-            <td><a href='{{body.evidence}}'>{{body.evidence}}</a></td>
-          </tr>
-          {% endif %}
-          {% if body.issued_on %}
-          <tr>
-            <td class='fieldlabel'>Issued On</td>
-            <td>{{body.issued_on}}</td>
-          </tr>
-          {% endif %}
-
-          {% if body.expires %}
-          <tr>
-            <td class='fieldlabel'>Expiration Date</td>
-            <td>{{body.expires}}</td>
-          </tr>
-          {% endif %}
-        </tbody>
-      </table>
+      {% include 'badge-data.html' %}
     </div>
   </div>
 </div>
