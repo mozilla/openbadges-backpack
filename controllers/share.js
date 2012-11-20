@@ -69,7 +69,6 @@ exports.editor = function (request, response) {
     portfolio.group = group;
     portfolio.badges = badgesWithStories;
     portfolio.preamble = prepareText(portfolio.get('preamble'));
-    console.log('$$$$$$$$$$$$$$$$$$$$$$$', require('util').inspect(portfolio, false, 3, true));
     response.render('portfolio-editor.html', {
       csrfToken: request.session._csrf,
       portfolio: portfolio
@@ -128,7 +127,6 @@ exports.show = function (request, response, next) {
     var badgesWithStories = _.map(badges, badgeModifierFactory(portfolio));
     portfolio.badges = badgesWithStories;
     portfolio.preamble = prepareText(portfolio.get('preamble'));
-    console.log('$$$$$$$$$$$$$$$$$$$$$$$', require('util').inspect(portfolio, false, 3, true));
 
     return response.render('portfolio.html', {
       opengraph: [

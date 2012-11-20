@@ -140,7 +140,7 @@ if (!module.parent) {
       process.exit();
     });
   };
-  start_server(http.createServer(app)); //TODO: move createServer into start_server?
+  start_server(http.createServer(app));
 } else {
-  module.exports = http.createServer(app); //TODO: move createServer out of app.js?
+  module.exports = http.createServer(app);
 }
