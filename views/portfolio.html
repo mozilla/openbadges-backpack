@@ -20,15 +20,13 @@
   {% endif %}
 
   <header>
-    <h1>{{portfolio.attributes.title}}</h1>
-    <h2>{{portfolio.attributes.subtitle}}</h1>
+    {% if portfolio.attributes.title %}
+      <h1>{{portfolio.attributes.title}}</h1>
+    {% endif %}
+    {% if portfolio.attributes.subtitle %}
+      <h2>{{portfolio.attributes.subtitle}}</h1>
+    {% endif %}
   </header>
-
-  {% if portfolio.attributes.preamble %}
-  <section class='preamble'>
-    <p>{{ portfolio.attributes.preamble }}</p>
-  </section>
-  {% endif %}
 
   <ul class='badges'>
     {% for badge in portfolio.badges %}

@@ -22,72 +22,78 @@
       </div>
 
       <table class='information table'>
-        <tr>
-          <td rowspan="100" class='image'>
-            <img src="{{image_path}}" class='badge-image'>
-            <button class='btn btn-danger disown'>Disown this Badge</button>
-          </td>
+        <colgroup>
+          <col class="imageCol">
+          <col class="fieldLabelCol">
+          <col class="dataCol">
+        </colgroup>
+        <tbody>
+          <tr>
+            <td rowspan="100" class='image'>
+              <img src="{{image_path}}" class='badge-image'>
+              <button class='btn btn-danger disown'>Disown this Badge</button>
+            </td>
 
-          <td class='section-head' colspan='2'>Issuer Details</td>
-        </tr>
-        <tr>
-          <td class='fieldlabel issuer-name'>Name</td>
-          <td>{{body.badge.issuer.name}}</td>
-        </tr>
-        <tr>
-          <td class='fieldlabel issuer-name'>URL</td>
-          <td><a href="{{body.badge.issuer.origin}}">{{body.badge.issuer.origin}}</a></td>
-        </tr>
-        {% if body.badge.issuer.org %}
-        <tr>
-          <td class='fieldlabel issuer-name'>Organization</td>
-          <td>{{body.badge.issuer.org}}</td>
-        </tr>
-        {% endif %}
+            <td class='section-head' colspan='2'>Issuer Details</td>
+          </tr>
+          <tr>
+            <td class='fieldlabel issuer-name'>Name</td>
+            <td>{{body.badge.issuer.name}}</td>
+          </tr>
+          <tr>
+            <td class='fieldlabel issuer-name'>URL</td>
+            <td><a href="{{body.badge.issuer.origin}}">{{body.badge.issuer.origin}}</a></td>
+          </tr>
+          {% if body.badge.issuer.org %}
+          <tr>
+            <td class='fieldlabel issuer-name'>Organization</td>
+            <td>{{body.badge.issuer.org}}</td>
+          </tr>
+          {% endif %}
 
-        <tr>
-          <td class='section-head' colspan='2'>Badge Details</td>
-        </tr>
-        <tr>
-          <td class='fieldlabel'>Name</td>
-          <td>{{body.badge.name}}</td>
-        </tr>
-        <tr>
-          <td class='fieldlabel'>Description</td>
-          <td>{{body.badge.description}}</td>
-        </tr>
-        <tr>
-          <td class='fieldlabel'>Criteria</td>
-          <td><a href='{{body.badge.criteria}}'>{{body.badge.criteria}}</a></td>
-        </tr>
+          <tr>
+            <td class='section-head' colspan='2'>Badge Details</td>
+          </tr>
+          <tr>
+            <td class='fieldlabel'>Name</td>
+            <td>{{body.badge.name}}</td>
+          </tr>
+          <tr>
+            <td class='fieldlabel'>Description</td>
+            <td>{{body.badge.description}}</td>
+          </tr>
+          <tr>
+            <td class='fieldlabel'>Criteria</td>
+            <td><a href='{{body.badge.criteria}}'>{{body.badge.criteria}}</a></td>
+          </tr>
 
-        <tr>
-          <td class='section-head' colspan='2'>Issuance Details</td>
-        </tr>
-        <tr>
-          <td class='fieldlabel recipient'>Recipient</td>
-          <td>{{body.recipient}}</td>
-        </tr>
-        {% if body.evidence %}
-        <tr>
-          <td class='fieldlabel evidence'>Evidence</td>
-          <td><a href='{{body.evidence}}'>{{body.evidence}}</a></td>
-        </tr>
-        {% endif %}
-        {% if body.issued_on %}
-        <tr>
-          <td class='fieldlabel'>Issued On</td>
-          <td>{{body.issued_on}}</td>
-        </tr>
-        {% endif %}
+          <tr>
+            <td class='section-head' colspan='2'>Issuance Details</td>
+          </tr>
+          <tr>
+            <td class='fieldlabel recipient'>Recipient</td>
+            <td>{{body.recipient}}</td>
+          </tr>
+          {% if body.evidence %}
+          <tr>
+            <td class='fieldlabel evidence'>Evidence</td>
+            <td><a href='{{body.evidence}}'>{{body.evidence}}</a></td>
+          </tr>
+          {% endif %}
+          {% if body.issued_on %}
+          <tr>
+            <td class='fieldlabel'>Issued On</td>
+            <td>{{body.issued_on}}</td>
+          </tr>
+          {% endif %}
 
-        {% if body.expires %}
-        <tr>
-          <td class='fieldlabel'>Expiration Date</td>
-          <td>{{body.expires}}</td>
-        </tr>
-        {% endif %}
-
+          {% if body.expires %}
+          <tr>
+            <td class='fieldlabel'>Expiration Date</td>
+            <td>{{body.expires}}</td>
+          </tr>
+          {% endif %}
+        </tbody>
       </table>
     </div>
   </div>

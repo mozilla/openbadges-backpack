@@ -94,7 +94,8 @@
   $(function(){
     $('[rel="popinfo"]').popover({
       animation: false,
-      trigger: 'hover'
+      trigger: 'hover',
+      html: true
     });
 {% if tooltips %}
     $('[rel="popover"]').popover({

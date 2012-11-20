@@ -10,10 +10,6 @@
     <input tabindex=1 name='subtitle' class='field subtitle' placeholder='Optional subtitle' value='{{portfolio.attributes.subtitle}}'>
   </header>
 
-  <section class='preamble'>
-    <textarea tabindex=1 name='preamble' class='field preamble' placeholder='some information about this badge group'>{{portfolio.attributes.preamble}}</textarea>
-  </section>
-
   <ul class='badges'>
     {% for badge in portfolio.badges %}
       <li>
