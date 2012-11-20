@@ -282,7 +282,7 @@ Group.View = Backbone.View.extend({
    */
   render: function () {
     //this.el = ich.groupTpl(this.model.attributes);
-    this.el = $(nunjucks.env.render('group-template.hogan.js', this.model.attributes));
+    this.el = $(nunjucks.env.render('group-template.html', this.model.attributes));
     this.setElement($(this.el));
     this.$el
       .hide()
@@ -355,7 +355,7 @@ Details.View = Backbone.View.extend({
   render: function () {
     //ich.grabTemplates();
     //this.el = ich.detailsTpl(this.model.attributes);
-    this.el = $(nunjucks.env.render('badge-details.hogan.js', this.model.attributes));
+    this.el = $(nunjucks.env.render('badge-details.html', this.model.attributes));
     this.setElement(this.el);
     this.$el.data('view', this);
     return this;
@@ -432,7 +432,7 @@ Badge.View = Backbone.View.extend({
    */
   render: function () {
     //this.el = ich.badgeTpl(this.model.attributes);
-    this.el = $(nunjucks.env.render('badges_partial.hogan.js', this.model.attributes));
+    this.el = $(nunjucks.env.render('badges_partial.html', this.model.attributes));
     this.$el.data('view', this);
     this.setElement($(this.el));
     this.attachToExisting($(this.el));

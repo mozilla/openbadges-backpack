@@ -19,7 +19,7 @@ var Group = require('../models/group');
 exports.login = function login(request, response) {
   // request.flash returns an array. Pass on the whole thing to the view and
   // decide there if we want to display all of them or just the first one.
-  response.render('login.hogan.js', {
+  response.render('login.html', {
     error: request.flash('error'),
     csrfToken: request.session._csrf
   });
@@ -112,7 +112,7 @@ exports.stats = function stats(request, response, next) {
   function startResponse(err, badges) {
     if (err) return next(err);
     var data = computeStats(badges);
-    response.render('stats.hogan.js', { stats: data });
+    response.render('stats.html', { stats: data });
   }
 
   function computeStats(badges) {
@@ -218,7 +218,7 @@ exports.manage = function manage(request, response, next) {
     if (err) return next(err);
     prepareBadgeIndex(badges);
     modifyGroups(groups);
-    response.render('backpack.hogan.js', {
+    response.render('backpack.html', {
       error: error,
       success: success,
       badges: badges,

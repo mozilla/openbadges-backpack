@@ -21,9 +21,9 @@
         <li>
           {{#body}}
           <h3>{{badge.name}}</h3>
-          
+
           <textarea name='stories[{{id}}]' tabindex=1 class='story' placeholder='some information about this badge'>{{_userStory}}</textarea>
-          
+
           <table class='information'>
             <tr>
               <td rowspan="100" class='image'>
@@ -69,7 +69,7 @@
               <td><a href='{{evidence}}'>{{evidence}}</a></td>
             </tr>
             {{/evidence}}
-            
+
             {{#issued_on}}
             <tr>
               <td class='fieldlabel'>Issued</td>
@@ -91,7 +91,7 @@
     {{/badges}}
   </ul>
   {{/portfolio}}
-  
+
   <div class='save actions'>
     <input tabindex=1 class='btn btn-primary btn-large save' type='submit' value='Save this page'>
   </div>
