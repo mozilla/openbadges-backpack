@@ -1,3 +1,3 @@
-<a href="/backpack/badge/{{id}}">
-  <img id="id.{{id}}" src="{{meta.imagePath}}" width="64px"/>
-</a>
+<span draggable="true" class="openbadge" data-id="{{id}}" rel="popinfo" data-title="{{body.badge.name}}" data-content="<span>{{body.badge.description}}</span><span>Issuer: {{body.badge.issuer.name}}</span>">
+  <img src="{{image_path}}" width="64px"/>
+</span>

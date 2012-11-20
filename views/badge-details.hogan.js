@@ -1,98 +1,94 @@
-<h1>{{type.name}}</h1>
-<div class="row">
-  <div class="span4 columns badge-details">
-    <img id="badge-image" src="{{image}}" alt="Badge Image"/>
-    <dl>
-      <dt>Recipient</dt>
-      <dd>{{recipient}}</dd>
+  <div class='lightbox' data-id='{{id}}'>
+    <div class='contents badge-details'>
+      <header>
+        <h2>{{body.badge.name}}</h2>
+        <span class='close'>&times;</span>
+      </header>
+      <div class='body'>
 
-      <dt>Name</dt>
-      <dd>{{type.name}}</dd>
+        <div class='confirm-disown'>
+          <p>
+            This will remove the badge from your account. It will also be
+            removed from all groups. The only way to get this badge back will be
+            to go to the place where it was issued
+            (<a href='{{body.badge.issuer.origin}}'>{{body.badge.issuer.name}}</a>)
+            and get it re-issued.
+          </p>
 
-      <dt>Description</dt>
-      <dd>{{type.description}}</dd>
+          <div class='buttons'>
+            <button class='btn nope'>Nevermind, I want to keep this badge</button>
+            <button class='btn yep btn-danger'>Yes, remove this badge</button>
+          </div>
+        </div>
 
-      <dt>Criteria</dt>
-      <dd><a href="{{type.criteria}}">{{type.criteria}}</a></dd>
+        <table class='information table'>
+          <tr>
+            <td rowspan="100" class='image'>
+              <img src="{{image_path}}" class='badge-image'>
+              <button class='btn btn-danger disown'>Disown this Badge</button>
+            </td>
 
-      <dt>Issuer</dt>
-      <dd>{{type.issuer.name}} (<a href="{{type.issuer.origin}}">{{type.issuer.origin}}</a>)</dd>
+            <td class='section-head' colspan='2'>Issuer Details</td>
+          </tr>
+          {% if body %}
+          <tr>
+            <td class='fieldlabel issuer-name'>Name</td>
+            <td>{{body.badge.issuer.name}}</td>
+          </tr>
+          <tr>
+            <td class='fieldlabel issuer-name'>URL</td>
+            <td><a href="{{body.badge.issuer.origin}}">{{body.badge.issuer.origin}}</a></td>
+          </tr>
+          {% if body.badge.issuer.org %}
+          <tr>
+            <td class='fieldlabel issuer-name'>Organization</td>
+            <td>{{body.badge.issuer.org}}</td>
+          </tr>
+          {% endif %}
 
-      {{#type.issuer.org}}
-      <dt>Organization</dt>
-      <dd> {{type.issuer.org}} </dd>
-      {{/type.issuer.org}}
-    </dl>
-  </div>
+          <tr>
+            <td class='section-head' colspan='2'>Badge Details</td>
+          </tr>
+          <tr>
+            <td class='fieldlabel'>Name</td>
+            <td>{{body.badge.name}}</td>
+          </tr>
+          <tr>
+            <td class='fieldlabel'>Description</td>
+            <td>{{badge.description}}</td>
+          </tr>
+          <tr>
+            <td class='fieldlabel'>Criteria</td>
+            <td><a href='{{badge.criteria}}'>{{badge.criteria}}</a></td>
+          </tr>
 
-  {{#owner}}
-  <div class="span8 columns management">
+          <tr>
+            <td class='section-head' colspan='2'>Issuance Details</td>
+          </tr>
+          <tr>
+            <td class='fieldlabel recipient'>Recipient</td>
+            <td>{{recipient}}</td>
+          </tr>
+          <tr>
+            <td class='fieldlabel evidence'>Evidence</td>
+            <td><a href='{{evidence}}'>{{evidence}}</a></td>
+          </tr>
+          {% if issued_on %}
+          <tr>
+            <td class='fieldlabel'>Issued On</td>
+            <td>{{issued_on}}</td>
+          </tr>
+          {% endif %}
 
-    <div class="accept-reject">
-      <h2>Keep this badge?</h2>
-      <form action="{{ deleteRoute }}" method="post" style="display: inline">
-        <input type="hidden" name="_csrf" value="{{ csrfToken }}"></input>
-        <input type="hidden" name="_method" value="delete"></input>
-        <input class="btn btn-danger" type="submit" value="No, delete this badge."></input>
-      </form>
+          {% if expires %}
+          <tr>
+            <td class='fieldlabel'>Expiration Date</td>
+            <td>{{expires}}</td>
+          </tr>
+          {% endif %}
+
+          {% endif %}
+        </table>
+      </div>
     </div>
   </div>
-  {{/owner}}
-</div>
-
-<script type="text/javascript">
-(function() {
-
-  coffeescript(function() {
-    var autocheck, checkboxes, newGroup, shortDisable, watchChanges;
-    newGroup = $('#new-group');
-    checkboxes = $('.input-append input[type=checkbox]');
-    watchChanges = function(event) {
-      var elem, input, label;
-      elem = $(this);
-      label = elem.parent();
-      input = label.siblings('input').first();
-      if (elem.attr('checked')) {
-        label.addClass('active');
-        if (!input.val()) return input.trigger('focus');
-      } else {
-        return label.removeClass('active');
-      }
-    };
-    autocheck = function(event) {
-      var checkbox, checked, elem;
-      elem = $(this);
-      checkbox = elem.siblings('label').first().find('input');
-      checked = elem.val() ? true : false;
-      return checkbox.attr('checked', checked).trigger('change');
-    };
-    shortDisable = function() {
-      var checkbox, elem;
-      elem = $(this);
-      checkbox = elem.siblings('label').first().find('input');
-      checkbox.attr('disabled', true);
-      return setTimeout(function() {
-        return checkbox.attr('disabled', false);
-      }, 20);
-    };
-    checkboxes.bind('change', watchChanges).trigger('change');
-    return newGroup.bind('keydown', autocheck).bind('blur', autocheck).bind('blur', shortDisable);
-  });
-</script>
-<script>
-(function() {
-
-  coffeescript(function() {
-    var image;
-    image = $('#badge-image');
-    return image.bind('load', function(event) {
-      if (this.clientWidth > 256) {
-        return $(this).css({
-          width: '256px'
-        });
-      }
-    });
-  });
-
-}).call(this);
-</script>

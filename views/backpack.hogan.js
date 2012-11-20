@@ -1,4 +1,6 @@
-{{#tooltips}}
+{% extends 'layout.hogan.js' %}
+{% block body %}
+{% if tooltips %}
 <div class="alert alert-block alert-info">
   <h4 class="alert-heading">Welcome to your Badge Backpack!</h4>
   <p>
@@ -11,28 +13,28 @@
     When you feel comfortable you can click the <a href="/">Help: Off</a> link here or above to toggle these messages off.
   </p>
 </div>
-{{/tooltips}}
+{% endif %}
 
-{{^badges.length}}
+{% if not badges.length %}
 <h1>No badges.  Better get out there and start earning some!</h1>
 <p>By the way, <a href="http://p2pu.org">P2PU</a> would be a great place to start
-{{/badges.length}}
+{% endif %}
 
 <div class="row" style="position: relative;">
   <div class="span4 column">
-    {{#badges.length}}
-    <h1><span data-title="Badges" data-content="These are the badges you've earned so far! Click on one to see its details." rel="popover">Badges{{#tooltips}}<i class="icon-info-sign"></i>{{/tooltips}}</span></h1>
+    {% if badges.length %}
+    <h1><span data-title="Badges" data-content="These are the badges you've earned so far! Click on one to see its details." rel="popover">Badges{% if tooltips %}<i class="icon-info-sign"></i>{% endif %}</span></h1>
     <div id="badges" class="js-badges">
-      {{#badges}}
-        <span draggable="true" class="openbadge" data-id="{{attributes.id}}" rel="popinfo" data-title="{{attributes.body.badge.name}}" data-content="<span>{{attributes.body.badge.description}}</span><span>Issuer: {{attributes.body.badge.issuer.name}}</span>">
-          <img src="{{attributes.image_path}}" width="64px"/>
+      {% for badge in badges %}
+        <span draggable="true" class="openbadge" data-id="{{badge.attributes.id}}" rel="popinfo" data-title="{{badge.attributes.body.badge.name}}" data-content="<span>{{badge.attributes.body.badge.description}}</span><span>Issuer: {{badge.attributes.body.badge.issuer.name}}</span>">
+          <img src="{{badge.attributes.image_path}}" width="64px"/>
         </span>
-      {{/badges}}
+      {% endfor %}
     </div>
-    {{/badges.length}}
+    {% endif %}
     
     <div class="upload">
-      <h3><span data-title="Upload Badges" data-content="You can upload previously earned badges here, but they have to comply with the OBI metadata spec." rel="popover">Upload Badges{{#tooltips}}<i class="icon-info-sign"></i>{{/tooltips}}</span></h3>
+      <h3><span data-title="Upload Badges" data-content="You can upload previously earned badges here, but they have to comply with the OBI metadata spec." rel="popover">Upload Badges{% if tooltips %}<i class="icon-info-sign"></i>{% endif %}</span></h3>
       <p>If you have badges you've been awarded, you can upload them manually</p>
       <form action="/backpack/badge" method="post" enctype="multipart/form-data">
         <fieldset>
@@ -48,27 +50,27 @@
     </div>
   </div>
 
-  {{#badges.length}}
+  {% if badges.length %}
     <div id='groups' class="span8 column">
-      <h1><span rel="popover" data-title="Groups" data-content="You can drag-and-drop badges into groups, which you can use to publish your badges for employers, social networks, etc.">Groups{{#tooltips}}<i class="icon-info-sign"></i>{{/tooltips}}</span></h1>
-      {{#groups}}
-        <div class='group' data-id="{{attributes.id}}" data-url="{{attributes.url}}">
-        <input class='groupName' type='text' value='{{attributes.name}}' style='display: block' rel="tooltip" data-title="Rename groups to whatever you want!">
+      <h1><span rel="popover" data-title="Groups" data-content="You can drag-and-drop badges into groups, which you can use to publish your badges for employers, social networks, etc.">Groups{% if tooltips %}<i class="icon-info-sign"></i>{% endif %}</span></h1>
+      {% for group in groups %}
+        <div class='group' data-id="{{group.attributes.id}}" data-url="{{group.attributes.url}}">
+        <input class='groupName' type='text' value='{{group.attributes.name}}' style='display: block' rel="tooltip" data-title="Rename groups to whatever you want!">
         <span class='icon delete' rel="tooltip" data-title="Click to delete this group">&times;</span>
-        <span class='icon share' rel="tooltip" data-placement="bottom" {{^attributes.badgeObjects}}style='display: none'{{/attributes.badgeObjects}} title='Share this group'>5</span>
+        <span class='icon share' rel="tooltip" data-placement="bottom" {% if not group.attributes.badgeObjects %}style='display: none'{% endif %} title='Share this group'>5</span>
         
         <span class='public'>
-          <input type='checkbox' id='public{{attributes.id}}' class='js-privacy' {{#attributes.public}}checked{{/attributes.public}}>
-          <label for='public{{attributes.id}}'>public</label>
+          <input type='checkbox' id='public{{group.attributes.id}}' class='js-privacy' {% if group.attributes.public %}checked{% endif %}>
+          <label for='public{{group.attributes.id}}'>public</label>
         </span>
           
-          {{#attributes.badgeObjects}}
-            <span draggable="true" class="openbadge" data-id="{{attributes.id}}" rel="popinfo" data-title="{{attributes.body.badge.name}}" data-content="<span>{{attributes.body.badge.description}}</span><span>Issuer: {{attributes.body.badge.issuer.name}}</span>">
-              <img src="{{attributes.image_path}}" width="64px"/>
+          {% for badge in group.attributes.badgeObjects %}
+            <span draggable="true" class="openbadge" data-id="{{badge.attributes.id}}" rel="popinfo" data-title="{{badge.attributes.body.badge.name}}" data-content="<span>{{badge.attributes.body.badge.description}}</span><span>Issuer: {{badge.attributes.body.badge.issuer.name}}</span>">
+              <img src="{{badge.attributes.image_path}}" width="64px"/>
             </span>
-          {{/attributes.badgeObjects}}
+          {% endfor %}
         </div>
-      {{/groups}}
+      {% endfor %}
       
       <div class='group isNew'>
         <input class='groupName' type='text' value='New Group'>
@@ -78,14 +80,14 @@
       </div>
       
     </div>
-  {{/badges.length}}
+  {% endif %}
 </div>
 
 <script>
-  window.badgeData = {}
-  {{#badges}}
-    window.badgeData[{{attributes.id}}] = {{{serializedAttributes}}};
-  {{/badges}}
+  window.badgeData = {};
+  {% for badge in badges %}
+    window.badgeData[{{badge.attributes.id}}] = {{badge.serializedAttributes}};
+  {% endfor %}
 </script>
 
 <script>
@@ -94,7 +96,7 @@
       animation: false,
       trigger: 'hover'
     });
-{{#tooltips}}
+{% if tooltips %}
     $('[rel="popover"]').popover({
       animation: false,
       placement: 'right',
@@ -103,132 +105,7 @@
     $('[rel="tooltip"]').tooltip({
       animation: false
     });
-{{/tooltips}}
+{% endif %}
   });
 </script>
-
-{{=|| ||=}} <!-- need to change delimeter so hogan doesn't parse these --->
-
-<script type='text/html' id='detailsTpl'>
-  <div class='lightbox' data-id='{{id}}'>
-    <div class='contents badge-details'>
-      <header>
-        <h2>{{body.badge.name}}</h2>
-        <span class='close'>&times;</span>
-      </header>
-      <div class='body'>
-
-        <div class='confirm-disown'>
-          <p>
-            This will remove the badge from your account. It will also be
-            removed from all groups. The only way to get this badge back will be
-            to go to the place where it was issued
-            (<a href='{{body.badge.issuer.origin}}'>{{body.badge.issuer.name}}</a>)
-            and get it re-issued.
-          </p>
-
-          <div class='buttons'>
-            <button class='btn nope'>Nevermind, I want to keep this badge</button>
-            <button class='btn yep btn-danger'>Yes, remove this badge</button>
-          </div>
-        </div>
-
-        <table class='information table'>
-          <tr>
-            <td rowspan="100" class='image'>
-              <img src="{{image_path}}" class='badge-image'>
-              <button class='btn btn-danger disown'>Disown this Badge</button>
-            </td>
-
-            <td class='section-head' colspan='2'>Issuer Details</td>
-          </tr>
-          {{#body}}
-          <tr>
-            <td class='fieldlabel issuer-name'>Name</td>
-            <td>{{badge.issuer.name}}</td>
-          </tr>
-          <tr>
-            <td class='fieldlabel issuer-name'>URL</td>
-            <td><a href="{{badge.issuer.origin}}">{{badge.issuer.origin}}</a></td>
-          </tr>
-          {{#badge.issuer.org}}
-          <tr>
-            <td class='fieldlabel issuer-name'>Organization</td>
-            <td>{{badge.issuer.org}}</td>
-          </tr>
-          {{/badge.issuer.org}}
-
-          <tr>
-            <td class='section-head' colspan='2'>Badge Details</td>
-          </tr>
-          <tr>
-            <td class='fieldlabel'>Name</td>
-            <td>{{badge.name}}</td>
-          </tr>
-          <tr>
-            <td class='fieldlabel'>Description</td>
-            <td>{{badge.description}}</td>
-          </tr>
-          <tr>
-            <td class='fieldlabel'>Criteria</td>
-            <td><a href='{{badge.criteria}}'>{{badge.criteria}}</a></td>
-          </tr>
-
-          <tr>
-            <td class='section-head' colspan='2'>Issuance Details</td>
-          </tr>
-          <tr>
-            <td class='fieldlabel recipient'>Recipient</td>
-            <td>{{recipient}}</td>
-          </tr>
-          <tr>
-            <td class='fieldlabel evidence'>Evidence</td>
-            <td><a href='{{evidence}}'>{{evidence}}</a></td>
-          </tr>
-          {{#issued_on}}
-          <tr>
-            <td class='fieldlabel'>Issued On</td>
-            <td>{{issued_on}}</td>
-          </tr>
-          {{/issued_on}}
-          
-          {{#expires}}
-          <tr>
-            <td class='fieldlabel'>Expiration Date</td>
-            <td>{{expires}}</td>
-          </tr>
-          {{/expires}}
-          
-          {{/body}}
-        </table>
-      </div>
-    </div>
-  </div>
-</script>
-
-
-
-<script type='text/html' id='groupTpl'>
-  <div class='group {{^attributes.id}}isNew{{/attributes.id}}'>
-    <input class='groupName' type='text' value='{{name}}'>
-    <span class='icon delete'>&times;</span>
-    <span class='icon share' style='display: none' title='share this group'>5</span>
-    
-    {{^attributes.id}}
-      <h3 class='instructions'>Drag a Badge Here</h3>
-    {{/attributes.id}}
-  
-    {{#attributes.id}}
-      <span class='public'>
-        <input type='checkbox' id='public{{attributes.id}}' class='js-privacy' {{#attributes.public}}checked{{/attributes.public}}>
-        <label for='public{{attributes.id}}'>public</label>
-      </span>
-    {{/attributes.id}}
-  </div>
-</script>
-
-<script type='text/html' class='partial' id='badgeTpl'>
-  <span draggable="true" class="openbadge" data-id="{{attributes.id}}" rel="popinfo" data-title="{{attributes.body.badge.name}}" data-content="<span>{{attributes.body.badge.description}}</span><span>Issuer: {{attributes.body.badge.issuer.name}}</span>">
-    <img src="{{image_path}}" width="64px"/>
-  </span>
-</script>
+{% endblock %}

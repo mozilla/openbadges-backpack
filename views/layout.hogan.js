@@ -4,9 +4,9 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge;chrome=1" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    {{#opengraph}}
+    {% if opengraph %}
       <meta property="og:{{property}}" content="{{content}}" />
-    {{/opengraph}}
+    {% endif %}
     <link rel="icon" href="favicon.ico">
     <link rel="stylesheet" href="/css/socialshare.min.css" type="text/css" media="all" />
     <link rel="stylesheet" href="/css/bootstrap-2.0.2.min.css" />
@@ -26,36 +26,38 @@
           <a href="http://www.mozilla.org/" id="tabzilla">a mozilla.org joint</a>
           <ul class="nav">
             <li><a href="/">Home</a></li>
-            <li><a href="/{{^tooltips}}?tooltips{{/tooltips}}">Help: {{#tooltips}}Off{{/tooltips}}{{^tooltips}}On{{/tooltips}}</a></li>
+            <li><a href="/{% if not tooltips %}?tooltips{% endif %}">
+              Help: {% if tooltips %}Off{% else %}On{% endif %}
+            </a></li>
           </ul>
-          {{#user}}
+          {% if user %}
             <ul class="nav pull-right">
-              <li class="user">{{attributes.email}}</li>
+              <li class="user">{{user.attributes.email}}</li>
               <li><a href="/backpack/signout">Sign Out</a></li>
             </ul>
-          {{/user}}
+          {% endif %}
         </div>
       </div>
     </div>
 
     <div id="body" class="container">
       <div class='message-container'>
-      {{#error.length}}
+      {% for e in error %}
         <div class="alert alert-error">
           <a class="close" data-dismiss="alert">×</a>
-          {{error}}
+          {{e}}
         </div>
-      {{/error.length}}
+      {% endfor %}
 
-      {{#success.length}}
+      {% for s in success %}
         <div class="alert alert-success">
           <a class="close" data-dismiss="alert">×</a>
-          {{success}}
+          {{s}}
         </div>
-      {{/success.length}}
+      {% endfor %}
       </div>
 
-      {{{body}}}
+      {% block body %}{% endblock %}
     </div>
 
     <div id="footer" class="container">
@@ -69,7 +71,6 @@
     </div>
 
 
-      {{=|| ||=}} <!-- need to change delimeter so hogan doesn't parse these -->
       <script type="text/html" id="messageTpl">
         <div class="alert alert-{{type}}">
           <p><strong>{{message}}</strong></p>
@@ -78,7 +79,7 @@
 
 
       <!-- third party -->
-      <script type="text/javascript" src="/js/ICanHaz.js"></script>
+      <script type="text/javascript" src="/js/nunjucks-dev.js"></script>
       <script type="text/javascript" src="/js/underscore.js"></script>
       <script type="text/javascript" src="/js/backbone.js"></script>
       <script type="text/javascript" src="/js/bootstrap-2.0.2.min.js"></script>

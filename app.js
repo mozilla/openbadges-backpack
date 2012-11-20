@@ -1,25 +1,22 @@
 // Configure & start express.
 var express = require('express');
+var http = require('http');
 var fs = require('fs');
 var path = require('path');
 var middleware = require('./middleware');
 var logger = require('./lib/logging').logger;
 var configuration = require('./lib/configuration');
-var hogan = require('hogan.js');
-var hoganadapter = require('./lib/hogan-express.js');
+var flash = require('connect-flash');
+var nunjucks = require('nunjucks');
 
-var app = express.createServer();
+var app = express();
 app.logger = logger;
 app.config = configuration;
-
-// default view engine
-app.set('view engine', 'hogan.js');
-app.register('hogan.js', hoganadapter.init(hogan));
 
 // View helpers. `user` and `badges` are set so we can use them in `if`
 // statements without getting undefined errors and without having to use typeof
 // checks.
-app.helpers({
+app.locals({
   login: true,
   title: 'Backpack',
   error: [],
@@ -27,16 +24,15 @@ app.helpers({
   badges: {},
 });
 
-app.dynamicHelpers({
-  user: function (req, res) {
-    return req.user || null;
-  }
-});
+// default view engine
+var env = new nunjucks.Environment(new nunjucks.FileSystemLoader('views'));
+env.express(app);
 
 // Middleware. Also see `middleware.js`
 // ------------------------------------
 app.use(express.static(path.join(__dirname, "static")));
 app.use(express.static(path.join(configuration.get('var_dir'), "badges")));
+app.use("/views", express.static(path.join(__dirname, "views")));
 app.use(middleware.noFrame({ whitelist: [ '/issuer/frame.*', '/', '/share/.*' ] }));
 app.use(express.bodyParser({ uploadDir: configuration.get('badge_path') }));
 app.use(express.cookieParser());
@@ -44,7 +40,8 @@ app.use(express.methodOverride());
 app.use(middleware.logRequests());
 app.use(middleware.cookieSessions());
 app.use(middleware.userFromSession());
-app.use(middleware.csrf({
+app.use(flash());
+app.use(middleware.csrf({ 
   whitelist: [
     '/backpack/authenticate',
     '/issuer/validator/?',
@@ -143,7 +140,7 @@ if (!module.parent) {
       process.exit();
     });
   };
-  start_server(app);
+  start_server(http.createServer(app)); //TODO: move createServer into start_server?
 } else {
-  module.exports = app;
+  module.exports = http.createServer(app); //TODO: move createServer out of app.js?
 }

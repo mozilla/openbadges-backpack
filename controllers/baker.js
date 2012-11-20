@@ -50,7 +50,7 @@ exports.baker = function (request, response) {
 
   // render the badge baker frontend and bounce if no assertion was passed
   if (!assertionUrl)
-    return response.render('baker', { title: 'Creator', login: false });
+    return response.render('baker.hogan.js', { title: 'Creator', login: false });
 
   // all errors get reported as json. we will explicitly set the
   // content-type to image/png on success.

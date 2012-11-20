@@ -11,6 +11,10 @@ $.ajaxSetup({
   }
 })
 
+if(!nunjucks.env) {
+    nunjucks.env = new nunjucks.Environment(new nunjucks.HttpLoader('/views'));
+}
+
 }(/*end setup*/)
 
 
@@ -89,7 +93,8 @@ Message.View = Backbone.View.extend({
   className: 'message',
   events: {},
   render: function (attributes) {
-    var $element = ich.messageTpl(attributes);
+    //var $element = ich.messageTpl(attributes);
+    var $element = $(nunjucks.env.render('message-template.html', attributes));
     this.parent.empty();
     $element
       .hide()
@@ -276,7 +281,8 @@ Group.View = Backbone.View.extend({
    * id "#groupTpl"
    */
   render: function () {
-    this.el = ich.groupTpl(this.model.attributes);
+    //this.el = ich.groupTpl(this.model.attributes);
+    this.el = $(nunjucks.env.render('group-template.hogan.js', this.model.attributes));
     this.setElement($(this.el));
     this.$el
       .hide()
@@ -347,8 +353,9 @@ Details.View = Backbone.View.extend({
   },
 
   render: function () {
-    ich.grabTemplates();
-    this.el = ich.detailsTpl(this.model.attributes);
+    //ich.grabTemplates();
+    //this.el = ich.detailsTpl(this.model.attributes);
+    this.el = $(nunjucks.env.render('badge-details.hogan.js', this.model.attributes));
     this.setElement(this.el);
     this.$el.data('view', this);
     return this;
@@ -424,7 +431,8 @@ Badge.View = Backbone.View.extend({
    * id "#badgeTpl"
    */
   render: function () {
-    this.el = ich.badgeTpl(this.model.attributes);
+    //this.el = ich.badgeTpl(this.model.attributes);
+    this.el = $(nunjucks.env.render('badges_partial.hogan.js', this.model.attributes));
     this.$el.data('view', this);
     this.setElement($(this.el));
     this.attachToExisting($(this.el));

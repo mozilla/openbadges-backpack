@@ -1,3 +1,5 @@
+{% extends 'layout.hogan.js' %}
+{% block body %}
 <h1>Welcome</h1>
 <h2>Use the green button below to <a href="#" class="js-browserid-link">sign in.</a><br/> Don&rsquo;t worry if you don&rsquo;t have an account, that&rsquo;ll get taken care of.</h2>
 
@@ -32,3 +34,4 @@
 //begin login handler scope
 }();
 </script>
+{% endblock %}
