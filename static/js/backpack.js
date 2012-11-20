@@ -355,7 +355,12 @@ Details.View = Backbone.View.extend({
   },
 
   render: function () {
-    this.el = template('badge-details.html', this.model.attributes);
+    this.el = template('badge-details.html', { 
+      badge: { 
+        attributes: this.model.attributes 
+      },
+      disownable: true
+    });
     this.setElement(this.el);
     this.$el.data('view', this);
     return this;
