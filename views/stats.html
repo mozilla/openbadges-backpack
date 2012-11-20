@@ -2,7 +2,10 @@
 {% block body %}
 <h1>Backpack Facts</h1>
 
-<p>There are {{totalBadges}} badges in the system.</p>
+<p>
+  There are {{totalBadges}} badges in the system
+  from {{totalPerIssuer.length}} issuers.
+</p>
 <p>Some details per issuer,
   <ul>
     {% for total in totalPerIssuer %}
