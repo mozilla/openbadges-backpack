@@ -446,8 +446,18 @@ Badge.View = Backbone.View.extend({
     this.detailsView = new Details.View({ model: this.model });
     this.detailsView.render();
     this.setElement($(el));
+    $(el).popover({
+      animation:false,
+      trigger: 'hover',
+      html: true
+    });
     return this;
   },
+
+  remove: function () {
+    this.$el.popover('hide');
+    Backbone.View.prototype.remove.call(this);
+  }
 });
 
 Badge.View.all = [];
