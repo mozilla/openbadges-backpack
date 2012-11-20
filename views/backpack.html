@@ -90,14 +90,9 @@
   {% endfor %}
 </script>
 
+{% if tooltips %}
 <script>
   $(function(){
-    $('[rel="popinfo"]').popover({
-      animation: false,
-      trigger: 'hover',
-      html: true
-    });
-{% if tooltips %}
     $('[rel="popover"]').popover({
       animation: false,
       placement: 'right',
@@ -106,7 +101,7 @@
     $('[rel="tooltip"]').tooltip({
       animation: false
     });
-{% endif %}
   });
 </script>
+{% endif %}
 {% endblock %}
