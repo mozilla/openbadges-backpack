@@ -13,7 +13,7 @@ var ORIGIN = protocol + '://' + configuration.get('hostname') + (port ? ':' + po
 
 // Render the view for the demo badge issuer.
 exports.issuer = function (req, res) {
-  res.render('issuer', {
+  res.render('issuer.html', {
     login: false,
     title: 'Demo Issuer',
     csrfToken: req.session._csrf

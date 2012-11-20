@@ -1,0 +1,13 @@
+{% extends 'layout.html' %}
+{% block body %}
+<h1>Backpack Facts</h1>
+
+<p>There are {{totalBadges}} badges in the system.</p>
+<p>Some details per issuer,
+  <ul>
+    {% for total in totalPerIssuer %}
+    <li>{{total.name}} (<a href='{{total.url}}'>{{total.url}}</a>) has {{total.total}} badges</li>
+    {% endfor %}
+  </ul>
+</p>
+{% endblock %}

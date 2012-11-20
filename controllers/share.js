@@ -69,7 +69,7 @@ exports.editor = function (request, response) {
     portfolio.group = group;
     portfolio.badges = badgesWithStories;
     portfolio.preamble = prepareText(portfolio.get('preamble'));
-    response.render('portfolio-editor', {
+    response.render('portfolio-editor.html', {
       csrfToken: request.session._csrf,
       portfolio: portfolio
     });
@@ -128,7 +128,7 @@ exports.show = function (request, response, next) {
     portfolio.badges = badgesWithStories;
     portfolio.preamble = prepareText(portfolio.get('preamble'));
 
-    return response.render('portfolio', {
+    return response.render('portfolio.html', {
       opengraph: [
         { property: 'title', content: portfolio.attributes.title },
         { property: 'type', content: 'openbadges:share' },

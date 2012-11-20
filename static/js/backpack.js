@@ -10,7 +10,9 @@ $.ajaxSetup({
     xhr.setRequestHeader('X-CSRF-Token', CSRF)
   }
 })
-
+if(!nunjucks.env) {
+    nunjucks.env = new nunjucks.Environment(new nunjucks.HttpLoader('/views'));
+}
 }(/*end setup*/)
 
 
@@ -38,6 +40,13 @@ var errHandler = function (model, xhr) {
     type: 'error',
     message:'There was a problem syncing your changes. Please refresh the page before making any new changes.'
   });
+}
+
+/**
+ * Nunjucks template helper
+ */
+var template = function template(name, data) {
+    return $(nunjucks.env.render(name, data));
 }
 
 // Model Definitions
@@ -89,7 +98,7 @@ Message.View = Backbone.View.extend({
   className: 'message',
   events: {},
   render: function (attributes) {
-    var $element = ich.messageTpl(attributes);
+    var $element = template('message-template.html', attributes);
     this.parent.empty();
     $element
       .hide()
@@ -272,11 +281,10 @@ Group.View = Backbone.View.extend({
 
 
   /**
-   * Render this sucker. Uses ICanHaz.js to find a template with the
-   * id "#groupTpl"
+   * Render this sucker.
    */
   render: function () {
-    this.el = ich.groupTpl(this.model.attributes);
+    this.el = template('group-template.html', this.model.attributes);
     this.setElement($(this.el));
     this.$el
       .hide()
@@ -347,8 +355,7 @@ Details.View = Backbone.View.extend({
   },
 
   render: function () {
-    ich.grabTemplates();
-    this.el = ich.detailsTpl(this.model.attributes);
+    this.el = template('badge-details.html', this.model.attributes);
     this.setElement(this.el);
     this.$el.data('view', this);
     return this;
@@ -420,11 +427,10 @@ Badge.View = Backbone.View.extend({
   },
 
   /**
-   * Render this sucker. Uses ICanHaz.js to find a template with the
-   * id "#badgeTpl"
+   * Render this sucker.
    */
   render: function () {
-    this.el = ich.badgeTpl(this.model.attributes);
+    this.el = template('badges_partial.html', this.model.attributes);
     this.$el.data('view', this);
     this.setElement($(this.el));
     this.attachToExisting($(this.el));

@@ -1,0 +1,136 @@
+{% extends 'layout.html' %}
+{% block body %}
+<link rel="stylesheet" href="/css/socialmedia.css">
+
+<div class='portfolio'>
+{% if message %}
+  <div class='message-container'>
+    <div class="alert alert-info">
+      <a class="close" data-dismiss="alert">×</a>
+      {{message}}
+      {{socialcode}}
+    </div>
+  </div>
+{% endif %}
+
+  {% if owner %}
+  <div class='edit'>
+    <a href="edit" class='edit btn btn-primary'>Edit this page</a>
+  </div>
+  {% endif %}
+
+  <header>
+    {% if portfolio.attributes.title %}
+      <h1>{{portfolio.attributes.title}}</h1>
+    {% endif %}
+    {% if portfolio.attributes.subtitle %}
+      <h2>{{portfolio.attributes.subtitle}}</h1>
+    {% endif %}
+  </header>
+
+  <ul class='badges'>
+    {% for badge in portfolio.badges %}
+      <li>
+        <h3>{{badge.attributes.body.badge.name}}</h3>
+
+        <p class='story'>{{badge.attributes.body._userStory}}</p>
+
+        <table class='information'>
+          <colgroup>
+            <col class="imageCol">
+            <col class="fieldLabelCol">
+            <col class="dataCol">
+          </colgroup>
+          <tbody>
+            <tr>
+              <td rowspan="100" class='image'>
+                <img src="{{badge.attributes.image_path}}">
+              </td>
+
+              <td class='section-head' colspan='2'>Issuer Details</td>
+            </tr>
+            <tr>
+              <td class='fieldlabel issuer-name'>Name</td>
+              <td>{{badge.attributes.body.badge.issuer.name}}</td>
+            </tr>
+            <tr>
+              <td class='fieldlabel issuer-name'>URL</td>
+              <td><a href="{{badge.attributes.body.badge.issuer.origin}}">{{badge.attributes.body.badge.issuer.origin}}</a></td>
+            </tr>
+            {% if badge.attributes.body.badge.issuer.org %}
+            <tr>
+              <td class='fieldlabel issuer-name'>Organization</td>
+              <td>{{badge.attributes.body.badge.issuer.org}}</td>
+            </tr>
+            {% endif %}
+
+            <tr>
+              <td class='section-head' colspan='2'>Badge Details</td>
+            </tr>
+            <tr>
+              <td class='fieldlabel'>Name</td>
+              <td>{{badge.attributes.body.badge.name|escape}}</td>
+            </tr>
+            <tr>
+              <td class='fieldlabel'>Description</td>
+              <td>{{badge.attributes.body.badge.description|escape}}</td>
+            </tr>
+            <tr>
+              <td class='fieldlabel'>Criteria</td>
+              <td><a href='{{badge.attributes.body.badge.criteria}}'>{{badge.attributes.body.badge.criteria}}</a></td>
+            </tr>
+
+            {% if badge.attributes.body.evidence %}
+            <tr>
+              <td class='fieldlabel evidence'>Evidence</td>
+              <td><a href='{{badge.attributes.body.evidence}}'>{{badge.attributes.body.evidence}}</a></td>
+            </tr>
+            {% endif %}
+
+            {% if badge.attributes.body.issued_on %}
+            <tr>
+              <td class='fieldlabel'>Issued</td>
+              <td>{{badge.attributes.body.issued_on}}</td>
+            </tr>
+            {% endif %}
+
+            {% if badge.attributes.body.expires %}
+            <tr>
+              <td class='fieldlabel'>Expiration</td>
+              <td>{{badge.attributes.body.expires}}</td>
+            </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </li>
+    {% endfor %}
+  </ul>
+
+  {% if postamble %}
+  <section class='postamble'>
+    {{postamble}}
+  </section>
+  {% endif %}
+</div>
+
+
+<script type="text/javascript" src="/js/social-media.js"></script>
+
+<script>
+function injectSocialMedia(container) {
+  // prevent this element from injecting social media again
+  container.onclick = function() { return false; }
+  var socialMedia = new SocialMedia();
+  var url = window.location.toString();
+
+  // inject twitter, g+ and facebook
+  socialMedia.hotLoad(container.querySelector(".twitter"),  socialMedia.twitter,  url);
+  socialMedia.hotLoad(container.querySelector(".google"),   socialMedia.google,   url);
+  socialMedia.hotLoad(container.querySelector(".facebook"), socialMedia.facebook, url);
+
+  // kill off the text label
+  var label = container.querySelector("span");
+  $(label).remove();
+}
+</script>
+{% endblock %}
