@@ -1,4 +1,4 @@
-<form id="bake-form" class="baker form-stacked" action="{{#reverse}}baker.baker{{/reverse}}" method="GET">
+<form id="bake-form" class="baker form-stacked" action="/baker" method="GET">
   <fieldset>
     <label for="assertion">URL for your badge assertion</label>
     <input id="assertion" class="xlarge" type="text" value="http://badgehub.org/test/badge.json" placeholder="http://your-site.com/path-to-assertion.json" name="assertion"></input>

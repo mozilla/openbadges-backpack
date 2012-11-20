@@ -1,7 +1,7 @@
 <h1>Welcome</h1>
 <h2>Use the green button below to <a href="#" class="js-browserid-link">sign in.</a><br/> Don&rsquo;t worry if you don&rsquo;t have an account, that&rsquo;ll get taken care of.</h2>
 
-<form class="signin js-browserid-form" method="POST" action="{{#reverse}}backpack.authenticate{{/reverse}}">
+<form class="signin js-browserid-form" method="POST" action="/backpack/authenticate">
   <input class="js-browserid-input" name="assertion" type="hidden"></input>
   <input name="_csrf" type="hidden" value="{{ csrfToken }}"></input>
 </form>

@@ -9,7 +9,7 @@
    * on account creation. Let's kick over to the welcome screen instead.
    */
    if (window.top === window.self) {
-    window.location = "{{#reverse}}issuer.welcome{{/reverse}}";
+    window.location = "/issuer/welcome";
   }
 </script>
 {{/framed}}
@@ -143,7 +143,7 @@
   <script>
     $(window).ready(function(){
       window.issue({{{assertions}}}, function(){
-        window.location = "{{#reverse}}backpack.manage{{/reverse}}";
+        window.location = "/";
       });
     });
   </script>

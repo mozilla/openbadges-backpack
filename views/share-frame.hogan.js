@@ -1,5 +1,5 @@
 {{#badges}}
-<a href="{{#reverse}}share.badge id{{/reverse}}"><img id="{{id}}" src="{{meta.imagePath}}" width="64px"></a>
+<img id="{{id}}" src="{{meta.imagePath}}" width="64px">
 {{/badges}}
 
 <script type="text/javascript">

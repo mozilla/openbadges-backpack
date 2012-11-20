@@ -8,7 +8,7 @@
     We've turned on some helpful tooltips to help you get oriented. Mouse over the different parts of your backpack to learn what they do, paying special attention anywhere you see the <i class="icon-info-sign"></i> icon.
   </p>
   <p>
-    When you feel comfortable you can click the <a href="{{#reverse}}backpack.manage{{/reverse}}">Help: Off</a> link here or above to toggle these messages off.
+    When you feel comfortable you can click the <a href="/">Help: Off</a> link here or above to toggle these messages off.
   </p>
 </div>
 {{/tooltips}}
@@ -34,7 +34,7 @@
     <div class="upload">
       <h3><span data-title="Upload Badges" data-content="You can upload previously earned badges here, but they have to comply with the OBI metadata spec." rel="popover">Upload Badges{{#tooltips}}<i class="icon-info-sign"></i>{{/tooltips}}</span></h3>
       <p>If you have badges you've been awarded, you can upload them manually</p>
-      <form action="{{#reverse}}backpack.userBadgeUpload{{/reverse}}" method="post" enctype="multipart/form-data">
+      <form action="/backpack/badge" method="post" enctype="multipart/form-data">
         <fieldset>
           <div class="clearfix">
             <input type="hidden" name="_csrf" value="{{ csrfToken }}"></input>
