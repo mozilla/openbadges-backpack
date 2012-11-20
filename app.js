@@ -5,7 +5,6 @@ var path = require('path');
 var middleware = require('./middleware');
 var logger = require('./lib/logging').logger;
 var configuration = require('./lib/configuration');
-var router = require('./lib/router');
 var hogan = require('hogan.js');
 var hoganadapter = require('./lib/hogan-express.js');
 
@@ -34,7 +33,8 @@ app.dynamicHelpers({
   }
 });
 
-// Middleware. See `middleware.js`
+// Middleware. Also see `middleware.js`
+// ------------------------------------
 app.use(express.static(path.join(__dirname, "static")));
 app.use(express.static(path.join(configuration.get('var_dir'), "badges")));
 app.use(middleware.noFrame({ whitelist: [ '/issuer/frame.*', '/', '/share/.*' ] }));
@@ -53,59 +53,73 @@ app.use(middleware.csrf({
   ]
 }));
 app.use(middleware.cors({ whitelist: ['/_badges.*', '/issuer.*', '/baker', '/displayer/.+/group.*'] }));
-
 app.configure('development', function () {
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
-
 app.configure('production', function () {
   app.use(express.errorHandler());
 });
 
-router(app)
-  .get('/baker',                      'baker.baker')
-  .delete('/badge/:badgeId',          'badge.destroy')
-  .get('/issuer.js',                  'issuer.generateScript')
-  .get('/issuer/frame',               'issuer.frame')
-  .post('/issuer/frameless',          'issuer.frameless')
-  .get('/issuer/assertion',           'issuer.issuerBadgeAddFromAssertion')
-  .post('/issuer/assertion',          'issuer.issuerBadgeAddFromAssertion')
 
-  .get('/issuer/validator',           'issuer.validator')
-  .post('/issuer/validator',          'issuer.validator')
-  .get('/issuer/welcome',             'issuer.welcome')
+// Routes
+// ------
+const baker = require('./controllers/baker');
+const badge = require('./controllers/badge');
+const issuer = require('./controllers/issuer');
+const displayer = require('./controllers/displayer');
+const demo = require('./controllers/demo');
+const backpack = require('./controllers/backpack');
+const group = require('./controllers/group');
+const share = require('./controllers/share');
 
+// Parameter handlers
+app.param('badgeId', badge.findById);
+app.param('dUserId', displayer.param.dUserId);
+app.param('dGroupId', displayer.param.dGroupId);
+app.param('groupId', group.findById);
+app.param('groupUrl', share.findGroupByUrl);
 
-  .get('/displayer/:dUserId/groups.:format?',          'displayer.userGroups')
-  .get('/displayer/:dUserId/group/:dGroupId.json',     'displayer.userGroupBadges')
-  .get('/displayer/convert/email',                     'displayer.emailToUserIdView')
-  .post('/displayer/convert/email',                    'displayer.emailToUserId')
+app.get('/baker', baker.baker);
+app.get('/issuer.js', issuer.generateScript);
+app.get('/issuer/frame', issuer.frame);
+app.post('/issuer/frameless', issuer.frameless);
+app.get('/issuer/assertion', issuer.issuerBadgeAddFromAssertion);
+app.post('/issuer/assertion', issuer.issuerBadgeAddFromAssertion);
+app.get('/issuer/validator', issuer.validator);
+app.post('/issuer/validator', issuer.validator);
+app.get('/issuer/welcome', issuer.welcome);
 
-  .get('/demo',                       'demo.issuer')
-  .get('/demo/ballertime',            'demo.massAward')
-  .get('/demo/badge.json',            'demo.demoBadge')
-  .get('/demo/invalid.json',          'demo.badBadge')
-  .post('/demo/award',                'demo.award')
+app.get('/displayer/convert/email', displayer.emailToUserIdView);
+app.post('/displayer/convert/email', displayer.emailToUserId);
+app.get('/displayer/:dUserId/groups.:format?', displayer.userGroups);
+app.get('/displayer/:dUserId/group/:dGroupId.json', displayer.userGroupBadges);
 
-  .get('/backpack/login',             'backpack.login')
-  .get('/backpack/signout',           'backpack.signout')
-  .get('/backpack/badge/:badgeId',    'backpack.details')
-  .get('/',                           'backpack.manage')
-  .get('/backpack',                   'backpack.manage')
-  .post('/backpack/badge',            'backpack.userBadgeUpload')
-  .post('/backpack/authenticate',     'backpack.authenticate')
-  .delete('/backpack/badge/:badgeId', 'backpack.deleteBadge')
+app.get('/demo', demo.issuer);
+app.get('/demo/ballertime', demo.massAward);
+app.get('/demo/badge.json', demo.demoBadge);
+app.get('/demo/invalid.json', demo.badBadge);
+app.post('/demo/award', demo.award);
 
-  .get('/stats',                      'backpack.stats')
+app.get('/', backpack.manage);
+app.get('/backpack', backpack.manage)
+app.get('/backpack/login', backpack.login);
+app.get('/backpack/signout', backpack.signout);
+app.post('/backpack/badge', backpack.userBadgeUpload);
+app.post('/backpack/authenticate', backpack.authenticate);
+app.get('/stats', backpack.stats);
+app.get('/backpack/badge/:badgeId', backpack.details);
+app.delete('/backpack/badge/:badgeId', backpack.deleteBadge);
 
-  .post('/group',                     'group.create')
-  .put('/group/:groupId',             'group.update')
-  .delete('/group/:groupId',          'group.destroy')
+app.delete('/badge/:badgeId', badge.destroy);
 
-  .get('/share/:groupUrl/edit',       'share.editor')
-  .post('/share/:groupUrl',           'share.createOrUpdate')
-  .put('/share/:groupUrl',            'share.createOrUpdate')
-  .get('/share/:groupUrl',            'share.show');
+app.post('/group', group.create);
+app.put('/group/:groupId', group.update);
+app.delete('/group/:groupId', group.destroy);
+
+app.get('/share/:groupUrl/edit', share.editor);
+app.post('/share/:groupUrl', share.createOrUpdate);
+app.put('/share/:groupUrl', share.createOrUpdate);
+app.get('/share/:groupUrl', share.show);
 
 if (!module.parent) {
   var start_server = function start_server(app) {

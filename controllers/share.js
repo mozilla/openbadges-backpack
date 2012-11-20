@@ -7,24 +7,25 @@ var Group = require('../models/group');
 var configuration = require('../lib/configuration');
 var logger = require('../lib/logging').logger;
 
-exports.param = {
-  groupUrl: function (request, response, next, url) {
-    Group.findOne({url: url}, function (err, group) {
-      if (err) {
-        logger.error("Error pulling group: " + err);
-        return response.send('Error pulling group', 500);
-      }
-      if (!group) {
-        return response.send('Could not find group', 404);
-      }
-      Portfolio.findOne({group_id: group.get('id')}, function (err, portfolio) {
-        if (err) return next(err);
-        if (portfolio) group.set('portfolio', portfolio);
-        request.group = group;
-        return next();
-      });
+exports.findGroupByUrl = function findGroupByUrl(req, res, next, url) {
+  Group.findOne({url: url}, function (err, group) {
+    if (err) {
+      logger.error("Error pulling group: " + err);
+      return res.send('Error pulling group', 500);
+    }
+
+    if (!group)
+      return res.send('Could not find group', 404);
+
+    Portfolio.findOne({group_id: group.get('id')}, function (err, portfolio) {
+      if (err)
+        return next(err);
+      if (portfolio)
+        group.set('portfolio', portfolio);
+      req.group = group;
+      return next();
     });
-  }
+  });
 };
 
 
