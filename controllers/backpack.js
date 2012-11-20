@@ -9,7 +9,6 @@ var baker = require('../lib/baker');
 var remote = require('../lib/remote');
 var browserid = require('../lib/browserid');
 var awardBadge = require('../lib/award');
-var reverse = require('../lib/router').reverse;
 var Badge = require('../models/badge');
 var Group = require('../models/group');
 
@@ -73,7 +72,7 @@ exports.authenticate = function authenticate(request, response) {
 
     logger.debug('browserid verified, attempting to authenticate user');
     request.session.emails = [verifierResponse.email];
-    return formatResponse(reverse('backpack.manage'));
+    return formatResponse('/');
   });
 };
 
@@ -158,7 +157,8 @@ exports.manage = function manage(request, response, next) {
   var success = request.flash('success');
   var groups = [];
   var badgeIndex = {};
-  if (!user) return response.redirect(reverse('backpack.login'), 303);
+  if (!user)
+    return response.redirect('/backpack/login', 303);
 
   response.header('Cache-Control', 'no-cache, must-revalidate');
 
@@ -255,11 +255,11 @@ exports.userBadgeUpload = function userBadgeUpload(request, response) {
       logger.debug(err);
       request.flash('error', err.message);
     }
-    return response.redirect(reverse('backpack.manage'), 303);
+    return response.redirect('/', 303);
   }
 
   if (!user)
-    return response.redirect(reverse('backpack.login'), 303);
+    return response.redirect('/', 303);
 
   if (!tmpfile.size)
     return redirect(new Error('You must choose a badge to upload.'));

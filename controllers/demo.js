@@ -6,7 +6,6 @@ var configuration = require('../lib/configuration');
 var request = require('request');
 var awardBadge = require('../lib/award');
 var logger = require('../lib/logging').logger;
-var reverse = require('../lib/router').reverse;
 
 var protocol = configuration.get('protocol') || 'http';
 var port = configuration.get('port') || '';
@@ -57,7 +56,7 @@ exports.massAward = function (req, res) {
         recipient: email
       });
     });
-  res.redirect(reverse('backpack.manage'), 303);
+  res.redirect('/', 303);
 };
 
 // Create a demo badge. Optionally override default values by providing GET

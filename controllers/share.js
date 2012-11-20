@@ -4,7 +4,6 @@ var User = require('../models/user');
 var Badge = require('../models/badge');
 var Portfolio = require('../models/portfolio');
 var Group = require('../models/group');
-var reverse = require('../lib/router').reverse;
 var configuration = require('../lib/configuration');
 var logger = require('../lib/logging').logger;
 

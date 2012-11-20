@@ -3,7 +3,6 @@ var request = require('request');
 var fs = require('fs');
 var url = require('url');
 var logger = require('../lib/logging').logger;
-var reverse = require('../lib/router').reverse;
 var awardBadge = require('../lib/award');
 var remote = require('../lib/remote');
 var Badge = require('../models/badge.js');
@@ -146,8 +145,8 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
   var success = req.flash('success');
 
   // is the user logged in? if not, suggest they redirect to the login page
-  if (!user) return res.json({ message: "user is not logged in, redirect to " + reverse('backpack.login'),
-                               redirect_to: reverse('backpack.login') }, 403);
+  if (!user) return res.json({ message: "user is not logged in, redirect to " + '/backpack/login',
+                               redirect_to: '/backpack/login' }, 403);
 
   // get the url param (lots of debugging statements here)
   var assertionUrl = req.query.url; // if it was as a query param in the GET
