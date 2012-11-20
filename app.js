@@ -140,7 +140,7 @@ if (!module.parent) {
       process.exit();
     });
   };
-  start_server(http.createServer(app));
+  start_server(app);
 } else {
   module.exports = http.createServer(app);
 }
