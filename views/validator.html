@@ -1,3 +1,5 @@
+{% extends 'layout.html' %}
+{% block body %}
 <div id='validator'>
   <form action='' method='post'>
     <input type='hidden' name='_csrf' value='{{csrfToken}}'>
@@ -8,20 +10,19 @@
   </form>
 
   <div id='results'>
-    {{#submitted}}
-      {{#success}}
+    {% if submitted %}
+      {% if success %}
         <h2>Everything looks good!</h2>
-      {{/success}}
-
-      {{^success}}
+      {% else %}
         <h2>There were problems with the following fields:</h2>
         <ul>
-          {{#errors}}
-            <li><strong>{{field}}</strong>: {{{value}}}</li>
-          {{/errors}}
+          {% for error in errors %}
+            <li><strong>{{error.field}}</strong>: {{error.value}}</li>
+          {% endfor %}
         </ul>
-      {{/success}}
+      {% endif %}
 
-    {{/submitted}}
+    {% endif %}
   </div>
 </div>
+{% endblock %}

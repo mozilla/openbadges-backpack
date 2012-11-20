@@ -1,12 +1,13 @@
+{% extends 'layout.html' %}
+{% block body %}
 <h1>Backpack Facts</h1>
 
-{{#stats}}
 <p>There are {{totalBadges}} badges in the system.</p>
 <p>Some details per issuer,
   <ul>
-    {{#totalPerIssuer}}
-    <li>{{name}} (<a href='{{url}}'>{{url}}</a>) has {{total}} badges</li>
-    {{/totalPerIssuer}}
+    {% for total in totalPerIssuer %}
+    <li>{{total.name}} (<a href='{{total.url}}'>{{total.url}}</a>) has {{total.total}} badges</li>
+    {% endfor %}
   </ul>
 </p>
-{{/stats}}
+{% endblock %}

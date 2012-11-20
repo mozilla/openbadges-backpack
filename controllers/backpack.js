@@ -112,7 +112,7 @@ exports.stats = function stats(request, response, next) {
   function startResponse(err, badges) {
     if (err) return next(err);
     var data = computeStats(badges);
-    response.render('stats.html', { stats: data });
+    response.render('stats.html', data);
   }
 
   function computeStats(badges) {
