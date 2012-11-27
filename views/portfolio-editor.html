@@ -26,6 +26,9 @@
     <input tabindex=1 class='btn btn-primary btn-large save' type='submit' value='Save this page'>
   </div>
 
+{% endblock %}
+{% block scripts %}
+
   <script>
     $('form.portfolio').on('submit', function(e){
       e.preventDefault();
@@ -36,4 +39,5 @@
     })
   </script>
 </form>
+
 {% endblock %}
