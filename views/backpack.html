@@ -83,6 +83,10 @@
   {% endif %}
 </div>
 
+{% endblock %}
+{% block scripts %}
+
+<!-- bootstrap some data -->
 <script>
   window.badgeData = {};
   {% for badge in badges %}
@@ -90,7 +94,19 @@
   {% endfor %}
 </script>
 
+<!-- third party -->
+<script type="text/javascript" src="/js/nunjucks-dev.js"></script>
+<script type="text/javascript" src="/js/underscore.js"></script>
+<script type="text/javascript" src="/js/backbone.js"></script>
+<script type="text/javascript" src="/js/bootstrap-2.0.2.min.js"></script>
+<script type="text/javascript" src="/js/bootstrap-popover.js"></script>
+
+<!-- my libraries -->
+<script type="text/javascript" src="/js/jquery.sync.js"></script>
+<script type="text/javascript" src="/js/backpack.js"></script>
+
 {% if tooltips %}
+<!-- initialize twitter bootstrap components -->
 <script>
   $(function(){
     $('[rel="popover"]').popover({

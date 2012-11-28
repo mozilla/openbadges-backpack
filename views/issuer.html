@@ -1,3 +1,5 @@
+{% extends 'layout.html' %}
+{% block body %}
 <form action="/demo/award" method="post">
   <input type="hidden" name="_csrf" value="{{ csrfToken }}">
   <fieldset>
@@ -21,3 +23,4 @@
 
   </fieldset>
 </form>
+{% endblock %}
