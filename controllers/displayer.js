@@ -96,7 +96,6 @@ function fullUrl(pathname) {
  */
 
 exports.findGroupById = function findGroupById(req, res, next, id) {
-  console.log('finding group');
   Group.findById(id, function (err, group) {
     if (err)
       return next(err);
@@ -115,7 +114,6 @@ exports.findGroupById = function findGroupById(req, res, next, id) {
  */
 
 exports.findUserById = function findUserById(req, res, next, id) {
-  console.log('finding user');
   User.findById(id, function (err, user) {
     if (err)
       return next(err);
