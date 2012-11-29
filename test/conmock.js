@@ -39,13 +39,26 @@ module.exports = function conmock (options, callback) {
     contentType: function (type) {
       return this.header('Content-Type', mime.lookup(type));
     },
+    type: function (type) {
+      return this.header('Content-Type', mime.lookup(type));
+    },
     send: function (data, status) {
+      if (typeof data === 'number') {
+        var tmp = data;
+        data = status;
+        status = tmp;
+      }
       this.fntype = 'send';
       this.body = data;
       this.status = status || 200;
       callback(null, this, request);
     },
     json: function (data, status) {
+      if (typeof data === 'number') {
+        var tmp = data;
+        data = status;
+        status = tmp;
+      }
       this.fntype = 'json';
       this.body = data;
       this.status = status;
