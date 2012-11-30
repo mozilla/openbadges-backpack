@@ -41,7 +41,7 @@ app.use(middleware.logRequests());
 app.use(middleware.cookieSessions());
 app.use(middleware.userFromSession());
 app.use(flash());
-app.use(middleware.csrf({ 
+app.use(middleware.csrf({
   whitelist: [
     '/backpack/authenticate',
     '/issuer/validator/?',
@@ -71,8 +71,8 @@ const share = require('./controllers/share');
 
 // Parameter handlers
 app.param('badgeId', badge.findById);
-app.param('dUserId', displayer.param.dUserId);
-app.param('dGroupId', displayer.param.dGroupId);
+app.param('apiUserId', displayer.findUserById);
+app.param('apiGroupId', displayer.findGroupById);
 app.param('groupId', group.findById);
 app.param('groupUrl', share.findGroupByUrl);
 
@@ -88,8 +88,8 @@ app.get('/issuer/welcome', issuer.welcome);
 
 app.get('/displayer/convert/email', displayer.emailToUserIdView);
 app.post('/displayer/convert/email', displayer.emailToUserId);
-app.get('/displayer/:dUserId/groups.:format?', displayer.userGroups);
-app.get('/displayer/:dUserId/group/:dGroupId.json', displayer.userGroupBadges);
+app.get('/displayer/:apiUserId/groups.:format?', displayer.userGroups);
+app.get('/displayer/:apiUserId/group/:apiGroupId.:format?', displayer.userGroupBadges);
 
 app.get('/demo', demo.issuer);
 app.get('/demo/ballertime', demo.massAward);
