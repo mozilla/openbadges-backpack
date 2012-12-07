@@ -1,7 +1,5 @@
 (function(){
-  // global var
   var CSRF = $("input[name='_csrf']").val();
-
   $.ajaxSetup({
     beforeSend: function (xhr, settings) {
       if (settings.crossDomain)
@@ -11,5 +9,4 @@
       xhr.setRequestHeader('X-CSRF-Token', CSRF)
     }
   });
-
 }());

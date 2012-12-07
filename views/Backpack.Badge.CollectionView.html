@@ -1,0 +1,26 @@
+<div class="collection">
+  <div class="set" data-id="1">
+  {% for badge in badges %}
+    {% include "views/Backpack.Badge.View.html" %}
+  {% endfor %}
+  </div>
+  
+  <!-- pagination controls -->
+  <div class="pages" style="display:none" data-set-size="8">
+    <button class="boxed page previous">&lt;</button>
+    <button class="boxed page" data-page="1">1</button>
+    <button class="boxed page next">&gt;</button>
+  </div>
+</div>
+
+<!-- Backbone definitions -->
+<div class="scripts" style="display:none">
+  <!-- badges -->
+  <script src="js/backbone/backpack.badge.model.js"></script>
+  <script src="js/backbone/backpack.badge.views.js"></script>
+  <script src="js/backbone/backpack.badge.controller.js"></script>
+  <!-- badge collection -->
+  <script src="js/backbone/backpack.badgeCollection.model.js"></script>
+  <script src="js/backbone/backpack.badgeCollection.views.js"></script>
+  <script src="js/backbone/backpack.badgeCollection.controller.js"></script>
+</div>
