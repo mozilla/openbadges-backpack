@@ -34,7 +34,7 @@ app.use(express.static(path.join(__dirname, "static")));
 app.use(express.static(path.join(configuration.get('var_dir'), "badges")));
 app.use("/views", express.static(path.join(__dirname, "views")));
 app.use(middleware.noFrame({ whitelist: [ '/issuer/frame.*', '/', '/share/.*' ] }));
-app.use(express.bodyParser({ uploadDir: configuration.get('badge_path') }));
+app.use(express.bodyParser());
 app.use(express.cookieParser());
 app.use(express.methodOverride());
 app.use(middleware.logRequests());
