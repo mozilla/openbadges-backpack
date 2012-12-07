@@ -1,0 +1,17 @@
+<section>
+  <header>
+    <div class="title">Groups</div>
+  </header>
+
+  <ul class="listing">
+    {% if groups.length == 0 %}
+    <p class="noGroups">You have no groups yet!</p>
+    {% endif %}
+    {% for group in groups %}
+      {% include "views/Backpack.Group.View.html" %}
+    {% endfor %}
+  </ul>
+
+  <button class="create btn">Create New Group</button>
+
+</section>

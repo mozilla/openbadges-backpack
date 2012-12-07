@@ -5,8 +5,6 @@ var Badge = require('../models/badge.js');
 var logger = require('../lib/logging').logger;
 var reverse = require('../lib/router').reverse;
 
-function makeBadgeObj(attr) { return new Badge(attr) }
-
 exports.param = {
   groupId: function (request, response, next, id) {
     Group.findById(id, function (err, group) {
@@ -46,7 +44,7 @@ exports.create = function (request, response) {
   var group = new Group({
     user_id: user.get('id'),
     name: body.name,
-    badges: badges.map(makeBadgeObj)
+    badges: badges
   });
 
   group.save(function (err, group) {
@@ -100,7 +98,7 @@ exports.update = function (request, response) {
   }
 
   if (body.badges) {
-    group.set('badges', body.badges.map(makeBadgeObj));
+    group.set('badges', body.badges);
   }
 
   if(null === body['description'] || "string" === typeof body['description']) {

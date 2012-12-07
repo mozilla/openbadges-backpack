@@ -25,6 +25,8 @@ var env = new nunjucks.Environment(new nunjucks.FileSystemLoader('views'));
 env.express(app);
 
 // Middleware. See `middleware.js`
+
+app.use('/views', express.static(__dirname + '/views'));
 app.use(express.static(path.join(__dirname, "static")));
 app.use(express.static(path.join(configuration.get('var_dir'), "badges")));
 app.use(middleware.noFrame({ whitelist: [ '/issuer/frame.*', '/', '/share/.*' ] }));
