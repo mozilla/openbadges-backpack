@@ -110,6 +110,7 @@ testUtils.prepareDatabase({
 
   test('displayer#userGroupBadges', function (t) {
     const user = fixtures['1-user'];
+    const otherUser = fixtures['2-other-user'];
     const badge = fixtures['3-badge'];
     const publicGroup = fixtures['4-group'];
     const privateGroup = fixtures['5-private-group'];
@@ -134,6 +135,14 @@ testUtils.prepareDatabase({
       request: request,
     }, function (err, mock) {
       t.same(mock.status, 404, 'should not find a group when it is private');
+    });
+
+    request = { user: otherUser, group: publicGroup };
+    conmock({
+      handler: handler,
+      request: request,
+    }, function (err, mock) {
+      t.same(mock.status, 404, 'should pretend to be missing when the user does not match');
       t.end();
     });
   });
