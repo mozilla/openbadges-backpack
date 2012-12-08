@@ -7,10 +7,10 @@
     <h3 class='instructions'>Drag a Badge Here</h3>
   {% endif %}
 
-  {% if attributes.id %}
-    <span class='public'>
-      <input type='checkbox' id='public{{attributes.id}}' class='js-privacy' {% if attributes.public %}checked{% endif %}>
-      <label for='public{{attributes.id}}'>public</label>
-    </span>
-  {% endif %}
+  <span class='public'>
+    <label>
+      <input type='checkbox' class='js-privacy' {% if attributes.public %}checked{% endif %}>
+      <span>public</span>
+    </label>
+  </span>
 </div>
