@@ -126,7 +126,7 @@ form.baker #assertion {
 }
 
 .group.isNew input.groupName {
-  opacity: 0;
+  display: none;
 }
 
 .group input.groupName:hover, .group input.groupName.hover {
@@ -197,7 +197,7 @@ form.baker #assertion {
   top: 6px;
 }
 .group.isNew .icon {
-  opacity: 0;
+  display: none;
 }
 
 .group .icon:hover {
@@ -294,7 +294,7 @@ form.baker #assertion {
 }
 
 .group.isNew .public {
-  opacity: 0;
+  display: none;
 }
 
 [draggable=true] {
