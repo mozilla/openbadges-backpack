@@ -28,6 +28,14 @@ app.locals({
 var env = new nunjucks.Environment(new nunjucks.FileSystemLoader('views'));
 env.express(app);
 
+env.addFilter('formatdate', function (rawDate) {
+  if (parseInt(rawDate, 10) == rawDate) {
+    var date = new Date(rawDate * 1000);
+    return date.toString();
+  }
+  return rawDate;
+});
+
 // Middleware. Also see `middleware.js`
 // ------------------------------------
 app.use(express.static(path.join(__dirname, "static")));
