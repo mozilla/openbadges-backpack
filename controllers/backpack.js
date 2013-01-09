@@ -300,3 +300,15 @@ exports.userBadgeUpload = function userBadgeUpload(request, response) {
     });
   });
 };
+
+/**
+ * Stub methods to prevent crash in Express 3.0.5
+ */
+
+exports.details = function details (request, response) {
+  return;
+}
+
+exports.deleteBadge = function deleteBadge (request, response) {
+  return;
+}
