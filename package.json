@@ -12,7 +12,7 @@
     "commander": "~0.5.2",
     "connect-cookie-session": "git+https://github.com/brianloveswords/connect-cookie-session.git",
     "connect-flash": "*",
-    "express": "~3",
+    "express": "~3.0.0",
     "formidable": "~1.0.9",
     "functools": "~1.2.0",
     "jshint": "~0.6.2",
