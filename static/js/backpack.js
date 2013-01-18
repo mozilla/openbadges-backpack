@@ -490,6 +490,8 @@ AllGroups.on('remove', function (group) {
     event.preventDefault();
   },
   maybeRemoveBadge: function (event) {
+    event.preventDefault();
+
     var badgeView = global.dragging
     var badge = badgeView.model;
 
