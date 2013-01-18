@@ -149,6 +149,7 @@ form.baker #assertion {
 }
   
 .group {
+  min-height: 64px;
   position: relative;
   margin: 20px 0 0 0;
   padding: 20px;
