@@ -126,7 +126,7 @@ form.baker #assertion {
 }
 
 .group.isNew input.groupName {
-  opacity: 0;
+  display: none;
 }
 
 .group input.groupName:hover, .group input.groupName.hover {
@@ -197,7 +197,7 @@ form.baker #assertion {
   top: 6px;
 }
 .group.isNew .icon {
-  opacity: 0;
+  display: none;
 }
 
 .group .icon:hover {
@@ -277,19 +277,24 @@ form.baker #assertion {
   position: absolute;
 }
 .group .public label {
+  margin: 0px;
   color: #868;
   font-size: 12px;
   line-height: 12px;
   display: inline-block;
 }
 
-.group .public input {
+.group .public label input {
   display: inline-block;
 }
 
-.group .public input:checked ~ label {
+.group .public label input:checked ~ span {
   color: #181;
   font-weight: bold;
+}
+
+.group.isNew .public {
+  display: none;
 }
 
 [draggable=true] {
