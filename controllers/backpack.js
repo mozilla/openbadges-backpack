@@ -135,7 +135,7 @@ exports.stats = function stats(request, response, next) {
       var issuer = issuers[name];
       return { name: name, total: issuer.total, url: issuer.url }
     });
-    totalPerIssuer.sort(function(issuer1,issuer2){
+    totalPerIssuer.sort(function(issuer1, issuer2) {
       return issuer2.total - issuer1.total
     });
     return {
