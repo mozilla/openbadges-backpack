@@ -391,6 +391,7 @@ Badge.View = Backbone.View.extend({
    * @param {Event} event
    */
   start : function (event) {
+    this.$el.popover('hide');
     global.dragging = this;
     event.stopPropagation();
   },
