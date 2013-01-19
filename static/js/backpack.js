@@ -422,6 +422,12 @@ Badge.View = Backbone.View.extend({
       var newBadgeCollection = new Badge.Collection([])
       var newGroupModel = new Group.Model({badges: newBadgeCollection})
       var newGroupView = new Group.View({model: newGroupModel});
+
+      // Add model to the list of all the groups and retain a reference
+      var allGroups = groupView.model.collection;
+      allGroups.add(newGroupView.model);
+      newGroupView.model.collection = allGroups;
+
       newBadgeCollection.belongsTo = newGroupModel;
       newGroupView.render();
 
