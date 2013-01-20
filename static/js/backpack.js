@@ -297,6 +297,8 @@ Group.View = Backbone.View.extend({
 Details.View = Backbone.View.extend({
   badgeView: null,
   events: {
+    'click': 'hide',
+    'click .contents': 'nothing',
     'click .close': 'hide',
     'mousedown .close': 'nothing',
     'click .badge-image': 'debugBadge',
