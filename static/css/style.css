@@ -330,6 +330,15 @@ form.baker #assertion {
   opacity: 0.4;
 }
 
+.lightbox .background {
+  position: fixed;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
 .lightbox .close:hover {
   -webkit-transition: opacity 0.5s;
   -moz-transition: opacity 0.5s;
