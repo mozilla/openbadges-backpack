@@ -12,6 +12,13 @@ $.ajaxSetup({
 })
 if(!nunjucks.env) {
     nunjucks.env = new nunjucks.Environment(new nunjucks.HttpLoader('/views'));
+    nunjucks.env.addFilter('formatdate', function (rawDate) {
+      if (parseInt(rawDate, 10) == rawDate) {
+        var date = new Date(rawDate * 1000);
+        return date.toString();
+      }
+      return rawDate;
+    });
 }
 }(/*end setup*/)
 
