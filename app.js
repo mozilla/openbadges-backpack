@@ -60,18 +60,9 @@ app.use(middleware.csrf({
 app.use(middleware.cors({ whitelist: ['/_badges.*', '/issuer.*', '/baker', '/displayer/.+/group.*'] }));
 app.configure('development', function () {
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-  fs.readFile(path.join(__dirname, '.git/HEAD'), 'utf8', function(err, head){
-    if(!err) {
-      if(head.indexOf('ref:') === 0){
-        var ref = head.split(/\s+/)[1];
-        fs.readFile(path.join(__dirname, '.git', ref.trim()), 'utf8', function(err, sha){
-          if (!err) app.set('sha', sha.trim());
-        });
-      }
-      else if(/^[0-9a-f]{40}$/m.test(head)) {
-        app.set('sha', head.trim());
-      }
-    }
+  var gitUtil = require('./lib/git-util');
+  gitUtil.findSHA(function(err, sha){ 
+    if (!err) app.set('sha', sha);
   });
 });
 app.configure('production', function () {
