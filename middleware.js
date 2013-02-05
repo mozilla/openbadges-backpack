@@ -71,7 +71,7 @@ exports.userFromSession = function userFromSession() {
         logger.error("Problem finding/creating user:");
         logger.error(err);
       }
-      req.user = user;
+      req.user = res.locals.user = user;
       return next();
     });
   };

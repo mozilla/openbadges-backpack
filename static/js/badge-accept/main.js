@@ -59,7 +59,7 @@ $(window).ready(function() {
 function showError(template, data) {
   $(template).render(data).appendTo("#messages").hide().slideDown(function(){
     var msg = this;
-    $(msg).click(function(){
+    $('.close', msg).click(function(){
       $(msg).slideUp(function(){
 	      $(this).remove();
       });

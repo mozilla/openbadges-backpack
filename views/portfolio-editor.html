@@ -1,0 +1,43 @@
+{% extends 'layout.html' %}
+{% block body %}
+<form class='portfolio' action='/share/{{portfolio.group.attributes.url}}/' method='post'>
+  <input type='hidden' name='_csrf' value='{{csrfToken}}'>
+  <input type='hidden' name='id' value='{{portfolio.attributes.id}}'>
+  <input type='hidden' name='group_id' value='{{group.attributes.id}}'>
+  <input type='hidden' name='url' value='{{groups.attributes.url}}'>
+  <header>
+    <input tabindex=1 name='title' class='field title' value='{{portfolio.attributes.title}}'>
+    <input tabindex=1 name='subtitle' class='field subtitle' placeholder='Optional subtitle' value='{{portfolio.attributes.subtitle}}'>
+  </header>
+
+  <ul class='badges'>
+    {% for badge in portfolio.badges %}
+      <li>
+        <h3>{{badge.attributes.body.badge.name}}</h3>
+
+        <textarea name='stories[{{badge.attributes.body.id}}]' tabindex=1 class='story' placeholder='some information about this badge'>{{badge.attributes.body._userStory}}</textarea>
+
+        {% include 'badge-data.html' %}
+      </li>
+    {% endfor %}
+  </ul>
+  
+  <div class='save actions'>
+    <input tabindex=1 class='btn btn-primary btn-large save' type='submit' value='Save this page'>
+  </div>
+
+{% endblock %}
+{% block scripts %}
+
+  <script>
+    $('form.portfolio').on('submit', function(e){
+      e.preventDefault();
+      return false;
+    });
+    $('input.save').on('click', function(e){
+      $('form.portfolio')[0].submit();
+    })
+  </script>
+</form>
+
+{% endblock %}

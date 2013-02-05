@@ -4,28 +4,28 @@ var User = require('../models/user');
 var Badge = require('../models/badge');
 var Portfolio = require('../models/portfolio');
 var Group = require('../models/group');
-var reverse = require('../lib/router').reverse;
 var configuration = require('../lib/configuration');
 var logger = require('../lib/logging').logger;
 
-exports.param = {
-  groupUrl: function (request, response, next, url) {
-    Group.findOne({url: url}, function (err, group) {
-      if (err) {
-        logger.error("Error pulling group: " + err);
-        return response.send('Error pulling group', 500);
-      }
-      if (!group) {
-        return response.send('Could not find group', 404);
-      }
-      Portfolio.findOne({group_id: group.get('id')}, function (err, portfolio) {
-        if (err) return next(err);
-        if (portfolio) group.set('portfolio', portfolio);
-        request.group = group;
-        return next();
-      });
+exports.findGroupByUrl = function findGroupByUrl(req, res, next, url) {
+  Group.findOne({url: url}, function (err, group) {
+    if (err) {
+      logger.error("Error pulling group: " + err);
+      return res.send('Error pulling group', 500);
+    }
+
+    if (!group)
+      return res.send('Could not find group', 404);
+
+    Portfolio.findOne({group_id: group.get('id')}, function (err, portfolio) {
+      if (err)
+        return next(err);
+      if (portfolio)
+        group.set('portfolio', portfolio);
+      req.group = group;
+      return next();
     });
-  }
+  });
 };
 
 
@@ -69,7 +69,7 @@ exports.editor = function (request, response) {
     portfolio.group = group;
     portfolio.badges = badgesWithStories;
     portfolio.preamble = prepareText(portfolio.get('preamble'));
-    response.render('portfolio-editor', {
+    response.render('portfolio-editor.html', {
       csrfToken: request.session._csrf,
       portfolio: portfolio
     });
@@ -94,7 +94,7 @@ function makeLinkUrl(path, configuration) {
 }
 
 exports.show = function (request, response, next) {
-  var user, group, portfolio, owner, message;
+  var user, group, portfolio, owner, message, socialcode;
 
   user = request.user;
   group = request.group;
@@ -114,22 +114,21 @@ exports.show = function (request, response, next) {
   }
 
   // if this is the user's page, show SocialShare button
-  if (owner)
-    message = '<p style="float: left;">This is what your portfolio page looks like to the public.</p>'
-      + '<div class="socialshare" style="float: right;" tabindex="0" onclick="injectSocialMedia(this)">'
-      + '<span>Share this on twitter, google+ or facebook</span>'
+  if (owner) {
+    message = '<p class="shareMessage">This is what your portfolio page looks like to the public.</p>';
+    socialcode = '<div class="socialshare" style="float: left;" tabindex="0" onclick="injectSocialMedia(this)">'
+      + '<span class="msg">Share this on twitter, google+ or facebook</span>'
       + '<div class="social-medium twitter"></div>'
       + '<div class="social-medium google"></div>'
-      + '<div class="social-medium facebook"></div>'
-      + '</div>';
-
+      + '<div class="social-medium facebook"></div>';
+  }
 
   request.group.getBadgeObjects(function (err, badges) {
     var badgesWithStories = _.map(badges, badgeModifierFactory(portfolio));
     portfolio.badges = badgesWithStories;
     portfolio.preamble = prepareText(portfolio.get('preamble'));
 
-    return response.render('portfolio', {
+    return response.render('portfolio.html', {
       opengraph: [
         { property: 'title', content: portfolio.attributes.title },
         { property: 'type', content: 'openbadges:share' },
@@ -137,6 +136,7 @@ exports.show = function (request, response, next) {
       ],
       portfolio: portfolio,
       message: message || null,
+      socialcode: socialcode || null,
       owner: owner
     });
   });
@@ -155,6 +155,7 @@ exports.createOrUpdate = function (request, response) {
   var stories = {};
   var submitted = request.body;
 
+  // #TODO: don't assume any stories have been submitted
   for (var i = 0; i < submitted.stories.length; i++)
     if (submitted.stories[i]) stories[i] = submitted.stories[i];
 

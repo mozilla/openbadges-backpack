@@ -10,7 +10,16 @@ $.ajaxSetup({
     xhr.setRequestHeader('X-CSRF-Token', CSRF)
   }
 })
-
+if(!nunjucks.env) {
+    nunjucks.env = new nunjucks.Environment(new nunjucks.HttpLoader('/views'));
+    nunjucks.env.addFilter('formatdate', function (rawDate) {
+      if (parseInt(rawDate, 10) == rawDate) {
+        var date = new Date(rawDate * 1000);
+        return date.toString();
+      }
+      return rawDate;
+    });
+}
 }(/*end setup*/)
 
 
@@ -38,6 +47,13 @@ var errHandler = function (model, xhr) {
     type: 'error',
     message:'There was a problem syncing your changes. Please refresh the page before making any new changes.'
   });
+}
+
+/**
+ * Nunjucks template helper
+ */
+var template = function template(name, data) {
+    return $(nunjucks.env.render(name, data));
 }
 
 // Model Definitions
@@ -89,7 +105,7 @@ Message.View = Backbone.View.extend({
   className: 'message',
   events: {},
   render: function (attributes) {
-    var $element = ich.messageTpl(attributes);
+    var $element = template('message-template.html', attributes);
     this.parent.empty();
     $element
       .hide()
@@ -272,11 +288,10 @@ Group.View = Backbone.View.extend({
 
 
   /**
-   * Render this sucker. Uses ICanHaz.js to find a template with the
-   * id "#groupTpl"
+   * Render this sucker.
    */
   render: function () {
-    this.el = ich.groupTpl(this.model.attributes);
+    this.el = template('group-template.html', this.model.attributes);
     this.setElement($(this.el));
     this.$el
       .hide()
@@ -290,6 +305,7 @@ Details.View = Backbone.View.extend({
   badgeView: null,
   events: {
     'click .close': 'hide',
+    'click .background': 'hide',
     'mousedown .close': 'nothing',
     'click .badge-image': 'debugBadge',
     'click .disown': 'showConfirmation',
@@ -347,8 +363,12 @@ Details.View = Backbone.View.extend({
   },
 
   render: function () {
-    ich.grabTemplates();
-    this.el = ich.detailsTpl(this.model.attributes);
+    this.el = template('badge-details.html', { 
+      badge: { 
+        attributes: this.model.attributes 
+      },
+      disownable: true
+    });
     this.setElement(this.el);
     this.$el.data('view', this);
     return this;
@@ -379,6 +399,7 @@ Badge.View = Backbone.View.extend({
    * @param {Event} event
    */
   start : function (event) {
+    this.$el.popover('hide');
     global.dragging = this;
     event.stopPropagation();
   },
@@ -409,6 +430,12 @@ Badge.View = Backbone.View.extend({
       var newBadgeCollection = new Badge.Collection([])
       var newGroupModel = new Group.Model({badges: newBadgeCollection})
       var newGroupView = new Group.View({model: newGroupModel});
+
+      // Add model to the list of all the groups and retain a reference
+      var allGroups = groupView.model.collection;
+      allGroups.add(newGroupView.model);
+      newGroupView.model.collection = allGroups;
+
       newBadgeCollection.belongsTo = newGroupModel;
       newGroupView.render();
 
@@ -420,11 +447,10 @@ Badge.View = Backbone.View.extend({
   },
 
   /**
-   * Render this sucker. Uses ICanHaz.js to find a template with the
-   * id "#badgeTpl"
+   * Render this sucker.
    */
   render: function () {
-    this.el = ich.badgeTpl(this.model.attributes);
+    this.el = template('badges_partial.html', this.model.attributes);
     this.$el.data('view', this);
     this.setElement($(this.el));
     this.attachToExisting($(this.el));
@@ -435,8 +461,18 @@ Badge.View = Backbone.View.extend({
     this.detailsView = new Details.View({ model: this.model });
     this.detailsView.render();
     this.setElement($(el));
+    $(el).popover({
+      animation:false,
+      trigger: 'hover',
+      html: true
+    });
     return this;
   },
+
+  remove: function () {
+    this.$el.popover('hide');
+    Backbone.View.prototype.remove.call(this);
+  }
 });
 
 Badge.View.all = [];
@@ -469,6 +505,8 @@ AllGroups.on('remove', function (group) {
     event.preventDefault();
   },
   maybeRemoveBadge: function (event) {
+    event.preventDefault();
+
     var badgeView = global.dragging
     var badge = badgeView.model;
 

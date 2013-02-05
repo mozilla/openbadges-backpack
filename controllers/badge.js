@@ -5,8 +5,6 @@ function respond(status, message) {
   return { status: status, message: message };
 }
 
-exports.param = {};
-
 /**
  * Route param pre-condition for finding a badge when a badgeId is present.
  * If the badge cannot be found, immediately return HTTP 404.
@@ -14,12 +12,12 @@ exports.param = {};
  * @param {String} hash is the `body_hash` of the badge to look up.
  */
 
-exports.param['badgeId'] = function (request, response, next, id) {
+exports.findById = function findById(req, res, next, id) {
   Badge.findById(id, function (err, badge) {
     if (!badge)
-      return response.send(respond('missing', 'could not find badge'), 404);
-    
-    request.badge = badge;
+      return res.send(respond('missing', 'could not find badge'), 404);
+
+    req.badge = badge;
     return next();
   });
 };
@@ -40,13 +38,13 @@ exports.destroy = function destroy(request, response) {
   function failNow() {
     return response.send(respond('forbidden', "Cannot delete a badge you don't own"), 403);
   }
-  
+
   if (!badge)
     return response.send(respond('missing', "Cannot delete a badge that doesn't exist"), 404);
-  
+
   if (!user || badge.get('user_id') !== user.get('id'))
     return failNow();
-  
+
   badge.destroy(function (err, badge) {
     if (err) {
       logger.warn('Failed to delete badge');

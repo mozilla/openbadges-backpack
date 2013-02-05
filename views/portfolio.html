@@ -1,0 +1,72 @@
+{% extends 'layout.html' %}
+{% block body %}
+<link rel="stylesheet" href="/css/socialmedia.css">
+
+<div class='portfolio'>
+{% if message %}
+  <div class='message-container'>
+    <div class="alert alert-info">
+      <a class="close" data-dismiss="alert">×</a>
+      {{message}}
+      {{socialcode}}
+    </div>
+  </div>
+{% endif %}
+
+  {% if owner %}
+  <div class='edit'>
+    <a href="edit" class='edit btn btn-primary'>Edit this page</a>
+  </div>
+  {% endif %}
+
+  <header>
+    {% if portfolio.attributes.title %}
+      <h1>{{portfolio.attributes.title}}</h1>
+    {% endif %}
+    {% if portfolio.attributes.subtitle %}
+      <h2>{{portfolio.attributes.subtitle}}</h1>
+    {% endif %}
+  </header>
+
+  <ul class='badges'>
+    {% for badge in portfolio.badges %}
+      <li>
+        <h3>{{badge.attributes.body.badge.name}}</h3>
+
+        <p class='story'>{{badge.attributes.body._userStory}}</p>
+
+        {% include 'badge-data.html' %}
+      </li>
+    {% endfor %}
+  </ul>
+
+  {% if postamble %}
+  <section class='postamble'>
+    {{postamble}}
+  </section>
+  {% endif %}
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script type="text/javascript" src="/js/bootstrap-2.0.2.min.js"></script>
+<script type="text/javascript" src="/js/social-media.js"></script>
+
+<script>
+function injectSocialMedia(container) {
+  // prevent this element from injecting social media again
+  container.onclick = function() { return false; }
+  var socialMedia = new SocialMedia();
+  var url = window.location.toString();
+
+  // inject twitter, g+ and facebook
+  socialMedia.hotLoad(container.querySelector(".twitter"),  socialMedia.twitter,  url);
+  socialMedia.hotLoad(container.querySelector(".google"),   socialMedia.google,   url);
+  socialMedia.hotLoad(container.querySelector(".facebook"), socialMedia.facebook, url);
+
+  // kill off the text label
+  var label = container.querySelector("span");
+  $(label).remove();
+}
+</script>
+{% endblock %}
