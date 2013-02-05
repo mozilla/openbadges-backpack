@@ -25,7 +25,7 @@ app.locals({
 });
 
 // default view engine
-var env = new nunjucks.Environment(new nunjucks.FileSystemLoader('views'));
+var env = new nunjucks.Environment(new nunjucks.FileSystemLoader(__dirname + '/views'));
 env.express(app);
 
 env.addFilter('formatdate', function (rawDate) {
