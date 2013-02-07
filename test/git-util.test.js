@@ -4,75 +4,55 @@ const gitUtil = require('../lib/git-util.js');
 
 var sha = 'abcde12345abcde12345abcde12345abcde12345';
 
-var fs = {
-  fileContents: {},
-  readFile: function(path, encoding, cb) {
-    var keys = Object.keys(this.fileContents);
-    for (var i = 0; i < keys.length; i++) {
-      var re = new RegExp(keys[i]);
-      if (re.test(path)) {
-        var val = this.fileContents[keys[i]];
-        cb(val.err, val.contents);
-        return;
-      }
-    }
-  }
-};
-
 test('handles branch head', function (t) {
-  fs.fileContents = {
-    '.git/HEAD': { contents: 'ref: refs/heads/branchname' },
-    'refs/heads/branchname':  { contents: sha }
-  };
-
-  gitUtil.findSHA(function(err, sha) {
-    t.same(sha, 'abcde12345abcde12345abcde12345abcde12345');
-    t.end();
-  }, fs);
+  var sha = gitUtil.findSHA(path.join(__dirname, 'data/git-util/HEAD-REF'));
+  t.same(sha, 'abcde12345abcde12345abcde12345abcde12345');
+  t.end();
 });
 
 test('handles detached head', function (t) {
-  fs.fileContents = {
-    '.git/HEAD': { contents: sha }
-  };
-
-  gitUtil.findSHA(function(err, sha) {
-    t.same(sha, 'abcde12345abcde12345abcde12345abcde12345');
-    t.end();
-  }, fs);
+  var head = path.join(__dirname, 'data/git-util/HEAD-SHA');
+  var sha = gitUtil.findSHA(head);
+  t.same(sha, 'abcde12345abcde12345abcde12345abcde12345');
+  t.end();
 });
 
 test('.git/HEAD read error', function (t) {
-  fs.fileContents = {
-    '.git/HEAD': { err: 'asplode' }
-  };
-
-  gitUtil.findSHA(function(err, sha) {
-    t.same(err, 'asplode');
-    t.end();
-  }, fs);
+  var head = path.join(__dirname, 'data/git-util/NOTTHERE');
+  try {
+    gitUtil.findSHA(head);
+    t.fail();
+  }
+  catch (err) {
+    t.ok(err, 'got an error');
+    t.same(err.message, 'Could not read HEAD file: ' + head);
+  }
+  t.end();
 });
 
 test('refs/heads/branchname read error', function (t) {
-  fs.fileContents = {
-    '.git/HEAD': { contents: 'ref: refs/heads/branchname' },
-    'refs/heads/branchname': { err: 'asplode' }
-  };
-
-  gitUtil.findSHA(function(err, sha) {
-    t.same(err, 'asplode');
-    t.end();
-  }, fs);
+  var head = path.join(__dirname, 'data/git-util/HEAD-BAD-REF');
+  var ref = path.resolve(path.join(__dirname, 'data/git-util/refs/heads/notthere')); 
+  try {
+    gitUtil.findSHA(head);
+    t.fail();
+  }
+  catch (err) {
+    t.ok(err, 'got an error');
+    t.same(err.message, 'Could not read ref file: ' + ref);
+  }
+  t.end();
 });
 
 test('unknown .git/HEAD error', function (t) {
-  fs.fileContents = {
-    '.git/HEAD': { contents: 'something unknown' }
-  };
-
-  gitUtil.findSHA(function(err, sha) {
-    t.ok(err);
-    t.same(err.message, 'Unable to parse .git/HEAD');
-    t.end();
-  }, fs);
+  var head = path.join(__dirname, 'data/git-util/HEAD-UNEXPECTED');
+  try {
+    gitUtil.findSHA(head);
+    t.fail();
+  }
+  catch (err) {
+    t.ok(err, 'got an error');
+    t.same(err.message, 'Unable to parse HEAD file: ' + head);
+  }
+  t.end();
 });
