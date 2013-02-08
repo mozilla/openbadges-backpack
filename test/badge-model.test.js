@@ -269,7 +269,7 @@ testUtils.prepareDatabase({
     t.end();
   });
 
-  test('Badge.confirmRecipient: hashed recipient, uppercase', function (t) {
+  test('Badge.confirmRecipient: hashed recipient, case-insensitive', function (t) {
     const email = 'brian@example.org';
     const assertion = { };
     assertion.recipient = hash('sha256', email).toUpperCase();
