@@ -250,10 +250,11 @@ testUtils.prepareDatabase({
     t.end();
   });
 
+  function hash(algo, string) {
+    return (algo+'$'+require('crypto').createHash(algo).update(string).digest('hex'));
+  }
+
   test('Badge.confirmRecipient: hashed recipient', function (t) {
-    function hash(algo, string) {
-      return algo + '$' + require('crypto').createHash(algo).update(string).digest('hex');
-    }
     const email = 'brian@example.org';
     const assertion = { };
 
@@ -265,6 +266,29 @@ testUtils.prepareDatabase({
     t.ok(Badge.confirmRecipient(assertion, email), 'hashed email should match');
     t.notOk(Badge.confirmRecipient(assertion, 'incorrect@example.org'), 'no match');
 
+    t.end();
+  });
+
+  test('Badge.confirmRecipient: hashed recipient, case-insensitive', function (t) {
+    const email = 'brian@example.org';
+    const assertion = { };
+    assertion.recipient = hash('sha256', email).toUpperCase();
+    t.ok(Badge.confirmRecipient(assertion, email), 'hashed email should match');
+    t.notOk(Badge.confirmRecipient(assertion, 'incorrect@example.org'), 'no match');
+
+    assertion.recipient = hash('sha256', email).toLowerCase();
+    t.ok(Badge.confirmRecipient(assertion, email), 'hashed email should match');
+    t.notOk(Badge.confirmRecipient(assertion, 'incorrect@example.org'), 'no match');
+    t.end();
+  });
+
+  test('Badge.confirmRecipient: bogus algorithm', function (t) {
+    const assertion = { recipient: "nope$garbage" };
+    const expect = false;
+    var value;
+    try { value = Badge.confirmRecipient(assertion, 'whatever') }
+    catch (e) { t.fail('should not have thrown') }
+    t.same(value, expect, 'got expected value');
     t.end();
   });
 
