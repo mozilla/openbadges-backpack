@@ -275,6 +275,10 @@ testUtils.prepareDatabase({
     assertion.recipient = hash('sha256', email).toUpperCase();
     t.ok(Badge.confirmRecipient(assertion, email), 'hashed email should match');
     t.notOk(Badge.confirmRecipient(assertion, 'incorrect@example.org'), 'no match');
+
+    assertion.recipient = hash('sha256', email).toLowerCase();
+    t.ok(Badge.confirmRecipient(assertion, email), 'hashed email should match');
+    t.notOk(Badge.confirmRecipient(assertion, 'incorrect@example.org'), 'no match');
     t.end();
   });
 
