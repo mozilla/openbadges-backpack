@@ -11,6 +11,7 @@ var browserid = require('../lib/browserid');
 var awardBadge = require('../lib/award');
 var Badge = require('../models/badge');
 var Group = require('../models/group');
+var User = require('../models/user');
 
 /**
  * Render the login page.
@@ -112,6 +113,9 @@ exports.stats = function stats(request, response, next) {
   function startResponse(err, badges) {
     if (err) return next(err);
     var data = computeStats(badges);
+    var users = 0;
+    User.findAll(function(u) { users += 1 });
+    data.userCount = users;
     response.render('stats.html', data);
   }
 
