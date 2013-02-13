@@ -2,6 +2,7 @@ var async = require('async');
 var test = require('tap').test;
 var constants = require('mysql');
 var mysql = require('../lib/mysql');
+var migrations = require('../lib/migrations');
 
 function getMigrations(callback) {
   mysql.client.query("SELECT * FROM migrations", callback);
@@ -11,7 +12,7 @@ test("initial migration can be applied and rolled back", function(t) {
   var INITIAL = "20130212162601-initial";
 
   var migrate = function(callback) {
-    mysql.migrations.up({destination: INITIAL}, function(err) {
+    migrations.up({destination: INITIAL}, function(err) {
       if (err) throw err;
       getMigrations(function(err, results) {
         if (err) throw err;
@@ -27,7 +28,7 @@ test("initial migration can be applied and rolled back", function(t) {
   };
   
   var rollback = function(callback) {
-    mysql.migrations.down({count: 1}, function(err) {
+    migrations.down({count: 1}, function(err) {
       getMigrations(function(err, results) {
         if (err) throw err;
         t.equal(results.length, 0, "migration was rolled back");

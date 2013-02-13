@@ -8,6 +8,7 @@ var optimist = require('optimist');
 var migrate = require('db-migrate');
 var log = require('db-migrate/lib/log');
 var mysql = require('../lib/mysql');
+var migrations = require('../lib/migrations');
 
 process.on('uncaughtException', function(err) {
   log.error(err.stack);
@@ -55,7 +56,7 @@ function executeCreate() {
   }
 
   argv.title = argv._.shift();
-  migrate.createMigration(argv.title, mysql.migrations.dir, function(err, migration) {
+  migrate.createMigration(argv.title, migrations.dir, function(err, migration) {
     assert.ifError(err);
     log.info(util.format('Created migration at %s', migration.path));
   });
@@ -81,9 +82,9 @@ function run() {
         argv.destination = argv._.shift().toString();
       }
       if(action == 'up') {
-        mysql.migrations.up(argv, onComplete);
+        migrations.up(argv, onComplete);
       } else {
-        mysql.migrations.down(argv, onComplete);
+        migrations.down(argv, onComplete);
       }
       break;
 
