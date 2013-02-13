@@ -135,6 +135,37 @@ happen. If you're on OS X, you can also use
 [Gas Mask](http://code.google.com/p/gmask/) for temporary hosts file switching
 rather than having to manually edit /etc/hosts
 
+### Database Migrations
+
+If you need to modify the database schema, you'll want to create a
+migration. You can do this as follows:
+
+1. Come up with an alphanumeric name for your migration, e.g.
+   `add-issuer-column`.
+
+2. Run `./bin/db-migrate create add-issuer-column`. This will create a new JS
+   file preixed with a timestamp in the `migrations` directory.
+   Something like the following should be displayed:
+
+       [INFO] Created migration at  
+       migrations/20130213205310-add-issuer-column.js
+
+3. Edit the new JS file as per the [node-db-migrate][] instructions.
+
+4. Try out your migration using `./bin/db-migrate up`.
+
+5. Try rolling back your migration using `./bin/db-migrate down`.
+
+Finally, note that during development, `make start` automatically runs
+`./bin/db-migrate up` for you. For production use, you'll need to manually
+run this command yourself whenever you deploy changes that involve a
+schema change.
+
+If you want to write tests for your migration, check out 
+`test/migration.test.js` for inspiration.
+
+  [node-db-migrate]: https://github.com/nearinfinity/node-db-migrate#creating-migrations
+
 ## Related Projects
 * https://github.com/lmorchard/django-badger -- Issuing app for Django
 * https://github.com/ralphbean/tahrir -- A pyramid (python) app for issuing your own Open Badges
