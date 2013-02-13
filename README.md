@@ -120,7 +120,7 @@ and then back in windows you can fire up your favourite browser and connect to t
 
 4. Run the test suite: `npm test`
 
-5. Start your server: `./node_modules/.bin/up -w -p 8888 app.js`
+5. Start your server: `make start`
 
 No matter which way you choose, you should join the
 [Open Badges Google Group](https://groups.google.com/forum/#!forum/openbadges). If

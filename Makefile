@@ -33,4 +33,8 @@ stop-issuer:
 jenkins_build: 
 	echo 'yep'
 
+start:
+	./bin/db-migrate up
+	./node_modules/.bin/up -w -p 8888 app.js
+
 .PHONY: fakeissuer
