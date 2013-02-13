@@ -5,7 +5,7 @@ var fs = require('fs');
 var path = require('path');
 var util = require('util');
 var optimist = require('optimist');
-var index = require('db-migrate');
+var migrate = require('db-migrate');
 var log = require('db-migrate/lib/log');
 var mysql = require('../lib/mysql');
 
@@ -55,7 +55,7 @@ function executeCreate() {
   }
 
   argv.title = argv._.shift();
-  index.createMigration(argv.title, mysql.migrations.dir, function(err, migration) {
+  migrate.createMigration(argv.title, mysql.migrations.dir, function(err, migration) {
     assert.ifError(err);
     log.info(util.format('Created migration at %s', migration.path));
   });
