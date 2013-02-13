@@ -35,6 +35,6 @@ jenkins_build:
 
 start:
 	./bin/db-migrate up
-	./node_modules/.bin/up -w -p 8888 app.js
+	./node_modules/.bin/up -w -n 1 -p 8888 app.js
 
 .PHONY: fakeissuer
