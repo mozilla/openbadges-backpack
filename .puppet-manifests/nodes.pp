@@ -7,7 +7,7 @@ node lucid32 {
   
   Package { require => Exec['apt-get update'] }
   
-  $node_version = "v0.6.20"
+  $node_version = "v0.8.19"
   class { 'nvm':
     node_version => $node_version,
   }
