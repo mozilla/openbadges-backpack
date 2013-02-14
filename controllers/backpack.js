@@ -12,6 +12,7 @@ var awardBadge = require('../lib/award');
 var Badge = require('../models/badge');
 var Group = require('../models/group');
 var User = require('../models/user');
+var parallel = require('async').parallel;
 
 /**
  * Render the login page.
@@ -110,44 +111,52 @@ exports.stats = function stats(request, response, next) {
     return response.send('Must be an admin user', 403);
   logger.info(user.get('email') + ' is accessing /stats');
 
-  function startResponse(err, badges) {
-    if (err) return next(err);
-    var data = computeStats(badges);
-    var users = 0;
-    User.findAll(function(u) { users += 1 });
-    data.userCount = users;
-    response.render('stats.html', data);
-  }
-
-  function computeStats(badges) {
-    var totalBadges = badges.length;
+  function badgeStats(callback) {
+    var totalBadges = 0;
     var issuers = {};
+    Badge.findAll(function(err, badges) {
+      totalBadges = badges.length;
+      badges.forEach(function (badge) {
+        var assertion = badge.get('body').badge;
+        if (!assertion.issuer) return;
 
-    badges.forEach(function (badge) {
-      var assertion = badge.get('body').badge;
-      if (!assertion.issuer) return;
+        var name = assertion.issuer.name;
+        var url = assertion.issuer.origin;
 
-      var name = assertion.issuer.name;
-      var url = assertion.issuer.origin;
+        issuers[name] = issuers[name] || { url: url, total: 0 };
+        issuers[name].total++;
+      });
 
-      issuers[name] = issuers[name] || { url: url, total: 0 };
-      issuers[name].total++;
+      var names = Object.keys(issuers);
+      var totalPerIssuer = names.map(function (name) {
+        var issuer = issuers[name];
+        return { name: name, total: issuer.total, url: issuer.url }
+      });
+      totalPerIssuer.sort(function(issuer1, issuer2) {
+        return issuer2.total - issuer1.total
+      });
+
+      callback(null, {totalPerIssuer: totalPerIssuer, totalBadges: totalBadges} );
     });
-
-    var names = Object.keys(issuers);
-    var totalPerIssuer = names.map(function (name) {
-      var issuer = issuers[name];
-      return { name: name, total: issuer.total, url: issuer.url }
-    });
-    totalPerIssuer.sort(function(issuer1, issuer2) {
-      return issuer2.total - issuer1.total
-    });
-    return {
-      totalBadges: totalBadges,
-      totalPerIssuer: totalPerIssuer
-    }
   }
-  return Badge.findAll(startResponse);
+
+  function userStats(callback) {
+    User.findAll(function(err, users) {
+      callback(null, {totalCount:users.length});
+    })
+  }
+
+  parallel({badges: badgeStats, users: userStats}, 
+           function(err, results) {
+             if (err) {
+               console.error(err);
+               console.log(results);
+             }
+             return response.render('stats.html', {totalBadges: results.badges.totalBadges, 
+                                                   totalPerIssuer: results.badges.totalPerIssuer,
+                                                   userCount: results.users.totalCount})
+           }
+          );
 }
 
 
