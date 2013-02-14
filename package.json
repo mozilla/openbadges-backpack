@@ -19,6 +19,7 @@
     "metapng": "git+https://github.com/brianloveswords/metapng.js.git",
     "mime": "~1.2.5",
     "mysql": "~0.9.5",
+    "db-migrate": "0.3.2",
     "nock": "~0.11.6",
     "nunjucks": "~0.1.6",
     "request": "~2.9.200",
@@ -28,6 +29,7 @@
     "up": "~0.2.2",
     "winston": "~0.5.10",
     "tap": "~0.3.2",
+    "optimist": "~0.3.0",
     "async": "~0.1.22"
   },
   "engines": {
