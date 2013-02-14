@@ -102,13 +102,13 @@ testMigration("add-public-columns", function(t, id, previousId) {
         "'/blah.png',0,'i am a json assertion','i am a json assertion hash'" +
         ",now());"),
     up({count: 1}),
-    sql("SELECT public, public_id FROM badge " +
+    sql("SELECT public, public_path FROM badge " +
         "WHERE endpoint='http://foo'", function(results) {
       t.equal(results[0].public, 0, "'public' defaults to false");
-      t.equal(results[0].public_id, null, "'public_id' defaults to null");
+      t.equal(results[0].public_path, null, "'public_path' defaults to null");
     }),
     down({count: 1}),
-    sqlError("SELECT public_id FROM badge", t, "ERROR_BAD_FIELD_ERROR"),
+    sqlError("SELECT public_path FROM badge", t, "ERROR_BAD_FIELD_ERROR"),
     sqlError("SELECT public FROM badge", t, "ERROR_BAD_FIELD_ERROR")
   ];
 });

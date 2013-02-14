@@ -5,7 +5,7 @@ var type = dbm.dataType;
 exports.up = function(db, callback) {
   async.series([
     db.runSql.bind(db, 'ALTER TABLE `badge` ' +
-                       'ADD public_id varchar(255) DEFAULT NULL UNIQUE;'),
+                       'ADD public_path varchar(255) DEFAULT NULL UNIQUE;'),
     db.runSql.bind(db, 'ALTER TABLE `badge` ' +
                        'ADD public BOOLEAN DEFAULT FALSE;')
   ], callback);
@@ -14,7 +14,7 @@ exports.up = function(db, callback) {
 exports.down = function(db, callback) {
   async.series([
     db.runSql.bind(db, 'ALTER TABLE `badge` ' +
-                       'DROP COLUMN public_id;'),
+                       'DROP COLUMN public_path;'),
     db.runSql.bind(db, 'ALTER TABLE `badge` ' +
                        'DROP COLUMN public;')
   ], callback);
