@@ -69,6 +69,12 @@ form.baker #assertion {
 .modal {
   display: none;
 }
+.env {
+  display: block;
+  text-align: right;
+  color: yellow;
+  font-weight: 100;
+}
 
 #footer {
   padding: 20px 0;

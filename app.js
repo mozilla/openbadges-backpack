@@ -60,6 +60,14 @@ app.use(middleware.csrf({
 app.use(middleware.cors({ whitelist: ['/_badges.*', '/issuer.*', '/baker', '/displayer/.+/group.*'] }));
 app.configure('development', function () {
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+  var gitUtil = require('./lib/git-util');
+  try {
+    var sha = gitUtil.findSHA();
+    app.set('sha', sha);
+  }
+  catch (ex) { 
+    logger.warn(ex.message);
+  }
 });
 app.configure('production', function () {
   app.use(express.errorHandler());
