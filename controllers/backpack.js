@@ -111,46 +111,19 @@ exports.stats = function stats(request, response, next) {
     return response.send('Must be an admin user', 403);
   logger.info(user.get('email') + ' is accessing /stats');
 
-  function badgeStats(callback) {
-    var totalBadges = 0;
-    var issuers = {};
-    Badge.findAll(function(err, badges) {
-      totalBadges = badges.length;
-      badges.forEach(function (badge) {
-        var assertion = badge.get('body').badge;
-        if (!assertion.issuer) return;
-
-        var name = assertion.issuer.name;
-        var url = assertion.issuer.origin;
-
-        issuers[name] = issuers[name] || { url: url, total: 0 };
-        issuers[name].total++;
-      });
-
-      var names = Object.keys(issuers);
-      var totalPerIssuer = names.map(function (name) {
-        var issuer = issuers[name];
-        return { name: name, total: issuer.total, url: issuer.url }
-      });
-      totalPerIssuer.sort(function(issuer1, issuer2) {
-        return issuer2.total - issuer1.total
-      });
-
-      callback(null, {totalPerIssuer: totalPerIssuer, totalBadges: totalBadges} );
-    });
-  }
-
   async.parallel({
-    badges: badgeStats, 
+    badges: Badge.stats, 
     users: User.totalCount
   }, function(err, results) {
     if (err) {
       console.error(err);
       console.log(results);
     }
-    return response.render('stats.html', {totalBadges: results.badges.totalBadges, 
-                                          totalPerIssuer: results.badges.totalPerIssuer,
-                                          userCount: results.users})
+    return response.render('stats.html', {
+      totalBadges: results.badges.totalBadges, 
+      totalPerIssuer: results.badges.totalPerIssuer,
+      userCount: results.users
+    })
   });
 }
 
