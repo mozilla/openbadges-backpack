@@ -23,6 +23,29 @@ exports.findById = function findById(req, res, next, id) {
 };
 
 /**
+ * Route param pre-condition for finding a badge when a badgeUrl is present.
+ * If the badge cannot be found, immediately return HTTP 404.
+ *
+ * @param {String} url is the `public_path` of the badge to look up.
+ */
+
+exports.findByUrl = function findByUrl(req, res, next, url) {
+  Badge.findByUrl(url, function (err, badge) {
+    if (!badge)
+      return res.send(respond('missing', 'could not find badge'), 404);
+
+    req.badge = badge;
+    return next();
+  });
+};
+
+exports.show = function show(req, res, next) {
+  // TODO: render the jinja partial that's currently displayed in the
+  // modal when a user clicks on a badge.
+  return res.send(respond('not implemented', 'not implemented'), 501);
+};
+
+/**
  * Completely delete a badge from the user's account.
  *
  * @return {HTTP 500|404|403|303}

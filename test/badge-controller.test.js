@@ -32,13 +32,51 @@ testUtils.prepareDatabase({
     endpoint: 'endpoint',
     image_path: 'image_path',
     body_hash: 'body_hash',
+    public_path: '4-badge-hashed-pth',
     body: testUtils.makeAssertion({
       recipient: makeHash('brian@example.org', 'hashbrowns'),
       salt: 'hashbrowns'
     })
   })
 }, function (fixtures) {
+  test('badge#findByUrl sets req.badge when url is valid', function(t) {
+    conmock({
+      handler: badge.findByUrl,
+      param: '4-badge-hashed-pth'
+    }, function(err, mock) {
+      if (err) throw err;
+      t.same(mock.request.badge.attributes.public_path, '4-badge-hashed-pth');
+      t.end();
+    });
+  });
 
+  test('badge#findByUrl returns 404 when url is invalid', function(t) {
+    conmock({
+      handler: badge.findByUrl,
+      param: 'badurl'
+    }, function(err, mock) {
+      if (err) throw err;
+      t.equal(mock.request.badge, undefined);
+      t.same(mock.status, 404);
+      t.end();
+    });
+  });
+  
+  test('badge#show', function(t) {
+    conmock({
+      handler: badge.show,
+      request: {
+        badge: fixtures['3-badge-raw']
+      }
+    }, function(err, mock) {
+      if (err) throw err;
+      // TODO: Once we implement the real handler, we'll need to
+      // change this.
+      t.same(mock.status, 501, '501 not implemented is thrown (for now)');
+      t.end();
+    });
+  });
+  
   test('badge#destroy', function (t) {
     const owner = fixtures['1-real-user'];
     const thief = fixtures['2-false-user'];

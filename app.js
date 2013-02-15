@@ -91,6 +91,7 @@ app.param('apiUserId', displayer.findUserById);
 app.param('apiGroupId', displayer.findGroupById);
 app.param('groupId', group.findById);
 app.param('groupUrl', share.findGroupByUrl);
+app.param('badgeUrl', badge.findByUrl);
 
 app.get('/baker', baker.baker);
 app.get('/issuer.js', issuer.generateScript);
@@ -128,6 +129,8 @@ app.delete('/badge/:badgeId', badge.destroy);
 app.post('/group', group.create);
 app.put('/group/:groupId', group.update);
 app.delete('/group/:groupId', group.destroy);
+
+app.get('/share/badge/:badgeUrl', badge.show);
 
 app.get('/share/:groupUrl/edit', share.editor);
 app.post('/share/:groupUrl', share.createOrUpdate);

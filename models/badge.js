@@ -123,6 +123,10 @@ Badge.validators = {
   }
 };
 
+Badge.findByUrl = function (url, callback) {
+  Badge.findOne({public_path: url}, callback);
+};
+
 // Prepare a field as it goes into or comes out of the database.
 Badge.prepare = {
   'in': { body: function (value) { return JSON.stringify(value); } },
