@@ -32,6 +32,9 @@ Badge.confirmRecipient = function confirmRecipient(assertion, email) {
   if (!recipient || !email)
     return false;
 
+  if (typeof recipient !== 'string')
+    return false
+
   // if it's an email address, do a straight comparison
   if (/@/.test(recipient))
     return recipient === email;
