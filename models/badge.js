@@ -26,21 +26,21 @@ Badge.confirmRecipient = function confirmRecipient(assertion, email) {
   if (!assertion)
     return false;
 
-  const badgeEmail = assertion.recipient;
+  const recipient = assertion.recipient;
   const salt = assertion.salt || '';
 
-  if (!badgeEmail || !email)
+  if (!recipient || !email)
     return false;
 
   // if it's an email address, do a straight comparison
-  if (/@/.test(badgeEmail))
-    return badgeEmail === email;
+  if (/@/.test(recipient))
+    return recipient === email;
 
   // if it's not an email address, it must have an alg and dollar sign.
-  if (!(badgeEmail.match(/\w+(\d+)?\$.+/)))
+  if (!(recipient.match(/\w+(\d+)?\$.+/)))
     return false;
 
-  const parts = badgeEmail.split('$');
+  const parts = recipient.split('$');
   const algorithm = parts[0];
   const expect = parts[1];
   var hasher;
