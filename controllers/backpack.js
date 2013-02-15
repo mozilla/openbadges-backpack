@@ -9,7 +9,6 @@ var baker = require('../lib/baker');
 var remote = require('../lib/remote');
 var browserid = require('../lib/browserid');
 var awardBadge = require('../lib/award');
-var reverse = require('../lib/router').reverse;
 var Badge = require('../models/badge');
 var Group = require('../models/group');
 
@@ -20,7 +19,7 @@ var Group = require('../models/group');
 exports.login = function login(request, response) {
   // request.flash returns an array. Pass on the whole thing to the view and
   // decide there if we want to display all of them or just the first one.
-  response.render('login', {
+  response.render('login.html', {
     error: request.flash('error'),
     csrfToken: request.session._csrf
   });
@@ -53,7 +52,7 @@ exports.authenticate = function authenticate(request, response) {
                      request.headers['accept'].indexOf('application/json') != -1;
 
   if (!request.body || !request.body['assertion']) {
-    return formatResponse(reverse('backpack.login'), "assertion expected");
+    return formatResponse('/backpack/login', "assertion expected");
   }
 
   var ident = configuration.get('identity');
@@ -73,7 +72,7 @@ exports.authenticate = function authenticate(request, response) {
 
     logger.debug('browserid verified, attempting to authenticate user');
     request.session.emails = [verifierResponse.email];
-    return formatResponse(reverse('backpack.manage'));
+    return formatResponse('/');
   });
 };
 
@@ -86,7 +85,7 @@ exports.authenticate = function authenticate(request, response) {
 
 exports.signout = function signout(request, response) {
   request.session = {};
-  response.redirect(reverse('backpack.login'), 303);
+  response.redirect('/backpack/login', 303);
 };
 
 /**
@@ -113,7 +112,7 @@ exports.stats = function stats(request, response, next) {
   function startResponse(err, badges) {
     if (err) return next(err);
     var data = computeStats(badges);
-    response.render('stats', { stats: data });
+    response.render('stats.html', data);
   }
 
   function computeStats(badges) {
@@ -136,7 +135,9 @@ exports.stats = function stats(request, response, next) {
       var issuer = issuers[name];
       return { name: name, total: issuer.total, url: issuer.url }
     });
-
+    totalPerIssuer.sort(function(issuer1, issuer2) {
+      return issuer2.total - issuer1.total
+    });
     return {
       totalBadges: totalBadges,
       totalPerIssuer: totalPerIssuer
@@ -158,7 +159,8 @@ exports.manage = function manage(request, response, next) {
   var success = request.flash('success');
   var groups = [];
   var badgeIndex = {};
-  if (!user) return response.redirect(reverse('backpack.login'), 303);
+  if (!user)
+    return response.redirect('/backpack/login', 303);
 
   response.header('Cache-Control', 'no-cache, must-revalidate');
 
@@ -171,7 +173,7 @@ exports.manage = function manage(request, response, next) {
 
       if (criteria[0] === '/') body.badge.criteria = origin + criteria;
       if (evidence && evidence[0] === '/') body.evidence = origin + evidence;
-      // Nobody wants to see the hash in the UI, apparently. 
+      // Nobody wants to see the hash in the UI, apparently.
       if (body.recipient.match(/\w+(\d+)?\$.+/)) body.recipient = user.get('email');
 
       badgeIndex[badge.get('id')] = badge;
@@ -218,13 +220,13 @@ exports.manage = function manage(request, response, next) {
     if (err) return next(err);
     prepareBadgeIndex(badges);
     modifyGroups(groups);
-    response.render('backpack', {
+    response.render('backpack.html', {
       error: error,
       success: success,
       badges: badges,
       csrfToken: request.session._csrf,
       groups: groups,
-      tooltips: request.param('tooltips')
+      tooltips: typeof request.param('tooltips') !== 'undefined'
     });
   }
 
@@ -255,11 +257,11 @@ exports.userBadgeUpload = function userBadgeUpload(request, response) {
       logger.debug(err);
       request.flash('error', err.message);
     }
-    return response.redirect(reverse('backpack.manage'), 303);
+    return response.redirect('/', 303);
   }
 
   if (!user)
-    return response.redirect(reverse('backpack.login'), 303);
+    return response.redirect('/', 303);
 
   if (!tmpfile.size)
     return redirect(new Error('You must choose a badge to upload.'));
@@ -300,3 +302,15 @@ exports.userBadgeUpload = function userBadgeUpload(request, response) {
     });
   });
 };
+
+/**
+ * Stub methods to prevent crash in Express 3.0.5
+ */
+
+exports.details = function details (request, response) {
+  return;
+}
+
+exports.deleteBadge = function deleteBadge (request, response) {
+  return;
+}

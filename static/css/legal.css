@@ -1,8 +1,6 @@
-body {
-  padding: 20px 0;
-}
 
-.container {
+body > .container {
+  padding-top: 2em;
   padding-bottom: 4em;
 }
 

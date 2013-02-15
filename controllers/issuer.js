@@ -3,7 +3,6 @@ var request = require('request');
 var fs = require('fs');
 var url = require('url');
 var logger = require('../lib/logging').logger;
-var reverse = require('../lib/router').reverse;
 var awardBadge = require('../lib/award');
 var remote = require('../lib/remote');
 var Badge = require('../models/badge.js');
@@ -100,7 +99,7 @@ exports.generateScript = function (req, res) {
 
 exports.frame = function (req, res) {
   res.header('Cache-Control', 'no-cache, must-revalidate');
-  res.render('badge-accept', {
+  res.render('badge-accept.html', {
     layout: null,
     framed: true,
     csrfToken: req.session._csrf,
@@ -119,7 +118,7 @@ exports.frameless = function (req, res) {
     }
   }
   res.header('Cache-Control', 'no-cache, must-revalidate');
-  res.render('badge-accept', {
+  res.render('badge-accept.html', {
     layout: null,
     framed: false,
     assertions: JSON.stringify(assertionUrls),
@@ -146,8 +145,8 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
   var success = req.flash('success');
 
   // is the user logged in? if not, suggest they redirect to the login page
-  if (!user) return res.json({ message: "user is not logged in, redirect to " + reverse('backpack.login'),
-                               redirect_to: reverse('backpack.login') }, 403);
+  if (!user) return res.json({ message: "user is not logged in, redirect to " + '/backpack/login',
+                               redirect_to: '/backpack/login' }, 403);
 
   // get the url param (lots of debugging statements here)
   var assertionUrl = req.query.url; // if it was as a query param in the GET
@@ -343,7 +342,7 @@ exports.validator = function (request, response) {
 
     'default': function () {
       var fielderrors = _.map(fields, humanize);
-      return response.render('validator', {
+      return response.render('validator.html', {
         status: 200,
         errors: fielderrors,
         csrfToken: request.session._csrf,
@@ -360,14 +359,14 @@ exports.validator = function (request, response) {
 
 exports.welcome = function(request, response, next) {
   var user = request.user;
-  if (!user) return response.redirect(reverse('backpack.login'), 303);
+  if (!user) return response.redirect('/backpack/login', 303);
 
   function makeResponse(err, badges) {
     if (err) return next(err);
     if (badges && badges.length)
-      return response.redirect(reverse('backpack.manage'), 303);
+      return response.redirect('/', 303);
     else
-      return response.render('issuer-welcome');
+      return response.render('issuer-welcome.html');
   }
 
   Badge.find({email: user.get('email')}, makeResponse);

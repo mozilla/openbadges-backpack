@@ -1,8 +1,7 @@
 language: node_js
 node_js:
-  - 0.6
+  - 0.8
 notifications:
-  webhooks: http://bjb.io:7076
   irc:
     - "irc.mozilla.org#badges"
   email:

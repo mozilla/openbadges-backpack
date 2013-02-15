@@ -72,7 +72,7 @@ exports.userFromSession = function userFromSession() {
         logger.error(err);
         return next(err);
       }
-      req.user = user;
+      req.user = res.locals.user = user;
       return next();
     });
   };

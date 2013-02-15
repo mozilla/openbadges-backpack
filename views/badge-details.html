@@ -1,0 +1,27 @@
+<div class='lightbox' data-id='{{id}}'>
+  <div class='contents badge-details'>
+    <header>
+      <h2>{{badge.attributes.body.badge.name}}</h2>
+      <span class='close'>&times;</span>
+    </header>
+    <div class='body'>
+
+      <div class='confirm-disown'>
+        <p>
+          This will remove the badge from your account. It will also be
+          removed from all groups. The only way to get this badge back will be
+          to go to the place where it was issued
+          (<a href='{{badge.attributes.body.badge.issuer.origin}}'>{{badge.attributes.body.badge.issuer.name}}</a>)
+          and get it re-issued.
+        </p>
+
+        <div class='buttons'>
+          <button class='btn nope'>Nevermind, I want to keep this badge</button>
+          <button class='btn yep btn-danger'>Yes, remove this badge</button>
+        </div>
+      </div>
+      {% include 'badge-data.html' %}
+    </div>
+  </div>
+  <div class='background'></div>
+</div>

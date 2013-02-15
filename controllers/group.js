@@ -6,27 +6,25 @@ var logger = require('../lib/logging').logger;
 
 function makeBadgeObj(attr) { return new Badge(attr) }
 
-exports.param = {
-  groupId: function (request, response, next, id) {
-    Group.findById(id, function (err, group) {
-      if (err) {
-        logger.error("Error pulling group: " + err);
-        return response.send({
-          status: 'error',
-          error: 'Error pulling group'
-        }, 500);
-      }
+exports.findById = function findById(req, res, next, id) {
+  Group.findById(id, function (err, group) {
+    if (err) {
+      logger.error("Error pulling group: " + err);
+      return res.send({
+        status: 'error',
+        error: 'Error pulling group'
+      }, 500);
+    }
 
-      if (!group)
-        return response.send({
-          status: 'missing',
-          error: 'Could not find group'
-        }, 404);
+    if (!group)
+      return res.send({
+        status: 'missing',
+        error: 'Could not find group'
+      }, 404);
 
-      request.group = group;
-      return next();
-    });
-  }
+    req.group = group;
+    return next();
+  });
 };
 
 exports.create = function (request, response) {

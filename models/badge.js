@@ -23,34 +23,42 @@ Badge.prototype.presave = function () {
 
 Badge.confirmRecipient = function confirmRecipient(assertion, email) {
   // can't validate if not given an assertion
-  if (!assertion) return false;
+  if (!assertion)
+    return false;
 
-  var badgeEmail = assertion.recipient;
-  var salt = assertion.salt || '';
+  const recipient = assertion.recipient;
+  const salt = assertion.salt || '';
 
-  if (!badgeEmail || !email) return false;
+  if (!recipient || !email)
+    return false;
 
   // if it's an email address, do a straight comparison
-  if (/@/.test(badgeEmail)) return badgeEmail === email;
+  if (/@/.test(recipient))
+    return recipient === email;
 
   // if it's not an email address, it must have an alg and dollar sign.
-  if (!(badgeEmail.match(/\w+(\d+)?\$.+/))) return false;
+  if (!(recipient.match(/\w+(\d+)?\$.+/)))
+    return false;
 
-  var parts = badgeEmail.split('$');
-  var algorithm = parts[0];
-  var hash = parts[1];
-  var given = crypto.createHash(algorithm);
-
-  // if there are only two parts, the first part is the algorithm and the
-  // second part is the computed hash.
-  if (parts.length === 2) {
-    return given.update(email + salt).digest('hex') === hash;
-  }
-  // if there are more parts, it's an algorithm with options
-  else {
-    // #TODO: support algorithms with options.
+  const parts = recipient.split('$');
+  const algorithm = parts[0];
+  const expect = parts[1];
+  var hasher;
+  try {
+    hasher = crypto.createHash(algorithm);
+  } catch(e) {
+    // #TODO: should probably actually throw an error here.
     return false;
   }
+
+  // if there are more than 2 parts, it's an algorithm with options
+  // #TODO: support algorithms with options, throw instead of just
+  //   returning false here.
+  if (parts.length !== 2)
+    return false;
+
+  const value = hasher.update(email + salt).digest('hex');
+  return value.toLowerCase() === expect.toLowerCase();
 };
 
 Badge.prototype.confirmRecipient = function confirmRecipient(email) {
