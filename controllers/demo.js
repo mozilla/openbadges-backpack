@@ -43,6 +43,7 @@ exports.massAward = function (req, res) {
       var imgUrl = ORIGIN + '/static/_demo/' + f;
       var assertion = makeDemoAssertion(recipient, imgUrl);
       return {
+        baseName: f,
         imgData: fs.readFileSync(path.join(demoBadgeDir, f)),
         assertion: assertion,
         assertionUrl: ORIGIN + '/demo/badge.json?' + qs.stringify({title: 'raaad', image: imgUrl, recipient: recipient})
@@ -52,6 +53,7 @@ exports.massAward = function (req, res) {
       awardBadge({
         assertion: item.assertion,
         url: item.assertionUrl,
+        public_path: item.baseName,
         imagedata: item.imgData,
         recipient: email
       });

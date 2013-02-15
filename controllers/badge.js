@@ -40,9 +40,7 @@ exports.findByUrl = function findByUrl(req, res, next, url) {
 };
 
 exports.show = function show(req, res, next) {
-  // TODO: render the jinja partial that's currently displayed in the
-  // modal when a user clicks on a badge.
-  return res.send(respond('not implemented', 'not implemented'), 501);
+  res.render('badge-shared.html', {badge: req.badge});
 };
 
 /**

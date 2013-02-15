@@ -66,13 +66,14 @@ testUtils.prepareDatabase({
     conmock({
       handler: badge.show,
       request: {
-        badge: fixtures['3-badge-raw']
+        badge: fixtures['4-badge-hashed']
       }
     }, function(err, mock) {
       if (err) throw err;
-      // TODO: Once we implement the real handler, we'll need to
-      // change this.
-      t.same(mock.status, 501, '501 not implemented is thrown (for now)');
+      t.same(mock.status, 200, '200 returned');
+      t.same(mock.fntype, 'render');
+      t.same(mock.path, 'badge-shared.html');
+      t.same(mock.options.badge.attributes.public_path, '4-badge-hashed-pth');
       t.end();
     });
   });
