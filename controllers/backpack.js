@@ -140,15 +140,9 @@ exports.stats = function stats(request, response, next) {
     });
   }
 
-  function userStats(callback) {
-    User.findAll(function(err, users) {
-      callback(null, {totalCount:users.length});
-    })
-  }
-
   async.parallel({
     badges: badgeStats, 
-    users: userStats
+    users: User.totalCount
   }, function(err, results) {
     if (err) {
       console.error(err);
@@ -156,9 +150,8 @@ exports.stats = function stats(request, response, next) {
     }
     return response.render('stats.html', {totalBadges: results.badges.totalBadges, 
                                           totalPerIssuer: results.badges.totalPerIssuer,
-                                          userCount: results.users.totalCount})
-  }
-                );
+                                          userCount: results.users})
+  });
 }
 
 

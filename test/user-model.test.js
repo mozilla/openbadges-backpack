@@ -53,6 +53,14 @@ testUtils.prepareDatabase(function () {
     });
   });
 
+  test('User.totalCount', function(t) {
+    User.totalCount(function(err, totalcount) {
+      t.notOk(err, "there's users, let's not have errors");
+      t.equal(totalcount, 2, 'we have one user, correct');
+      t.end();
+    })
+  })
+
 
   testUtils.finish(test);
 });
