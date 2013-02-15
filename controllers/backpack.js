@@ -12,7 +12,7 @@ var awardBadge = require('../lib/award');
 var Badge = require('../models/badge');
 var Group = require('../models/group');
 var User = require('../models/user');
-var parallel = require('async').parallel;
+var async = require('async');
 
 /**
  * Render the login page.
@@ -146,17 +146,19 @@ exports.stats = function stats(request, response, next) {
     })
   }
 
-  parallel({badges: badgeStats, users: userStats}, 
-           function(err, results) {
-             if (err) {
-               console.error(err);
-               console.log(results);
-             }
-             return response.render('stats.html', {totalBadges: results.badges.totalBadges, 
-                                                   totalPerIssuer: results.badges.totalPerIssuer,
-                                                   userCount: results.users.totalCount})
-           }
-          );
+  async.parallel({
+    badges: badgeStats, 
+    users: userStats
+  }, function(err, results) {
+    if (err) {
+      console.error(err);
+      console.log(results);
+    }
+    return response.render('stats.html', {totalBadges: results.badges.totalBadges, 
+                                          totalPerIssuer: results.badges.totalPerIssuer,
+                                          userCount: results.users.totalCount})
+  }
+                );
 }
 
 
