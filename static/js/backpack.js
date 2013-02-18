@@ -12,6 +12,11 @@ $.ajaxSetup({
 })
 if(!nunjucks.env) {
     nunjucks.env = new nunjucks.Environment(new nunjucks.HttpLoader('/views'));
+    if (!nunjucks.env.globals)
+      nunjucks.env.globals = {};
+    $.extend(nunjucks.env.globals, {
+      csrfToken: CSRF
+    });
     nunjucks.env.addFilter('formatdate', function (rawDate) {
       if (parseInt(rawDate, 10) == rawDate) {
         var date = new Date(rawDate * 1000);
@@ -53,7 +58,7 @@ var errHandler = function (model, xhr) {
  * Nunjucks template helper
  */
 var template = function template(name, data) {
-    return $(nunjucks.env.render(name, data));
+    return $(nunjucks.env.render(name, $.extend(data, nunjucks.env.globals)));
 }
 
 // Model Definitions
