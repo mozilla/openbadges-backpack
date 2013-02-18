@@ -62,6 +62,37 @@ testUtils.prepareDatabase({
     });
   });
   
+  test('badge#share creates badge if needed', function(t) {
+    Badge.findById(fixtures['3-badge-raw'].attributes.id, function(err, b) {
+      if (err) throw err;
+      conmock({
+        handler: badge.share,
+        request: {badge: b}
+      }, function(err, mock) {
+        if (err) throw err;
+        t.same(mock.status, 303);
+        t.same(mock.fntype, 'redirect');
+        t.same(mock.path, '/share/badge/' + b.attributes.body_hash);
+        t.end();
+      });
+    });
+  });
+
+  test('badge#share doesn\'t create badge if not needed', function(t) {
+    conmock({
+      handler: badge.share,
+      request: {
+        badge: fixtures['4-badge-hashed']
+      }
+    }, function(err, mock) {
+      if (err) throw err;
+      t.same(mock.status, 303);
+      t.same(mock.fntype, 'redirect');
+      t.same(mock.path, '/share/badge/4-badge-hashed-pth');
+      t.end();
+    });
+  });
+  
   test('badge#show', function(t) {
     conmock({
       handler: badge.show,

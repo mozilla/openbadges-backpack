@@ -130,6 +130,7 @@ app.post('/group', group.create);
 app.put('/group/:groupId', group.update);
 app.delete('/group/:groupId', group.destroy);
 
+app.post('/share/badge/:badgeId', badge.share);
 app.get('/share/badge/:badgeUrl', badge.show);
 
 app.get('/share/:groupUrl/edit', share.editor);

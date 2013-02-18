@@ -64,6 +64,15 @@ Badge.confirmRecipient = function confirmRecipient(assertion, email) {
   return value.toLowerCase() === expect.toLowerCase();
 };
 
+Badge.prototype.share = function share(callback) {
+  if (this.get('public_path'))
+    return callback(null, this);
+  
+  this.presave();
+  this.set('public_path', this.get('body_hash'));
+  this.save(callback);
+};
+
 Badge.prototype.confirmRecipient = function confirmRecipient(email) {
   return Badge.confirmRecipient(this.get('body'), email);
 };

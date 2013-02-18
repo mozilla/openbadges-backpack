@@ -39,6 +39,13 @@ exports.findByUrl = function findByUrl(req, res, next, url) {
   });
 };
 
+exports.share = function share(req, res, next) {
+  req.badge.share(function(err, badge) {
+    if (err) throw err;
+    return res.redirect('/share/badge/' + badge.attributes.public_path, 303);
+  });
+};
+
 exports.show = function show(req, res, next) {
   res.render('badge-shared.html', {badge: req.badge});
 };
