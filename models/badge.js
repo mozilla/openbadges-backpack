@@ -64,6 +64,15 @@ Badge.confirmRecipient = function confirmRecipient(assertion, email) {
   return value.toLowerCase() === expect.toLowerCase();
 };
 
+Badge.prototype.share = function share(callback) {
+  if (this.get('public_path'))
+    return callback(null, this);
+  
+  this.presave();
+  this.set('public_path', this.get('body_hash'));
+  this.save(callback);
+};
+
 Badge.prototype.confirmRecipient = function confirmRecipient(email) {
   return Badge.confirmRecipient(this.get('body'), email);
 };
@@ -121,6 +130,10 @@ Badge.validators = {
     if (String(value) !== '[object Object]') { return "body must be an object"; }
     if (Badge.validateBody(value) instanceof Error) { return "invalid body"; }
   }
+};
+
+Badge.findByUrl = function (url, callback) {
+  Badge.findOne({public_path: url}, callback);
 };
 
 // Prepare a field as it goes into or comes out of the database.

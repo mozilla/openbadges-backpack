@@ -84,5 +84,5 @@ module.exports = function conmock (options, callback) {
     mock.fntype = 'next';
     callback(null, mock, request);
   }
-  return handler(request, mock, next);
+  return handler(request, mock, next, options.param);
 };
