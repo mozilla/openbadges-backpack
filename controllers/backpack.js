@@ -283,6 +283,25 @@ exports.settings = function settings(request, response) {
 
 
 /**
+ * Save the user settings
+ *
+ * @return {HTTP 303}
+ *   with no user: redirect user to login page
+ *   otherwise: redirect to user settings page
+ */
+
+exports.saveSettings = function saveSettings(request, response) {
+  var user = request.user;
+  if (!user)
+    return response.redirect('/backpack/login', 303);
+
+  request.flash('error', 'Saving settings not yet implemented :(');
+
+  return response.redirect('/backpack/settings', 303);
+}
+
+
+/**
  * Handle upload of a badge from a user's filesystem. Gets embedded data from
  * uploaded PNG with `urlFromUpload` from lib/baker, retrieves the assertion
  * using `getHostedAssertion` from lib/remote and finally awards the badge
