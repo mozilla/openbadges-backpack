@@ -62,14 +62,17 @@ testUtils.prepareDatabase({
     });
   });
   
-  test('badge#share creates badge if needed', function(t) {
+  test('badge#share works when public_path doesn\'t exist', function(t) {
     Badge.findById(fixtures['3-badge-raw'].attributes.id, function(err, b) {
       if (err) throw err;
+      t.same(b.get('public_path'), null, 'public_path doesn\'t exist');
       conmock({
         handler: badge.share,
         request: {badge: b}
       }, function(err, mock) {
         if (err) throw err;
+        t.same(b.get('public_path'), b.attributes.body_hash,
+               'public_path was created');
         t.same(mock.status, 303);
         t.same(mock.fntype, 'redirect');
         t.same(mock.path, '/share/badge/' + b.attributes.body_hash);
@@ -78,7 +81,9 @@ testUtils.prepareDatabase({
     });
   });
 
-  test('badge#share doesn\'t create badge if not needed', function(t) {
+  test('badge#share works when public_path already exists', function(t) {
+    t.same(fixtures['4-badge-hashed'].get('public_path'),
+           '4-badge-hashed-pth', 'public_path already exists');
     conmock({
       handler: badge.share,
       request: {
