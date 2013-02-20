@@ -118,6 +118,7 @@ exports.stats = function stats(request, response, next) {
     if (err) {
       console.error(err);
       console.log(results);
+      return next(err);
     }
     return response.render('stats.html', {
       totalBadges: results.badges.totalBadges, 
