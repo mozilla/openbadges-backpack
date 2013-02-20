@@ -61,9 +61,6 @@ testUtils.prepareDatabase({
     const group = fixtures['5-group'];
     const expect = fixtures['3-badge'];
 
-    // #FIXME: stupid fix -- when saving a group, it modifies the
-    // original object in place to be the serialized value instead
-    // of the complex value. This is dumb and I hate it and it's dumb.
     group.set('badges', [1, 2]);
 
     group.getBadgeObjects(function (err, badges) {
@@ -80,11 +77,11 @@ testUtils.prepareDatabase({
       user_id: 1,
       name: 'New Group Alpha',
       badges: badges
-    })
+    });
+    t.same(group.get('badges'), [1, 2]);
     group.save(function (err) {
       t.notOk(err, 'no errors');
-      // this will break when I fix that thing above.
-      t.same(group.get('badges'), '[1,2]');
+      t.same(group.get('badges'), [1, 2]);
       t.end();
     })
   });

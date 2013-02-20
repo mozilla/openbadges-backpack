@@ -17,7 +17,7 @@ Base.apply(Badge, 'badge');
 
 Badge.prototype.presave = function () {
   if (!this.get('id')) {
-    this.set('body_hash', sha256(this.get('body')));
+    this.set('body_hash', sha256(JSON.stringify(this.get('body'))));
   }
 };
 
