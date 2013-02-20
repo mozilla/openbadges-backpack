@@ -23,6 +23,34 @@ exports.findById = function findById(req, res, next, id) {
 };
 
 /**
+ * Route param pre-condition for finding a badge when a badgeUrl is present.
+ * If the badge cannot be found, immediately return HTTP 404.
+ *
+ * @param {String} url is the `public_path` of the badge to look up.
+ */
+
+exports.findByUrl = function findByUrl(req, res, next, url) {
+  Badge.findByUrl(url, function (err, badge) {
+    if (!badge)
+      return res.send(respond('missing', 'could not find badge'), 404);
+
+    req.badge = badge;
+    return next();
+  });
+};
+
+exports.share = function share(req, res, next) {
+  req.badge.share(function(err, badge) {
+    if (err) throw err;
+    return res.redirect('/share/badge/' + badge.attributes.public_path, 303);
+  });
+};
+
+exports.show = function show(req, res, next) {
+  res.render('badge-shared.html', {badge: req.badge});
+};
+
+/**
  * Completely delete a badge from the user's account.
  *
  * @return {HTTP 500|404|403|303}

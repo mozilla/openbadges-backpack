@@ -64,6 +64,20 @@ test('next()', function (t) {
   t.end();
 });
 
+test('options.param', function(t) {
+  conmock({
+    handler: function(req, res, next, param) {
+      req.passedInParam = param;
+      next();
+    },
+    param: 'lol'
+  }, function(err, mock) {
+    if (err) throw err;
+    t.equal(mock.request.passedInParam, 'lol');
+    t.end();
+  });
+});
+
 test('res.contentType', function (t) {
   function handler(type) {
     return function (req, res, next) {

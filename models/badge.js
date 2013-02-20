@@ -26,21 +26,24 @@ Badge.confirmRecipient = function confirmRecipient(assertion, email) {
   if (!assertion)
     return false;
 
-  const badgeEmail = assertion.recipient;
+  const recipient = assertion.recipient;
   const salt = assertion.salt || '';
 
-  if (!badgeEmail || !email)
+  if (!recipient || !email)
     return false;
+
+  if (typeof recipient !== 'string')
+    return false
 
   // if it's an email address, do a straight comparison
-  if (/@/.test(badgeEmail))
-    return badgeEmail === email;
+  if (/@/.test(recipient))
+    return recipient === email;
 
   // if it's not an email address, it must have an alg and dollar sign.
-  if (!(badgeEmail.match(/\w+(\d+)?\$.+/)))
+  if (!(recipient.match(/\w+(\d+)?\$.+/)))
     return false;
 
-  const parts = badgeEmail.split('$');
+  const parts = recipient.split('$');
   const algorithm = parts[0];
   const expect = parts[1];
   var hasher;
@@ -59,6 +62,15 @@ Badge.confirmRecipient = function confirmRecipient(assertion, email) {
 
   const value = hasher.update(email + salt).digest('hex');
   return value.toLowerCase() === expect.toLowerCase();
+};
+
+Badge.prototype.share = function share(callback) {
+  if (this.get('public_path'))
+    return callback(null, this);
+  
+  this.presave();
+  this.set('public_path', this.get('body_hash'));
+  this.save(callback);
 };
 
 Badge.prototype.confirmRecipient = function confirmRecipient(email) {
@@ -118,6 +130,10 @@ Badge.validators = {
     if (String(value) !== '[object Object]') { return "body must be an object"; }
     if (Badge.validateBody(value) instanceof Error) { return "invalid body"; }
   }
+};
+
+Badge.findByUrl = function (url, callback) {
+  Badge.findOne({public_path: url}, callback);
 };
 
 // Prepare a field as it goes into or comes out of the database.
@@ -233,18 +249,19 @@ Badge.stats = function (callback) {
       var name = assertion.issuer.name;
       var url = assertion.issuer.origin;
 
-      issuers[name] = issuers[name] || { url: url, total: 0 };
-      issuers[name].total++;
+      issuers[url] = issuers[url] || { name: name, total: 0 };
+      issuers[url].total++;
     });
 
-    var names = Object.keys(issuers);
-    var totalPerIssuer = names.map(function (name) {
-      var issuer = issuers[name];
-      return { name: name, total: issuer.total, url: issuer.url }
+    var urls = Object.keys(issuers);
+    var totalPerIssuer = urls.map(function (url) {
+      var issuer = issuers[url];
+      return { url: url, total: issuer.total, name: issuer.name }
     });
     totalPerIssuer.sort(function(issuer1, issuer2) {
       return issuer2.total - issuer1.total
     });
+    debugger;
     callback(null, {totalPerIssuer: totalPerIssuer, totalBadges: totalBadges} );
   });
 }

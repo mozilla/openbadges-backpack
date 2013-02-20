@@ -301,5 +301,15 @@ testUtils.prepareDatabase({
     t.end();
   })
 
+  test('Badge.confirmRecipient: new assertions should fail at the moment', function (t) {
+    const assertion = { recipient: { identity: "brian@mozillafoundation.org" } };
+    const expect = false;
+    var value;
+    try { value = Badge.confirmRecipient(assertion, 'whatever') }
+    catch (e) { t.fail('should not have thrown') }
+    t.same(value, expect, 'got expected value');
+    t.end();
+  });
+
   testUtils.finish(test);
 });

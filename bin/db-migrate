@@ -1,0 +1,99 @@
+#!/usr/bin/env node
+
+var assert = require('assert');
+var fs = require('fs');
+var path = require('path');
+var util = require('util');
+var optimist = require('optimist');
+var migrate = require('db-migrate');
+var log = require('db-migrate/lib/log');
+var mysql = require('../lib/mysql');
+var migrations = require('../lib/migrations');
+
+process.on('uncaughtException', function(err) {
+  log.error(err.stack);
+  process.exit(1);
+});
+
+var argv = optimist
+    .default({
+      verbose: false
+    })
+    .usage('Usage: db-migrate [up|down|create] migrationName [options]')
+
+    .describe('count', 'Max number of migrations to run.')
+    .alias('c', 'count')
+    .string('c')
+
+    .describe('dry-run', "Prints the SQL but doesn't run it.")
+    .boolean('dry-run')
+
+    .describe('verbose', 'Verbose mode.')
+    .alias('v', 'verbose')
+    .boolean('v')
+
+    .alias('h', 'help')
+    .alias('h', '?')
+    .boolean('h')
+    .argv;
+
+if (argv.help || argv._.length == 0) {
+  optimist.showHelp();
+  process.exit(1);
+}
+
+global.verbose = argv.verbose;
+global.dryRun = argv['dry-run'];
+if(global.dryRun) {
+  log.info('dry run');
+}
+
+function executeCreate() {
+  if(argv._.length == 0) {
+    log.error("'migrationName' is required.");
+    optimist.showHelp();
+    process.exit(1);
+  }
+
+  argv.title = argv._.shift();
+  migrate.createMigration(argv.title, migrations.dir, function(err, migration) {
+    assert.ifError(err);
+    log.info(util.format('Created migration at %s', migration.path));
+  });
+}
+
+function onComplete(err) {
+  assert.ifError(err);
+  log.info('Done');
+}
+
+function run() {
+  var action = argv._.shift();
+  switch(action) {
+    case 'create':
+      executeCreate();
+      break;
+    case 'up':
+    case 'down':
+      if(verbose) {
+        log.info("Using settings:", mysql.getDatabaseConfig());
+      }
+      if(argv._.length > 0) {
+        argv.destination = argv._.shift().toString();
+      }
+      if(action == 'up') {
+        migrations.up(argv, onComplete);
+      } else {
+        migrations.down(argv, onComplete);
+      }
+      break;
+
+    default:
+      log.error('Invalid Action: Must be [up|down|create].');
+      optimist.showHelp();
+      process.exit(1);
+      break;
+  }
+}
+
+run();

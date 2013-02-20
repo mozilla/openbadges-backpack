@@ -1,5 +1,6 @@
 const _ = require('underscore');
 const mysql = require('../lib/mysql');
+const migrations = require('../lib/migrations');
 const async = require('async');
 
 const ALPHABET = 'abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_';
@@ -111,7 +112,7 @@ function recreateDatabase(callback) {
     mysql.dropTestDatabase,
     mysql.createTestDatabase,
     mysql.useTestDatabase,
-    mysql.createTables
+    migrations.up
   ], function (err, results) {
     if (err) throw err;
     callback(null, results);

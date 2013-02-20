@@ -5,7 +5,7 @@ var configuration = require('./lib/configuration');
 var logger = require('./lib/logging').logger;
 var crypto = require('crypto');
 var User = require('./models/user');
-    
+
 // `COOKIE_SECRET` is randomly generated on the first run of the server,
 // then stored to a file and looked up on restart to maintain state.
 // See the `secrets.js` for more information.
@@ -48,28 +48,29 @@ exports.userFromSession = function userFromSession() {
   return function (req, res, next) {
     var email = '';
     var emailRe = /^.+?\@.+?\.*$/;
-    
+
     if (!req.session) {
       logger.debug('could not find session');
       return next();
     }
-    
+
     if (!req.session.emails) {
       return next();
     }
-    
+
     email = req.session.emails[0];
-    
+
     if (!emailRe.test(email)) {
       logger.warn('req.session.emails does not contain valid user: ' + email);
       req.session = {};
       return req.next();
     }
-    
+
     User.findOrCreate(email, function (err, user) {
       if (err) {
         logger.error("Problem finding/creating user:");
         logger.error(err);
+        return next(err);
       }
       req.user = res.locals.user = user;
       return next();
@@ -115,7 +116,7 @@ exports.csrf = function (options) {
   var list = options.whitelist;
   return function (req, res, next) {
     if (whitelisted(list, req.url)) return next();
-    
+
     var token = req.session._csrf || (req.session._csrf = utils.uid(24));
     if ('GET' == req.method || 'HEAD' == req.method) return next();
     var val = value(req);

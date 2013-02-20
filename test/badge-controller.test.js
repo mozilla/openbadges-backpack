@@ -32,13 +32,88 @@ testUtils.prepareDatabase({
     endpoint: 'endpoint',
     image_path: 'image_path',
     body_hash: 'body_hash',
+    public_path: '4-badge-hashed-pth',
     body: testUtils.makeAssertion({
       recipient: makeHash('brian@example.org', 'hashbrowns'),
       salt: 'hashbrowns'
     })
   })
 }, function (fixtures) {
+  test('badge#findByUrl sets req.badge when url is valid', function(t) {
+    conmock({
+      handler: badge.findByUrl,
+      param: '4-badge-hashed-pth'
+    }, function(err, mock) {
+      if (err) throw err;
+      t.same(mock.request.badge.attributes.public_path, '4-badge-hashed-pth');
+      t.end();
+    });
+  });
 
+  test('badge#findByUrl returns 404 when url is invalid', function(t) {
+    conmock({
+      handler: badge.findByUrl,
+      param: 'badurl'
+    }, function(err, mock) {
+      if (err) throw err;
+      t.equal(mock.request.badge, undefined);
+      t.same(mock.status, 404);
+      t.end();
+    });
+  });
+  
+  test('badge#share works when public_path doesn\'t exist', function(t) {
+    Badge.findById(fixtures['3-badge-raw'].attributes.id, function(err, b) {
+      if (err) throw err;
+      t.same(b.get('public_path'), null, 'public_path doesn\'t exist');
+      conmock({
+        handler: badge.share,
+        request: {badge: b}
+      }, function(err, mock) {
+        if (err) throw err;
+        t.same(b.get('public_path'), b.attributes.body_hash,
+               'public_path was created');
+        t.same(mock.status, 303);
+        t.same(mock.fntype, 'redirect');
+        t.same(mock.path, '/share/badge/' + b.attributes.body_hash);
+        t.end();
+      });
+    });
+  });
+
+  test('badge#share works when public_path already exists', function(t) {
+    t.same(fixtures['4-badge-hashed'].get('public_path'),
+           '4-badge-hashed-pth', 'public_path already exists');
+    conmock({
+      handler: badge.share,
+      request: {
+        badge: fixtures['4-badge-hashed']
+      }
+    }, function(err, mock) {
+      if (err) throw err;
+      t.same(mock.status, 303);
+      t.same(mock.fntype, 'redirect');
+      t.same(mock.path, '/share/badge/4-badge-hashed-pth');
+      t.end();
+    });
+  });
+  
+  test('badge#show', function(t) {
+    conmock({
+      handler: badge.show,
+      request: {
+        badge: fixtures['4-badge-hashed']
+      }
+    }, function(err, mock) {
+      if (err) throw err;
+      t.same(mock.status, 200, '200 returned');
+      t.same(mock.fntype, 'render');
+      t.same(mock.path, 'badge-shared.html');
+      t.same(mock.options.badge.attributes.public_path, '4-badge-hashed-pth');
+      t.end();
+    });
+  });
+  
   test('badge#destroy', function (t) {
     const owner = fixtures['1-real-user'];
     const thief = fixtures['2-false-user'];
