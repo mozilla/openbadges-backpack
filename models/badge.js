@@ -233,13 +233,13 @@ Badge.validateBody = function (body) {
   return null;
 };
 
+// callback has the signature callback(err, {totalPerIssuer: ['issuer':1], totalBadges:1})
 Badge.stats = function (callback) {
-  // callback(err, {totalPerIssuer: ['issuer':1], totalBadges:1})
   var totalBadges = 0;
   var issuers = {};
   Badge.findAll(function(err, badges) {
     if (err) {
-      callback(err);
+      return callback(err);
     }
     totalBadges = badges.length;
     badges.forEach(function (badge) {
@@ -261,8 +261,7 @@ Badge.stats = function (callback) {
     totalPerIssuer.sort(function(issuer1, issuer2) {
       return issuer2.total - issuer1.total
     });
-    debugger;
-    callback(null, {totalPerIssuer: totalPerIssuer, totalBadges: totalBadges} );
+    return callback(null, {totalPerIssuer: totalPerIssuer, totalBadges: totalBadges} );
   });
 }
 
