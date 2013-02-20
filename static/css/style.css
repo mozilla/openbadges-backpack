@@ -10,11 +10,9 @@
 }
 
 html {
-  background: #fff url('/images/stripes.png') repeat-x;
   height: 100%;
 }
 body {
-  background: transparent;
   height: 101%;
 }
 #body {
@@ -62,9 +60,7 @@ form.baker #assertion {
 .navbar .user {
   padding: 10px 10px 11px;
   line-height: 19px;
-  color: #999999;
   text-decoration: none;
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
 }
 .modal {
   display: none;
@@ -77,7 +73,9 @@ form.baker #assertion {
 }
 
 #footer {
+  margin-top: 100px;
   padding: 20px 0;
+  text-align: right;
 }
 #footer ul {
   margin: 0;
@@ -98,9 +96,6 @@ form.baker #assertion {
 }
 #footer aside {
   font-size: 0.85em;
-}
-#footer aside a {
-  color: #999;
 }
 
 .openbadge {

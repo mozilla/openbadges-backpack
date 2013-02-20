@@ -23,7 +23,7 @@
 <div class="row" style="position: relative;">
   <div class="span4 column">
     {% if badges.length %}
-    <h1><span data-title="Badges" data-content="These are the badges you've earned so far! Click on one to see its details." rel="popover">Badges{% if tooltips %}<i class="icon-info-sign"></i>{% endif %}</span></h1>
+    <h2><span data-title="Badges" data-content="These are the badges you've earned so far! Click on one to see its details." rel="popover">Badges{% if tooltips %}<i class="icon-info-sign"></i>{% endif %}</span></h2>
     <div id="badges" class="js-badges">
       {% for badge in badges %}
         <span draggable="true" class="openbadge" data-id="{{badge.attributes.id}}" rel="popinfo" data-title="{{badge.attributes.body.badge.name}}" data-content="<span>{{badge.attributes.body.badge.description}}</span><span>Issuer: {{badge.attributes.body.badge.issuer.name}}</span>">
@@ -52,7 +52,7 @@
 
   {% if badges.length %}
     <div id='groups' class="span8 column">
-      <h1><span rel="popover" data-title="Groups" data-content="You can drag-and-drop badges into groups, which you can use to publish your badges for employers, social networks, etc.">Groups{% if tooltips %}<i class="icon-info-sign"></i>{% endif %}</span></h1>
+      <h2><span rel="popover" data-title="Groups" data-content="You can drag-and-drop badges into groups, which you can use to publish your badges for employers, social networks, etc.">Groups{% if tooltips %}<i class="icon-info-sign"></i>{% endif %}</span></h2>
       {% for group in groups %}
         <div class='group' data-id="{{group.attributes.id}}" data-url="{{group.attributes.url}}">
         <input class='groupName' type='text' value='{{group.attributes.name}}' style='display: block' rel="tooltip" data-title="Rename groups to whatever you want!">
