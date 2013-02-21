@@ -82,7 +82,8 @@ Base.prototype.save = function save(callback) {
   var err = this.validate(attributes);
   var model = this.model;
   var prepMethods = (model.prepare || {})['in'] || {};
-
+  var preppedAttributes = {};
+  
   function parseResult(err, result) {
     if (err) { return callback(err, null); }
     if (!attributes.id && result.insertId)
@@ -93,15 +94,15 @@ Base.prototype.save = function save(callback) {
   callback = callback || function () {};
   if (err) { return callback(err, null); }
 
-  Object.keys(attributes).forEach(function (key) {
-    var prep = prepMethods[key];
-    if (prep) attributes[key] = prep(attributes[key], attributes);
-  });
-
   if ('function' === typeof this.presave)
     this.presave();
   
-  client._upsert(table, attributes, parseResult.bind(this));
+  Object.keys(attributes).forEach(function (key) {
+    var prep = prepMethods[key] || function(x) { return x; };
+    preppedAttributes[key] = prep(attributes[key], attributes);
+  });
+
+  client._upsert(table, preppedAttributes, parseResult.bind(this));
 };
 
 Base.prototype.destroy = function (callback) {

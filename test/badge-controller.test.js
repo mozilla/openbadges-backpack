@@ -62,22 +62,30 @@ testUtils.prepareDatabase({
     });
   });
   
-  test('badge#share works when public_path doesn\'t exist', function(t) {
-    Badge.findById(fixtures['3-badge-raw'].attributes.id, function(err, b) {
+  test('badge#save does not leave body serialized as JSON', function(t) {
+    var b = fixtures['3-badge-raw'];
+    t.same(b.get('body').recipient, 'brian@example.org');
+    b.save(function(err) {
       if (err) throw err;
-      t.same(b.get('public_path'), null, 'public_path doesn\'t exist');
-      conmock({
-        handler: badge.share,
-        request: {badge: b}
-      }, function(err, mock) {
-        if (err) throw err;
-        t.same(b.get('public_path'), b.attributes.body_hash,
-               'public_path was created');
-        t.same(mock.status, 303);
-        t.same(mock.fntype, 'redirect');
-        t.same(mock.path, '/share/badge/' + b.attributes.body_hash);
-        t.end();
-      });
+      t.same(b.get('body').recipient, 'brian@example.org');
+      t.end();
+    });
+  });
+  
+  test('badge#share works when public_path doesn\'t exist', function(t) {
+    var b = fixtures['3-badge-raw'];
+    t.same(b.get('public_path'), undefined, 'public_path doesn\'t exist');
+    conmock({
+      handler: badge.share,
+      request: {badge: b}
+    }, function(err, mock) {
+      if (err) throw err;
+      t.same(b.get('public_path'), b.attributes.body_hash,
+             'public_path was created');
+      t.same(mock.status, 303);
+      t.same(mock.fntype, 'redirect');
+      t.same(mock.path, '/share/badge/' + b.attributes.body_hash);
+      t.end();
     });
   });
 

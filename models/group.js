@@ -11,6 +11,11 @@ function md5(v) {
 }
 
 var Group = function (attributes) {
+  if (attributes.badges.toString().match('[object Object]'))
+    // Assume this is an array of badge items if it's an array of objects.
+    attributes.badges = attributes.badges.map(function (v) {
+      return v.attributes.id;
+    });
   this.attributes = attributes;
 };
 
@@ -41,11 +46,7 @@ Group.prototype.presave = function presave() {
 Group.prepare = {
   'in': {
     badges: function (value) {
-      // Assume this is an array of badge items if it's an array of objects.
       if (!value) { return; }
-      if (value.toString().match('[object Object]')) {
-        return JSON.stringify(value.map(function (v) { return v.attributes.id }));
-      }
       return JSON.stringify(value);
     }
   },
