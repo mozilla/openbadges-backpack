@@ -1,14 +1,10 @@
 @font-face {
-    font-family: 'EntypoRegular';
-    src: url('/fonts/entypo-webfont.eot');
-    src: url('/fonts/entypo-webfont.eot?#iefix') format('embedded-opentype'),
-         url('/fonts/entypo-webfont.woff') format('woff'),
-         url('/fonts/entypo-webfont.ttf') format('truetype'),
-         url('/fonts/entypo-webfont.svg#EntypoRegular') format('svg');
-    font-weight: normal;
-    font-style: normal;
+  font-family: 'EntypoRegular';
+  src: url('/fonts/entypo-webfont.eot');
+  src: url('/fonts/entypo-webfont.eot?#iefix') format('embedded-opentype'), url('/fonts/entypo-webfont.woff') format('woff'), url('/fonts/entypo-webfont.ttf') format('truetype'), url('/fonts/entypo-webfont.svg#EntypoRegular') format('svg');
+  font-weight: normal;
+  font-style: normal;
 }
-
 html {
   height: 100%;
 }
@@ -21,7 +17,9 @@ body {
 h1 {
   margin-bottom: 18px;
 }
-form.signin { display: none; }
+form.signin {
+  display: none;
+}
 form.baker label {
   font-size: 18px;
   line-height: 24px;
@@ -35,11 +33,9 @@ form.baker #assertion {
   color: #333;
   font-size: 16px;
 }
-
 .badge-details dd {
   padding: 3px 0 6px;
 }
-
 #moztab {
   background-image: url('/images/icons-sprite.png');
   height: 49px;
@@ -71,7 +67,6 @@ form.baker #assertion {
   color: yellow;
   font-weight: 100;
 }
-
 #footer {
   margin-top: 100px;
   padding: 20px 0;
@@ -97,17 +92,14 @@ form.baker #assertion {
 #footer aside {
   font-size: 0.85em;
 }
-
 .openbadge {
   display: inline-block;
   overflow: hidden;
   cursor: pointer;
 }
-
 .openbadge:active {
   outline: none;
 }
-
 .group input.groupName {
   -webkit-transition: all 0.4s ease;
   -moz-transition: all 0.4s ease;
@@ -125,30 +117,27 @@ form.baker #assertion {
   text-shadow: #eee 1px 1px;
   opacity: 1;
 }
-
 .group.isNew input.groupName {
   display: none;
 }
-
-.group input.groupName:hover, .group input.groupName.hover {
+.group input.groupName:hover,
+.group input.groupName.hover {
   -webkit-transition: all 0.4s ease;
   -moz-transition: all 0.4s ease;
   -ms-transition: all 0.4s ease;
   -o-transition: all 0.4s ease;
   border: 1px solid #ccc;
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.2);
   color: #444;
 }
-
 .group input.groupName:focus {
   -webkit-transition: all 0.4s ease;
   -moz-transition: all 0.4s ease;
   -ms-transition: all 0.4s ease;
   -o-transition: all 0.4s ease;
-  background: rgba(255,255,255,0.6);
+  background: rgba(255, 255, 255, 0.6);
   color: #222;
 }
-  
 .group {
   min-height: 64px;
   position: relative;
@@ -166,7 +155,6 @@ form.baker #assertion {
   -o-transition: all 0.25s ease;
   transition: all 0.25s ease;
 }
-
 .group.dying {
   -webkit-transition: none;
   -moz-transition: none;
@@ -174,7 +162,6 @@ form.baker #assertion {
   -o-transition: none;
   transition: none;
 }
-
 .group .icon {
   position: absolute;
   font-size: 3em;
@@ -188,43 +175,37 @@ form.baker #assertion {
   opacity: 1;
   right: 8px;
 }
- 
-
 .group .delete {
-  -webkit-transition: opacity,color,text-shadow 0.25s ease;
-  -moz-transition: opacity,color,text-shadow 0.25s ease;
-  -ms-transition: opacity,color,text-shadow 0.25s ease;
-  -o-transition: opacity,color,text-shadow 0.25s ease;
-  transition: opacity,color,text-shadow 0.25s ease;
+  -webkit-transition: opacity, color, text-shadow 0.25s ease;
+  -moz-transition: opacity, color, text-shadow 0.25s ease;
+  -ms-transition: opacity, color, text-shadow 0.25s ease;
+  -o-transition: opacity, color, text-shadow 0.25s ease;
+  transition: opacity, color, text-shadow 0.25s ease;
   top: 6px;
 }
 .group.isNew .icon {
   display: none;
 }
-
 .group .icon:hover {
-  -webkit-transition: color,text-shadow 0.25s ease;
-  -moz-transition: color,text-shadow 0.25s ease;
-  -ms-transition: color,text-shadow 0.25s ease;
-  -o-transition: color,text-shadow 0.25s ease;
-  transition: color,text-shadow 0.25s ease;
+  -webkit-transition: color, text-shadow 0.25s ease;
+  -moz-transition: color, text-shadow 0.25s ease;
+  -ms-transition: color, text-shadow 0.25s ease;
+  -o-transition: color, text-shadow 0.25s ease;
+  transition: color, text-shadow 0.25s ease;
   cursor: pointer;
   color: #c00;
   text-shadow: #aaa 1px 1px 2px;
 }
-
 .group .delete:active {
   top: 8px;
   right: 6px;
-  text-shadow: #aaa -1px -1px 2px;
+  text-shadow: #aaaaaa -1px -1px 2px;
 }
-
 .group .share {
   font-family: 'EntypoRegular';
   font-size: 3.3em;
   bottom: 10px;
 }
-
 .group .share:hover {
   color: #66f;
   text-shadow: #fff 1px 1px 2px;
@@ -232,9 +213,8 @@ form.baker #assertion {
 .group .share:active {
   bottom: 8px;
   right: 6px;
-  text-shadow: #aaa -1px -1px 2px;
+  text-shadow: #aaaaaa -1px -1px 2px;
 }
-
 .group.hovering {
   -webkit-transition: all 0.25s ease;
   -moz-transition: all 0.25s ease;
@@ -252,11 +232,9 @@ form.baker #assertion {
   margin: 0;
   overflow: hidden;
 }
-
 .group h3 {
   pointer-events: none;
 }
-
 .group.hovering h3 {
   -webkit-transition: all 0.25s ease;
   -moz-transition: all 0.25s ease;
@@ -264,7 +242,6 @@ form.baker #assertion {
   -o-transition: all 0.25s ease;
   transition: all 0.25s ease;
 }
-
 .group .public * {
   -webkit-transition: all 0.25s ease;
   -moz-transition: all 0.25s ease;
@@ -272,7 +249,6 @@ form.baker #assertion {
   -o-transition: all 0.25s ease;
   transition: all 0.25s ease;
 }
-
 .group .public {
   bottom: 2px;
   left: 10px;
@@ -285,24 +261,19 @@ form.baker #assertion {
   line-height: 12px;
   display: inline-block;
 }
-
 .group .public label input {
   display: inline-block;
 }
-
 .group .public label input:checked ~ span {
   color: #181;
   font-weight: bold;
 }
-
 .group.isNew .public {
   display: none;
 }
-
 [draggable=true] {
   -khtml-user-drag: element;
 }
-
 .lightbox {
   position: fixed;
   background: rgba(0, 0, 0, 0.3);
@@ -312,7 +283,6 @@ form.baker #assertion {
   width: 100%;
   height: 100%;
 }
-
 .lightbox .close {
   -webkit-transition: opacity 0.5s;
   -moz-transition: opacity 0.5s;
@@ -330,7 +300,6 @@ form.baker #assertion {
   cursor: pointer;
   opacity: 0.4;
 }
-
 .lightbox .background {
   position: fixed;
   z-index: -1;
@@ -339,7 +308,6 @@ form.baker #assertion {
   width: 100%;
   height: 100%;
 }
-
 .lightbox .close:hover {
   -webkit-transition: opacity 0.5s;
   -moz-transition: opacity 0.5s;
@@ -348,13 +316,11 @@ form.baker #assertion {
   transition: opacity 0.5s;
   opacity: 1;
 }
-
 .lightbox .close:active {
   top: 5px;
   right: 1px;
   text-shadow: 0 0 1px #000;
-} 
-
+}
 .lightbox .contents {
   width: 700px;
   margin: 88px auto;
@@ -365,18 +331,15 @@ form.baker #assertion {
   background: #444;
   border: 3px solid #444;
 }
-
 .lightbox .contents header {
   position: relative;
   padding: 2px 20px;
   color: #eee;
 }
-
 .lightbox .contents h2 {
   color: #fff;
   text-shadow: 1px 1px 1px #222;
 }
-
 .lightbox .contents .body {
   position: relative;
   min-height: 300px;
@@ -385,8 +348,6 @@ form.baker #assertion {
   text-shadow: 1px 1px 1px #fff;
   box-shadow: 0px 1px 2px 2px rgba(0, 0, 0, 0.4);
 }
-
-
 .lightbox .confirm-disown {
   display: none;
   padding: 10px 20px;
@@ -396,30 +357,25 @@ form.baker #assertion {
   z-index: 18;
   border-radius: 5px;
 }
-
 .lightbox .confirm-disown p {
   margin: 30px auto;
   font-size: 1.3em;
   line-height: 1.4em;
   width: 80%;
 }
-
 .lightbox .confirm-disown .buttons {
   margin: 20px auto;
   padding: 30px 0;
   border-top: 1px solid #dcc;
   width: 80%;
 }
-
 .lightbox .confirm-disown .btn {
   font-size: 1.0em;
 }
-
 .lightbox .confirm-disown .danger {
   float: right;
   font-weight: bold;
 }
-
 table.information {
   table-layout: fixed;
   word-wrap: break-word;
@@ -428,22 +384,18 @@ table.information {
   border-collapse: separate;
   font-size: 13px;
 }
-
 .information td {
   border: 0;
   padding: 2px 12px;
 }
-
 .information .fieldLabelCol {
   width: 120px;
 }
-
 .information td.fieldlabel {
   white-space: nowrap;
   font-weight: bold;
   text-align: right;
 }
-
 .information td.fieldlabel:after {
   position: absolute;
   margin-left: 4px;
@@ -453,36 +405,30 @@ table.information {
   color: #bbb;
   z-index: 5;
 }
-
 .information td.section-head {
   color: #999;
   border-bottom: 1px solid #ccc;
   line-height: 1.5em;
   padding-left: 0;
 }
-
 .information .image {
   text-align: center;
   vertical-align: middle;
 }
-
 .information .imageCol {
   width: 148px;
 }
 .information img {
   max-height: 128px;
   max-width: 128px;
-  margin: auto; 
+  margin: auto;
 }
-
 .information button {
   margin-top: 16px;
 }
-
 .portfolio div.edit {
   text-align: right;
 }
-
 .portfolio ul {
   list-style: none;
   margin: 20px auto;
@@ -490,7 +436,6 @@ table.information {
 .portfolio ul li {
   clear: both;
 }
-
 .portfolio .story {
   float: right;
   width: 350px;
@@ -500,19 +445,20 @@ table.information {
   line-height: 1.5em;
   color: #555;
 }
-
 .portfolio table.information {
   width: 550px;
 }
-
-.portfolio input, .portfolio textarea {
+.portfolio input,
+.portfolio textarea {
   border: 1px solid #eee;
 }
-.portfolio input.field:hover, .portfolio textarea:hover {
+.portfolio input.field:hover,
+.portfolio textarea:hover {
   background: none;
   border: 1px solid #555;
 }
-.portfolio input.field:focus, .portfolio textarea:focus {
+.portfolio input.field:focus,
+.portfolio textarea:focus {
   border: 1px solid #bbb;
 }
 .portfolio .title {
@@ -543,7 +489,6 @@ table.information {
 .portfolio .save input {
   text-align: center;
 }
-
 .portfolio h3 {
   background: #ddd;
   padding: 3px 10px;
@@ -552,57 +497,45 @@ table.information {
   text-shadow: 1px 1px 2px #fff;
   box-shadow: 1px 1px 1px #aaa;
 }
-.alert {  
+.alert {
   overflow: hidden;
 }
-
 #validator textarea {
   width: 600px;
   height: 300px;
 }
-
 #validator .submit {
   margin: 1em 0;
 }
-
 #validator h2 {
   margin: 0.25em 0;
 }
-
 #validator li strong {
   color: #d00;
 }
-
 #converter {
   text-align: center;
 }
-
 #converter .alert {
   display: none;
 }
-
 #converter input {
   font-size: 2em;
 }
-
 #converter .submit input {
   width: 200px;
 }
-
 #converter .input input {
   height: 36px;
   vertical-align: middle;
   text-align: center;
 }
-
 #converter .email {
   width: 400px;
 }
-
 #converter .userid {
   width: 100px;
 }
-
 #converter .arrow {
   display: inline-block;
   font-size: 2em;
@@ -612,15 +545,12 @@ table.information {
 body {
   cursor: default;
 }
-
-
 /**
   badge "popinfo" multi block styling (description span + issuer span)
 **/
 .popover-content p span {
   display: block;
 }
-
 .popover-content p span + span {
   margin-top: 1em;
 }
