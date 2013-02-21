@@ -27,4 +27,14 @@ User.validators = {
   }
 };
 
+// callback has the signature (err, numberOfUsers)
+User.totalCount = function (callback) {
+  User.findAll(function(err, users) {
+    if (err) {
+      return callback(err, null);
+    }
+    return callback(null, users.length);
+  })
+}
+
 module.exports = User;

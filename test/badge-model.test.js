@@ -292,6 +292,15 @@ testUtils.prepareDatabase({
     t.end();
   });
 
+  test('Badge#stats', function (t) {
+    Badge.stats(function(err, data) {
+      t.notOk(err, "shouldn't have errors");
+      t.equal(data.totalBadges, 2, "count of badges");
+      t.equal(data.totalPerIssuer.length, 2, "count of issuers");
+    })
+    t.end();
+  })
+
   test('Badge.confirmRecipient: new assertions should fail at the moment', function (t) {
     const assertion = { recipient: { identity: "brian@mozillafoundation.org" } };
     const expect = false;

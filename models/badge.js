@@ -232,4 +232,37 @@ Badge.validateBody = function (body) {
   if (Object.keys(err.fields).length) { return err; }
   return null;
 };
+
+// callback has the signature callback(err, {totalPerIssuer: ['issuer':1], totalBadges:1})
+Badge.stats = function (callback) {
+  var totalBadges = 0;
+  var issuers = {};
+  Badge.findAll(function(err, badges) {
+    if (err) {
+      return callback(err);
+    }
+    totalBadges = badges.length;
+    badges.forEach(function (badge) {
+      var assertion = badge.get('body').badge;
+      if (!assertion.issuer) return;
+
+      var name = assertion.issuer.name;
+      var url = assertion.issuer.origin;
+
+      issuers[url] = issuers[url] || { name: name, total: 0 };
+      issuers[url].total++;
+    });
+
+    var urls = Object.keys(issuers);
+    var totalPerIssuer = urls.map(function (url) {
+      var issuer = issuers[url];
+      return { url: url, total: issuer.total, name: issuer.name }
+    });
+    totalPerIssuer.sort(function(issuer1, issuer2) {
+      return issuer2.total - issuer1.total
+    });
+    return callback(null, {totalPerIssuer: totalPerIssuer, totalBadges: totalBadges} );
+  });
+}
+
 module.exports = Badge;
