@@ -1,0 +1,69 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<h1>Backpack Settings</h1>
+<form method="post" class="settings">
+  <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+  <fieldset id="accounts">
+    <legend>Connected Accounts</legend>
+    <div class="item">
+      <span class="title"><strong>Twitter</strong>
+        {% if services.twitter %} <span class="hide">is</span> <span class="status">connected</span>{% endif %}
+      </span>
+      <div class="content">
+        Please note that badges you share on Twitter will be public
+        {% if services.twitter %}
+          <input type="button" class="btn btn-danger" value="Disconnect">
+        {% else %}
+          <input type="button" class="btn btn-primary" value="Connect">
+        {% endif %}
+      </div>
+    </div>
+    <div class="item">
+      <span class="title"><strong>Facebook</strong>
+        {% if services.facebook %} <span class="hide">is</span> <span class="status">connected</span>{% endif %}
+      </span>
+      {% if services.facebook %}
+        <div class="content">
+          <input type="button" class="btn btn-danger" value="Disconnect">
+        </div>
+        <div class="secondary">
+          <label class="slider full">
+            Automatically post to my wall when I earn new badges
+            <input type="checkbox" id="services-facebook-auto" name="services[facebook][auto]" value="true"{% if services.facebook.auto %} checked="checked"{% endif %}>
+            <span data-on="On" data-off="Off"></span>
+          </label>
+        </div>
+      {% else %}
+        <div class="content">
+          <input type="button" class="btn btn-primary" value="Connect">
+        </div>
+      {% endif %}
+    </div>
+  </fieldset>
+  <fieldset id="issuer-acceptance">
+    <legend>Issuer Badge Acceptance</legend>
+    {% if issuers.length %}
+      {% for issuer in issuers %}
+        <div class="item">
+          <strong class="title">{{ issuer.title }}</strong>
+          <label class="slider content">
+            Automatically accept earned badges from {{ issuer.title }}
+            <input type="checkbox" id="issuer-{{ issuer.id }}" name="issuers[{{ issuer.id }}]" value="true"{% if issuer.accepted %} checked="checked"{% endif %}>
+            <span data-on="On" data-off="Off"></span>
+          </label>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="item">
+        No issuers found
+      </div>
+    {% endif %}
+  </fieldset>
+  <div class="form-actions">
+    <input type="submit" class="btn btn-primary" value="Save changes">
+    <a href="/backpack/settings" class="btn">Cancel</a>
+  </div>
+</form>
+{% endblock %}

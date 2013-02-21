@@ -218,6 +218,72 @@ exports.manage = function manage(request, response, next) {
 
 
 /**
+ * Render the settings page for logged in users.
+ *
+ * @return {HTTP 303} redirect user to login page
+ */
+
+exports.settings = function settings(request, response) {
+  var user = request.user;
+  var error = request.flash('error');
+  var success = request.flash('success');
+
+  if (!user)
+    return response.redirect('/backpack/login', 303);
+
+  response.header('Cache-Control', 'no-cache, must-revalidate');
+
+  function getServices() {
+    /* This needs to be plugged in to something */
+
+    // return {
+    //   twitter: false,
+    //   facebook: {auto: true}
+    // };
+
+    return {};
+  }
+
+  function getIssuers() {
+    /* This needs to be plugged in to something */
+
+    return [
+      {id: 'mozilla', title: 'Mozilla', accepted: true},
+      {id: 'issuer_2', title: 'Issuer 2', accepted: false},
+      {id: 'issuer_3', title: 'Issuer 3', accepted: false},
+    ];
+  }
+
+  response.render('settings.html', {
+    error: error,
+    success: success,
+    csrfToken: request.session._csrf,
+    services: getServices(),
+    issuers: getIssuers()
+  });
+}
+
+
+/**
+ * Save the user settings
+ *
+ * @return {HTTP 303}
+ *   with no user: redirect user to login page
+ *   otherwise: redirect to user settings page
+ */
+
+exports.saveSettings = function saveSettings(request, response) {
+  var user = request.user;
+  if (!user)
+    return response.redirect('/backpack/login', 303);
+
+  request.flash('error', 'Saving settings not yet implemented :(');
+
+  return response.redirect('/backpack/settings', 303);
+}
+
+
+/**
  * Handle upload of a badge from a user's filesystem. Gets embedded data from
  * uploaded PNG with `urlFromUpload` from lib/baker, retrieves the assertion
  * using `getHostedAssertion` from lib/remote and finally awards the badge
