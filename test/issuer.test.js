@@ -64,12 +64,14 @@ appUtils.prepareApp(function(a) {
   issuerApp.listen(PORT, function() {
     // Ensure assertions w/ bad image URLs raise errors.
 
-    a.testAuthRequest('GET', '/issuer/assertion?url=' + BAD_IMG_BADGE_URL, {
+    a.login();
+    
+    a.verifyRequest('GET', '/issuer/assertion?url=' + BAD_IMG_BADGE_URL, {
       statusCode: 502,
       body: /trying to grab image.*unreachable/i
     });
     
-    a.testAuthRequest('POST', '/issuer/assertion', {
+    a.verifyRequest('POST', '/issuer/assertion', {
       form: {
         '_csrf': a.csrf,
         'url': BAD_IMG_BADGE_URL
@@ -81,7 +83,7 @@ appUtils.prepareApp(function(a) {
   
     // Ensure the example badge isn't in the user's backpack.
 
-    a.testAuthRequest('GET', '/issuer/assertion?url=' + EXAMPLE_BADGE_URL, {
+    a.verifyRequest('GET', '/issuer/assertion?url=' + EXAMPLE_BADGE_URL, {
       statusCode: 200,
       body: {
         owner:  true,
@@ -93,7 +95,7 @@ appUtils.prepareApp(function(a) {
 
     // Now put the example badge in the user's backpack.
   
-    a.testAuthRequest('POST', '/issuer/assertion', {
+    a.verifyRequest('POST', '/issuer/assertion', {
       form: {
         '_csrf': a.csrf,
         'url': EXAMPLE_BADGE_URL
@@ -109,7 +111,7 @@ appUtils.prepareApp(function(a) {
     // Ensure putting the example badge in the user's backpack again results
     // in a 304 Not Modified.
 
-    a.testAuthRequest('POST', '/issuer/assertion', {
+    a.verifyRequest('POST', '/issuer/assertion', {
       form: {
         '_csrf': a.csrf,
         'url': EXAMPLE_BADGE_URL
@@ -120,7 +122,7 @@ appUtils.prepareApp(function(a) {
   
     // Now ensure that the example badge is in the user's backpack.
   
-    a.testAuthRequest('GET', '/issuer/assertion?url=' + EXAMPLE_BADGE_URL, {
+    a.verifyRequest('GET', '/issuer/assertion?url=' + EXAMPLE_BADGE_URL, {
       statusCode: 200,
       body: {
         owner:  true,
@@ -142,20 +144,22 @@ appUtils.prepareApp(function(a) {
 appUtils.prepareApp(function(a) {
   var ERR_404_URL = a.resolve('/404');
   
-  a.testNoAuthRequest('GET', '/issuer/frame', {statusCode: 200});
-  a.testNoAuthRequest('GET', '/issuer.js', {statusCode: 200});
-  a.testNoAuthRequest('GET', '/issuer/assertion', {statusCode: 403});
-  a.testNoAuthRequest('POST', '/issuer/assertion', {statusCode: 403});
+  a.verifyRequest('GET', '/issuer/frame', {statusCode: 200});
+  a.verifyRequest('GET', '/issuer.js', {statusCode: 200});
+  a.verifyRequest('GET', '/issuer/assertion', {statusCode: 403});
+  a.verifyRequest('POST', '/issuer/assertion', {statusCode: 403});
 
-  a.testAuthRequest('GET', '/issuer/assertion', {
+  a.login();
+  
+  a.verifyRequest('GET', '/issuer/assertion', {
     statusCode: 400,
     body: {'message': 'url is a required param'}
   });
 
   // Ensure POSTing to the endpoint while logged-in w/o a csrf token fails.
-  a.testAuthRequest('POST', '/issuer/assertion', {statusCode: 403});
+  a.verifyRequest('POST', '/issuer/assertion', {statusCode: 403});
 
-  a.testAuthRequest('POST', '/issuer/assertion', {
+  a.verifyRequest('POST', '/issuer/assertion', {
     form: {'_csrf': a.csrf}
   }, {
     statusCode: 400,
@@ -164,12 +168,12 @@ appUtils.prepareApp(function(a) {
 
   // Ensure assertions w/ malformed URLs raise errors.
   
-  a.testAuthRequest('GET', '/issuer/assertion?url=LOL', {
+  a.verifyRequest('GET', '/issuer/assertion?url=LOL', {
     statusCode: 400,
     body: {'message': 'malformed url'}
   });
 
-  a.testAuthRequest('POST', '/issuer/assertion', {
+  a.verifyRequest('POST', '/issuer/assertion', {
     form: {'_csrf': a.csrf, 'url': 'LOL'}
   }, {
     statusCode: 400,
@@ -178,12 +182,12 @@ appUtils.prepareApp(function(a) {
 
   // Ensure unreachable assertions raise errors.
 
-  a.testAuthRequest('GET', '/issuer/assertion?url=' + ERR_404_URL, {
+  a.verifyRequest('GET', '/issuer/assertion?url=' + ERR_404_URL, {
     statusCode: 502,
     body: /unreachable/i
   });
 
-  a.testAuthRequest('POST', '/issuer/assertion', {
+  a.verifyRequest('POST', '/issuer/assertion', {
     form: {
       '_csrf': a.csrf,
       'url': ERR_404_URL

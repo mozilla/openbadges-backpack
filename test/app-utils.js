@@ -30,11 +30,37 @@ exports.prepareApp = function prepareApp(cb) {
       resolve: function(path) {
         return url.resolve(BASE_URL, path);
       },
+      request: request.defaults({jar: request.jar()}),
       email: FAKE_EMAIL,
       csrf: FAKE_UID,
-      testNoAuthRequest: testNoAuthRequest,
-      testAuthRequest: testAuthRequest,
-      testAuthRequestWithCallback: testAuthRequestWithCallback
+      login: function() {
+        this.t.test(
+          "login",
+          ensureRequest(this.request, 'POST', '/backpack/authenticate', {
+            form: {
+              '_csrf': FAKE_UID,
+              'assertion': FAKE_ASSERTION
+            }
+          }, {
+            statusCode: 303,
+            responseHeaders: {
+              'set-cookie': /openbadges_state=.*HttpOnly/,
+              'location': '/'
+            }
+          })
+        );
+      },
+      verifyRequest: function(method, url, options, assertions) {
+        if (typeof(assertions) == 'undefined') {
+          assertions = options;
+          options = {};
+        }
+
+        this.t.test(
+          method + ' ' + url,
+          ensureRequest(this.request, method, url, options, assertions)
+        );
+      }
     };
     
     testUtils.prepareDatabase(function () {
@@ -43,13 +69,13 @@ exports.prepareApp = function prepareApp(cb) {
   });
 };
 
-function ensureRequest(t, request, method, url, options, assertions) {
+function ensureRequest(request, method, url, options, assertions) {
   var name = method + ' ' + url;
-
-  return function(cb) {
-    var fn = request[method.toLowerCase()];
+  var fn = request[method.toLowerCase()];
+  
+  return function(t) {
     fn.call(request, BASE_URL+url, options, function(err, res, body) {
-      if (err) return cb(err);
+      if (err) throw err;
       if (assertions.statusCode)
         t.same(res.statusCode, assertions.statusCode,
                name + ' returns status code ' + assertions.statusCode);
@@ -68,7 +94,7 @@ function ensureRequest(t, request, method, url, options, assertions) {
       if (assertions.responseHeaders)
         Object.keys(assertions.responseHeaders).forEach(function(header) {
           var expected = assertions.responseHeaders[header];
-          
+        
           if (expected instanceof RegExp) {
             if (typeof(res.headers[header]) != 'undefined')
               t.ok(res.headers[header].toString().match(expected),
@@ -79,47 +105,9 @@ function ensureRequest(t, request, method, url, options, assertions) {
             t.same(res.headers[header], expected,
                    name + ' header "' + header + '" is ' + expected);
         });
-      cb(null);
+      t.end();
     });
   };
-}
-
-function series(t, callbacks) {
-  async.series(callbacks, function(err) {
-    if (err) throw err;
-    t.end();
-  });
-}
-
-function testNoAuthRequest(method, url, options, assertions) {
-  var name = method + ' ' + url;
-  var noAuthReq = request.defaults({jar: false});
-  
-  if (typeof(assertions) == 'undefined') {
-    assertions = options;
-    options = {};
-  }
-  
-  this.t.test(name, function(t) {
-    series(t, [
-      ensureRequest(t, noAuthReq, method, url, options, assertions)
-    ]);
-  });
-}
-
-function loginToBackpack(t, request) {
-  return ensureRequest(t, request, 'POST', '/backpack/authenticate', {
-    form: {
-      '_csrf': FAKE_UID,
-      'assertion': FAKE_ASSERTION
-    }
-  }, {
-    statusCode: 303,
-    responseHeaders: {
-      'set-cookie': /openbadges_state=.*HttpOnly/,
-      'location': '/'
-    }
-  });
 }
 
 function replaceAppAuthForTesting() {
@@ -143,28 +131,4 @@ function replaceAppAuthForTesting() {
     browserid.verify = originalVerify;
     middleware.utils.uid = originalUid;
   };
-}
-
-function testAuthRequestWithCallback(name, cb) {
-  this.t.test(name, function(t) {
-    var authReq = request.defaults({jar: request.jar()});
-    
-    cb(t, authReq);
-  });
-}
-
-function testAuthRequest(method, url, options, assertions) {
-  var name = 'authenticated ' + method + ' ' + url;
-  
-  if (typeof(assertions) == 'undefined') {
-    assertions = options;
-    options = {};
-  }
-  
-  this.testAuthRequestWithCallback(name, function(t, request) {
-    series(t, [
-      loginToBackpack(t, request),
-      ensureRequest(t, request, method, url, options, assertions)
-    ]);
-  });
 }
