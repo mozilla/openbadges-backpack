@@ -118,9 +118,11 @@ and then back in windows you can fire up your favourite browser and connect to t
 
 3. Install local dependencies: `npm install`
 
-4. Run the test suite: `npm test`
+4. Create database tables using the db migration too, `./bin/db-migrate up`
 
-5. Start your server: `make start`
+5. Run the test suite: `npm test`
+
+6. Start your server: `make start`
 
 No matter which way you choose, you should join the
 [Open Badges Google Group](https://groups.google.com/forum/#!forum/openbadges). If
