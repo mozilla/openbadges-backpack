@@ -58,6 +58,8 @@ app.use(middleware.csrf({
   ]
 }));
 app.use(middleware.cors({ whitelist: ['/_badges.*', '/issuer.*', '/baker', '/displayer/.+/group.*'] }));
+app.use(app.router)
+app.use(middleware.notFound());
 app.configure('development', function () {
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
   var gitUtil = require('./lib/git-util');
