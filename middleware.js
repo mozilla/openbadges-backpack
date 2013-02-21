@@ -127,6 +127,20 @@ exports.csrf = function (options) {
   };
 };
 
+exports.notFound = function notFound() {
+  return function (req, res, next) {
+    res.statusCode = 404;
+
+    if (req.accepts('html')) {
+      res.render('errors/404.html', {url: req.url});
+    } else if (req.accepts('json')) {
+      res.send({error: 'Not found'});
+    } else {
+      res.type('txt').send('Not found');
+    }
+  }
+}
+
 var utils = exports.utils = {};
 
 utils.forbidden = function (res) {
