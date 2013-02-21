@@ -4,8 +4,6 @@ const testUtils = require('./');
 const app = require('../app');
 const request = require('request');
 const async = require('async');
-const browserid = require('../lib/browserid');
-const middleware = require('../middleware');
 
 const PORT = 8889;
 const BASE_URL = 'http://localhost:' + PORT;
@@ -15,11 +13,13 @@ const FAKE_ASSERTION = 'yup, it is example@example.com.';
 
 exports.prepareApp = function prepareApp(cb) {  
   test("preparing database and app", function(t) {
+    var undoAppAuthChanges = replaceAppAuthForTesting();
     var a = {
       t: t,
       end: function() {
         this.t.test('shutting down server', function(t) {
           app.close();
+          undoAppAuthChanges();
           t.end();
         });
       
@@ -122,10 +122,14 @@ function loginToBackpack(t, request) {
   });
 }
 
-function testAuthRequestWithCallback(name, cb) {
-  var originalVerify, originalUid;
+function replaceAppAuthForTesting() {
+  var browserid = require('../lib/browserid');
+  var middleware = require('../middleware');
+  var originalVerify = browserid.verify;
+  var originalUid = middleware.utils.uid;
 
-  function fakeBrowseridVerify(uri, assertion, audience, cb) {
+  middleware.utils.uid = function fakeUid() { return FAKE_UID; };
+  browserid.verify = function fakeVerify(uri, assertion, audience, cb) {
     var expected = FAKE_ASSERTION;
     if (assertion == expected)
       return cb(null, {email: FAKE_EMAIL});
@@ -134,26 +138,18 @@ function testAuthRequestWithCallback(name, cb) {
                  body: 'expected ' + JSON.stringify(expected) +
                        ' but got ' + JSON.stringify(assertion)}, null);
   };
-
-  function fakeUid() {
-    return FAKE_UID;
-  };
   
-  this.t.test(name, function(t) {
-    var authReq = request.defaults({jar: request.jar()});
-
-    originalVerify = browserid.verify;
-    originalUid = middleware.utils.uid;
-    browserid.verify = fakeBrowseridVerify;
-    middleware.utils.uid = fakeUid;
-    
-    cb(t, authReq);
-  });
-  
-  this.t.test("teardown of auth request test", function(t) {
+  return function undo() {
     browserid.verify = originalVerify;
     middleware.utils.uid = originalUid;
-    t.end();
+  };
+}
+
+function testAuthRequestWithCallback(name, cb) {
+  this.t.test(name, function(t) {
+    var authReq = request.defaults({jar: request.jar()});
+    
+    cb(t, authReq);
   });
 }
 
