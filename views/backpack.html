@@ -26,7 +26,7 @@
     <h1><span data-title="Badges" data-content="These are the badges you've earned so far! Click on one to see its details." rel="popover">Badges{% if tooltips %}<i class="icon-info-sign"></i>{% endif %}</span></h1>
     <div id="badges" class="js-badges">
       {% for badge in badges %}
-        <span draggable="true" class="openbadge" data-id="{{badge.attributes.id}}" rel="popinfo" data-title="{{badge.attributes.body.badge.name}}" data-content="<span>{{badge.attributes.body.badge.description}}</span><span>Issuer: {{badge.attributes.body.badge.issuer.name}}</span>">
+        <span draggable="true" class="openbadge" data-id="{{badge.attributes.id}}" rel="popinfo" data-title="{{badge.attributes.body.badge.name}}" data-content="<span>{{badge.attributes.body.badge.description|escape}}</span><span>Issuer: {{badge.attributes.body.badge.issuer.name}}</span>">
           <img src="{{badge.attributes.image_path}}" width="64px"/>
         </span>
       {% endfor %}
@@ -67,7 +67,7 @@
         </span>
 
           {% for badge in group.attributes.badgeObjects %}
-            <span draggable="true" class="openbadge" data-id="{{badge.attributes.id}}" rel="popinfo" data-title="{{badge.attributes.body.badge.name}}" data-content="<span>{{badge.attributes.body.badge.description}}</span><span>Issuer: {{badge.attributes.body.badge.issuer.name}}</span>">
+            <span draggable="true" class="openbadge" data-id="{{badge.attributes.id}}" rel="popinfo" data-title="{{badge.attributes.body.badge.name}}" data-content="<span>{{badge.attributes.body.badge.description|escape}}</span><span>Issuer: {{badge.attributes.body.badge.issuer.name}}</span>">
               <img src="{{badge.attributes.image_path}}" width="64px"/>
             </span>
           {% endfor %}
