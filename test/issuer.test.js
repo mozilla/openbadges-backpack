@@ -2,13 +2,18 @@ const appUtils = require('./app-utils');
 const express = require('express');
 const http = require('http');
 
+function makeHash(email, salt) {
+  var sha = require('crypto').createHash('sha256');
+  return 'sha256$' + sha.update(email + salt).digest('hex');
+}
+
 appUtils.prepareApp(function(a) {
   var PORT = 9000;
   var BASE_URL = 'http://localhost:' + PORT;
   var BAD_IMG_BADGE_URL = BASE_URL + '/bad_img';
   var EXAMPLE_BADGE_URL = BASE_URL + '/example';
   var BAD_IMG_BADGE = {
-    "recipient": "sha256$4817f7f2b03fb83c669a56ed1212047a8d9ca294aaf7a01c569de070dfb3fe8b",
+    "recipient": makeHash(a.email, "ballertime"),
     "salt": "ballertime",
     "evidence": "/badges/html5-basic/example",
     "badge": {
@@ -26,7 +31,7 @@ appUtils.prepareApp(function(a) {
     }
   };
   var EXAMPLE_BADGE = {
-    "recipient": "sha256$4817f7f2b03fb83c669a56ed1212047a8d9ca294aaf7a01c569de070dfb3fe8b",
+    "recipient": makeHash(a.email, "ballertime"),
     "salt": "ballertime",
     "evidence": "/badges/html5-basic/example",
     "badge": {
@@ -81,7 +86,7 @@ appUtils.prepareApp(function(a) {
       body: {
         owner:  true,
         exists: false,
-        recipient: 'example@example.com',
+        recipient: a.email,
         badge: EXAMPLE_BADGE
       }
     });
@@ -120,7 +125,7 @@ appUtils.prepareApp(function(a) {
       body: {
         owner:  true,
         exists: true,
-        recipient: 'example@example.com',
+        recipient: a.email,
         badge: EXAMPLE_BADGE
       }
     });

@@ -30,6 +30,7 @@ exports.prepareApp = function prepareApp(cb) {
       resolve: function(path) {
         return url.resolve(BASE_URL, path);
       },
+      email: FAKE_EMAIL,
       csrf: FAKE_UID,
       testNoAuthRequest: testNoAuthRequest,
       testAuthRequest: testAuthRequest,
