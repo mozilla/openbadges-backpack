@@ -11,60 +11,63 @@ const FAKE_UID = '1234';
 const FAKE_EMAIL = 'example@example.com';
 const FAKE_ASSERTION = 'yup, it is example@example.com.';
 
+function AppTestHarness(t) {
+  this.t = t;
+  this.undoAppAuthChanges = replaceAppAuthForTesting();
+  this.request = request.defaults({jar: request.jar()});
+}
+
+AppTestHarness.prototype = {
+  end: function() {
+    this.t.test('shutting down server', (function(t) {
+      app.close();
+      this.undoAppAuthChanges();
+      t.end();
+    }).bind(this));
+  
+    testUtils.finish(this.t.test.bind(this.t));
+    
+    this.t.end();
+  },
+  resolve: function(path) {
+    return url.resolve(BASE_URL, path);
+  },
+  email: FAKE_EMAIL,
+  csrf: FAKE_UID,
+  login: function() {
+    this.t.test(
+      "login",
+      ensureRequest(this.request, 'POST', '/backpack/authenticate', {
+        form: {
+          '_csrf': FAKE_UID,
+          'assertion': FAKE_ASSERTION
+        }
+      }, {
+        statusCode: 303,
+        responseHeaders: {
+          'set-cookie': /openbadges_state=.*HttpOnly/,
+          'location': '/'
+        }
+      })
+    );
+  },
+  verifyRequest: function(method, url, options, assertions) {
+    if (typeof(assertions) == 'undefined') {
+      assertions = options;
+      options = {};
+    }
+
+    this.t.test(
+      method + ' ' + url,
+      ensureRequest(this.request, method, url, options, assertions)
+    );
+  }
+};
+
 exports.prepareApp = function prepareApp(cb) {  
   test("preparing database and app", function(t) {
-    var undoAppAuthChanges = replaceAppAuthForTesting();
-    var a = {
-      t: t,
-      end: function() {
-        this.t.test('shutting down server', function(t) {
-          app.close();
-          undoAppAuthChanges();
-          t.end();
-        });
-      
-        testUtils.finish(this.t.test.bind(this.t));
-        
-        this.t.end();
-      },
-      resolve: function(path) {
-        return url.resolve(BASE_URL, path);
-      },
-      request: request.defaults({jar: request.jar()}),
-      email: FAKE_EMAIL,
-      csrf: FAKE_UID,
-      login: function() {
-        this.t.test(
-          "login",
-          ensureRequest(this.request, 'POST', '/backpack/authenticate', {
-            form: {
-              '_csrf': FAKE_UID,
-              'assertion': FAKE_ASSERTION
-            }
-          }, {
-            statusCode: 303,
-            responseHeaders: {
-              'set-cookie': /openbadges_state=.*HttpOnly/,
-              'location': '/'
-            }
-          })
-        );
-      },
-      verifyRequest: function(method, url, options, assertions) {
-        if (typeof(assertions) == 'undefined') {
-          assertions = options;
-          options = {};
-        }
-
-        this.t.test(
-          method + ' ' + url,
-          ensureRequest(this.request, method, url, options, assertions)
-        );
-      }
-    };
-    
     testUtils.prepareDatabase(function () {
-      app.listen(PORT, function() { cb(a); });
+      app.listen(PORT, function() { cb(new AppTestHarness(t)); });
     });
   });
 };
