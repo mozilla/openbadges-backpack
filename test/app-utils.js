@@ -1,3 +1,4 @@
+const url = require('url');
 const test = require('tap').test;
 const testUtils = require('./');
 const app = require('../app');
@@ -9,11 +10,22 @@ const middleware = require('../middleware');
 const PORT = 8889;
 const BASE_URL = 'http://localhost:' + PORT;
 const FAKE_UID = '1234';
+const FAKE_EMAIL = 'example@example.com';
+const FAKE_ASSERTION = 'yup, it is example@example.com.';
 
-function prepareApp(cb) {
+exports.prepareApp = function prepareApp(cb) {
+  var a = {
+    resolve: function(path) {
+      return url.resolve(BASE_URL, path);
+    },
+    csrf: FAKE_UID,
+    testNoAuthRequest: testNoAuthRequest,
+    testAuthRequest: testAuthRequest
+  };
+  
   testUtils.prepareDatabase(function () {
     app.listen(PORT, function() {
-      cb();
+      cb(a);
 
       test('shutting down server', function(t) {
         app.close();
@@ -23,7 +35,7 @@ function prepareApp(cb) {
       testUtils.finish(test);
     });
   });
-}
+};
 
 function ensureRequest(t, request, method, url, options, assertions) {
   var name = method + ' ' + url;
@@ -93,7 +105,7 @@ function loginToBackpack(t, request) {
   return ensureRequest(t, request, 'POST', '/backpack/authenticate', {
     form: {
       '_csrf': FAKE_UID,
-      'assertion': module.exports.FAKE_ASSERTION
+      'assertion': FAKE_ASSERTION
     }
   }, {
     statusCode: 303,
@@ -108,9 +120,9 @@ function testAuthRequestWithCallback(name, cb) {
   var originalVerify, originalUid;
 
   function fakeBrowseridVerify(uri, assertion, audience, cb) {
-    var expected = module.exports.FAKE_ASSERTION;
+    var expected = FAKE_ASSERTION;
     if (assertion == expected)
-      return cb(null, {email: module.exports.FAKE_EMAIL});
+      return cb(null, {email: FAKE_EMAIL});
     else
       return cb({type: 'invalid assertion',
                  body: 'expected ' + JSON.stringify(expected) +
@@ -154,16 +166,3 @@ function testAuthRequest(method, url, options, assertions) {
     ]);
   });
 }
-
-module.exports = {
-  PORT: PORT,
-  BASE_URL: BASE_URL,
-  FAKE_EMAIL: 'example@example.com',
-  FAKE_ASSERTION: 'yup, it is example@example.com.',
-  FAKE_UID: FAKE_UID,
-  FAKE_CSRF: FAKE_UID,
-  prepareApp: prepareApp,
-  ensureRequest: ensureRequest,
-  testNoAuthRequest: testNoAuthRequest,
-  testAuthRequest: testAuthRequest
-};
