@@ -142,4 +142,6 @@ appUtils.prepareApp(function(a) {
       badge: EXAMPLE_BADGE
     }
   });
+  
+  a.end();
 });

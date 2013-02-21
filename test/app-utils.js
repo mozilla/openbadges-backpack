@@ -13,26 +13,31 @@ const FAKE_UID = '1234';
 const FAKE_EMAIL = 'example@example.com';
 const FAKE_ASSERTION = 'yup, it is example@example.com.';
 
-exports.prepareApp = function prepareApp(cb) {
-  var a = {
-    resolve: function(path) {
-      return url.resolve(BASE_URL, path);
-    },
-    csrf: FAKE_UID,
-    testNoAuthRequest: testNoAuthRequest,
-    testAuthRequest: testAuthRequest
-  };
-  
-  testUtils.prepareDatabase(function () {
-    app.listen(PORT, function() {
-      cb(a);
-
-      test('shutting down server', function(t) {
-        app.close();
-        t.end();
-      });
+exports.prepareApp = function prepareApp(cb) {  
+  test("preparing database and app", function(t) {
+    var a = {
+      t: t,
+      end: function() {
+        this.t.test('shutting down server', function(t) {
+          app.close();
+          t.end();
+        });
       
-      testUtils.finish(test);
+        testUtils.finish(this.t.test.bind(this.t));
+        
+        this.t.end();
+      },
+      resolve: function(path) {
+        return url.resolve(BASE_URL, path);
+      },
+      csrf: FAKE_UID,
+      testNoAuthRequest: testNoAuthRequest,
+      testAuthRequest: testAuthRequest,
+      testAuthRequestWithCallback: testAuthRequestWithCallback
+    };
+    
+    testUtils.prepareDatabase(function () {
+      app.listen(PORT, function() { cb(a); });
     });
   });
 };
@@ -94,7 +99,7 @@ function testNoAuthRequest(method, url, options, assertions) {
     options = {};
   }
   
-  test(name, function(t) {
+  this.t.test(name, function(t) {
     series(t, [
       ensureRequest(t, noAuthReq, method, url, options, assertions)
     ]);
@@ -133,7 +138,7 @@ function testAuthRequestWithCallback(name, cb) {
     return FAKE_UID;
   };
   
-  test(name, function(t) {
+  this.t.test(name, function(t) {
     var authReq = request.defaults({jar: request.jar()});
 
     originalVerify = browserid.verify;
@@ -144,7 +149,7 @@ function testAuthRequestWithCallback(name, cb) {
     cb(t, authReq);
   });
   
-  test("teardown of auth request test", function(t) {
+  this.t.test("teardown of auth request test", function(t) {
     browserid.verify = originalVerify;
     middleware.utils.uid = originalUid;
     t.end();
@@ -159,7 +164,7 @@ function testAuthRequest(method, url, options, assertions) {
     options = {};
   }
   
-  testAuthRequestWithCallback(name, function(t, request) {
+  this.testAuthRequestWithCallback(name, function(t, request) {
     series(t, [
       loginToBackpack(t, request),
       ensureRequest(t, request, method, url, options, assertions)
