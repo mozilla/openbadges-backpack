@@ -33,6 +33,7 @@ AppTestHarness.prototype = {
     return url.resolve(BASE_URL, path);
   },
   email: FAKE_EMAIL,
+  assertion: FAKE_ASSERTION,
   csrf: FAKE_UID,
   login: function() {
     this.t.test(
