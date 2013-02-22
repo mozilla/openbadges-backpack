@@ -39,13 +39,11 @@ env.addFilter('formatdate', function (rawDate) {
 
 // Middleware. Also see `middleware.js`
 // ------------------------------------
-var bootstrapPath = path.join(__dirname, 'node_modules', 'bootstrap');
 app.use(less({
-  src: path.join(__dirname, "static", "less"),
-  paths: [path.join(bootstrapPath, "less")],
-  dest: path.join(__dirname, "static", "css"),
-  prefix: '/css',
-  debug: true
+  src: path.join(__dirname, "static/less"),
+  paths: [path.join(__dirname, "static/vendor/bootstrap/less")],
+  dest: path.join(__dirname, "static/css"),
+  prefix: '/css'
 }));
 app.use(express.static(path.join(__dirname, "static")));
 app.use(express.static(path.join(configuration.get('var_dir'), "badges")));

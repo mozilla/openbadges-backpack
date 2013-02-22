@@ -4,11 +4,9 @@
   "version": "0.5.0",
   "private": true,
   "scripts": {
-    "test": "NODE_ENV=test ./node_modules/.bin/tap test/*.test.js",
-    "postinstall": "cp ./node_modules/bootstrap/js/*.js static/js/bootstrap/"
+    "test": "NODE_ENV=test ./node_modules/.bin/tap test/*.test.js"
   },
   "dependencies": {
-    "bootstrap": "git+https://github.com/twitter/bootstrap.git#v2.2.2",
     "colors": "*",
     "commander": "~0.5.2",
     "connect-flash": "*",
