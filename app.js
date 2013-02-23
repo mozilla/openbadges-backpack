@@ -48,6 +48,10 @@ app.use(express.methodOverride());
 app.use(middleware.logRequests());
 app.use(middleware.cookieSessions());
 app.use(middleware.userFromSession());
+app.configure('development', function () {
+  if (app.config.get('enable_test_user'))
+    app.use(middleware.testUser());
+});
 app.use(flash());
 app.use(middleware.csrf({
   whitelist: [
