@@ -53,9 +53,12 @@ exports.massAward = function (req, res) {
       awardBadge({
         assertion: item.assertion,
         url: item.assertionUrl,
-        public_path: item.baseName,
+        public_path: email + item.baseName,
         imagedata: item.imgData,
         recipient: email
+      }, function(err) {
+        if (err)
+          logger.debug('baller, please:', err.message);
       });
     });
   res.redirect('/', 303);
