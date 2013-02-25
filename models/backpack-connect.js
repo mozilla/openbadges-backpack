@@ -3,6 +3,7 @@ var mysql = require('../lib/mysql');
 var Base = require('./mysql-base');
 
 const DEFAULT_TOKEN_LENGTH = 24;
+const DEFAULT_TOKEN_LIFETIME = 60 * 60;
 
 var getOrigin = function getOrigin(value) {
   var parsed = url.parse(value, false, true);
@@ -15,6 +16,7 @@ var Session = exports.Session = function(attributes, options) {
   this.attributes = attributes;
   this.attributes.origin = getOrigin(attributes.origin);
   this.tokenLength = options.tokenLength || DEFAULT_TOKEN_LENGTH;
+  this.tokenLifetime = options.tokenLifetime || DEFAULT_TOKEN_LIFETIME;
   this._uid = options.uid || require('../middleware').utils.uid;
   this._now = options.now || Date.now.bind(Date);
 };
@@ -43,13 +45,21 @@ Session.prepare = {
   }
 };
 
+Session.prototype.isExpired = function() {
+  return this.get('access_time') + this.tokenLifetime < this._nowSecs();
+};
+
 Session.prototype.hasPermission = function(name) {
   return this.get('permissions').indexOf(name) != -1;
 };
 
+Session.prototype._nowSecs = function() {
+  return Math.floor(this._now() / 1000);
+};
+
 Session.prototype.refresh = function() {
   this.set('access_token', this._uid(this.tokenLength));
-  this.set('access_time', Math.floor(this._now() / 1000));
+  this.set('access_time', this._nowSecs());
   this.set('refresh_token', this._uid(this.tokenLength));
 };
 

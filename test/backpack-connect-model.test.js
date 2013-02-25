@@ -18,12 +18,14 @@ testUtils.prepareDatabase({
 }, function (fixtures) {
   var session = fixtures['2-session'];
 
-  test("refresh() works", function(t) {
+  test("refresh() and isExpired() work", function(t) {
     var i = 0;
+    var now = 5000;
     var session = new BPCSession({origin: "http://bar.org"}, {
       tokenLength: 4,
+      tokenLifetime: 5,
       uid: function(len) { return "UID#" + (++i) + ",length:" + len },
-      now: function() { return 5000; }
+      now: function() { return now; }
     });
     
     t.same(session.get('access_token'), undefined,
@@ -33,6 +35,9 @@ testUtils.prepareDatabase({
     t.same(session.get('refresh_token'), 'UID#2,length:4');
     t.same(session.get('access_time'), 5,
            'access_time is in seconds, not ms');
+    t.ok(!session.isExpired(), 'new token is not expired');
+    now += 6000;
+    t.ok(session.isExpired(), 'token is expired once time has elapsed');
     t.end();
   });
   
