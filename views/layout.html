@@ -26,6 +26,9 @@
   </head>
   <body>
     <div id="fb-root"></div>
+    {% if settings.env == 'development' %}
+      <img src="/images/testribbon.png" class="test-ribbon" title="{{ settings.sha|d('') }}">
+    {% endif %}
     <div class="navbar">
       <div class="navbar-inner">
         <div class="container" style="position: relative;">
