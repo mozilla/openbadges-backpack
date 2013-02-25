@@ -1,16 +1,15 @@
 {% extends 'layout.html' %}
+{% set bodyClass = 'login' %}
 {% block body %}
-<h1>Welcome</h1>
-<h2>Use the green button below to <a href="#" class="js-browserid-link">sign in.</a><br/> Don&rsquo;t worry if you don&rsquo;t have an account, that&rsquo;ll get taken care of.</h2>
+<h1 class="title">Welcome to your Backpack</h1>
+<p class="subtitle">Celebrate your skills & passions</p>
+<a class="js-browserid-link" href="#"><img class="persona-button" src="/images/plain_sign_in_black.png"/></a>
 
 <form class="signin js-browserid-form" method="POST" action="/backpack/authenticate">
   <input class="js-browserid-input" name="assertion" type="hidden"></input>
   <input name="_csrf" type="hidden" value="{{ csrfToken }}"></input>
 </form>
 
-<div style="padding-top: 10px">
-  <a class="js-browserid-link" href="#"><img src="/images/plain_sign_in_black.png"/></a>
-</div>
 
 <script type="text/javascript">
 !!function loginHandler () {

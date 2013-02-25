@@ -24,7 +24,7 @@
     </script>
     {% block head %}{% endblock %}
   </head>
-  <body>
+  <body {% if bodyClass %}class="{{bodyClass}}"{% endif %}>
     <div id="fb-root"></div>
     {% if settings.env == 'development' %}
       <img src="/images/testribbon.png" class="test-ribbon" title="{{ settings.sha|d('') }}">
