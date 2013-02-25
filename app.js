@@ -48,6 +48,11 @@ app.use(express.methodOverride());
 app.use(middleware.logRequests());
 app.use(middleware.cookieSessions());
 app.use(middleware.userFromSession());
+app.configure('development', function () {
+  var testUser = process.env['OPENBADGES_TEST_USER'];
+  if (testUser)
+    app.use(middleware.testUser(testUser));
+});
 app.use(flash());
 app.use(middleware.csrf({
   whitelist: [
