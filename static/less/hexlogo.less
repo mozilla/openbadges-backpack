@@ -1,0 +1,33 @@
+@hexWidth: 64px;          /* width of the hexagon in the logo */
+@hexShadowHeight: 22px;   /* thickness of the shadow at its thickest point */
+
+@hexShadowWidth: (@hexShadowHeight / 0.577);  /* 0.577 ~ tan(30) */
+@hexShadowOffset: (@hexWidth - (2 * @hexShadowWidth)) / 2;
+
+.navbar {
+  border-bottom: 4px solid #333;
+
+  .brand {
+    padding-bottom: 0;
+
+    img {
+      position: relative;
+      bottom: -6px; /* bring logo down towards navbar border-bottom */
+      left: -1px;   /* hexagon position 1px in from left in img */
+      z-index: 2;   /* higher than .brand:after */
+    }
+
+    &:after {
+      display: block;
+      content: "";
+      width: 0;
+      position: relative;
+      z-index: 1;
+      border-top: @hexShadowHeight solid white;
+      border-left: @hexShadowWidth solid transparent;
+      border-right: @hexShadowWidth solid transparent;
+      left: @hexShadowOffset;
+      margin-bottom: -@hexShadowHeight;
+    }
+  }
+}
