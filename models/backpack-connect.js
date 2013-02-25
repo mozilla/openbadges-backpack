@@ -11,59 +11,64 @@ var getOrigin = function getOrigin(value) {
   return parsed.protocol + "//" + parsed.host;
 };
 
-var Session = exports.Session = function(attributes, options) {
-  options = options || {};
-  this.attributes = attributes;
-  this.attributes.origin = getOrigin(attributes.origin);
-  this.tokenLength = options.tokenLength || DEFAULT_TOKEN_LENGTH;
-  this.tokenLifetime = options.tokenLifetime || DEFAULT_TOKEN_LIFETIME;
-  this._uid = options.uid || require('../middleware').utils.uid;
-  this._now = options.now || Date.now.bind(Date);
-};
+function SessionFactory(options) {
+  var tokenLength = options.tokenLength || DEFAULT_TOKEN_LENGTH;
+  var tokenLifetime = options.tokenLifetime || DEFAULT_TOKEN_LIFETIME;
+  var uid = options.uid || require('../middleware').utils.uid;
+  var now = options.now || Date.now.bind(Date);
+  var nowSecs = function() { return Math.floor(now() / 1000); };
+  var Session = exports.Session = function(attributes) {
+    this.attributes = attributes;
+    this.attributes.origin = getOrigin(attributes.origin);
+    this.tokenLength = tokenLength;
+    this.tokenLifetime = tokenLifetime;
+  };
 
-Base.apply(Session, 'bpc_session');
+  Base.apply(Session, 'bpc_session');
 
-Session.validators = {
-  origin: function(value, attributes) {
-    var parsedOrigin = url.parse(value, false, true);
+  Session.validators = {
+    origin: function(value, attributes) {
+      var parsedOrigin = url.parse(value, false, true);
     
-    if (!(parsedOrigin.protocol &&
-          parsedOrigin.protocol.match(/^https?:/)))
-      return "invalid origin protocol";
+      if (!(parsedOrigin.protocol &&
+            parsedOrigin.protocol.match(/^https?:/)))
+        return "invalid origin protocol";
     
-    if (!parsedOrigin.host)
-      return "invalid origin host";
-  }
+      if (!parsedOrigin.host)
+        return "invalid origin host";
+    }
+  };
+
+  Session.prepare = {
+    'in': {
+      permissions: function(value) { return value.join(','); }
+    },
+    'out': {
+      permissions: function(value) { return value.split(','); }
+    }
+  };
+
+  Session.prototype.isExpired = function() {
+    return this.get('access_time') + tokenLifetime < nowSecs();
+  };
+
+  Session.prototype.hasPermission = function(name) {
+    return this.get('permissions').indexOf(name) != -1;
+  };
+
+  Session.prototype.refresh = function() {
+    this.set('access_token', uid(tokenLength));
+    this.set('access_time', nowSecs());
+    this.set('refresh_token', uid(tokenLength));
+  };
+
+  Session.prototype.presave = function () {
+    if (!this.get('access_token'))
+      this.refresh();
+  };
+  
+  return Session;
 };
 
-Session.prepare = {
-  'in': {
-    permissions: function(value) { return value.join(','); }
-  },
-  'out': {
-    permissions: function(value) { return value.split(','); }
-  }
-};
-
-Session.prototype.isExpired = function() {
-  return this.get('access_time') + this.tokenLifetime < this._nowSecs();
-};
-
-Session.prototype.hasPermission = function(name) {
-  return this.get('permissions').indexOf(name) != -1;
-};
-
-Session.prototype._nowSecs = function() {
-  return Math.floor(this._now() / 1000);
-};
-
-Session.prototype.refresh = function() {
-  this.set('access_token', this._uid(this.tokenLength));
-  this.set('access_time', this._nowSecs());
-  this.set('refresh_token', this._uid(this.tokenLength));
-};
-
-Session.prototype.presave = function () {
-  if (!this.get('access_token'))
-    this.refresh();
-};
+exports.SessionFactory = SessionFactory;
+exports.Session = new SessionFactory({});

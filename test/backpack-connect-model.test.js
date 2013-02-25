@@ -2,7 +2,8 @@ const test = require('tap').test;
 const testUtils = require('./');
 const mysql = require('../lib/mysql');
 const User = require('../models/user');
-const BPCSession = require('../models/backpack-connect').Session;
+const BPC = require('../models/backpack-connect');
+const BPCSession = BPC.Session;
 
 const FIVE_MINUTES = 1000 * 60 * 5;
 
@@ -21,12 +22,13 @@ testUtils.prepareDatabase({
   test("refresh() and isExpired() work", function(t) {
     var i = 0;
     var now = 5000;
-    var session = new BPCSession({origin: "http://bar.org"}, {
+    var BPCSession = new BPC.SessionFactory({
       tokenLength: 4,
       tokenLifetime: 5,
       uid: function(len) { return "UID#" + (++i) + ",length:" + len },
       now: function() { return now; }
     });
+    var session = new BPCSession({origin: "http://bar.org"});
     
     t.same(session.get('access_token'), undefined,
            'access_token starts unset');
