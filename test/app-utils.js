@@ -5,16 +5,15 @@ const app = require('../app');
 const request = require('request');
 const async = require('async');
 
-const PORT = 8889;
-const BASE_URL = 'http://localhost:' + PORT;
 const FAKE_UID = '1234';
 const FAKE_EMAIL = 'example@example.com';
 const FAKE_ASSERTION = 'yup, it is example@example.com.';
 
-function AppTestHarness(t) {
+function AppTestHarness(t, port) {
   this.t = t;
   this.undoAppAuthChanges = replaceAppAuthForTesting();
   this.request = request.defaults({jar: request.jar()});
+  this.port = port;
 }
 
 AppTestHarness.prototype = {
@@ -30,15 +29,16 @@ AppTestHarness.prototype = {
     this.t.end();
   },
   resolve: function(path) {
-    return url.resolve(BASE_URL, path);
+    return url.resolve("http://localhost:" + this.port, path);
   },
   email: FAKE_EMAIL,
   assertion: FAKE_ASSERTION,
   csrf: FAKE_UID,
   login: function() {
+    var url = this.resolve('/backpack/authenticate');
     this.t.test(
       "login",
-      ensureRequest(this.request, 'POST', '/backpack/authenticate', {
+      ensureRequest(this.request, 'POST', url, {
         form: {
           '_csrf': FAKE_UID,
           'assertion': FAKE_ASSERTION
@@ -60,7 +60,8 @@ AppTestHarness.prototype = {
 
     this.t.test(
       method + ' ' + url,
-      ensureRequest(this.request, method, url, options, assertions)
+      ensureRequest(this.request, method, this.resolve(url), options,
+                    assertions)
     );
   }
 };
@@ -68,7 +69,10 @@ AppTestHarness.prototype = {
 exports.prepareApp = function prepareApp(cb) {  
   test("preparing database and app", function(t) {
     testUtils.prepareDatabase(function () {
-      app.listen(PORT, function() { cb(new AppTestHarness(t)); });
+      app.listen(0, function() {
+        var a = new AppTestHarness(t, app.address().port);
+        cb(a);
+      });
     });
   });
 };
@@ -78,7 +82,7 @@ function ensureRequest(request, method, url, options, assertions) {
   var fn = request[method.toLowerCase()];
   
   return function(t) {
-    fn.call(request, BASE_URL+url, options, function(err, res, body) {
+    fn.call(request, url, options, function(err, res, body) {
       if (err) throw err;
       if (assertions.statusCode)
         t.same(res.statusCode, assertions.statusCode,
