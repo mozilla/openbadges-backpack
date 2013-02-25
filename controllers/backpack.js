@@ -207,8 +207,7 @@ exports.manage = function manage(request, response, next) {
       success: success,
       badges: badges,
       csrfToken: request.session._csrf,
-      groups: groups,
-      tooltips: typeof request.param('tooltips') !== 'undefined'
+      groups: groups
     });
   }
 
