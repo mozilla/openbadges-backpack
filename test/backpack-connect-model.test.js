@@ -86,5 +86,12 @@ testUtils.prepareDatabase({
     t.end();
   });
 
+  test('hasPermission() works', function(t) {
+    t.same(session.hasPermission('foo'), true);
+    t.same(session.hasPermission('blogh'), false);
+    t.same(session.hasPermission('bar'), true);
+    t.end();
+  });
+  
   testUtils.finish(test);
 });

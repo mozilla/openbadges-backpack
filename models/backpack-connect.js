@@ -43,6 +43,10 @@ Session.prepare = {
   }
 };
 
+Session.prototype.hasPermission = function(name) {
+  return this.get('permissions').indexOf(name) != -1;
+};
+
 Session.prototype.refresh = function() {
   this.set('access_token', this._uid(this.tokenLength));
   this.set('access_time', Math.floor(this._now() / 1000));
