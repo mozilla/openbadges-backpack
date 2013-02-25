@@ -91,7 +91,7 @@ function makeDemoAssertion(email, image, title, description) {
     badge: {
       version: 'v0.5.0',
       name: 'DEMO: ' + (title || 'Open Badges Demo Badge'),
-      description: description || "For rocking in the free world",
+      description: description || 'For rocking in the "free world"',
       image: image,
       criteria: '/demo/criteria',
       issuer: {
