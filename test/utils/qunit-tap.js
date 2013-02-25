@@ -3,7 +3,6 @@ var app = require('../../app'),
     spawn = require('child_process').spawn;
 
 const PHANTOMJS = 'phantomjs' || process.env['PHANTOMJS'];
-const PORT = 8889;
 const PHANTOMJS_NOT_FOUND_ERR = 
   'phantomjs not found. please install it from ' +
   'http://phantomjs.org/, or set the ' +
@@ -23,8 +22,8 @@ function loggedSpawn(command, args, options) {
 }
 
 function start(path, cb) {
-  app.listen(PORT, function() {
-    var url = 'http://localhost:' + PORT + path;
+  app.listen(0, function() {
+    var url = 'http://localhost:' + app.address().port + path;
     var args = [__dirname + '/phantom-qunit.js', url];
     var cmdline = PHANTOMJS + ' ' + args.join(' ');
     var phantom = loggedSpawn(PHANTOMJS, args);
