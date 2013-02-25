@@ -51,7 +51,7 @@ expect in case of error.
 
 ## I want to play with the code, where do I start?
 
-### The easy way[*](#vagrant-trouble)
+### The easy way[*](#a-warning)
 
 [Use Vagrant](http://vagrantup.com/v1/docs/getting-started/index.html). `vagrant up` in the project root will spin
 up a fully provisioned VM (it'll take about two or three minutes, longer if
@@ -93,7 +93,7 @@ and then back in windows you can fire up your favourite browser and connect to t
 
     http://localhost:8888
 
-<a id="vagrant-trouble"></a>
+#### A Warning
 :warning: Some developers have been having trouble with vagrant, and don't use it any more. Vagrant support may be out of date.
 
 ### The hard way
