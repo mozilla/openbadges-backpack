@@ -77,9 +77,7 @@ exports.userFromSession = function userFromSession() {
   };
 };
 
-exports.testUser = function testUser() {
-  const username = 'someone@something.org';
-
+exports.testUser = function testUser(username) {
   return function(req, res, next) {
     if (!req.user) {
       User.findOrCreate(username, function (err, user) {
