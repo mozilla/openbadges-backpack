@@ -1,3 +1,3 @@
-<span draggable="true" class="openbadge" data-id="{{id}}" rel="popinfo" data-title="{{body.badge.name}}" data-content="<span>{{body.badge.description}}</span><span>Issuer: {{body.badge.issuer.name}}</span>">
+<span draggable="true" class="openbadge" data-id="{{id}}" rel="popinfo" data-title="{{body.badge.name|escape}}" data-content="<span>{{body.badge.description|escape}}</span><span>Issuer: {{body.badge.issuer.name|escape}}</span>">
   <img src="{{image_path}}" width="64px"/>
 </span>

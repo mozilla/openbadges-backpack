@@ -77,6 +77,22 @@ exports.userFromSession = function userFromSession() {
   };
 };
 
+exports.testUser = function testUser(username) {
+  return function(req, res, next) {
+    if (!req.user) {
+      User.findOrCreate(username, function (err, user) {
+        if (err) {
+          logger.error("Problem finding/creating user:");
+          logger.error(err);
+          return next(err);
+        }
+        req.user = res.locals.user = user;
+        return next();
+      });
+    }
+  };
+};
+
 function whitelisted(list, input) {
   var pattern;
   for (var i = list.length; i--;) {

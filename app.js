@@ -8,6 +8,7 @@ var logger = require('./lib/logging').logger;
 var configuration = require('./lib/configuration');
 var flash = require('connect-flash');
 var nunjucks = require('nunjucks');
+var less = require('less-middleware');
 
 var app = express();
 app.logger = logger;
@@ -38,6 +39,12 @@ env.addFilter('formatdate', function (rawDate) {
 
 // Middleware. Also see `middleware.js`
 // ------------------------------------
+app.use(less({
+  src: path.join(__dirname, "static/less"),
+  paths: [path.join(__dirname, "static/vendor/bootstrap/less")],
+  dest: path.join(__dirname, "static/css"),
+  prefix: '/css'
+}));
 app.use(express.static(path.join(__dirname, "static")));
 app.use(express.static(path.join(configuration.get('var_dir'), "badges")));
 app.use("/views", express.static(path.join(__dirname, "views")));
@@ -48,6 +55,11 @@ app.use(express.methodOverride());
 app.use(middleware.logRequests());
 app.use(middleware.cookieSessions());
 app.use(middleware.userFromSession());
+app.configure('development', function () {
+  var testUser = process.env['OPENBADGES_TEST_USER'];
+  if (testUser)
+    app.use(middleware.testUser(testUser));
+});
 app.use(flash());
 app.use(middleware.csrf({
   whitelist: [

@@ -8,60 +8,58 @@ function makeHash(email, salt) {
 }
 
 appUtils.prepareApp(function(a) {
-  var PORT = 9000;
-  var BASE_URL = 'http://localhost:' + PORT;
-  var BAD_IMG_BADGE_URL = BASE_URL + '/bad_img';
-  var EXAMPLE_BADGE_URL = BASE_URL + '/example';
-  var BAD_IMG_BADGE = {
-    "recipient": makeHash(a.email, "ballertime"),
-    "salt": "ballertime",
-    "evidence": "/badges/html5-basic/example",
-    "badge": {
-      "version": "0.5.0",
-      "name": "HTML5 Fundamental",
-      "image": "/CANT_BE_REACHED.png",
-      "description": "Knows the difference between a <section> and a blah",
-      "criteria": "/badges/html5-basic",
-      "issuer": {
-        "origin": BASE_URL,
-        "name": "P2PU",
-        "org": "School of Webcraft",
-        "contact": "admin@p2pu.org"
-     }
-    }
-  };
-  var EXAMPLE_BADGE = {
-    "recipient": makeHash(a.email, "ballertime"),
-    "salt": "ballertime",
-    "evidence": "/badges/html5-basic/example",
-    "badge": {
-      "version": "0.5.0",
-      "name": "HTML5 Fundamental",
-      "image": a.resolve('/_demo/cc.large.png'),
-      "description": "Knows the difference between a <section> and a blah",
-      "criteria": "/badges/html5-basic",
-      "issuer": {
-        "origin": BASE_URL,
-        "name": "P2PU",
-        "org": "School of Webcraft",
-        "contact": "admin@p2pu.org"
-     }
-    }
-  };
-  
   var issuerApp = express();
-  
-  issuerApp.get('/bad_img', function(req, res) {
-    return res.send(BAD_IMG_BADGE);
-  });
-  
-  issuerApp.get('/example', function(req, res) {
-    return res.send(EXAMPLE_BADGE);
-  });
+  var issuerServer = http.createServer(issuerApp);
+  issuerServer.listen(0, function() {
+    var PORT = issuerServer.address().port;
+    var BASE_URL = 'http://localhost:' + PORT;
+    var BAD_IMG_BADGE_URL = BASE_URL + '/bad_img';
+    var EXAMPLE_BADGE_URL = BASE_URL + '/example';
+    var BAD_IMG_BADGE = {
+      "recipient": makeHash(a.email, "ballertime"),
+      "salt": "ballertime",
+      "evidence": "/badges/html5-basic/example",
+      "badge": {
+        "version": "0.5.0",
+        "name": "HTML5 Fundamental",
+        "image": "/CANT_BE_REACHED.png",
+        "description": "Knows the difference between a <section> and a blah",
+        "criteria": "/badges/html5-basic",
+        "issuer": {
+          "origin": BASE_URL,
+          "name": "P2PU",
+          "org": "School of Webcraft",
+          "contact": "admin@p2pu.org"
+       }
+      }
+    };
+    var EXAMPLE_BADGE = {
+      "recipient": makeHash(a.email, "ballertime"),
+      "salt": "ballertime",
+      "evidence": "/badges/html5-basic/example",
+      "badge": {
+        "version": "0.5.0",
+        "name": "HTML5 Fundamental",
+        "image": a.resolve('/_demo/cc.large.png'),
+        "description": "Knows the difference between a <section> and a blah",
+        "criteria": "/badges/html5-basic",
+        "issuer": {
+          "origin": BASE_URL,
+          "name": "P2PU",
+          "org": "School of Webcraft",
+          "contact": "admin@p2pu.org"
+       }
+      }
+    };
 
-  issuerApp = http.createServer(issuerApp);
+    issuerApp.get('/bad_img', function(req, res) {
+      return res.send(BAD_IMG_BADGE);
+    });
   
-  issuerApp.listen(PORT, function() {
+    issuerApp.get('/example', function(req, res) {
+      return res.send(EXAMPLE_BADGE);
+    });
+  
     // Ensure assertions w/ bad image URLs raise errors.
 
     a.login();
@@ -133,7 +131,7 @@ appUtils.prepareApp(function(a) {
     });
     
     a.t.test("shut down issuer server", function(t) {
-      issuerApp.close();
+      issuerServer.close();
       t.end();
     });
     
