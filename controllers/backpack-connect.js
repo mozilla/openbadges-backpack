@@ -9,6 +9,19 @@ var BackpackConnect = module.exports = function BackpackConnect(options) {
   this.realm = options.realm;
 };
 
+// TODO: This is mostly duplicated from controllers/displayer.js; we should
+// consolidate the two functions.
+function fullUrl(pathname) {
+  var conf = require('../lib/configuration');
+  var url = require('url');
+  var base = url.format({
+    protocol: conf.get('protocol'),
+    hostname: conf.get('hostname'),
+    port: conf.get('port')
+  });
+  return url.resolve(base, pathname);
+}
+
 BackpackConnect.prototype = {
   refresh: function() { return refresh.bind(this); },
   allowAccess: function() { return allowAccess.bind(this); },
@@ -86,7 +99,7 @@ function allowAccess(req, res) {
       access_token: session.get('access_token'),
       refresh_token: session.get('refresh_token'),
       expires: session.tokenLifetime,
-      api_root: apiRoot
+      api_root: fullUrl(apiRoot)
     }), 303);
   });
 }

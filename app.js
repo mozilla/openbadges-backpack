@@ -66,7 +66,8 @@ app.use(middleware.csrf({
     '/backpack/authenticate',
     '/issuer/validator/?',
     '/displayer/convert/.+',
-    '/issuer/frameless.*'
+    '/issuer/frameless.*',
+    '/api/.+'
   ]
 }));
 app.use(middleware.cors({ whitelist: ['/_badges.*', '/issuer.*', '/baker', '/displayer/.+/group.*'] }));
@@ -98,6 +99,11 @@ const demo = require('./controllers/demo');
 const backpack = require('./controllers/backpack');
 const group = require('./controllers/group');
 const share = require('./controllers/share');
+const BackpackConnect = require('./controllers/backpack-connect');
+const backpackConnect = new BackpackConnect({
+  apiRoot: '/api',
+  realm: 'openbadges'
+});
 
 // Parameter handlers
 app.param('badgeId', badge.findById);
@@ -153,6 +159,12 @@ app.get('/share/:groupUrl/edit', share.editor);
 app.post('/share/:groupUrl', share.createOrUpdate);
 app.put('/share/:groupUrl', share.createOrUpdate);
 app.get('/share/:groupUrl', share.show);
+
+app.post('/accept', backpackConnect.allowAccess());
+app.post('/api/token', backpackConnect.refresh());
+app.post('/api/issue', backpackConnect.authorize(), function(req, res) {
+  return res.send('TODO: implement this!', 501);
+});
 
 if (!module.parent) {
   var start_server = function start_server(app) {
