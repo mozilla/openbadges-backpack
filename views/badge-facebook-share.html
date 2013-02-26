@@ -1,0 +1,39 @@
+<table class='information'>
+  <colgroup>
+    <col class="imageCol">
+    <col class="dataCol">
+  </colgroup>
+  <tbody class="confirm-facebook-share">
+    <tr>
+      <td rowspan="80" class='image'>
+        <img src="{{badge.attributes.image_path}}">
+      </td>
+    </tr>
+    <tr>
+      <td>
+	      <strong>{{badge.attributes.body.badge.issuer.name}}</strong>
+	    </td>
+    </tr>
+    <tr>
+      <td>
+      	{{badge.attributes.body.badge.description|escape}}
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <textarea name='facebook-share-comment' tabindex=1 class='comment' placeholder='Add your personal comment'></textarea>
+      </td>
+    </tr>
+    <tr>
+	    <td><input type="checkbox" name="facebook-automatic-push" value="{{user.facebook_auto_share}}">Automatically publish badges to Facebook when they are added to my backpack.</td>
+	  </tr>
+	  <tr>
+		  <td>
+			  <div class='buttons'>
+          <button class='btn nope'>Cancel</button>
+          <button class='btn yep btn-primary'>Share on Facebook</button>
+        </div>
+			</td>
+		</tr>
+  </tbody>
+</table>
