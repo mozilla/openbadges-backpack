@@ -24,8 +24,9 @@
       position: relative;
       z-index: 1;
       border-top: @hexShadowHeight solid white;
-      border-left: @hexShadowWidth solid transparent;
-      border-right: @hexShadowWidth solid transparent;
+      /* dotted makes FF render edge smoothly */
+      border-left: @hexShadowWidth dotted transparent;
+      border-right: @hexShadowWidth dotted transparent;
       left: @hexShadowOffset;
       margin-bottom: -@hexShadowHeight;
     }
