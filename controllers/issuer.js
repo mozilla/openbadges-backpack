@@ -47,6 +47,7 @@ var myFiles = [
   "jquery.min.js",
   "jschannel.js",
   "issuer-parts/issuer-core.js",
+  "issuer-parts/issuer-backpack-connect.js",
   "issuer-parts/issuer-script-outro.js"
 ];
 

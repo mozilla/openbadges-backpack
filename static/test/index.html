@@ -77,4 +77,22 @@ asyncTest('cross-frame communication works', function() {
   }
   OpenBadges.issue(["http://example.com/badge.json"], cb, hook);
 });
+
+module("backpack-connect");
+  
+asyncTest("OpenBadges.connect() works", function() {
+  OpenBadges.connect({
+    callback: "/lolol",
+    scope: ["foo", "bar"],
+    location: {
+      replace: function(url) {
+        var expected = '/access?callback=' +
+                       encodeURIComponent(absoluteUrl('/lolol')) +
+                       '&scope=foo%2Cbar';
+        equal(url, absoluteUrl(expected));
+        start();
+      }
+    }
+  });
+});
 </script>
