@@ -18,6 +18,12 @@ var originalDollar = $;
 </script>
 <script src="../issuer.js"></script>
 <script>
+function absoluteUrl(path) {
+  var a = document.createElement('a');
+  a.setAttribute('href', path);
+  return a.href;
+}
+
 module('general');
 
 test('OpenBadges global exists', function() {
@@ -31,6 +37,10 @@ test('jschannel global is not clobbered', function() {
 test('jQuery globals are not clobbered', function() {
   ok(jQuery === originaljQuery, "jQuery is not clobbered");
   ok($ === originalDollar, "$ is not clobbered");
+});
+
+test('OpenBadges.getRoot() works', function() {
+  equal(OpenBadges.getRoot(), absoluteUrl('/'));
 });
 
 module('OpenBadges.issue()');
