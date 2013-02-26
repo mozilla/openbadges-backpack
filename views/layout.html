@@ -45,7 +45,7 @@
           {% if user %}
             <li class="user">{{user.attributes.email}}</li>
             <li><a href="/backpack/signout">Sign Out</a></li>
-          {% else %}
+          {% elif bodyClass == 'login' %}
             <li><a class="js-browserid-link" href="#">Sign In</a></li>
           {% endif %}
           </ul>
