@@ -328,7 +328,9 @@ Details.View = Backbone.View.extend({
     'click .badge-image': 'debugBadge',
     'click .disown': 'showConfirmation',
     'click .confirm-disown .nope': 'hideConfirmation',
-    'click .confirm-disown .yep': 'destroyBadge'
+    'click .confirm-disown .yep': 'destroyBadge',
+    'click .facebook-share': 'showFacebookModal',
+    'click .confirm-facebook-share .nope': 'hideFacebookModal'
   },
 
   debugBadge: function (event) {
@@ -341,6 +343,14 @@ Details.View = Backbone.View.extend({
 
   hideConfirmation: function () {
     this.$el.find('.confirm-disown').fadeOut('fast');
+  },
+
+  showFacebookModal: function () {
+	  this.$el.find('.confirm-facebook-share').fadeIn('fast');
+  },
+
+  hideFacebookModal: function () {
+	  this.$el.find('.confirm-facebook-share').fadeOut('fast');
   },
 
   destroyBadge: function () {
