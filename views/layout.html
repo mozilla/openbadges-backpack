@@ -41,12 +41,14 @@
               <li><a href="/backpack/settings">Settings</a></li>
             {% endif %}
           </ul>
+          <ul class="nav pull-right">
           {% if user %}
-            <ul class="nav pull-right">
-              <li class="user">{{user.attributes.email}}</li>
-              <li><a href="/backpack/signout">Sign Out</a></li>
-            </ul>
+            <li class="user">{{user.attributes.email}}</li>
+            <li><a href="/backpack/signout">Sign Out</a></li>
+          {% else %}
+            <li><a class="js-browserid-link" href="#">Sign In</a></li>
           {% endif %}
+          </ul>
         </div>
       </div>
     </div>
