@@ -3,7 +3,9 @@ const testUtils = require('./');
 const mysql = require('../lib/mysql');
 const User = require('../models/user');
 const BPC = require('../models/backpack-connect');
-const BPCSession = BPC.Session;
+const BPCSession = BPC.SessionFactory({
+  validPermissions: ["foo", "bar"]
+});
 
 const FIVE_MINUTES = 1000 * 60 * 5;
 
@@ -40,6 +42,13 @@ testUtils.prepareDatabase({
     t.ok(!session.isExpired(), 'new token is not expired');
     now += 6000;
     t.ok(session.isExpired(), 'token is expired once time has elapsed');
+    t.end();
+  });
+  
+  test('permissions validator works', function(t) {
+    t.equal(BPCSession.validators.permissions(["foo", "bar"]), undefined);
+    t.equal(BPCSession.validators.permissions(["a", "b"]),
+            "invalid permission(s): a, b");
     t.end();
   });
   

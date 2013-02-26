@@ -4,6 +4,7 @@ var Base = require('./mysql-base');
 
 const DEFAULT_TOKEN_LENGTH = 24;
 const DEFAULT_TOKEN_LIFETIME = 60 * 60;
+const DEFAULT_VALID_PERMS = ["issue"];
 
 var getOrigin = function getOrigin(value) {
   var parsed = url.parse(value, false, true);
@@ -12,6 +13,7 @@ var getOrigin = function getOrigin(value) {
 };
 
 function SessionFactory(options) {
+  var validPermissions = options.validPermissions || DEFAULT_VALID_PERMS;
   var tokenLength = options.tokenLength || DEFAULT_TOKEN_LENGTH;
   var tokenLifetime = options.tokenLifetime || DEFAULT_TOKEN_LIFETIME;
   var uid = options.uid || require('../middleware').utils.uid;
@@ -36,6 +38,14 @@ function SessionFactory(options) {
     
       if (!parsedOrigin.host)
         return "invalid origin host";
+    },
+    permissions: function(perms) {
+      var invalid = perms.filter(function(perm) {
+        return validPermissions.indexOf(perm) == -1;
+      });
+      
+      if (invalid.length)
+        return "invalid permission(s): " + invalid.join(', ');
     }
   };
 
