@@ -35,6 +35,10 @@ appUtils.prepareApp(function(a) {
       }
     });
 
+    // Log out to ensure that this all works w/o any cookies.
+
+    a.verifyRequest('GET', '/backpack/signout', {statusCode: 200});
+    
     // Ensure attempting to issue a badge w/o a token fails
     
     a.verifyRequest('POST', '/api/issue', {
@@ -45,15 +49,32 @@ appUtils.prepareApp(function(a) {
       }
     });
 
-    // Ensure attempting to issue a badge w/ a token succeeds
+    // Ensure attempting to issue a badge w/ a token but no URL fails.
     
     a.verifyRequest('POST', '/api/issue', {
       headers: {
         'authorization': 'Bearer ' + b64enc('1234')
       }
     }, {
-      // TODO: This will change once we actually implement the endpoint!
-      statusCode: 501
+      statusCode: 400,
+      body: {message: 'url is a required param'}
+    });
+
+    // Ensure attempting to issue a badge w/ a valid URL succeeds.
+
+    a.verifyRequest('POST', '/api/issue', {
+      headers: {
+        'authorization': 'Bearer ' + b64enc('1234')
+      },
+      form: {
+        'badge': issuer.resolve('/example')
+      }
+    }, {
+      statusCode: 201,
+      body: {
+        'exists': false,
+        'badge': issuer.BADGES['/example']
+      }
     });
 
     // Ensure refreshing the wrong token fails

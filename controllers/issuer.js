@@ -156,7 +156,7 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
     logger.debug("tried GET assertionUrl, didn't get anything " + req.param());
     logger.debug("full query " + JSON.stringify(req.query));
     // if the param was in a POST body
-    assertionUrl = req.body['url'];
+    assertionUrl = req.body['url'] || req.body['badge'];
     logger.debug("POST attempt got " + assertionUrl);
     // more debugging
     if (!assertionUrl && req.method == 'GET') {

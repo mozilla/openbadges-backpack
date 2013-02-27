@@ -162,9 +162,8 @@ app.get('/share/:groupUrl', share.show);
 
 app.post('/accept', backpackConnect.allowAccess());
 app.post('/api/token', backpackConnect.refresh());
-app.post('/api/issue', backpackConnect.authorize(), function(req, res) {
-  return res.send('TODO: implement this!', 501);
-});
+app.post('/api/issue', backpackConnect.authorize("issue"),
+                       issuer.issuerBadgeAddFromAssertion);
 
 if (!module.parent) {
   var start_server = function start_server(app) {
