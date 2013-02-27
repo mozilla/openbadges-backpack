@@ -78,6 +78,88 @@ testUtils.prepareDatabase({
       t.end();
     });
   });
+
+  test('requestAccess() fails w/ empty callback', function(t) {
+    conmock({
+      handler: bpc.requestAccess(),
+      request: {
+        query: {callback: ''}
+      }
+    }, function(err, mock) {
+      if (err) throw err;
+      t.equal(mock.status, 400);
+      t.equal(mock.body, 'callback expected');
+      t.end();
+    });
+  });
+
+  test('requestAccess() fails w/ empty scope', function(t) {
+    conmock({
+      handler: bpc.requestAccess(),
+      request: {
+        query: {callback: 'http://foo.org', scope: ''}
+      }
+    }, function(err, mock) {
+      if (err) throw err;
+      t.equal(mock.status, 400);
+      t.equal(mock.body, 'scope expected');
+      t.end();
+    });
+  });
+
+  test('requestAccess() fails w/ bad callback', function(t) {
+    conmock({
+      handler: bpc.requestAccess(),
+      request: {
+        query: {callback: 'LOL', scope: 'foo_perm'}
+      }
+    }, function(err, mock) {
+      if (err) throw err;
+      t.equal(mock.status, 400);
+      t.equal(mock.body, 'invalid callback: invalid origin protocol');
+      t.end();
+    });
+  });
+
+  test('requestAccess() fails w/ bad scope', function(t) {
+    conmock({
+      handler: bpc.requestAccess(),
+      request: {
+        query: {callback: 'http://foo.org', scope: 'BAD'}
+      }
+    }, function(err, mock) {
+      if (err) throw err;
+      t.equal(mock.status, 400);
+      t.equal(mock.body, 'invalid scope: invalid permission(s): BAD');
+      t.end();
+    });
+  });
+  
+  test('requestAccess() works w/ valid args', function(t) {
+    conmock({
+      handler: bpc.requestAccess(),
+      request: {
+        query: {
+          callback: 'http://foo.org',
+          scope: 'foo_perm,bar_perm'
+        },
+        session: {_csrf: 'a_csrf'}
+      }
+    }, function(err, mock) {
+      if (err) throw err;
+      t.equal(mock.fntype, 'render');
+      t.equal(mock.path, 'backpack-connect.html');
+      t.same(mock.options, {
+        clientDomain: "foo.org",
+        csrfToken: 'a_csrf',
+        joinedScope: "foo_perm,bar_perm",
+        scopes: ["foo_perm", "bar_perm"],
+        callback: "http://foo.org"
+      });
+      t.equal(mock.status, 200);
+      t.end();
+    });
+  });
   
   test('allowAccess() 403\'s when unauthenticated', function(t) {
     conmock({handler: bpc.allowAccess()}, function(err, mock) {

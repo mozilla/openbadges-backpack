@@ -1,4 +1,5 @@
 var querystring = require('querystring');
+var url = require('url');
 
 var logger = require('../lib/logging').logger;
 
@@ -14,7 +15,6 @@ var BackpackConnect = module.exports = function BackpackConnect(options) {
 // consolidate the two functions.
 function fullUrl(pathname) {
   var conf = require('../lib/configuration');
-  var url = require('url');
   var base = url.format({
     protocol: conf.get('protocol'),
     hostname: conf.get('hostname'),
@@ -25,6 +25,7 @@ function fullUrl(pathname) {
 
 BackpackConnect.prototype = {
   refresh: function() { return refresh.bind(this); },
+  requestAccess: function() { return requestAccess.bind(this); },
   allowAccess: function() { return allowAccess.bind(this); },
   authorize: function(perm) { return authorize.bind(this, perm); }
 };
@@ -61,6 +62,31 @@ function refresh(req, res) {
     } else {
       return res.send('invalid refresh_token', 400);
     }
+  });
+}
+
+function requestAccess(req, res) {
+  if (!req.query.callback)
+    return res.send('callback expected', 400);
+  if (!req.query.scope)
+    return res.send('scope expected', 400);
+
+  var originErr = this.Model.validators.origin(req.query.callback);
+  var scopes = req.query.scope.split(',');
+  var scopeErr = this.Model.validators.permissions(scopes);
+  var parsed = url.parse(req.query.callback, false, true);
+  
+  if (originErr)
+    return res.send('invalid callback: ' + originErr, 400);
+  if (scopeErr)
+    return res.send('invalid scope: ' + scopeErr, 400);
+  
+  return res.render('backpack-connect.html', {
+    clientDomain: parsed.hostname,
+    csrfToken: req.session._csrf,
+    joinedScope: req.query.scope,
+    scopes: scopes,
+    callback: req.query.callback
   });
 }
 

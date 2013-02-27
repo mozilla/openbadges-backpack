@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+{% block body %}
+<h1><span class="client">{{ clientDomain }}</span> would like permission 
+  to:</h1>
+
+<ul>
+  {% for scope in scopes %}
+    <li>
+      {% if scope == "issue" %}
+      Send the open badges I've earned to my backpack.
+      {% endif %}
+    </li>
+  {% endfor %}
+</ul>
+
+{% if not user %}
+
+<p>Don't have a backpack account yet? 
+  <a class="js-browserid-link" href="#">Sign up</a> to start 
+  displaying your skills and achievements that happen online or 
+  anywhere in the universe.</p>
+
+<a class="js-browserid-link" href="#">
+  <img src="https://browserid.org/i/sign_in_green.png"/>
+</a>
+
+{% else %}
+
+<form method="POST" action="accept">
+  <input name="_csrf" type="hidden" value="{{ csrfToken }}">
+  <input name="callback" type="hidden" value="{{ callback }}">
+  <input name="scope" type="hidden" value="{{ joinedScope }}">
+  <button class="btn btn-primary" type="submit">Grant permission
+    to {{ clientDomain }}.</button>
+  <a class="btn" href="/backpack/signout">I am not 
+    {{ user.attributes.email }}.</a>
+</form>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="https://login.persona.org/include.js"></script>
+<script src="/js/jquery.min.js"></script>
+<script>
+$(window).ready(function() {
+  var reloadPage = function() { window.location.reload(); };
+
+  $(document).ajaxError(function() {
+    alert("Sorry, an error occurred. Please try again later.");
+  });
+  
+  $('a[href="/backpack/signout"]').click(function() {
+    $.get($(this).attr("href"), reloadPage);
+    return false;
+  });
+
+  $(".js-browserid-link").click(function() {
+    navigator.id.get(function(assertion) {
+      if (!assertion) return;
+      $.ajax({
+        url: '/backpack/authenticate',
+        type: 'POST',
+        dataType: 'json',
+        data: {assertion: assertion},
+        headers: {'X-CSRF-Token': '{{ csrfToken }}'},
+        success: reloadPage
+      });
+    });
+    return false;
+  });
+});
+</script>
+{% endblock %}

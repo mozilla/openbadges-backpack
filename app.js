@@ -160,6 +160,7 @@ app.post('/share/:groupUrl', share.createOrUpdate);
 app.put('/share/:groupUrl', share.createOrUpdate);
 app.get('/share/:groupUrl', share.show);
 
+app.get('/access', backpackConnect.requestAccess());
 app.post('/accept', backpackConnect.allowAccess());
 app.post('/api/token', backpackConnect.refresh());
 app.post('/api/issue', backpackConnect.authorize("issue"),
