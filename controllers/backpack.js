@@ -133,6 +133,20 @@ function badgePage (request, response, badges, recent) {
   var error = request.flash('error');
   var success = request.flash('success');
 
+  badges.forEach(function (badge) {
+    var body = badge.get('body');
+    var origin = body.badge.issuer.origin;
+    var criteria = body.badge.criteria;
+    var evidence = body.evidence;
+
+    if (criteria[0] === '/') body.badge.criteria = origin + criteria;
+    if (evidence && evidence[0] === '/') body.evidence = origin + evidence;
+    // Nobody wants to see the hash in the UI, apparently.
+    if (body.recipient.match(/\w+(\d+)?\$.+/)) body.recipient = user.get('email');
+
+    badge.serializedAttributes = JSON.stringify(badge.attributes);
+  });
+
   response.render('badges.html', {
     error: error,
     success: success,

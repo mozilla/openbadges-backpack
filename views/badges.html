@@ -26,7 +26,7 @@
     <ul id="badges" class="js-badges badge-list">
       {% for badge in badges %}
         <li class="span3">
-          <div class="openbadge">
+          <div class="openbadge" data-id="{{badge.attributes.id}}">
             <img src="{{ badge.attributes.image_path }}" width="64">
             <p class="title">{{ badge.attributes.body.badge.name }}</p>
             <p class="issuer">Issuer: {{ badge.attributes.body.badge.issuer.name }}</p>
@@ -40,6 +40,46 @@
       </li>
     </ul>
   </div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+
+<!-- bootstrap some data -->
+<script>
+  window.badgeData = {};
+  {% for badge in badges %}
+    window.badgeData[{{badge.attributes.id}}] = {{badge.serializedAttributes}};
+  {% endfor %}
+</script>
+
+<!-- third party -->
+<script type="text/javascript" src="/js/nunjucks-dev.js"></script>
+<script type="text/javascript" src="/js/underscore.js"></script>
+<script type="text/javascript" src="/js/backbone.js"></script>
+<script type="text/javascript" src="/vendor/bootstrap/js/bootstrap-alert.js"></script>
+<script type="text/javascript" src="/vendor/bootstrap/js/bootstrap-tooltip.js"></script>
+<script type="text/javascript" src="/vendor/bootstrap/js/bootstrap-popover.js"></script>
+
+<!-- my libraries -->
+<script type="text/javascript" src="/js/jquery.sync.js"></script>
+<script type="text/javascript" src="/js/backpack.js"></script>
+
+{% if tooltips %}
+<!-- initialize twitter bootstrap components -->
+<script>
+  $(function(){
+    $('[rel="popover"]').popover({
+      animation: false,
+      placement: 'right',
+      trigger: 'hover'
+    });
+    $('[rel="tooltip"]').tooltip({
+      animation: false
+    });
+  });
+</script>
 {% endif %}
 
 {% endblock %}
