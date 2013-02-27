@@ -30,6 +30,18 @@ a:focus {
   max-width: 940px;
 }
 
+.navbar .brand {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.navbar .nav > li > a,
+.navbar .navbar-text {
+  @bottom-padding: 10px;
+  padding-top: (@navbarHeight - @baseLineHeight - @bottom-padding);
+  padding-bottom: @bottom-padding;
+}
+
 // NAV
 // -----------------------------------------------------
 
