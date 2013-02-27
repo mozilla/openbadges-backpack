@@ -5,6 +5,7 @@ var logger = require('../lib/logging').logger;
 var BackpackConnect = module.exports = function BackpackConnect(options) {
   this.Model = options.Model ||
                require('../models/backpack-connect').Session;
+  this.UserModel = options.UserModel || require('../models/user');
   this.apiRoot = options.apiRoot;
   this.realm = options.realm;
 };
@@ -105,6 +106,7 @@ function allowAccess(req, res) {
 }
 
 function authorize(req, res, next) {
+  var User = this.UserModel;
   var auth = (req.headers['authorization'] || '').match(/^Bearer (.+)$/);
   var bearerRealmStr = 'Bearer realm="' + this.realm + '"';
   var invalidTokenError = function(desc) {
@@ -135,7 +137,15 @@ function authorize(req, res, next) {
       if (results[0].isExpired())
         return invalidTokenError("The access token expired");
       req.backpackConnect = results[0];
-      return next();
+      User.find({id: results[0].get('user_id')}, function(err, results) {
+        if (err || !results.length) {
+          logger.warn('There was an error retrieving a user');
+          logger.debug(err);
+          return res.send(500);
+        }
+        req.user = results[0];
+        return next();
+      });
     } else {
       return invalidTokenError("Unknown access token");
     }

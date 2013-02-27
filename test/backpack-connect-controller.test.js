@@ -274,6 +274,10 @@ testUtils.prepareDatabase({
       }
     }, function(err, mock) {
       t.equal(mock.fntype, 'next');
+      t.equal(mock.request.backpackConnect.get('access_token'), 'SOME_UID_3',
+              'request.backpackConnect is set properly');
+      t.equal(mock.request.user.get('email'), 'brian@example.org',
+              'request.user is set properly');
       t.end();
     });
   });
