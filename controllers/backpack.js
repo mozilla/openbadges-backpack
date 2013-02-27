@@ -128,6 +128,51 @@ exports.stats = function stats(request, response, next) {
   });
 }
 
+function badgePage (request, response, badges, recent) {
+  var user = request.user;
+  var error = request.flash('error');
+  var success = request.flash('success');
+
+  response.render('badges.html', {
+    error: error,
+    success: success,
+    badges: badges,
+    csrfToken: request.session._csrf,
+    tooltips: typeof request.param('tooltips') !== 'undefined',
+    recent: !!recent
+  });
+}
+
+exports.recentBadges = function recent (request, response, next) {
+  var user = request.user;
+  if (!user)
+    return response.redirect('/backpack/login', 303);
+
+  function startResponse () {
+    return user.getLatestBadges(function(err, badges) {
+      if (err) return next(err);
+      return badgePage(request, response, badges, true);
+    });
+  }
+
+  return startResponse();
+}
+
+exports.allBadges = function everything (request, response, next) {
+  var user = request.user;
+  if (!user)
+    return response.redirect('/backpack/login', 303);
+
+  function startResponse () {
+    return user.getAllBadges(function(err, badges) {
+      if (err) return next(err);
+      return badgePage(request, response, badges);
+    });
+  }
+
+  return startResponse();
+}
+
 
 /**
  * Render the management page for logged in users.
