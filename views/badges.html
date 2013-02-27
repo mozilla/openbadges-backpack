@@ -1,0 +1,45 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+{% if tooltips %}
+<div class="alert alert-block alert-info">
+  <h4 class="alert-heading">Welcome to your Badge Backpack!</h4>
+  <p>
+    You collect badges here from various issuers and learning experiences. In fact, you can see the badge(s) you just earned here.
+  </p>
+  <p>
+    We've turned on some helpful tooltips to help you get oriented. Mouse over the different parts of your backpack to learn what they do, paying special attention anywhere you see the <i class="icon-info-sign"></i> icon.
+  </p>
+  <p>
+    When you feel comfortable you can click the <a href="/">Help: Off</a> link here or above to toggle these messages off.
+  </p>
+</div>
+{% endif %}
+
+{% if not badges.length %}
+  <h1>No badges.  Better get out there and start earning some!</h1>
+  <p>By the way, <a href="http://p2pu.org">P2PU</a> would be a great place to start
+{% else %}
+  <p class="badge-nav"><span class="hide">Show</span> <a href="/"{% if recent %} class="selected"{% endif %}>Recent</a> <span class="hide">or</span> <a href="/backpack/badges"{% if not recent %} class="selected"{% endif %}>Everything</a></p>
+  <div class="row">
+    <ul id="badges" class="js-badges badge-list">
+      {% for badge in badges %}
+        <li class="span3">
+          <div class="openbadge">
+            <img src="{{ badge.attributes.image_path }}" width="64">
+            <p class="title">{{ badge.attributes.body.badge.name }}</p>
+            <p class="issuer">Issuer: {{ badge.attributes.body.badge.issuer.name }}</p>
+          </div>
+        </li>
+      {% endfor %}
+      <li class="span3">
+        <a href="/backpack/add" class="add-badge">
+          Upload a badge
+        </a>
+      </li>
+    </ul>
+  </div>
+{% endif %}
+
+{% endblock %}
