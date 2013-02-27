@@ -40,9 +40,6 @@
             {% if user %}
               <li><a href="/backpack/settings">Settings</a></li>
             {% endif %}
-            <li><a href="/{% if not tooltips %}?tooltips{% endif %}">
-              Help: {% if tooltips %}Off{% else %}On{% endif %}
-            </a></li>
           </ul>
           {% if user %}
             <ul class="nav pull-right">
