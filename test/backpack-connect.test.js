@@ -1,5 +1,6 @@
 const appUtils = require('./app-utils');
 const issuerUtils = require('./issuer-utils');
+const b64enc = function(s) { return new Buffer(s).toString('base64'); };
 
 appUtils.prepareApp(function(a) {
   issuerUtils.createIssuer(a, function(issuer) {
@@ -48,7 +49,7 @@ appUtils.prepareApp(function(a) {
     
     a.verifyRequest('POST', '/api/issue', {
       headers: {
-        'authorization': 'Bearer 1234'
+        'authorization': 'Bearer ' + b64enc('1234')
       }
     }, {
       // TODO: This will change once we actually implement the endpoint!

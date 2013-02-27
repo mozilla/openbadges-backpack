@@ -123,7 +123,9 @@ function authorize(req, res, next) {
     return res.send("access token expected", 401);
   }
   
-  this.Model.find({access_token: auth[1]}, function(err, results) {
+  auth = new Buffer(auth[1], 'base64').toString('ascii');
+  
+  this.Model.find({access_token: auth}, function(err, results) {
     if (err) {
       logger.warn('There was an error retrieving an access token');
       logger.debug(err);

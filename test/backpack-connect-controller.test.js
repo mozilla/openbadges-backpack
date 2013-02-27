@@ -17,7 +17,7 @@ const bpc = new BackpackConnect({
   apiRoot: 'http://backpack.org/test_api',
   realm: 'test'
 });
-
+const b64enc = function(s) { return new Buffer(s).toString('base64'); };
 var uid = 0;
 var nowSecs = 0;
 
@@ -217,7 +217,7 @@ testUtils.prepareDatabase({
       handler: bpc.authorize(),
       request: {
         headers: {
-          'authorization': 'Bearer SOME_UID_1'
+          'authorization': 'Bearer ' + b64enc("SOME_UID_1")
         }
       }
     }, function(err, mock) {
@@ -232,7 +232,7 @@ testUtils.prepareDatabase({
       handler: bpc.authorize(),
       request: {
         headers: {
-          'authorization': 'Bearer SOME_UID_1'
+          'authorization': 'Bearer ' + b64enc("SOME_UID_1")
         }
       }
     }, function(err, mock) {
@@ -269,7 +269,7 @@ testUtils.prepareDatabase({
       handler: bpc.authorize(),
       request: {
         headers: {
-          'authorization': 'Bearer SOME_UID_3'
+          'authorization': 'Bearer ' + b64enc("SOME_UID_3")
         }
       }
     }, function(err, mock) {
