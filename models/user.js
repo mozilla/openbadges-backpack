@@ -2,6 +2,7 @@ var crypto = require('crypto');
 var regex = require('../lib/regex');
 var mysql = require('../lib/mysql');
 var Base = require('./mysql-base');
+var Badge = require('./badge');
 
 var User = function (attributes) {
   this.attributes = attributes;
@@ -11,6 +12,38 @@ var User = function (attributes) {
 };
 
 Base.apply(User, 'user');
+
+User.prototype.getAllBadges = function(callback) {
+  Badge.find({email: this.get('email')}, function(err, badges) {
+    if (!err && badges) {
+      // There doesn't appear to be a way to do this at the SQL level :(
+      badges.sort(function(a, b) {
+        var aid = a.get('id'),
+            bid = b.get('id');
+        if (aid == bid) return 0;
+        return bid - aid;
+      });
+    }
+
+    callback(err, badges);
+  });
+}
+
+User.prototype.getLatestBadges = function(count, callback) {
+  if (typeof count == 'function') {
+    callback = count;
+    count = 7; // Yay for magic numbers!
+  }
+
+  this.getAllBadges(function(err, badges) {
+    if (!err && badges) {
+      // There doesn't appear to be a way to do this at the SQL level :(
+      badges = badges.slice(0,count);
+    }
+
+    callback(err, badges);
+  });
+}
 
 User.findOrCreate = function (email, callback) {
   var newUser = new User({ email: email });
