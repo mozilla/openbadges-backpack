@@ -38,11 +38,12 @@
           <a href="http://www.mozilla.org/" id="tabzilla">a mozilla.org joint</a>
           <ul class="nav pull-right">
           {% if user %}
+            <li><a href="#" class="badge-link"><span>Badges</span></a></li>
+            <li><a href="#" class="collection-link"><span>Collections</span></a></li>
             <li class="user navbar-text">{{user.attributes.email}}</li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                <i class="icon-cog"></i>
-                <b class="caret"></b>
+                <i class="icon-cog"></i><b class="caret"></b>
               </a>
               <ul class="dropdown-menu">
                 <li><a href="/backpack/settings">Settings</a></li>

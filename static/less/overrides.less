@@ -37,9 +37,10 @@ a:focus {
 
 .navbar .nav > li > a,
 .navbar .navbar-text {
-  @bottom-padding: 10px;
-  padding-top: (@navbarHeight - @baseLineHeight - @bottom-padding);
-  padding-bottom: @bottom-padding;
+  @navIconHeight: 45px;
+  @bottom-padding: 0;
+  padding: (@navbarHeight - @navIconHeight - @bottom-padding) 15px @bottom-padding;
+  line-height: @navIconHeight;
 }
 
 // NAV
@@ -61,6 +62,10 @@ a:focus {
 
 // DROPDOWNS
 // -----------------------------------------------------
+
+.caret {
+  vertical-align: text-top;
+}
 
 // ALERTS, LABELS, BADGES
 // -----------------------------------------------------
