@@ -67,7 +67,7 @@
         </span>
 
           {% for badge in group.attributes.badgeObjects %}
-            <span draggable="true" class="openbadge">
+            <span draggable="true" class="openbadge" data-id="{{badge.attributes.id}}">
               <img src="{{badge.attributes.image_path}}" width="64px"/>
             </span>
           {% endfor %}
