@@ -1,6 +1,6 @@
 var Badge = require('../models/badge');
 var logger = require('../lib/logging').logger;
-var displayer = require('./displayer')
+var utils = require('../lib/utils');
 
 function respond(status, message) {
   return { status: status, message: message };
@@ -53,8 +53,8 @@ exports.show = function show(req, res, next) {
     og: [
       { property: 'type', content: 'open-badges:badge' },
       { property: 'title', content: req.badge.attributes.body.badge.issuer.name },
-      { property: 'url', content: displayer.fullUrl(req.url) },
-      { property: 'image', content: displayer.fullUrl(req.badge.attributes.image_path) },
+      { property: 'url', content: utils.fullUrl(req.url) },
+      { property: 'image', content: utils.fullUrl(req.badge.attributes.image_path) },
       { property: 'description', content: req.badge.attributes.body.badge.description },
       ],
     fb: [
