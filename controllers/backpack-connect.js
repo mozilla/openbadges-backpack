@@ -26,7 +26,7 @@ function fullUrl(pathname) {
 BackpackConnect.prototype = {
   refresh: function() { return refresh.bind(this); },
   allowAccess: function() { return allowAccess.bind(this); },
-  authorize: function() { return authorize.bind(this); }
+  authorize: function(perm) { return authorize.bind(this, perm); }
 };
 
 function refresh(req, res) {
@@ -105,20 +105,21 @@ function allowAccess(req, res) {
   });
 }
 
-function authorize(req, res, next) {
+function authorize(permission, req, res, next) {
   var User = this.UserModel;
   var auth = (req.headers['authorization'] || '').match(/^Bearer (.+)$/);
   var bearerRealmStr = 'Bearer realm="' + this.realm + '"';
-  var invalidTokenError = function(desc) {
+  var tokenError = function(type, desc) {
     // For more information on this, see:
     // http://tools.ietf.org/html/rfc6750#section-3.1
     res.header('WWW-Authenticate', [
       bearerRealmStr,
-      'error="invalid_token"',
+      'error="' + type + '"',
       'error_description="' + desc + '"'
     ].join(', '));
-    return res.send(401);
+    return res.send(type + ": " + desc, 401);
   };
+  var invalidTokenError = tokenError.bind(null, "invalid_token");
 
   if (!auth) {
     res.header('WWW-Authenticate', bearerRealmStr);
@@ -136,6 +137,9 @@ function authorize(req, res, next) {
     if (results.length) {
       if (results[0].isExpired())
         return invalidTokenError("The access token expired");
+      if (permission && !results[0].hasPermission(permission))
+        return tokenError("insufficient_scope",
+                          "Scope '" + permission + "' is required");
       req.backpackConnect = results[0];
       User.find({id: results[0].get('user_id')}, function(err, results) {
         if (err || !results.length) {

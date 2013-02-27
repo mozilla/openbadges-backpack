@@ -8,7 +8,7 @@ const BPCSession = require('../models/backpack-connect').SessionFactory({
   now: function() { return nowSecs * 1000; },
   tokenLifetime: 1000,
   uid: function() { return "SOME_UID_" + (++uid); },
-  validPermissions: ["foo_perm"]
+  validPermissions: ["foo_perm", "bar_perm"]
 });
 const User = require('../models/user');
 const BackpackConnect = require('../controllers/backpack-connect');
@@ -222,6 +222,37 @@ testUtils.prepareDatabase({
       }
     }, function(err, mock) {
       t.equal(mock.fntype, 'next');
+      t.end();
+    });
+  });
+
+  test('authorize(permission) works when perms sufficient', function(t) {
+    conmock({
+      handler: bpc.authorize("foo_perm"),
+      request: {
+        headers: {
+          'authorization': 'Bearer ' + b64enc("SOME_UID_1")
+        }
+      }
+    }, function(err, mock) {
+      t.equal(mock.fntype, 'next');
+      t.end();
+    });
+  });
+
+  test('authorize(permission) fails when perms insufficient', function(t) {
+    conmock({
+      handler: bpc.authorize("bar_perm"),
+      request: {
+        headers: {
+          'authorization': 'Bearer ' + b64enc("SOME_UID_1")
+        }
+      }
+    }, function(err, mock) {
+      t.equal(mock.status, 401);
+      t.equal(mock.header('WWW-Authenticate'),
+              'Bearer realm="test", error="insufficient_scope", ' +
+              'error_description="Scope \'bar_perm\' is required"');
       t.end();
     });
   });
