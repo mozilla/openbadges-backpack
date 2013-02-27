@@ -79,7 +79,7 @@ function formatResponse(data, req, res) {
  * @return A fully qualified URL.
  */
 
-function fullUrl(pathname) {
+exports.fullUrl = function fullUrl(pathname) {
   return require('url').format({
     protocol: conf.get('protocol'),
     hostname: conf.get('hostname'),
