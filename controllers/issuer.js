@@ -204,6 +204,12 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
       return res.json({ message: "badge assertion appears to be invalid" }, 400);
     }
 
+    if (req.backpackConnect &&
+        req.backpackConnect.get('origin') != assertion.badge.issuer.origin)
+      return res.json({
+        message: "issuer origin must be identical to bearer token origin"
+      }, 400);
+      
     // grabbing the remote badge image
     var imageUrl = qualifyUrl(assertion.badge.image, assertion.badge.issuer.origin);
     remote.badgeImage(imageUrl, function (err, imagedata) {

@@ -2,8 +2,17 @@ const appUtils = require('./app-utils');
 const issuerUtils = require('./issuer-utils');
 const b64enc = function(s) { return new Buffer(s).toString('base64'); };
 
+function setupDifferentIssuer(issuer, path, origin) {
+  var badge = JSON.parse(JSON.stringify(issuer.BADGES['/example']));
+
+  badge.badge.issuer.origin = origin;
+  issuer.app.get(path, function(req, res) { return res.send(badge); });
+}
+
 appUtils.prepareApp(function(a) {
   issuerUtils.createIssuer(a, function(issuer) {
+    setupDifferentIssuer(issuer, '/different', 'http://different.org');
+
     a.login();
 
     // Ensure a request w/o a CSRF fails.
@@ -74,6 +83,22 @@ appUtils.prepareApp(function(a) {
       body: {
         'exists': false,
         'badge': issuer.BADGES['/example']
+      }
+    });
+
+    // Ensure attempting to issue a badge w/ a different issuer fails.
+
+    a.verifyRequest('POST', '/api/issue', {
+      headers: {
+        'authorization': 'Bearer ' + b64enc('1234')
+      },
+      form: {
+        'badge': issuer.resolve('/different')
+      }
+    }, {
+      statusCode: 400,
+      body: {
+        'message': 'issuer origin must be identical to bearer token origin'
       }
     });
 
