@@ -128,7 +128,7 @@ exports.stats = function stats(request, response, next) {
   });
 }
 
-function badgePage (request, response, badges, recent) {
+function badgePage (request, response, badges, template) {
   var user = request.user;
   var error = request.flash('error');
   var success = request.flash('success');
@@ -147,13 +147,11 @@ function badgePage (request, response, badges, recent) {
     badge.serializedAttributes = JSON.stringify(badge.attributes);
   });
 
-  response.render('badges.html', {
+  response.render(template||'badges.html', {
     error: error,
     success: success,
     badges: badges,
-    csrfToken: request.session._csrf,
-    tooltips: typeof request.param('tooltips') !== 'undefined',
-    recent: !!recent
+    csrfToken: request.session._csrf
   });
 }
 
@@ -165,7 +163,7 @@ exports.recentBadges = function recent (request, response, next) {
   function startResponse () {
     return user.getLatestBadges(function(err, badges) {
       if (err) return next(err);
-      return badgePage(request, response, badges, true);
+      return badgePage(request, response, badges, 'recentBadges.html');
     });
   }
 
@@ -180,7 +178,7 @@ exports.allBadges = function everything (request, response, next) {
   function startResponse () {
     return user.getAllBadges(function(err, badges) {
       if (err) return next(err);
-      return badgePage(request, response, badges);
+      return badgePage(request, response, badges, 'allBadges.html');
     });
   }
 
