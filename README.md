@@ -161,7 +161,7 @@ migration. You can do this as follows:
 
 5. Try rolling back your migration using `./bin/db-migrate down`.
 
-Finally, note that during development, `make start` automatically runs
+And finally, note that during development, `make start` automatically runs
 `./bin/db-migrate up` for you. For production use, you'll need to manually
 run this command yourself whenever you deploy changes that involve a
 schema change.
