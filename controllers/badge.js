@@ -1,5 +1,6 @@
 var Badge = require('../models/badge');
 var logger = require('../lib/logging').logger;
+var utils = require('../lib/utils');
 
 function respond(status, message) {
   return { status: status, message: message };
@@ -47,7 +48,19 @@ exports.share = function share(req, res, next) {
 };
 
 exports.show = function show(req, res, next) {
-  res.render('badge-shared.html', {badge: req.badge});
+  res.render('badge-shared.html', {
+    badge: req.badge,
+    og: [
+      { property: 'type', content: 'open-badges:badge' },
+      { property: 'title', content: req.badge.attributes.body.badge.issuer.name },
+      { property: 'url', content: utils.fullUrl(req.url) },
+      { property: 'image', content: utils.fullUrl(req.badge.attributes.image_path) },
+      { property: 'description', content: req.badge.attributes.body.badge.description },
+      ],
+    fb: [
+      { property: 'app_id', content: '268806889891263' }
+      ]
+  });
 };
 
 /**

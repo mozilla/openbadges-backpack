@@ -14,6 +14,7 @@
     "formidable": "~1.0.9",
     "functools": "~1.2.0",
     "jshint": "~0.6.2",
+    "less-middleware": "*",
     "metapng": "git+https://github.com/brianloveswords/metapng.js.git",
     "mime": "~1.2.5",
     "mysql": "~0.9.5",

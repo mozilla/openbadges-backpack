@@ -64,7 +64,20 @@ var template = function template(name, data) {
 // Model Definitions
 // ----------------------
 Badge.Model = Backbone.Model.extend({
-  urlRoot: '/badge'
+  urlRoot: '/badge',
+  isExpired: function() {
+    // parse a date in yyyy-mm-dd format
+    // taken from http://stackoverflow.com/a/2587398
+    var parseDate = function parseDate(input) {
+      var parts = input.match(/(\d+)/g);
+      // new Date(year, month [, date [, hours[, minutes[, seconds[, ms]]]]])
+      return new Date(parts[0], parts[1]-1, parts[2]); // months are 0-based
+    }
+    
+    var expiry = parseDate(this.attributes.body.expires).getTime();
+    
+    return Date.now() - expiry > 0;
+  }
 });
 
 Group.Model = Backbone.Model.extend({
@@ -577,5 +590,6 @@ var existingGroups = $('#groups').find('.group');
 _.each(existingBadges, Badge.fromElement);
 _.each(existingGroups, Group.fromElement);
 
+window.Badge = Badge;
 //end app scope
 }();

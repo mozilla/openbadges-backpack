@@ -4,6 +4,7 @@ var Badge = require('../models/badge.js');
 var User = require('../models/user.js');
 var conf = require('../lib/configuration');
 var logger = require('../lib/logging').logger;
+var utils = require('../lib/utils');
 
 // Helpers
 // -------
@@ -70,22 +71,6 @@ function formatResponse(data, req, res) {
   responseBody = formatter(data, req);
   res.type(format);
   return res.send(status, responseBody);
-}
-
-/**
- * Fully qualify a relative URL using entries from the configuration
- *
- * @param {String} pathname
- * @return A fully qualified URL.
- */
-
-function fullUrl(pathname) {
-  return require('url').format({
-    protocol: conf.get('protocol'),
-    hostname: conf.get('hostname'),
-    port: conf.get('port'),
-    pathname: pathname
-  });
 }
 
 // Parameter Handlers
@@ -241,7 +226,7 @@ exports.userGroupBadges = function userGroupBadges(req, res, next) {
         assertionType: badge.get('type'),
         hostedUrl: badge.get('endpoint'),
         assertion: badge.get('body'),
-        imageUrl: fullUrl(badge.get('image_path'))
+        imageUrl: utils.fullUrl(badge.get('image_path'))
       };
     });
     return formatResponse({

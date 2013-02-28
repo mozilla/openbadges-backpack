@@ -33,7 +33,7 @@
       <li>
         <h3>{{badge.attributes.body.badge.name}}</h3>
 
-        <p class='story'>{{badge.attributes.body._userStory}}</p>
+        <p class='story'>{{badge.attributes._userStory}}</p>
 
         {% include 'badge-data.html' %}
       </li>
@@ -49,7 +49,7 @@
 
 {% endblock %}
 {% block scripts %}
-<script type="text/javascript" src="/js/bootstrap-2.0.2.min.js"></script>
+<script type="text/javascript" src="/vendor/bootstrap/js/bootstrap-alert.js"></script>
 <script type="text/javascript" src="/js/social-media.js"></script>
 
 <script>

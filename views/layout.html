@@ -1,21 +1,16 @@
 <!DOCTYPE html>
-<html>
+<html{{ htmlPrefix|default('') }}>
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge;chrome=1" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    {% if opengraph %}
-      <meta property="og:{{property}}" content="{{content}}" />
-    {% endif %}
     <link rel="icon" href="/favicon.ico">
-    <link rel="stylesheet" href="/css/socialshare.min.css" type="text/css" media="all" />
-    <link rel="stylesheet" href="/css/bootstrap-2.0.2.min.css" />
     <link href="//www.mozilla.org/tabzilla/media/css/tabzilla.css" rel="stylesheet" />
-    <link rel="stylesheet" href="/css/style.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="/css/backpack.min.css" type="text/css" media="all" />
     <title dir="ltr">Open Badge Backpack</title>
     <script type="text/javascript" src="/js/modernizr.js"></script>
     <script type="text/javascript" src="https://login.persona.org/include.js"></script>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
     <script type="text/javascript">
       var _gaq = _gaq || [];
       _gaq.push(['_setAccount', 'UA-35433268-10']);
@@ -27,33 +22,33 @@
         var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
       })();
     </script>
+    {% block head %}{% endblock %}
   </head>
-  <body>
+  <body {% if bodyClass %}class="{{bodyClass}}"{% endif %}>
+    <div id="fb-root"></div>
+    {% if settings.env == 'development' %}
+      <img src="/images/testribbon.png" class="test-ribbon" title="{{ settings.sha|d('') }}">
+    {% endif %}
     <div class="navbar">
       <div class="navbar-inner">
         <div class="container" style="position: relative;">
-          <h3><a class="brand" href="/">
-            Open Badge Backpack
-            {% if settings.env == 'development' %}
-              <small class="env" title="{{ settings.sha|d('') }}">{{ settings.env }}</small>
-            {% endif %}
-          </a></h3>
+          <a class="brand" href="/">
+            <img class="logo" src="/images/logo.png" alt="Mozilla Open Badge Backpack logo" />
+          </a>
           <a href="http://www.mozilla.org/" id="tabzilla">a mozilla.org joint</a>
           <ul class="nav">
-            <li><a href="/">Home</a></li>
             {% if user %}
               <li><a href="/backpack/settings">Settings</a></li>
             {% endif %}
-            <li><a href="/{% if not tooltips %}?tooltips{% endif %}">
-              Help: {% if tooltips %}Off{% else %}On{% endif %}
-            </a></li>
           </ul>
+          <ul class="nav pull-right">
           {% if user %}
-            <ul class="nav pull-right">
-              <li class="user">{{user.attributes.email}}</li>
-              <li><a href="/backpack/signout">Sign Out</a></li>
-            </ul>
+            <li class="user">{{user.attributes.email}}</li>
+            <li><a href="/backpack/signout">Sign Out</a></li>
+          {% elif bodyClass == 'login' %}
+            <li><a class="js-browserid-link" href="#">Sign In</a></li>
           {% endif %}
+          </ul>
         </div>
       </div>
     </div>
@@ -79,14 +74,14 @@
     </div>
 
     <div id="footer" class="container">
-      <aside>
+      <aside><small>
         <h2>Legal</h2>
         <ul>
-          <li><a href="/tou.html">Terms of Use</a></li>
-          <li><a href="/privacy.html">Privacy Policy</a></li>
-          <li><a href="/vpat.html">Accessibility</a></li>
+          <li><a href="/tou.html" class="muted">Terms of Use</a></li>
+          <li><a href="/privacy.html" class="muted">Privacy Policy</a></li>
+          <li><a href="/vpat.html" class="muted">Accessibility</a></li>
         </ul>
-      </aside>
+      </small></aside>
     </div>
 
     <script src="//www.mozilla.org/tabzilla/media/js/tabzilla.js"></script>

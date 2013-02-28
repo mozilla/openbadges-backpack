@@ -1,4 +1,13 @@
 {% extends 'layout.html' %}
+{% set htmlPrefix = ' prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# open-badges: http://ogp.me/ns/fb/open-badges#"' %}
+{% block head %}
+{% for facebook in fb -%}
+  <meta property="fb:{{facebook.property}}" content="{{facebook.content}}" />
+{% endfor -%}
+{% for opengraph in og -%}
+  <meta property="og:{{opengraph.property}}" content="{{opengraph.content}}" />
+{% endfor -%}
+{% endblock %}
 {% block body %}
 {% include 'badge-data.html' %}
 {% endblock %}

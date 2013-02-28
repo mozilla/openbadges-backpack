@@ -51,7 +51,7 @@ expect in case of error.
 
 ## I want to play with the code, where do I start?
 
-### The easy way
+### The easy way[*](#a-warning)
 
 [Use Vagrant](http://vagrantup.com/v1/docs/getting-started/index.html). `vagrant up` in the project root will spin
 up a fully provisioned VM (it'll take about two or three minutes, longer if
@@ -93,6 +93,9 @@ and then back in windows you can fire up your favourite browser and connect to t
 
     http://localhost:8888
 
+#### A Warning
+:warning: Some developers have been having trouble with vagrant, and don't use it any more. Vagrant support may be out of date.
+
 ### The hard way
 
 1. Setup a MySQL database. Create a database and a user with full privileges on
@@ -118,9 +121,11 @@ and then back in windows you can fire up your favourite browser and connect to t
 
 3. Install local dependencies: `npm install`
 
-4. Run the test suite: `npm test`
+4. Install submodules: `npm submodule update --init`
 
-5. Start your server: `make start`
+5. Run the test suite: `npm test`
+
+6. Start your server: `make start`
 
 No matter which way you choose, you should join the
 [Open Badges Google Group](https://groups.google.com/forum/#!forum/openbadges). If
@@ -156,7 +161,7 @@ migration. You can do this as follows:
 
 5. Try rolling back your migration using `./bin/db-migrate down`.
 
-Finally, note that during development, `make start` automatically runs
+And finally, note that during development, `make start` automatically runs
 `./bin/db-migrate up` for you. For production use, you'll need to manually
 run this command yourself whenever you deploy changes that involve a
 schema change.
