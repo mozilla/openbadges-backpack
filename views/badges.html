@@ -2,21 +2,6 @@
 
 {% block body %}
 
-{% if tooltips %}
-<div class="alert alert-block alert-info">
-  <h4 class="alert-heading">Welcome to your Badge Backpack!</h4>
-  <p>
-    You collect badges here from various issuers and learning experiences. In fact, you can see the badge(s) you just earned here.
-  </p>
-  <p>
-    We've turned on some helpful tooltips to help you get oriented. Mouse over the different parts of your backpack to learn what they do, paying special attention anywhere you see the <i class="icon-info-sign"></i> icon.
-  </p>
-  <p>
-    When you feel comfortable you can click the <a href="/">Help: Off</a> link here or above to toggle these messages off.
-  </p>
-</div>
-{% endif %}
-
 {% if not badges.length %}
   <h1>No badges.  Better get out there and start earning some!</h1>
   <p>By the way, <a href="http://p2pu.org">P2PU</a> would be a great place to start
@@ -65,21 +50,5 @@
 <!-- my libraries -->
 <script type="text/javascript" src="/js/jquery.sync.js"></script>
 <script type="text/javascript" src="/js/backpack.js"></script>
-
-{% if tooltips %}
-<!-- initialize twitter bootstrap components -->
-<script>
-  $(function(){
-    $('[rel="popover"]').popover({
-      animation: false,
-      placement: 'right',
-      trigger: 'hover'
-    });
-    $('[rel="tooltip"]').tooltip({
-      animation: false
-    });
-  });
-</script>
-{% endif %}
 
 {% endblock %}
