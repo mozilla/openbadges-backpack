@@ -89,9 +89,13 @@ testUtils.prepareDatabase({
   });
   
   test('token lengths are valid', function(t) {
-    t.equal(session.get('access_token').length, session.tokenLength,
+    function len(token) {
+      return new Buffer(token.split('_')[0], 'base64').length;
+    }
+    
+    t.equal(len(session.get('access_token')), session.tokenLength,
             "access_token is expected length");
-    t.equal(session.get('refresh_token').length, session.tokenLength,
+    t.equal(len(session.get('refresh_token')), session.tokenLength,
             "refresh_token is expected length");
     t.end();
   });

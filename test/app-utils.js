@@ -129,12 +129,16 @@ function replaceModuleFunctionsForTesting(port) {
   };
   var originalVerify = browserid.verify;
   var originalUid = middleware.utils.uid;
+  var originalCreateSecureToken = middleware.utils.createSecureToken;
   var originalConfGet = conf.get;
   
   conf.get = function fakeGet(val, env) {
     if (val in testConf)
       return testConf[val];
     return originalConfGet.apply(conf, arguments);
+  };
+  middleware.utils.createSecureToken = function fakeCreateSecureToken() {
+    return FAKE_UID;
   };
   middleware.utils.uid = function fakeUid() { return FAKE_UID; };
   browserid.verify = function fakeVerify(uri, assertion, audience, cb) {
@@ -151,5 +155,6 @@ function replaceModuleFunctionsForTesting(port) {
     conf.get = originalConfGet;
     browserid.verify = originalVerify;
     middleware.utils.uid = originalUid;
+    middleware.utils.createSecureToken = originalCreateSecureToken;
   };
 }

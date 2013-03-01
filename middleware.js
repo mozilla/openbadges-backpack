@@ -167,6 +167,11 @@ utils.forbidden = function (res) {
   res.end(body);
 };
 
+utils.createSecureToken = function(numBaseBytes) {
+  return crypto.randomBytes(numBaseBytes).toString('base64') + '_' +
+         Math.floor(Date.now() / 1000);
+};
+
 utils.uid = function (len) {
   var buf = [];
   var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';

@@ -19,7 +19,7 @@ function SessionFactory(options) {
   var uid = options.uid || function(length) {
     // Ultra-late binding here ensures that any last-minute
     // test fakes/stubs/mocks will be invoked.
-    return require('../middleware').utils.uid(length);
+    return require('../middleware').utils.createSecureToken(length);
   };
   var now = options.now || Date.now.bind(Date);
   var nowSecs = function() { return Math.floor(now() / 1000); };
