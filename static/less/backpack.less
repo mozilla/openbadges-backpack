@@ -113,6 +113,66 @@ form.baker #assertion {
   outline: none;
 }
 
+.badge-nav {
+  text-align: center;
+  font-size: 1.25em;
+  margin-bottom: 2em;
+  color: @grayLight;
+
+  a {
+    color: inherit;
+    display: inline-block;
+    margin: 0 1em;
+
+    &.selected {
+      color: @textColor;
+    }
+  }
+}
+
+.badge-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    margin-bottom: 20px;
+  }
+
+  .openbadge {
+    display: block;
+    background: #FFF;
+    border: solid 1px #8D8D8D;
+    text-align: center;
+    padding: 20px;
+    box-shadow: 1px 1px 2px #999;
+
+    img {
+      display: block;
+      margin: 0 auto 20px;
+    }
+
+    .title {
+      margin: 0;
+    }
+
+    .issuer {
+      margin: 10px -20px -20px;
+      background: #FAB142;
+      font-size: 0.8em;
+    }
+  }
+
+  .add-badge {
+    display: block;
+    text-align: center;
+    padding: 20px;
+    border: dashed 1px #8F8F8F;
+    min-height: 134px;
+    line-height: 134px;
+  }
+}
+
 .group input.groupName {
   -webkit-transition: all 0.4s ease;
   -moz-transition: all 0.4s ease;
