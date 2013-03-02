@@ -1,15 +1,60 @@
 @import "backpack";
 
+@navbarHeight: 80px;
+
 body {
-  padding-top: 60px;
+  padding-top: @navbarHeight;
+  background-position: 0 @navbarHeight;
   max-width: 660px;
   margin: 0 auto;
 }
 
-#welcome .badge-count,
-#welcome .host,
-#welcome .email {
-  font-weight: bold;
+.narrow {
+  width: 66%;
+  margin: 60px auto;
+}
+
+button,
+.btn {
+  display: block;
+}
+
+#body {
+  p, a,
+  button, .btn,
+  h1, h2, h3 {
+    margin: 30px 0;
+  }
+
+  a.close {
+    margin: 0;
+  }
+}
+
+#badge-ask {
+  .header {
+    h2,
+    button {
+      float: left;
+    }
+
+    button {
+      margin-top: 38px;
+      margin-left: 30px;
+    }
+  }
+
+  dl {
+    margin-top: 40px;
+  }
+  dt {
+    float: left;
+    clear: left;
+    min-width: 100px;
+  }
+  dd {
+    float: left;
+  }
 }
 
 .logged-in, .logged-out {
@@ -18,33 +63,31 @@ body {
 
 .navbar {
   border-top: none;
-}
 
-.navbar .brand {
-  position: relative;
-  top: -3px;
-}
+  .brand {
+    position: relative;
+    top: -3px;
+  }
 
-.navbar #moztab {
-  right: 40px;
-}
+  .closeFrame {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    font-size: 20px;
+    color: #333;
+    opacity: 0.6;
+    text-shadow: none;
+    margin-top: 0;
 
-.navbar .closeFrame {
-  position: absolute;
-  top: 0px;
-  right: 10px;
-  font-size: 20px;
-  color: #333;
-  opacity: 0.6;
-  text-shadow: none;
-}
-.navbar .closeFrame:hover {
-  opacity: 0.8;
-  text-decoration: none;
-}
+    &:hover {
+      opacity: 0.8;
+      text-decoration: none;
+    }
+  }
 
-.navbar-inner {
-  height: 32px;
+  .navbar-inner {
+    height: @navbarHeight;
+  }
 }
 
 #ajax-loader {
@@ -53,6 +96,7 @@ body {
 }
 
 .badge-image {
-  max-width: 100%;
-  padding-top: 15px;
+  max-width: 233px;
+  max-height: 233px;
+  margin: 0 auto;
 }

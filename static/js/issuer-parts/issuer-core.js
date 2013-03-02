@@ -90,7 +90,7 @@ var OpenBadges = (function() {
         right: 0,
         bottom: 0,
         zIndex: 99999,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)'
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
       }).appendTo(document.body);
       var iframe = document.createElement("iframe");
       // add Date.now() to aggressively cache-bust.
@@ -100,7 +100,8 @@ var OpenBadges = (function() {
       var baseStyles = {
         border: "none",
         position: "absolute",
-        left: "50%"
+        left: "50%",
+        'border-radius': '10px'
       };
       $(iframe).css($.extend(baseStyles, layout.bestSize()));
       $(window).resize(function(){layout.resize(iframe);});
