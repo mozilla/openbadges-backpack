@@ -13,6 +13,17 @@ appUtils.prepareApp(function(a) {
   issuerUtils.createIssuer(a, function(issuer) {
     setupDifferentIssuer(issuer, '/different', 'http://different.org');
 
+    // Ensure CORS OPTIONS requests work.
+
+    a.verifyRequest('OPTIONS', '/api/foo', {
+      statusCode: 200,
+      responseHeaders: {
+        'access-control-allow-origin': '*',
+        'access-control-allow-headers': 'Content-Type, Authorization',
+        'access-control-expose-headers': 'WWW-Authenticate'
+      }
+    });
+
     a.login();
 
     // Ensure a request w/o a CSRF fails.
@@ -86,6 +97,34 @@ appUtils.prepareApp(function(a) {
       }
     });
 
+    // Ensure attempting to issue a badge from a bad CORS origin fails.
+
+    a.verifyRequest('POST', '/api/issue', {
+      headers: {
+        'authorization': 'Bearer ' + b64enc('1234'),
+        'origin': 'http://blah.org'
+      }
+    }, {
+      statusCode: 401,
+      responseHeaders: {'access-control-allow-origin': issuer.BASE_URL},
+      body: 'invalid origin'
+    });
+
+    // Ensure attempting to issue a badge from a good CORS origin succeeds.
+
+    a.verifyRequest('POST', '/api/issue', {
+      headers: {
+        'authorization': 'Bearer ' + b64enc('1234'),
+        'origin': issuer.BASE_URL
+      },
+      form: {
+        'badge': issuer.resolve('/example')
+      }
+    }, {
+      statusCode: 304,
+      responseHeaders: {'access-control-allow-origin': issuer.BASE_URL}
+    });
+
     // Ensure attempting to issue a badge w/ a different issuer fails.
 
     a.verifyRequest('POST', '/api/issue', {
@@ -128,6 +167,33 @@ appUtils.prepareApp(function(a) {
         access_token: '1234',
         refresh_token: '1234'
       }
+    });
+
+    // Ensure refreshing the token from a bad origin over CORS fails
+    
+    a.verifyRequest('POST', '/api/token', {
+      headers: {'origin': 'http://blarg.org'},
+      form: {
+        'grant_type': 'refresh_token',
+        'refresh_token': '1234'
+      }
+    }, {
+      statusCode: 401,
+      responseHeaders: {'access-control-allow-origin': issuer.BASE_URL},
+      body: 'invalid origin'
+    });
+
+    // Ensure refreshing the token from a good origin over CORS fails
+    
+    a.verifyRequest('POST', '/api/token', {
+      headers: {'origin': issuer.BASE_URL},
+      form: {
+        'grant_type': 'refresh_token',
+        'refresh_token': '1234'
+      }
+    }, {
+      statusCode: 200,
+      responseHeaders: {'access-control-allow-origin': issuer.BASE_URL}
     });
 
     issuer.end();

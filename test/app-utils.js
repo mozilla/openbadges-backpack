@@ -79,10 +79,10 @@ exports.prepareApp = function prepareApp(cb) {
 
 function ensureRequest(request, method, url, options, assertions) {
   var name = method + ' ' + url;
-  var fn = request[method.toLowerCase()];
   
+  options.method = method;
   return function(t) {
-    fn.call(request, url, options, function(err, res, body) {
+    request(url, options, function(err, res, body) {
       if (err) throw err;
       if (assertions.statusCode)
         t.same(res.statusCode, assertions.statusCode,

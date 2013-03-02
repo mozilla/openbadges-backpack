@@ -27,6 +27,7 @@ BackpackConnect.prototype = {
   refresh: function() { return refresh.bind(this); },
   requestAccess: function() { return requestAccess.bind(this); },
   allowAccess: function() { return allowAccess.bind(this); },
+  allowCors: function() { return allowCors.bind(this); },
   authorize: function(perm) { return authorize.bind(this, perm); }
 };
 
@@ -46,6 +47,12 @@ function refresh(req, res) {
       return res.send(500);
     }
     if (session) {
+      if (req.headers['origin']) {
+        res.set('access-control-allow-origin', session.get('origin'));
+        if (session.get('origin') != req.headers['origin'])
+          return res.send("invalid origin", 401);
+      }
+
       session.refresh();
       session.save(function(err) {
         if (err) {
@@ -131,6 +138,15 @@ function allowAccess(req, res) {
   });
 }
 
+function allowCors(req, res, next) {
+  res.set('access-control-allow-origin', '*');
+  res.set('access-control-allow-headers', 'Content-Type, Authorization');
+  res.set('access-control-expose-headers', 'WWW-Authenticate');
+  if (req.method == 'OPTIONS')
+    return res.send(200);
+  next();
+}
+
 function authorize(permission, req, res, next) {
   var User = this.UserModel;
   var auth = (req.headers['authorization'] || '').match(/^Bearer (.+)$/);
@@ -167,6 +183,11 @@ function authorize(permission, req, res, next) {
         return tokenError("insufficient_scope",
                           "Scope '" + permission + "' is required");
       req.backpackConnect = results[0];
+      if (req.headers['origin']) {
+        res.set('access-control-allow-origin', results[0].get('origin'));
+        if (results[0].get('origin') != req.headers['origin'])
+          return res.send("invalid origin", 401);
+      }
       User.find({id: results[0].get('user_id')}, function(err, results) {
         if (err || !results.length) {
           logger.warn('There was an error retrieving a user');

@@ -162,6 +162,8 @@ app.get('/share/:groupUrl', share.show);
 
 app.get('/access', backpackConnect.requestAccess());
 app.post('/accept', backpackConnect.allowAccess());
+
+app.all('/api/*', backpackConnect.allowCors());
 app.post('/api/token', backpackConnect.refresh());
 app.post('/api/issue', backpackConnect.authorize("issue"),
                        issuer.issuerBadgeAddFromAssertion);
