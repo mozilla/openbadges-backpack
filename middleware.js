@@ -158,6 +158,12 @@ exports.notFound = function notFound() {
 }
 
 var utils = exports.utils = {};
+var pseudoRandomBytes = function(num) {
+  var a = [];
+  for (var i = 0; i < num; i++)
+    a.push(getRandomInt(0, 255));
+  return new Buffer(a);
+};
 
 utils.forbidden = function (res) {
   var body = 'Forbidden';
@@ -168,8 +174,16 @@ utils.forbidden = function (res) {
 };
 
 utils.createSecureToken = function(numBaseBytes) {
-  return crypto.randomBytes(numBaseBytes).toString('base64') + '_' +
-         Math.floor(Date.now() / 1000);
+  var randomBytes;
+
+  try {
+    randomBytes = crypto.randomBytes(numBaseBytes);
+  } catch (e) {
+    logger.warn('crypto.randomBytes() failed with ' + e);
+    logger.warn('falling back to pseudo-random bytes.');
+    randomBytes = pseudoRandomBytes(numBaseBytes);
+  }
+  return randomBytes.toString('base64') + '_' + Math.floor(Date.now() / 1000);
 };
 
 utils.uid = function (len) {

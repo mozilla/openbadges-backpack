@@ -6,16 +6,37 @@ const conmock = require('./conmock');
 const ALLOW_CORS = 'Access-Control-Allow-Origin';
 
 test('middleware#utils.createSecureToken', function(t) {
-  var token = middleware.utils.createSecureToken(6);
-  var parts = token.split('_');
-  var base64data = parts[0];
-  var timestamp = parseInt(parts[1]);
-  var now = Math.floor(Date.now() / 1000);
-  var twoMinutesAgo = now - 60*2;
-  t.equal(base64data.length, 8,
-          "first part of token is 8 characters (6 bytes of base64 data)");
-  t.ok(now >= timestamp && timestamp > twoMinutesAgo,
-       "second part is timestamp (in secs) from within past two minutes");
+  function runTest(t) {
+    var token = middleware.utils.createSecureToken(6);
+    var parts = token.split('_');
+    var base64data = parts[0];
+    var timestamp = parseInt(parts[1]);
+    var now = Math.floor(Date.now() / 1000);
+    var twoMinutesAgo = now - 60*2;
+    t.equal(base64data.length, 8,
+            "first part of token is 8 characters (6 bytes of base64 data)");
+    t.ok(now >= timestamp && timestamp > twoMinutesAgo,
+         "second part is timestamp (in secs) from within past two minutes");
+  }
+
+  t.test("works in normal case", function(t) {
+    runTest(t);
+    t.end();
+  });
+  t.test("works when crypto.randomBytes() fails", function(t) {
+    var crypto = require("crypto");
+    var origRandomBytes = crypto.randomBytes;
+    var thrown = false;
+    crypto.randomBytes = function() {
+      thrown = true;
+      throw new Error("NO ENTROPY BRO");
+    };
+    try {
+      runTest(t);
+    } finally { crypto.randomBytes = origRandomBytes; }
+    t.ok(thrown);
+    t.end();
+  });
   t.end();
 });
 
