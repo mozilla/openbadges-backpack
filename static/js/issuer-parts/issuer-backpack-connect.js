@@ -13,7 +13,7 @@ OpenBadges.connect = (function() {
     if (!$.isArray(options.scope))
       throw new Error("scope must be an array");
     if (typeof(options.callback) != "string")
-      throw new Error("callback must be a string");
+      throw new Error("callback must be a URL");
     
     var location = options.location || window.location;
     var redirect = OpenBadges.getRoot() + ACCESS_ENDPOINT + '?' + $.param({
