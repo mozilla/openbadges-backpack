@@ -149,7 +149,7 @@ function allowCors(req, res, next) {
 
 function authorize(permission, req, res, next) {
   var User = this.UserModel;
-  var auth = (req.headers['authorization'] || '').match(/^Bearer (.+)$/);
+  var auth = /^Bearer (.+)$/.exec(req.headers['authorization']);
   var bearerRealmStr = 'Bearer realm="' + this.realm + '"';
   var tokenError = function(type, desc) {
     // For more information on this, see:
