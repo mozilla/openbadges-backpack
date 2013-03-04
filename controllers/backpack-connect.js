@@ -24,11 +24,33 @@ function fullUrl(pathname) {
 }
 
 BackpackConnect.prototype = {
+  revokeOrigin: function() { return revokeOrigin.bind(this); },
   refresh: function() { return refresh.bind(this); },
   requestAccess: function() { return requestAccess.bind(this); },
   allowAccess: function() { return allowAccess.bind(this); },
   allowCors: function() { return allowCors.bind(this); },
   authorize: function(perm) { return authorize.bind(this, perm); }
+};
+
+function revokeOrigin(req, res, next) {
+  if (!req.user)
+    return res.send(403);
+  if (!req.body)
+    return res.send('body expected', 400);
+  if (!req.body.origin)
+    return res.send('origin URL expected', 400);
+
+  this.Model.revokeOriginForUser({
+    origin: req.body.origin,
+    user_id: req.user.get('id')
+  }, function(err) {
+    if (err) {
+      logger.warn('There was an error revoking an origin for a user');
+      logger.debug(err);
+      return next(err);
+    }
+    return res.send(204);
+  });
 };
 
 function refresh(req, res, next) {

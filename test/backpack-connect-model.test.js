@@ -13,6 +13,9 @@ testUtils.prepareDatabase({
   '1-user': new User({
     email: 'brian@example.com'
   }),
+  '2-user': new User({
+    email: 'bob@example.com'
+  }),
   '2-session': new BPCSession({
     origin: 'http://foo.org/UNNECCESSARY_PATH',
     permissions: ["foo", "bar"],
@@ -22,7 +25,17 @@ testUtils.prepareDatabase({
     origin: 'http://foo.org',
     permissions: ["foo", "baz"],
     user_id: 1
-  })
+  }),
+  '4-session': new BPCSession({
+    origin: 'http://foo2.org',
+    permissions: ["bar"],
+    user_id: 1
+  }),
+  '5-session': new BPCSession({
+    origin: 'http://foo.org',
+    permissions: ["foo"],
+    user_id: 2
+  }),
 }, function (fixtures) {
   var session = fixtures['2-session'];
 
@@ -124,8 +137,26 @@ testUtils.prepareDatabase({
       t.same(results, [{
         origin: "http://foo.org",
         permissions: ["bar", "baz", "foo"]
+      }, {
+        origin: "http://foo2.org",
+        permissions: ["bar"]
       }]);
       t.end();
+    });
+  });
+
+  test('revokeOriginForUser() works', function(t) {
+    BPCSession.revokeOriginForUser({
+      origin: "http://foo.org",
+      user_id: 1
+    }, function(err) {
+      if (err) throw err;
+      BPCSession.find({origin: "http://foo.org"}, function(err, results) {
+        if (err) throw err;
+        t.equal(results.length, 1);
+        t.equal(results[0].get('user_id'), 2);
+        t.end();
+      });
     });
   });
 

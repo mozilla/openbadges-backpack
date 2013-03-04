@@ -33,6 +33,16 @@ function SessionFactory(options) {
 
   Base.apply(Session, 'bpc_session');
 
+  Session.revokeOriginForUser = function(options, cb) {
+    var qstring = 'DELETE FROM `' + this.prototype.getTableName() +
+                  '` WHERE origin = ? AND user_id = ?';
+    var values = [options.origin, options.user_id];
+    this.prototype.client.query(qstring, values, function(err, results) {
+      require('../lib/logging').logger.debug("HI " + results.affectedRows);
+      cb(err);
+    });
+  };
+
   Session.summarizeForUser = function(userId, cb) {
     this.find({user_id: userId}, function(err, results) {
       var originPerms = {};
@@ -44,7 +54,7 @@ function SessionFactory(options) {
         originPerms[origin] = _.union(originPerms[origin],
                                       result.get('permissions'));
       });
-      cb(null, Object.keys(originPerms).map(function(origin) {
+      cb(null, Object.keys(originPerms).sort().map(function(origin) {
         return {
           origin: origin,
           permissions: originPerms[origin].sort()
