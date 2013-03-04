@@ -53,7 +53,7 @@
         </span>
 
           {% for badge in group.attributes.badgeObjects %}
-            <span draggable="true" class="openbadge" data-id="{{badge.attributes.id}}" rel="popinfo" data-title="{{badge.attributes.body.badge.name|escape}}" data-content="<span>{{badge.attributes.body.badge.description|escape}}</span><span>Issuer: {{badge.attributes.body.badge.issuer.name|escape}}</span>">
+            <span draggable="true" class="openbadge" data-id="{{badge.attributes.id}}">
               <img src="{{badge.attributes.image_path}}" width="64px"/>
             </span>
           {% endfor %}
