@@ -11,7 +11,7 @@ test('middleware#utils.createSecureToken', function(t) {
     var parts = token.split('_');
     var base64data = parts[0];
     var timestamp = parseInt(parts[1], 32);
-    var now = Math.floor(Date.now());
+    var now = Date.now();
     var twoMinutesAgo = now - 60*2000;
     t.equal(base64data.length, 8,
             "first part of token is 8 characters (6 bytes of base64 data)");
