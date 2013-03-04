@@ -176,30 +176,29 @@ function authorize(permission, req, res, next) {
       logger.debug(err);
       return next(err);
     }
-    if (results.length) {
-      if (results[0].isExpired())
-        return invalidTokenError("The access token expired");
-      if (permission && !results[0].hasPermission(permission))
-        return tokenError("insufficient_scope",
-                          "Scope '" + permission + "' is required");
-      req.backpackConnect = results[0];
-      if (req.headers['origin']) {
-        res.set('access-control-allow-origin', results[0].get('origin'));
-        if (results[0].get('origin') != req.headers['origin'])
-          return res.send("invalid origin", 401);
-      }
-      User.find({id: results[0].get('user_id')}, function(err, results) {
-        if (err || !results.length) {
-          logger.warn('There was an error retrieving a user');
-          if (!err) err = new Error("user with id not found");
-          logger.debug(err);
-          return next(err);
-        }
-        req.user = results[0];
-        return next();
-      });
-    } else {
+    if (!results.length)
       return invalidTokenError("Unknown access token");
+    const token = results[0];
+    if (token.isExpired())
+      return invalidTokenError("The access token expired");
+    if (permission && !token.hasPermission(permission))
+      return tokenError("insufficient_scope",
+                        "Scope '" + permission + "' is required");
+    req.backpackConnect = token;
+    if (req.headers['origin']) {
+      res.set('access-control-allow-origin', token.get('origin'));
+      if (token.get('origin') != req.headers['origin'])
+        return res.send("invalid origin", 401);
     }
+    User.find({id: token.get('user_id')}, function(err, results) {
+      if (err || !results.length) {
+        logger.warn('There was an error retrieving a user');
+        if (!err) err = new Error("user with id not found");
+        logger.debug(err);
+        return next(err);
+      }
+      req.user = results[0];
+      return next();
+    });
   });
 }
