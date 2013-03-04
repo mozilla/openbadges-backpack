@@ -168,7 +168,7 @@ function authorize(permission, req, res, next) {
     return res.send("access token expected", 401);
   }
   
-  auth = new Buffer(auth[1], 'base64').toString('ascii');
+  auth = new Buffer(auth[1], 'base64');
   
   this.Model.find({access_token: auth}, function(err, results) {
     if (err) {
