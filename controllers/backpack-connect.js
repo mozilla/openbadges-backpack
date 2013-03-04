@@ -31,7 +31,7 @@ BackpackConnect.prototype = {
   authorize: function(perm) { return authorize.bind(this, perm); }
 };
 
-function refresh(req, res) {
+function refresh(req, res, next) {
   if (!req.body)
     return res.send('body expected', 400);
   if (req.body.grant_type != "refresh_token")
@@ -44,7 +44,7 @@ function refresh(req, res) {
     if (err) {
       logger.warn('There was an error looking up a refresh token');
       logger.debug(err);
-      return res.send(500);
+      return next(err);
     }
     if (session) {
       if (req.headers['origin']) {
@@ -58,7 +58,7 @@ function refresh(req, res) {
         if (err) {
           logger.warn('There was an error saving a refreshed token');
           logger.debug(err);
-          return res.send(500);
+          return next(err);
         }
         return res.send({
           expires: session.tokenLifetime,
@@ -97,7 +97,7 @@ function requestAccess(req, res) {
   });
 }
 
-function allowAccess(req, res) {
+function allowAccess(req, res, next) {
   if (!req.user)
     return res.send(403);
   if (!req.body)
@@ -127,7 +127,7 @@ function allowAccess(req, res) {
     if (err) {
       logger.warn('There was an error creating a backpack connect token');
       logger.debug(err);
-      return res.send(500);
+      return next(err);
     }
     return res.redirect(req.body.callback + "?" + querystring.stringify({
       access_token: session.get('access_token'),
@@ -174,7 +174,7 @@ function authorize(permission, req, res, next) {
     if (err) {
       logger.warn('There was an error retrieving an access token');
       logger.debug(err);
-      return res.send(500);
+      return next(err);
     }
     if (results.length) {
       if (results[0].isExpired())
@@ -191,8 +191,9 @@ function authorize(permission, req, res, next) {
       User.find({id: results[0].get('user_id')}, function(err, results) {
         if (err || !results.length) {
           logger.warn('There was an error retrieving a user');
+          if (!err) err = new Error("user with id not found");
           logger.debug(err);
-          return res.send(500);
+          return next(err);
         }
         req.user = results[0];
         return next();

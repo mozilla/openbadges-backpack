@@ -24,6 +24,125 @@ var nowSecs = 0;
 testUtils.prepareDatabase({
   '1-real-user': new User({ email: 'brian@example.org' }),
 }, function (fixtures) {
+  test("Model.find() err on refresh() is handled", function(t) {
+    var bpc = new BackpackConnect({
+      Model: {
+        find: function(info, cb) { return cb(new Error("FIND ERROR")); }
+      }
+    });
+    conmock({
+      handler: bpc.refresh(),
+      request: {body: {grant_type: "refresh_token"}}
+    }, function(err, mock) {
+      t.equal(mock.fntype, "next");
+      t.equal(mock.nextErr.message, "FIND ERROR");
+      t.end();
+    });
+  });
+
+  test("session save err on refresh() is handled", function(t) {
+    var bpc = new BackpackConnect({
+      Model: {
+        find: function(info, cb) {
+          return cb(null, [{
+            refresh: function() {},
+            save: function(cb) { cb(new Error("SAVE ERROR")); }
+          }]);
+        }
+      }
+    });
+    conmock({
+      handler: bpc.refresh(),
+      request: {body: {grant_type: "refresh_token"}}
+    }, function(err, mock) {
+      t.equal(mock.fntype, "next");
+      t.equal(mock.nextErr.message, "SAVE ERROR");
+      t.end();
+    });
+  });
+
+  test("session save err on allowAccess() is handled", function(t) {
+    var FakeModel = function FakeModel() {
+      return {
+        save: function(cb) { return cb(new Error("SAVE ERROR")); }
+      };
+    };
+    var bpc = new BackpackConnect({Model: FakeModel});
+    FakeModel.validators = {origin: function() {}, permissions: function() {}};
+    conmock({
+      handler: bpc.allowAccess(),
+      request: {user: {get: function() {}}, body: {callback: {}, scope: 'lol'}}
+    }, function(err, mock) {
+      t.equal(mock.fntype, "next");
+      t.equal(mock.nextErr.message, "SAVE ERROR");
+      t.end();
+    });
+  });
+
+  test("Model.find() err on authorize() is handled", function(t) {
+    var bpc = new BackpackConnect({
+      Model: {
+        find: function(info, cb) { return cb(new Error("FIND ERROR")); }
+      }
+    });
+    conmock({
+      handler: bpc.authorize(),
+      request: {headers: {authorization: "Bearer LOL"}}
+    }, function(err, mock) {
+      t.equal(mock.fntype, "next");
+      t.equal(mock.nextErr.message, "FIND ERROR");
+      t.end();
+    });
+  });
+
+  test("User.find() err on authorize() is handled", function(t) {
+    var bpc = new BackpackConnect({
+      UserModel: {
+        find: function(info, cb) { cb(new Error("USER FIND ERROR")); }
+      },
+      Model: {
+        find: function(info, cb) {
+          return cb(null, [{
+            isExpired: function() { return false; },
+            get: function() {}
+          }]);
+        }
+      }
+    });
+    conmock({
+      handler: bpc.authorize(),
+      request: {headers: {authorization: "Bearer LOL"}}
+    }, function(err, mock) {
+      t.equal(mock.fntype, "next");
+      t.equal(mock.nextErr.message, "USER FIND ERROR");
+      t.end();
+    });
+  });
+
+  test("User.find() w/ no results is handled", function(t) {
+    var bpc = new BackpackConnect({
+      UserModel: {
+        find: function(info, cb) { cb(null, []); }
+      },
+      Model: {
+        find: function(info, cb) {
+          return cb(null, [{
+            isExpired: function() { return false; },
+            get: function() {}
+          }]);
+        }
+      }
+    });
+    conmock({
+      handler: bpc.authorize(),
+      request: {headers: {authorization: "Bearer LOL"}}
+    }, function(err, mock) {
+      t.equal(mock.fntype, "next");
+      t.equal(mock.nextErr.message, "user with id not found");
+      t.end();
+    });
+  });
+
   test('refresh() fails w/ no body', function(t) {
     conmock({handler: bpc.refresh()}, function(err, mock) {
       t.equal(mock.status, 400);

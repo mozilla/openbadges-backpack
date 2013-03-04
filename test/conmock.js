@@ -80,8 +80,9 @@ module.exports = function conmock (options, callback) {
     },
   };
   mock.request = request;
-  function next () {
+  function next (err) {
     mock.fntype = 'next';
+    mock.nextErr = err;
     callback(null, mock, request);
   }
   return handler(request, mock, next, options.param);
