@@ -1,0 +1,69 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+{% if not badges.length %}
+  {% block noBadges %}
+    <h1>No badges.  Better get out there and start earning some!</h1>
+    <p>By the way, <a href="http://p2pu.org">P2PU</a> would be a great place to start
+  {% endblock %}
+{% else %}
+  {% block badgeNav %}
+    <p class="badge-nav">
+      <span class="hide">Show</span>
+      <a href="/"{% if selectedBadgeTab == 'recent' %} class="selected"{% endif %}>Recent</a>
+      <span class="hide">or</span>
+      <a href="/backpack/badges"{% if selectedBadgeTab == 'all' %} class="selected"{% endif %}>Everything</a>
+    </p>
+  {% endblock %}
+  <div class="row">
+    {% block badgeList %}
+      <ul id="badges" class="js-badges badge-list">
+        {% block badgeItems %}
+          {% for badge in badges %}
+            <li class="span3">
+              <div class="openbadge" data-id="{{badge.attributes.id}}">
+                <img src="{{ badge.attributes.image_path }}" width="64">
+                <p class="title">{{ badge.attributes.body.badge.name }}</p>
+                <p class="issuer">Issuer: {{ badge.attributes.body.badge.issuer.name }}</p>
+              </div>
+            </li>
+          {% endfor %}
+        {% endblock %}
+        {% block afterBadgeItems %}
+          <li class="span3">
+            <a href="/backpack/add" class="add-badge">
+              Upload a badge
+            </a>
+          </li>
+        {% endblock %}
+      </ul>
+    {% endblock %}
+  </div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+
+<!-- bootstrap some data -->
+<script>
+  window.badgeData = {};
+  {% for badge in badges %}
+    window.badgeData[{{badge.attributes.id}}] = {{badge.serializedAttributes}};
+  {% endfor %}
+</script>
+
+<!-- third party -->
+<script type="text/javascript" src="/js/nunjucks-dev.js"></script>
+<script type="text/javascript" src="/js/underscore.js"></script>
+<script type="text/javascript" src="/js/backbone.js"></script>
+<script type="text/javascript" src="/vendor/bootstrap/js/bootstrap-alert.js"></script>
+<script type="text/javascript" src="/vendor/bootstrap/js/bootstrap-tooltip.js"></script>
+<script type="text/javascript" src="/vendor/bootstrap/js/bootstrap-popover.js"></script>
+
+<!-- my libraries -->
+<script type="text/javascript" src="/js/jquery.sync.js"></script>
+<script type="text/javascript" src="/js/backpack.js"></script>
+
+{% endblock %}

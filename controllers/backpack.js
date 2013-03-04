@@ -128,6 +128,63 @@ exports.stats = function stats(request, response, next) {
   });
 }
 
+function badgePage (request, response, badges, template) {
+  var user = request.user;
+  var error = request.flash('error');
+  var success = request.flash('success');
+
+  badges.forEach(function (badge) {
+    var body = badge.get('body');
+    var origin = body.badge.issuer.origin;
+    var criteria = body.badge.criteria;
+    var evidence = body.evidence;
+
+    if (criteria[0] === '/') body.badge.criteria = origin + criteria;
+    if (evidence && evidence[0] === '/') body.evidence = origin + evidence;
+    // Nobody wants to see the hash in the UI, apparently.
+    if (body.recipient.match(/\w+(\d+)?\$.+/)) body.recipient = user.get('email');
+
+    badge.serializedAttributes = JSON.stringify(badge.attributes);
+  });
+
+  response.render(template||'badges.html', {
+    error: error,
+    success: success,
+    badges: badges,
+    csrfToken: request.session._csrf
+  });
+}
+
+exports.recentBadges = function recent (request, response, next) {
+  var user = request.user;
+  if (!user)
+    return response.redirect('/backpack/login', 303);
+
+  function startResponse () {
+    return user.getLatestBadges(function(err, badges) {
+      if (err) return next(err);
+      return badgePage(request, response, badges, 'recentBadges.html');
+    });
+  }
+
+  return startResponse();
+}
+
+exports.allBadges = function everything (request, response, next) {
+  var user = request.user;
+  if (!user)
+    return response.redirect('/backpack/login', 303);
+
+  function startResponse () {
+    return user.getAllBadges(function(err, badges) {
+      if (err) return next(err);
+      return badgePage(request, response, badges, 'allBadges.html');
+    });
+  }
+
+  return startResponse();
+}
+
 
 /**
  * Render the management page for logged in users.
