@@ -46,29 +46,27 @@ function refresh(req, res, next) {
       logger.debug(err);
       return next(err);
     }
-    if (session) {
-      if (req.headers['origin']) {
-        res.set('access-control-allow-origin', session.get('origin'));
-        if (session.get('origin') != req.headers['origin'])
-          return res.send("invalid origin", 401);
-      }
-
-      session.refresh();
-      session.save(function(err) {
-        if (err) {
-          logger.warn('There was an error saving a refreshed token');
-          logger.debug(err);
-          return next(err);
-        }
-        return res.send({
-          expires: session.tokenLifetime,
-          access_token: session.get('access_token'),
-          refresh_token: session.get('refresh_token')
-        });
-      });
-    } else {
+    if (!session)
       return res.send('invalid refresh_token', 400);
+    if (req.headers['origin']) {
+      res.set('access-control-allow-origin', session.get('origin'));
+      if (session.get('origin') != req.headers['origin'])
+        return res.send("invalid origin", 401);
     }
+
+    session.refresh();
+    session.save(function(err) {
+      if (err) {
+        logger.warn('There was an error saving a refreshed token');
+        logger.debug(err);
+        return next(err);
+      }
+      return res.send({
+        expires: session.tokenLifetime,
+        access_token: session.get('access_token'),
+        refresh_token: session.get('refresh_token')
+      });
+    });
   });
 }
 
