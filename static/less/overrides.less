@@ -22,25 +22,29 @@ a:focus {
 // NAVBAR
 // -----------------------------------------------------
 
-.navbar-inner {
-  border-top: 0; /* for tabzilla */
-}
+.navbar {
+  border-bottom: 4px solid #333;
 
-.navbar .container {
-  max-width: 940px;
-}
+  .navbar-inner {
+    border-top: 0; /* for tabzilla */
+  }
 
-.navbar .brand {
-  padding-top: 0;
-  padding-bottom: 0;
-}
+  .container {
+    max-width: 940px;
+  }
 
-.navbar .nav > li > a,
-.navbar .navbar-text {
-  @navIconHeight: 45px;
-  @bottom-padding: 0;
-  padding: (@navbarHeight - @navIconHeight - @bottom-padding) 15px @bottom-padding;
-  line-height: @navIconHeight;
+  .brand {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .nav > li > a,
+  .navbar-text {
+    @navIconHeight: 45px;
+    @bottom-padding: 0;
+    padding: (@navbarHeight - @navIconHeight - @bottom-padding) 15px @bottom-padding;
+    line-height: @navIconHeight;
+  }
 }
 
 // NAV
