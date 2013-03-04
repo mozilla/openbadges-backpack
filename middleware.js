@@ -183,7 +183,8 @@ utils.createSecureToken = function(numBaseBytes) {
     logger.warn('falling back to pseudo-random bytes.');
     randomBytes = pseudoRandomBytes(numBaseBytes);
   }
-  return randomBytes.toString('base64') + '_' + Math.floor(Date.now() / 1000);
+  return randomBytes.toString('base64') + '_' +
+         Math.floor(Date.now()).toString(32);
 };
 
 utils.uid = function (len) {
