@@ -4,7 +4,7 @@ const mysql = require('../lib/mysql');
 const User = require('../models/user');
 const BPC = require('../models/backpack-connect');
 const BPCSession = BPC.SessionFactory({
-  validPermissions: ["foo", "bar"]
+  validPermissions: ["foo", "bar", "baz"]
 });
 
 const FIVE_MINUTES = 1000 * 60 * 5;
@@ -16,6 +16,11 @@ testUtils.prepareDatabase({
   '2-session': new BPCSession({
     origin: 'http://foo.org/UNNECCESSARY_PATH',
     permissions: ["foo", "bar"],
+    user_id: 1
+  }),
+  '3-session': new BPCSession({
+    origin: 'http://foo.org',
+    permissions: ["foo", "baz"],
     user_id: 1
   })
 }, function (fixtures) {
@@ -113,5 +118,16 @@ testUtils.prepareDatabase({
     t.end();
   });
   
+  test('summarizeForUser() works', function(t) {
+    BPCSession.summarizeForUser(1, function(err, results) {
+      if (err) throw err;
+      t.same(results, [{
+        origin: "http://foo.org",
+        permissions: ["bar", "baz", "foo"]
+      }]);
+      t.end();
+    });
+  });
+
   testUtils.finish(test);
 });

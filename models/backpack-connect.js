@@ -1,4 +1,5 @@
 var url = require('url');
+var _ = require('underscore');
 var mysql = require('../lib/mysql');
 var Base = require('./mysql-base');
 
@@ -31,6 +32,26 @@ function SessionFactory(options) {
   };
 
   Base.apply(Session, 'bpc_session');
+
+  Session.summarizeForUser = function(userId, cb) {
+    this.find({user_id: userId}, function(err, results) {
+      var originPerms = {};
+      if (err) return cb(err);
+      results.forEach(function(result) {
+        var origin = result.get('origin');
+        if (!(origin in originPerms))
+          originPerms[origin] = [];
+        originPerms[origin] = _.union(originPerms[origin],
+                                      result.get('permissions'));
+      });
+      cb(null, Object.keys(originPerms).map(function(origin) {
+        return {
+          origin: origin,
+          permissions: originPerms[origin].sort()
+        };
+      }));
+    });
+  };
 
   Session.validators = {
     origin: function(value, attributes) {
