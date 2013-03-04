@@ -84,6 +84,7 @@ var access_token = getParameterByName('access_token');
 var refresh_token = getParameterByName('refresh_token');
 var api_root = getParameterByName('api_root');
 
-document.getElementById("content").classList.toggle("connected", !!api_root);
+if (api_root)
+  document.getElementById("content").classList.add("connected");
 </script>
 <script src="http://localhost:8888/issuer.js"></script>
