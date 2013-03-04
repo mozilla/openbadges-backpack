@@ -44,6 +44,25 @@ a:focus {
     padding: (@navbarHeight - @navIconHeight - @bottom-padding) 15px @bottom-padding;
     line-height: @navIconHeight;
   }
+
+  .nav > .active > a,
+  .nav > .active > a:hover,
+  .nav > .active a:focus {
+    .box-shadow(none);
+
+    @caretHeight: 10px;
+    @caretWidth: 15px;
+    &:after {
+      content: "";
+      display: block;
+      box-sizing: border-box;
+      width: @caretWidth;
+      margin: 0 auto -@caretHeight;
+      border-top: @caretHeight solid white;
+      border-left: @caretWidth/2 dotted transparent;
+      border-right: @caretWidth/2 dotted transparent;
+    }
+  }
 }
 
 // NAV
