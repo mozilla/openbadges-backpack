@@ -11,29 +11,23 @@
     </tr>
     <tr>
       <td>
-	      <strong>{{badge.attributes.body.badge.issuer.name}}</strong>
-	    </td>
-    </tr>
-    <tr>
-      <td>
-      	{{badge.attributes.body.badge.description|escape}}
+        <form action="/backpack/facebook" method="POST" class="facebook-share">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}"></input>
+        <input type="hidden" name="badge_body_hash" value="{{badge.attributes.body_hash}}"></input>
+        <strong>{{badge.attributes.body.badge.issuer.name}}</strong><br />
+        {{badge.attributes.body.badge.description|escape}}
+        <textarea name='facebookcomment' tabindex=1 class='comment' placeholder='Add your personal comment'></textarea>
+        <input type="checkbox" name="facebook_automatic_push" value="facebook_automatic_push">Automatically publish badges to Facebook when they are added to my backpack.</td>
       </td>
     </tr>
     <tr>
       <td>
-        <textarea name='facebook-share-comment' tabindex=1 class='comment' placeholder='Add your personal comment'></textarea>
-      </td>
-    </tr>
-    <tr>
-	    <td><input type="checkbox" name="facebook-automatic-push" value="{{user.facebook_auto_share}}">Automatically publish badges to Facebook when they are added to my backpack.</td>
-	  </tr>
-	  <tr>
-		  <td>
-			  <div class='buttons'>
-          <button class='btn nope'>Cancel</button>
+        <div class='buttons'>
+          <a href="/backpack" class="btn">Cancel</a>
           <button class='btn yep btn-primary'>Share on Facebook</button>
         </div>
-			</td>
-		</tr>
+        </form>
+      </td>
+    </tr>
   </tbody>
 </table>
