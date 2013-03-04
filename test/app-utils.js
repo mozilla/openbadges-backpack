@@ -11,7 +11,7 @@ const FAKE_ASSERTION = 'yup, it is example@example.com.';
 
 function AppTestHarness(t, port) {
   this.t = t;
-  this.undoAppAuthChanges = replaceAppAuthForTesting();
+  this.undoModuleFunctionChanges = replaceModuleFunctionsForTesting(port);
   this.request = request.defaults({jar: request.jar()});
   this.port = port;
 }
@@ -20,7 +20,7 @@ AppTestHarness.prototype = {
   end: function() {
     this.t.test('shutting down server', (function(t) {
       app.close();
-      this.undoAppAuthChanges();
+      this.undoModuleFunctionChanges();
       t.end();
     }).bind(this));
   
@@ -79,10 +79,10 @@ exports.prepareApp = function prepareApp(cb) {
 
 function ensureRequest(request, method, url, options, assertions) {
   var name = method + ' ' + url;
-  var fn = request[method.toLowerCase()];
   
+  options.method = method;
   return function(t) {
-    fn.call(request, url, options, function(err, res, body) {
+    request(url, options, function(err, res, body) {
       if (err) throw err;
       if (assertions.statusCode)
         t.same(res.statusCode, assertions.statusCode,
@@ -118,12 +118,28 @@ function ensureRequest(request, method, url, options, assertions) {
   };
 }
 
-function replaceAppAuthForTesting() {
+function replaceModuleFunctionsForTesting(port) {
   var browserid = require('../lib/browserid');
   var middleware = require('../middleware');
+  var conf = require('../lib/configuration');
+  var testConf = {
+    protocol: 'http:',
+    host: 'localhost',
+    port: port
+  };
   var originalVerify = browserid.verify;
   var originalUid = middleware.utils.uid;
-
+  var originalCreateSecureToken = middleware.utils.createSecureToken;
+  var originalConfGet = conf.get;
+  
+  conf.get = function fakeGet(val, env) {
+    if (val in testConf)
+      return testConf[val];
+    return originalConfGet.apply(conf, arguments);
+  };
+  middleware.utils.createSecureToken = function fakeCreateSecureToken() {
+    return FAKE_UID;
+  };
   middleware.utils.uid = function fakeUid() { return FAKE_UID; };
   browserid.verify = function fakeVerify(uri, assertion, audience, cb) {
     var expected = FAKE_ASSERTION;
@@ -136,7 +152,9 @@ function replaceAppAuthForTesting() {
   };
   
   return function undo() {
+    conf.get = originalConfGet;
     browserid.verify = originalVerify;
     middleware.utils.uid = originalUid;
+    middleware.utils.createSecureToken = originalCreateSecureToken;
   };
 }

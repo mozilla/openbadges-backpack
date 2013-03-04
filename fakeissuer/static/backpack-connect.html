@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Backpack Connect Test</title>
+<style>
+#content:not(.connected) .if-connected {
+  display: none;
+}
+
+#content.connected .if-not-connected {
+  display: none;
+}
+</style>
+<div id="content">
+  <div class="if-connected">
+    <h2>You are connected to the backpack.</h2>
+    <label>Email: <input id='email'></label>
+    <button onclick="issue()">Issue Badge</button>
+    <button onclick="forgetToken()">Forget Token</button>
+    <button onclick="refreshToken()">Refresh Token</button>
+  </div>
+  <div class="if-not-connected">
+    <h2>You are not connected to the backpack.</h2>
+    <button onclick="connect()">Connect to Backpack</button>
+  </div>
+</div>
+<script>
+// http://stackoverflow.com/a/901144
+function getParameterByName(name) {
+  name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+  var regexS = "[\\?&]" + name + "=([^&#]*)";
+  var regex = new RegExp(regexS);
+  var results = regex.exec(window.location.search);
+  if(results == null)
+    return "";
+  else
+    return decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+function issue() {
+  var url = 'http://localhost:8889/raw.json?email=' + 
+            encodeURIComponent(document.getElementById('email').value);
+  var req = new XMLHttpRequest();
+  req.open('POST', api_root + '/issue');
+  req.setRequestHeader('authorization', 'Bearer ' + btoa(access_token));
+  req.setRequestHeader('content-type', 'application/json');
+  req.onload = function() {
+    alert("status: " + req.status + "\ncontent: " + req.responseText);
+  };
+  req.send(JSON.stringify({badge: url}));
+}
+
+function forgetToken() {
+  window.location.replace(window.location.pathname);
+}
+
+function refreshToken() {
+  var req = new XMLHttpRequest();
+  req.open('POST', api_root + '/token');
+  req.setRequestHeader('content-type', 'application/json');
+  req.onload = function() {
+    if (req.status == 200) {
+      var info = JSON.parse(req.responseText);
+      var url = window.location.pathname +
+        '?access_token=' + encodeURIComponent(info.access_token) +
+        '&refresh_token=' + encodeURIComponent(info.refresh_token) +
+        '&api_root=' + encodeURIComponent(api_root);
+      window.location.replace(url);
+    }
+  };
+  req.send(JSON.stringify({
+    grant_type: 'refresh_token',
+    refresh_token: refresh_token
+  }));
+}
+
+function connect() {
+  OpenBadges.connect({
+    callback: window.location.pathname,
+    scope: ["issue"]
+  });
+}
+
+var access_token = getParameterByName('access_token');
+var refresh_token = getParameterByName('refresh_token');
+var api_root = getParameterByName('api_root');
+
+if (api_root)
+  document.getElementById("content").classList.add("connected");
+</script>
+<script src="http://localhost:8888/issuer.js"></script>

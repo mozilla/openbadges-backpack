@@ -1,70 +1,16 @@
 const appUtils = require('./app-utils');
-const express = require('express');
-const http = require('http');
-
-function makeHash(email, salt) {
-  var sha = require('crypto').createHash('sha256');
-  return 'sha256$' + sha.update(email + salt).digest('hex');
-}
+const issuerUtils = require('./issuer-utils');
 
 appUtils.prepareApp(function(a) {
-  var issuerApp = express();
-  var issuerServer = http.createServer(issuerApp);
-  issuerServer.listen(0, function() {
-    var PORT = issuerServer.address().port;
-    var BASE_URL = 'http://localhost:' + PORT;
-    var BAD_IMG_BADGE_URL = BASE_URL + '/bad_img';
-    var EXAMPLE_BADGE_URL = BASE_URL + '/example';
-    var BAD_IMG_BADGE = {
-      "recipient": makeHash(a.email, "ballertime"),
-      "salt": "ballertime",
-      "evidence": "/badges/html5-basic/example",
-      "badge": {
-        "version": "0.5.0",
-        "name": "HTML5 Fundamental",
-        "image": "/CANT_BE_REACHED.png",
-        "description": "Knows the difference between a <section> and a blah",
-        "criteria": "/badges/html5-basic",
-        "issuer": {
-          "origin": BASE_URL,
-          "name": "P2PU",
-          "org": "School of Webcraft",
-          "contact": "admin@p2pu.org"
-       }
-      }
-    };
-    var EXAMPLE_BADGE = {
-      "recipient": makeHash(a.email, "ballertime"),
-      "salt": "ballertime",
-      "evidence": "/badges/html5-basic/example",
-      "badge": {
-        "version": "0.5.0",
-        "name": "HTML5 Fundamental",
-        "image": a.resolve('/_demo/cc.large.png'),
-        "description": "Knows the difference between a <section> and a blah",
-        "criteria": "/badges/html5-basic",
-        "issuer": {
-          "origin": BASE_URL,
-          "name": "P2PU",
-          "org": "School of Webcraft",
-          "contact": "admin@p2pu.org"
-       }
-      }
-    };
-
-    issuerApp.get('/bad_img', function(req, res) {
-      return res.send(BAD_IMG_BADGE);
-    });
-  
-    issuerApp.get('/example', function(req, res) {
-      return res.send(EXAMPLE_BADGE);
-    });
-  
+  issuerUtils.createIssuer(a, function(issuer) {
+    var BAD_IMG_URL = issuer.resolve('/bad_img');
+    var EXAMPLE_URL = issuer.resolve('/example');
+    
     // Ensure assertions w/ bad image URLs raise errors.
 
     a.login();
     
-    a.verifyRequest('GET', '/issuer/assertion?url=' + BAD_IMG_BADGE_URL, {
+    a.verifyRequest('GET', '/issuer/assertion?url=' + BAD_IMG_URL, {
       statusCode: 502,
       body: /trying to grab image.*unreachable/i
     });
@@ -72,7 +18,7 @@ appUtils.prepareApp(function(a) {
     a.verifyRequest('POST', '/issuer/assertion', {
       form: {
         '_csrf': a.csrf,
-        'url': BAD_IMG_BADGE_URL
+        'url': BAD_IMG_URL
       }
     }, {
       statusCode: 502,
@@ -81,13 +27,13 @@ appUtils.prepareApp(function(a) {
   
     // Ensure the example badge isn't in the user's backpack.
 
-    a.verifyRequest('GET', '/issuer/assertion?url=' + EXAMPLE_BADGE_URL, {
+    a.verifyRequest('GET', '/issuer/assertion?url=' + EXAMPLE_URL, {
       statusCode: 200,
       body: {
         owner:  true,
         exists: false,
         recipient: a.email,
-        badge: EXAMPLE_BADGE
+        badge: issuer.BADGES['/example']
       }
     });
 
@@ -96,13 +42,13 @@ appUtils.prepareApp(function(a) {
     a.verifyRequest('POST', '/issuer/assertion', {
       form: {
         '_csrf': a.csrf,
-        'url': EXAMPLE_BADGE_URL
+        'url': EXAMPLE_URL
       }
     }, {
       statusCode: 201,
       body: {
         'exists': false,
-        badge: EXAMPLE_BADGE
+        badge: issuer.BADGES['/example']
       }
     });
   
@@ -112,7 +58,7 @@ appUtils.prepareApp(function(a) {
     a.verifyRequest('POST', '/issuer/assertion', {
       form: {
         '_csrf': a.csrf,
-        'url': EXAMPLE_BADGE_URL
+        'url': EXAMPLE_URL
       }
     }, {
       statusCode: 304
@@ -120,21 +66,17 @@ appUtils.prepareApp(function(a) {
   
     // Now ensure that the example badge is in the user's backpack.
   
-    a.verifyRequest('GET', '/issuer/assertion?url=' + EXAMPLE_BADGE_URL, {
+    a.verifyRequest('GET', '/issuer/assertion?url=' + EXAMPLE_URL, {
       statusCode: 200,
       body: {
         owner:  true,
         exists: true,
         recipient: a.email,
-        badge: EXAMPLE_BADGE
+        badge: issuer.BADGES['/example']
       }
     });
     
-    a.t.test("shut down issuer server", function(t) {
-      issuerServer.close();
-      t.end();
-    });
-    
+    issuer.end();
     a.end();
   });
 });
