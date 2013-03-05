@@ -34,7 +34,7 @@ function SessionFactory(options) {
   Base.apply(Session, 'bpc_session');
 
   Session.revokeOriginForUser = function(options, cb) {
-    this.destroy({
+    this.findAndDestroy({
       origin: options.origin,
       user_id: options.user_id
     }, cb);
