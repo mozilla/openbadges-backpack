@@ -26,7 +26,8 @@
     "winston": "~0.5.10",
     "optimist": "~0.3.0",
     "async": "~0.1.22",
-    "openbadges-validator": "0.0.1"
+    "openbadges-validator": "0.0.1",
+    "openbadges-bakery": "~0.1.1"
   },
   "engines": {
     "node": "0.8.x"
