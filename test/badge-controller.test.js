@@ -17,7 +17,6 @@ testUtils.prepareDatabase({
   '2-false-user': new User({ email: 'thief@example.org' }),
   '3-badge-raw': new Badge({
     user_id: 1,
-    type: 'hosted',
     endpoint: 'endpoint',
     image_path: 'image_path',
     body_hash: 'body_hash',
@@ -28,7 +27,6 @@ testUtils.prepareDatabase({
   }),
   '4-badge-hashed': new Badge({
     user_id: 1,
-    type: 'hosted',
     endpoint: 'endpoint',
     image_path: 'image_path',
     body_hash: 'body_hash',
@@ -61,7 +59,7 @@ testUtils.prepareDatabase({
       t.end();
     });
   });
-  
+
   test('badge#save does not leave body serialized as JSON', function(t) {
     var b = fixtures['3-badge-raw'];
     t.same(b.get('body').recipient, 'brian@example.org');
@@ -71,7 +69,7 @@ testUtils.prepareDatabase({
       t.end();
     });
   });
-  
+
   test('badge#share works when public_path doesn\'t exist', function(t) {
     var b = fixtures['3-badge-raw'];
     t.same(b.get('public_path'), undefined, 'public_path doesn\'t exist');
@@ -105,7 +103,7 @@ testUtils.prepareDatabase({
       t.end();
     });
   });
-  
+
   test('badge#show', function(t) {
     conmock({
       handler: badge.show,
@@ -121,7 +119,7 @@ testUtils.prepareDatabase({
       t.end();
     });
   });
-  
+
   test('badge#destroy', function (t) {
     const owner = fixtures['1-real-user'];
     const thief = fixtures['2-false-user'];

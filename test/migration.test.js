@@ -139,3 +139,13 @@ testMigration("rename-jwt-to-signature", function(t, id, previousId) {
   ];
 });
 
+testMigration("drop-badge-type-column", function(t, id, previousId) {
+  return [
+    up({destination: previousId}),
+    sql("INSERT INTO `user` VALUES (1,'foo@bar.org',NULL,1,NULL,NULL);"),
+    sql("INSERT INTO `badge` (id, user_id, type, signature, image_path, body, body_hash) VALUES (1,1,'hosted', 'sup', 'image.png','body','hash')"),
+    up({count: 1}),
+    sqlError("SELECT `type` FROM badge", t, "ERROR_BAD_FIELD_ERROR"),
+  ];
+});
+

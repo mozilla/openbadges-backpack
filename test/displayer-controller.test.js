@@ -16,7 +16,6 @@ testUtils.prepareDatabase({
   }),
   '3-badge': new Badge({
     user_id: 1,
-    type: 'hosted',
     endpoint: 'endpoint',
     image_path: 'image_path',
     body_hash: 'body_hash',
