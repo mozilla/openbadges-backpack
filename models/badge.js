@@ -100,8 +100,8 @@ Badge.validators = {
     if (value === 'hosted' && !attributes.endpoint) {
       return "If type is hosted, endpoint must be set";
     }
-    if (value === 'signed' && !attributes.jwt) {
-      return "If type is signed, jwt must be set";
+    if (value === 'signed' && !attributes.signature) {
+      return "If type is signed, signature must be set";
     }
   },
   endpoint: function (value, attributes) {
@@ -109,9 +109,9 @@ Badge.validators = {
       return "If type is hosted, endpoint must be set";
     }
   },
-  jwt: function (value, attributes) {
+  signature: function (value, attributes) {
     if (!value && attributes.type === 'signed') {
-      return "If type is signed, jwt must be set";
+      return "If type is signed, signature must be set";
     }
   },
   image_path: function (value) {

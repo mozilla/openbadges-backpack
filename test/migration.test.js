@@ -123,3 +123,19 @@ testMigration("drop-public-key-field", function(t, id, previousId) {
   ];
 });
 
+testMigration("rename-jwt-to-signature", function(t, id, previousId) {
+  return [
+    up({destination: previousId}),
+    sql("INSERT INTO `user` VALUES (1,'foo@bar.org',NULL,1,NULL,NULL);"),
+    sql("INSERT INTO `badge` (id, user_id, type, jwt, image_path, body, body_hash) VALUES (1,1,'hosted', 'sup', 'image.png','body','hash')"),
+    up({count: 1}),
+    sql("SELECT signature FROM badge WHERE id=1", function(results) {
+      t.equal(results[0].signature, 'sup', "'jwt' should have been renamed");
+    }),
+    down({count: 1}),
+    sql("SELECT jwt FROM badge WHERE id=1", function(results) {
+      t.equal(results[0].jwt, 'sup', "'jwt' should have risen from the grave like a phoenix");
+    }),
+  ];
+});
+
