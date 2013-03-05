@@ -3,15 +3,8 @@
 <h1><span class="client">{{ clientDomain }}</span> would like permission 
   to:</h1>
 
-<ul>
-  {% for scope in scopes %}
-    <li>
-      {% if scope == "issue" %}
-      Send the open badges I've earned to my backpack.
-      {% endif %}
-    </li>
-  {% endfor %}
-</ul>
+{% set permissions = scopes %}
+{% include 'permissions.html' %}
 
 {% if not user %}
 

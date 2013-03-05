@@ -35,5 +35,63 @@ test('backpack#manage', function (t) {
   t.end();
 });
 
+test('backpack#settings redirects to login if no user', function (t) {
+  conmock({handler: backpack.settings()}, function(err, mock) {
+    t.same(mock.status, 303);
+    t.same(mock.path, "/backpack/login");
+    t.end();
+  });
+});
+
+test('backpack#settings handles summarizeForUser() errors', function (t) {
+  conmock({
+    handler: backpack.settings({
+      backpackConnectModel: {
+        summarizeForUser: function(id, cb) {
+          cb(new Error("SUMMARIZE ERROR"));
+        }
+      }
+    }),
+    request: {user: {get: function() {}}}
+  }, function(err, mock) {
+    t.same(mock.fntype, 'next');
+    t.same(mock.nextErr.message, 'SUMMARIZE ERROR');
+    t.end();
+  });
+});
+
+test('backpack#settings works', function (t) {
+  conmock({
+    handler: backpack.settings({
+      backpackConnectModel: {
+        summarizeForUser: function(id, cb) {
+          t.same(id, 5);
+          cb(null, [{origin: "http://foo.org", permissions: ["bar"]}]);
+        }
+      }
+    }),
+    request: {
+      user: {get: function() { return 5; }},
+      session: {_csrf: "csrf"}
+    }
+  }, function(err, mock) {
+    t.same(mock.fntype, 'render');
+    t.same(mock.headers, {
+      "Cache-Control" : "no-cache, must-revalidate"
+    });
+    t.same(mock.options, {
+      error: undefined,
+      success: undefined,
+      csrfToken: "csrf",
+      services: {},
+      issuers: [{
+        origin: "http://foo.org",
+        domain: "foo.org",
+        permissions: ["bar"]
+      }]
+    });
+    t.end();
+  });
+});
 
 testUtils.finish(test);

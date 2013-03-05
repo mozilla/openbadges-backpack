@@ -1,0 +1,9 @@
+<ul>
+  {% for permission in permissions %}
+    <li>
+      {% if permission == "issue" %}
+      Send the open badges I've earned to my backpack.
+      {% endif %}
+    </li>
+  {% endfor %}
+</ul>

@@ -43,27 +43,44 @@
     </div>
   </fieldset>
   <fieldset id="issuer-acceptance">
-    <legend>Issuer Badge Acceptance</legend>
+    <legend>Connected Issuers</legend>
     {% if issuers.length %}
       {% for issuer in issuers %}
         <div class="item">
-          <strong class="title">{{ issuer.title }}</strong>
-          <label class="slider content">
-            Automatically accept earned badges from {{ issuer.title }}
-            <input type="checkbox" id="issuer-{{ issuer.id }}" name="issuers[{{ issuer.id }}]" value="true"{% if issuer.accepted %} checked="checked"{% endif %}>
-            <span data-on="On" data-off="Off"></span>
-          </label>
+          <h4>{{ issuer.domain }}</h4>
+          <p>The website at <a href="{{ issuer.origin }}">{{ issuer.domain }}</a> has
+            permission to:</p>
+          {% set permissions = issuer.permissions %}
+          {% include 'permissions.html' %}
+          <button type="button" class="btn btn-danger js-revoke"
+                  autocomplete="off"
+                  data-loading-text="Revoking..."
+                  data-revoke="{{ issuer.origin }}">Revoke
+            access for {{ issuer.domain }}</button>
         </div>
       {% endfor %}
     {% else %}
       <div class="item">
-        No issuers found
+        No issuers found.
       </div>
     {% endif %}
   </fieldset>
-  <div class="form-actions">
-    <input type="submit" class="btn btn-primary" value="Save changes">
-    <a href="/backpack/settings" class="btn">Cancel</a>
-  </div>
 </form>
+{% endblock %}
+
+{% block scripts %}
+<script src="/vendor/bootstrap/js/bootstrap-button.js"></script>
+<script>
+$(window).ready(function() {
+  $(".js-revoke").click(function() {
+    var item = $(this).closest(".item");
+    $(this).button('loading');
+    $.post('/backpack/settings/revoke-origin', {
+      _csrf: '{{ csrfToken }}',
+      origin: $(this).attr("data-revoke")
+    }, function() { item.slideUp(); });
+    return false;
+  });
+});
+</script>
 {% endblock %}

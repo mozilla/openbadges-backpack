@@ -52,6 +52,14 @@ Base.apply = function apply(Model, table) {
     Model.findOne({id: id}, callback);
   };
 
+  Model.findAndDestroy = function(criteria, callback) {
+    var keys = Object.keys(criteria);
+    var values = keys.map(function (key) { return criteria[key] });
+    var qstring = 'DELETE FROM `' + table + '` WHERE ' + keys.map(function (key) { return (key + ' = ?')}).join(' AND ');
+
+    client.query(qstring, values, function(err) { callback(err); });
+  };
+
   Model.prototype = new Base();
   Model.prototype.model = Model;
   Model.prototype.client = client;

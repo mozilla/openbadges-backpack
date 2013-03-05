@@ -24,6 +24,59 @@ var nowSecs = 0;
 testUtils.prepareDatabase({
   '1-real-user': new User({ email: 'brian@example.org' }),
 }, function (fixtures) {
+  test("revokeOrigin() fails if no user", function(t) {
+    conmock({
+      handler: bpc.revokeOrigin(),
+    }, function(err, mock) {
+      if (err) throw err;
+      t.equal(mock.status, 403);
+      t.end();
+    });
+  });
+
+  test("revokeOrigin() fails if no body", function(t) {
+    conmock({
+      handler: bpc.revokeOrigin(),
+      request: {user: {}}
+    }, function(err, mock) {
+      if (err) throw err;
+      t.equal(mock.status, 400);
+      t.equal(mock.body, 'body expected');
+      t.end();
+    });
+  });
+
+  test("revokeOrigin() fails if no origin", function(t) {
+    conmock({
+      handler: bpc.revokeOrigin(),
+      request: {user: {}, body: {}}
+    }, function(err, mock) {
+      if (err) throw err;
+      t.equal(mock.status, 400);
+      t.equal(mock.body, 'origin URL expected');
+      t.end();
+    });
+  });
+
+  test("Model.revokeOriginForUser() err is handled", function(t) {
+    var bpc = new BackpackConnect({
+      Model: {
+        revokeOriginForUser: function(options, cb) {
+          cb(new Error("BLARG ERROR"));
+        }
+      }
+    });
+    conmock({
+      handler: bpc.revokeOrigin(),
+      request: {user: {get: function() {}}, body: {origin: {}}}
+    }, function(err, mock) {
+      if (err) throw err;
+      t.equal(mock.fntype, "next");
+      t.equal(mock.nextErr.message, "BLARG ERROR");
+      t.end();
+    });
+  });
+
   test("Model.find() err on refresh() is handled", function(t) {
     var bpc = new BackpackConnect({
       Model: {
@@ -514,6 +567,36 @@ testUtils.prepareDatabase({
     });
   });
   
+  test('revokeOrigin() works', function(t) {
+    conmock({
+      handler: bpc.revokeOrigin(),
+      request: {
+        user: fixtures['1-real-user'],
+        body: {origin: "http://foo.org"}
+      }
+    }, function(err, mock) {
+      if (err) throw err;
+      t.equal(mock.status, 204);
+      t.end();
+    });
+  });
+
+  test('authorize() fails w/ revoked token', function(t) {
+    conmock({
+      handler: bpc.authorize(),
+      request: {
+        headers: {
+          'authorization': 'Bearer ' + b64enc("SOME_UID_3")
+        }
+      }
+    }, function(err, mock) {
+      if (err) throw err;
+      t.equal(mock.fntype, 'send');
+      t.equal(mock.status, 401);
+      t.end();
+    });
+  });
+
   testUtils.finish(test);
 });
 

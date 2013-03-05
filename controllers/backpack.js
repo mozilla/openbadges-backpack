@@ -279,65 +279,53 @@ exports.manage = function manage(request, response, next) {
  * @return {HTTP 303} redirect user to login page
  */
 
-exports.settings = function settings(request, response) {
-  var user = request.user;
-  var error = request.flash('error');
-  var success = request.flash('success');
+exports.settings = function(options) {
+  options = options || {};
 
-  if (!user)
-    return response.redirect('/backpack/login', 303);
+  var bpcModel = options.backpackConnectModel ||
+                 require("../models/backpack-connect").Session;
+  var getServices = options.getServices || function() {
+      /* This needs to be plugged in to something */
 
-  response.header('Cache-Control', 'no-cache, must-revalidate');
+      // return {
+      //   twitter: false,
+      //   facebook: {auto: true}
+      // };
 
-  function getServices() {
-    /* This needs to be plugged in to something */
+      return {};
+  };
 
-    // return {
-    //   twitter: false,
-    //   facebook: {auto: true}
-    // };
+  return function settings(request, response, next) {
+    var user = request.user;
+    var error = request.flash('error');
+    var success = request.flash('success');
 
-    return {};
-  }
+    if (!user)
+      return response.redirect('/backpack/login', 303);
 
-  function getIssuers() {
-    /* This needs to be plugged in to something */
+    response.header('Cache-Control', 'no-cache, must-revalidate');
 
-    return [
-      {id: 'mozilla', title: 'Mozilla', accepted: true},
-      {id: 'issuer_2', title: 'Issuer 2', accepted: false},
-      {id: 'issuer_3', title: 'Issuer 3', accepted: false},
-    ];
-  }
+    bpcModel.summarizeForUser(user.get('id'), function(err, issuers) {
+      if (err) {
+        logger.warn("There was an error summarizing backpack connect info");
+        logger.debug(err);
+        return next(err);
+      }
 
-  response.render('settings.html', {
-    error: error,
-    success: success,
-    csrfToken: request.session._csrf,
-    services: getServices(),
-    issuers: getIssuers()
-  });
-}
+      issuers.forEach(function(issuer) {
+        issuer.domain = url.parse(issuer.origin).hostname;
+      });
 
-
-/**
- * Save the user settings
- *
- * @return {HTTP 303}
- *   with no user: redirect user to login page
- *   otherwise: redirect to user settings page
- */
-
-exports.saveSettings = function saveSettings(request, response) {
-  var user = request.user;
-  if (!user)
-    return response.redirect('/backpack/login', 303);
-
-  request.flash('error', 'Saving settings not yet implemented :(');
-
-  return response.redirect('/backpack/settings', 303);
-}
-
+      response.render('settings.html', {
+        error: error,
+        success: success,
+        csrfToken: request.session._csrf,
+        services: getServices(),
+        issuers: issuers
+      });
+    });
+  };
+};
 
 /**
  * Handle upload of a badge from a user's filesystem. Gets embedded data from
