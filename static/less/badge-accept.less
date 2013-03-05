@@ -1,12 +1,9 @@
 @import "backpack";
 
-@navbarHeight: 80px;
-
 body {
-  padding-top: @navbarHeight;
-  background-position: 0 @navbarHeight;
   max-width: 660px;
   margin: 0 auto;
+  padding-top: @navbarHeight;
 }
 
 .narrow {
@@ -64,11 +61,6 @@ button,
 .navbar {
   border-top: none;
 
-  .brand {
-    position: relative;
-    top: -3px;
-  }
-
   .closeFrame {
     position: absolute;
     top: 6px;
@@ -83,10 +75,6 @@ button,
       opacity: 0.8;
       text-decoration: none;
     }
-  }
-
-  .navbar-inner {
-    height: @navbarHeight;
   }
 }
 
