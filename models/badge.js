@@ -92,28 +92,6 @@ Badge.prototype.checkHash = function checkHash() {
 // TODO: make these errors more than strings so we don't have to parse
 // them to figure out how to handle the error
 Badge.validators = {
-  type: function (value, attributes) {
-    var valid = ['signed', 'hosted'];
-    if (valid.indexOf(value) === -1) {
-      return "Unknown type: " + value;
-    }
-    if (value === 'hosted' && !attributes.endpoint) {
-      return "If type is hosted, endpoint must be set";
-    }
-    if (value === 'signed' && !attributes.signature) {
-      return "If type is signed, signature must be set";
-    }
-  },
-  endpoint: function (value, attributes) {
-    if (!value && attributes.type === 'hosted') {
-      return "If type is hosted, endpoint must be set";
-    }
-  },
-  signature: function (value, attributes) {
-    if (!value && attributes.type === 'signed') {
-      return "If type is signed, signature must be set";
-    }
-  },
   image_path: function (value) {
     if (!value) { return "Must have an image_path."; }
   },

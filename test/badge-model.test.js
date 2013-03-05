@@ -11,7 +11,6 @@ testUtils.prepareDatabase({
   }),
   '2-existing-badge': new Badge({
     user_id: 1,
-    type: 'hosted',
     endpoint: 'endpoint',
     image_path: 'image_path',
     body: testUtils.makeAssertion({recipient: 'brian@example.org'})
@@ -33,7 +32,6 @@ testUtils.prepareDatabase({
     const assertion = testUtils.makeAssertion({'badge.name': 'Bodyhash Test'});
     const badge = new Badge({
       user_id: 1,
-      type: 'hosted',
       endpoint: 'endpoint',
       image_path: 'image_path',
       body: assertion
@@ -58,7 +56,6 @@ testUtils.prepareDatabase({
     function newBadge(modifications) {
       var attrs = _.extend({
         user_id: 1,
-        type: 'hosted',
         endpoint: 'endpoint',
         image_path: 'image_path',
         body: randomAssertion()
@@ -76,17 +73,6 @@ testUtils.prepareDatabase({
 
     var err;
     t.notOk(newBadge().validate(), 'should have no errors with the defaults');
-
-    err = validate({type: 'flurgle'});
-    t.ok(hasError(err, 'type'), 'should have an error with a bogus type');
-
-    err = validate({type: 'hosted', endpoint: null});
-    t.ok(hasError(err, 'type'), 'type error if hosted without endpoint');
-    t.ok(hasError(err, 'endpoint'), 'endpoint error if hosted without endpoint');
-
-    err = validate({type: 'signed', signature: null});
-    t.ok(hasError(err, 'type'), 'type error if signed without signature');
-    t.ok(hasError(err, 'signature'), 'endpoint error if signed without signature');
 
     err = validate({image_path: null});
     t.ok(hasError(err, 'image_path'), 'image_path is required');

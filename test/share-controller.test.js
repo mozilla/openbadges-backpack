@@ -13,7 +13,6 @@ testUtils.prepareDatabase({
   '2-other-user': new User({ email: 'lolwut@example.com' }),
   '3-badge': new Badge({
     user_id: 1,
-    type: 'hosted',
     endpoint: 'endpoint',
     image_path: 'image_path',
     body_hash: 'body_hash',

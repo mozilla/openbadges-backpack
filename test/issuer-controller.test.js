@@ -11,14 +11,13 @@ testUtils.prepareDatabase({
   '1-user': new User({ email: 'brian@example.org' }),
   '2-badge': new Badge({
     user_id: 1,
-    type: 'hosted',
     endpoint: 'endpoint',
     image_path: 'image_path',
     body_hash: 'body_hash',
     body: testUtils.makeAssertion({})
   }),
 }, function (fixtures) {
-  
+
   test('issuer#welcome: no user', function (t) {
     conmock(issuer.welcome, function (err, mock) {
       t.same(mock.fntype, 'redirect');
