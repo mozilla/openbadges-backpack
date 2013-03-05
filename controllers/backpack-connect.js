@@ -24,6 +24,7 @@ function fullUrl(pathname) {
 }
 
 BackpackConnect.prototype = {
+  hash: function() { return hash.bind(this); },
   revokeOrigin: function() { return revokeOrigin.bind(this); },
   refresh: function() { return refresh.bind(this); },
   requestAccess: function() { return requestAccess.bind(this); },
@@ -31,6 +32,10 @@ BackpackConnect.prototype = {
   allowCors: function() { return allowCors.bind(this); },
   authorize: function(perm) { return authorize.bind(this, perm); }
 };
+
+function hash(req, res, next) {
+  return res.send(this.Model.makeRecipientHash(req.user.get('email')));
+}
 
 function revokeOrigin(req, res, next) {
   if (!req.user)
