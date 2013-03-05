@@ -38,7 +38,6 @@ function SessionFactory(options) {
                   '` WHERE origin = ? AND user_id = ?';
     var values = [options.origin, options.user_id];
     this.prototype.client.query(qstring, values, function(err, results) {
-      require('../lib/logging').logger.debug("HI " + results.affectedRows);
       cb(err);
     });
   };
