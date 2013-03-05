@@ -312,7 +312,6 @@ exports.settings = function(options) {
         return next(err);
       }
 
-      //issuers = [{origin: "http://foo.org/", permissions: ["issue"]}];
       issuers.forEach(function(issuer) {
         issuer.domain = url.parse(issuer.origin).hostname;
       });
