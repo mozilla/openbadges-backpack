@@ -40,7 +40,7 @@ function sql(sql, testFunc) {
 function findMigration(name) {
   var filename, candidate;
   var previous = null;
-  
+
   for (var i = 0; i < migrationDirFiles.length; i++) {
     filename = migrationDirFiles[i];
     match = filename.match(/^([0-9]+)-(.*)\.js$/);
@@ -61,7 +61,7 @@ function testMigration(name, getSeries) {
     mysql.createTestDatabase,
     mysql.useTestDatabase
   ];
-  
+
   if (!migration.previous)
     migration.previous = "empty database";
 
@@ -112,3 +112,14 @@ testMigration("add-public-columns", function(t, id, previousId) {
     sqlError("SELECT public FROM badge", t, "ERROR_BAD_FIELD_ERROR")
   ];
 });
+
+testMigration("drop-public-key-field", function(t, id, previousId) {
+  return [
+    up({destination: previousId}),
+    sql("INSERT INTO `user` VALUES (1,'foo@bar.org',NULL,1,NULL,NULL);"),
+    sql("INSERT INTO `badge` (id, user_id, type, image_path, body, body_hash) VALUES (1,1,'hosted','image.png','body','hash')"),
+    up({count: 1}),
+    sqlError("SELECT public_key FROM badge", t, "ERROR_BAD_FIELD_ERROR"),
+  ];
+});
+

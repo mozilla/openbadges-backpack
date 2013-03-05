@@ -88,10 +88,6 @@ testUtils.prepareDatabase({
     t.ok(hasError(err, 'type'), 'type error if signed without jwt');
     t.ok(hasError(err, 'jwt'), 'endpoint error if signed without jwt');
 
-    err = validate({type: 'signed', jwt: 'stuff', public_key: null});
-    t.ok(hasError(err, 'type'), 'type error if signed without public_key');
-    t.ok(hasError(err, 'public_key'), 'public_key error if signed without jwt');
-
     err = validate({image_path: null});
     t.ok(hasError(err, 'image_path'), 'image_path is required');
 

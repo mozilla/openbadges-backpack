@@ -67,7 +67,7 @@ Badge.confirmRecipient = function confirmRecipient(assertion, email) {
 Badge.prototype.share = function share(callback) {
   if (this.get('public_path'))
     return callback(null, this);
-  
+
   this.presave();
   this.set('public_path', this.get('body_hash'));
   this.save(callback);
@@ -103,9 +103,6 @@ Badge.validators = {
     if (value === 'signed' && !attributes.jwt) {
       return "If type is signed, jwt must be set";
     }
-    if (value === 'signed' && !attributes.public_key) {
-      return "If type is signed, public_key must be set";
-    }
   },
   endpoint: function (value, attributes) {
     if (!value && attributes.type === 'hosted') {
@@ -115,11 +112,6 @@ Badge.validators = {
   jwt: function (value, attributes) {
     if (!value && attributes.type === 'signed') {
       return "If type is signed, jwt must be set";
-    }
-  },
-  public_key: function (value, attributes) {
-    if (!value && attributes.type === 'signed') {
-      return "If type is signed, public_key must be set";
     }
   },
   image_path: function (value) {
