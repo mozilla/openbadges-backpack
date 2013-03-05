@@ -1,0 +1,27 @@
+.navbar .nav > li > a.badge-link span,
+.navbar .nav > li > a.collection-link span {
+  display: table-cell;
+  height: 45px;
+  vertical-align: middle;
+  padding-left: 45px;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+
+  &:hover {
+    background-position: 0 -45px;
+  }
+}
+
+.badge-link span {
+  background: url(/images/badges-icon.png);
+  &:hover {
+    color: #31bdaf;
+  }
+}
+
+.collection-link span {
+  background: url(/images/collections-icon.png);
+  &:hover {
+    color: #0090ff;
+  }
+}

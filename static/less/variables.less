@@ -44,7 +44,7 @@
 
 // Typography
 // -------------------------
-@sansFontFamily:        "Open Sans", Courier, "Helvetica Neue", Helvetica, Arial, sans-serif;
+@sansFontFamily:        "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 @serifFontFamily:       Georgia, "Times New Roman", Times, serif;
 @monoFontFamily:        Monaco, Menlo, Consolas, "Courier New", monospace;
 
@@ -180,9 +180,12 @@
 @navbarCollapseWidth:             979px;
 @navbarCollapseDesktopWidth:      @navbarCollapseWidth + 1;
 
-@navbarHeight:                    40px;
+@logoHeight:                      48px; // height of actual png
+@logoTopPadding:                  5px;
+@logoBottomPadding:               2px;
+@navbarHeight:                    @logoHeight + @logoTopPadding + @logoBottomPadding;
 @navbarBackgroundHighlight:       #ffffff;
-@navbarBackground:                #ffffff;//darken(@navbarBackgroundHighlight, 5%);
+@navbarBackground:                #ffffff;
 @navbarBorder:                    darken(@navbarBackground, 12%);
 
 @navbarText:                      @grayDark;

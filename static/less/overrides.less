@@ -22,12 +22,47 @@ a:focus {
 // NAVBAR
 // -----------------------------------------------------
 
-.navbar-inner {
-  border-top: 0; /* for tabzilla */
-}
+.navbar {
+  border-bottom: 4px solid #333;
 
-.navbar .container {
-  max-width: 940px;
+  .navbar-inner {
+    border-top: 0; /* for tabzilla */
+  }
+
+  .container {
+    max-width: 940px;
+  }
+
+  .brand {
+    padding: @logoTopPadding 20px @logoBottomPadding;
+  }
+
+  .nav > li > a,
+  .navbar-text {
+    @navIconHeight: 45px;
+    @bottom-padding: 0;
+    padding: (@navbarHeight - @navIconHeight - @bottom-padding) 15px @bottom-padding;
+    line-height: @navIconHeight;
+  }
+
+  .nav > .active > a,
+  .nav > .active > a:hover,
+  .nav > .active a:focus {
+    .box-shadow(none);
+
+    @caretHeight: 10px;
+    @caretWidth: 15px;
+    &:after {
+      content: "";
+      display: block;
+      .box-sizing(border-box);
+      width: @caretWidth;
+      margin: 0 auto -@caretHeight;
+      border-top: @caretHeight solid white;
+      border-left: @caretWidth/2 dotted transparent;
+      border-right: @caretWidth/2 dotted transparent;
+    }
+  }
 }
 
 // NAV
@@ -49,6 +84,10 @@ a:focus {
 
 // DROPDOWNS
 // -----------------------------------------------------
+
+.caret {
+  vertical-align: text-top;
+}
 
 // ALERTS, LABELS, BADGES
 // -----------------------------------------------------
