@@ -84,9 +84,9 @@ testUtils.prepareDatabase({
     t.ok(hasError(err, 'type'), 'type error if hosted without endpoint');
     t.ok(hasError(err, 'endpoint'), 'endpoint error if hosted without endpoint');
 
-    err = validate({type: 'signed', jwt: null});
-    t.ok(hasError(err, 'type'), 'type error if signed without jwt');
-    t.ok(hasError(err, 'jwt'), 'endpoint error if signed without jwt');
+    err = validate({type: 'signed', signature: null});
+    t.ok(hasError(err, 'type'), 'type error if signed without signature');
+    t.ok(hasError(err, 'signature'), 'endpoint error if signed without signature');
 
     err = validate({image_path: null});
     t.ok(hasError(err, 'image_path'), 'image_path is required');
