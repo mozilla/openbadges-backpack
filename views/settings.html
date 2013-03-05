@@ -50,15 +50,8 @@
           <h4>{{ issuer.domain }}</h4>
           <p>The website at <a href="{{ issuer.origin }}">{{ issuer.domain }}</a> has
             permission to:</p>
-          <ul>
-          {% for permission in issuer.permissions %}
-          <li>
-            {% if permission == "issue" %}
-            Send the open badges I've earned to my backpack.
-            {% endif %}
-          </li>
-          {% endfor %}
-          </ul>
+          {% set permissions = issuer.permissions %}
+          {% include 'permissions.html' %}
           <button type="button" class="btn btn-danger js-revoke"
                   autocomplete="off"
                   data-loading-text="Revoking..."
