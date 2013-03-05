@@ -30,6 +30,19 @@ testUtils.prepareDatabase({
     });
   });
 
+  test('Portfolio#save: generates URL', function (t) {
+    const portfolio = new Portfolio({
+      group_id: 1,
+      title: "oh hey",
+      stories: {}
+    });
+    portfolio.save(function (err, result) {
+      t.notOk(err, 'should not have an error');
+      t.ok(result.get('url'), 'should have a url');
+      t.end();
+    });
+  });
+
   testUtils.finish(test);
 })
 
