@@ -146,8 +146,10 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
   var success = req.flash('success');
 
   // is the user logged in? if not, suggest they redirect to the login page
-  if (!user) return res.json({ message: "user is not logged in, redirect to " + '/backpack/login',
-                               redirect_to: '/backpack/login' }, 403);
+  if (!user) return res.json({
+    message: "user is not logged in, redirect to /backpack/login",
+    redirect_to: '/backpack/login'
+  }, 403);
 
   // get the url param (lots of debugging statements here)
   var assertionUrl = req.query.url; // if it was as a query param in the GET
@@ -193,7 +195,9 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
 
     var userOwnsBadge = Badge.confirmRecipient(assertion, recipient);
     if (req.method == 'POST' &&  !userOwnsBadge) {
-      return res.json({ message: "badge assertion is for a different user" }, 403);
+      return res.json({
+        message: "badge assertion is for a different user"
+      }, 403);
     }
 
     // #TODO: write tests for invalid assertions, potentially move this check
@@ -201,7 +205,9 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
     // Badge.validateBody is ill named -- it returns null if the badge is
     // valid, an error object if the badge is not valid.
     if (Badge.validateBody(assertion)) {
-      return res.json({ message: "badge assertion appears to be invalid" }, 400);
+      return res.json({
+        message: "badge assertion appears to be invalid"
+      }, 400);
     }
 
     if (req.backpackConnect &&
@@ -236,13 +242,24 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
             logger.error(err);
             var dupe_regex = /Duplicate entry/;
             if (dupe_regex.test(err)) {
-              return res.json({badge: assertion, exists: true, message: "badge already exists"}, 304);
+              return res.json({
+                badge: assertion,
+                exists: true,
+                message: "badge already exists"
+              }, 304);
             }
             // return a general error message
-            return res.json({badge: assertion, exists: false, 'message': error_message}, 500);
+            return res.json({
+              badge: assertion,
+              exists: false,
+              message: error_message
+            }, 500);
           }
           logger.debug("badge added " + assertionUrl);
-          return res.json({exists: false, badge: assertion}, 201);
+          return res.json({
+            exists: false,
+            badge: assertion
+          }, 201);
         });
       }
 
@@ -250,7 +267,11 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
       else {
         assertion.badge.image = imageUrl;
 
-        var response = {exists: false, badge: assertion, recipient: recipient};
+        var response = {
+          exists: false,
+          badge: assertion,
+          recipient: recipient
+        };
         Badge.findOne({endpoint: assertionUrl}, function (err, badge) {
           if (err) {
             logger.error(err);
