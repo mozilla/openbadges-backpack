@@ -26,6 +26,22 @@ appUtils.prepareApp(function(a) {
 
     a.login();
 
+    // Ensure a request to revoke-origin w/o a CSRF fails.
+
+    a.verifyRequest('POST', '/backpack/settings/revoke-origin', {
+      form: {origin: 'http://foo.org'}
+    }, {
+      statusCode: 403
+    });
+
+    // Ensure a request to revoke-origin w/ a CSRF works.
+
+    a.verifyRequest('POST', '/backpack/settings/revoke-origin', {
+      form: {_csrf: a.csrf, origin: 'http://foo.org'}
+    }, {
+      statusCode: 204
+    });
+
     // Ensure a request w/o a CSRF fails.
     
     a.verifyRequest('POST', '/accept', {
