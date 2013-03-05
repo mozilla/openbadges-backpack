@@ -64,7 +64,6 @@ app.use(flash());
 app.use(middleware.csrf({
   whitelist: [
     '/backpack/authenticate',
-    '/issuer/validator/?',
     '/displayer/convert/.+',
     '/issuer/frameless.*',
     '/api/.+'
@@ -80,7 +79,7 @@ app.configure('development', function () {
     var sha = gitUtil.findSHA();
     app.set('sha', sha);
   }
-  catch (ex) { 
+  catch (ex) {
     logger.warn(ex.message);
   }
 });
@@ -119,8 +118,6 @@ app.get('/issuer/frame', issuer.frame);
 app.post('/issuer/frameless', issuer.frameless);
 app.get('/issuer/assertion', issuer.issuerBadgeAddFromAssertion);
 app.post('/issuer/assertion', issuer.issuerBadgeAddFromAssertion);
-app.get('/issuer/validator', issuer.validator);
-app.post('/issuer/validator', issuer.validator);
 app.get('/issuer/welcome', issuer.welcome);
 
 app.get('/displayer/convert/email', displayer.emailToUserIdView);
