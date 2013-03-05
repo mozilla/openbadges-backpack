@@ -34,12 +34,10 @@ function SessionFactory(options) {
   Base.apply(Session, 'bpc_session');
 
   Session.revokeOriginForUser = function(options, cb) {
-    var qstring = 'DELETE FROM `' + this.prototype.getTableName() +
-                  '` WHERE origin = ? AND user_id = ?';
-    var values = [options.origin, options.user_id];
-    this.prototype.client.query(qstring, values, function(err, results) {
-      cb(err);
-    });
+    this.destroy({
+      origin: options.origin,
+      user_id: options.user_id
+    }, cb);
   };
 
   Session.summarizeForUser = function(userId, cb) {
