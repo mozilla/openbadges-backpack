@@ -57,6 +57,12 @@ const NEW_ASSERTION = {
 const EXPECTATION = {
   uid: "f2c20",
   recipient: "sha256$c7ef86405ba71b85acd8e2e95166c4b111448089f2e1599f42fe1bba46e865c5",
+  _originalRecipient: {
+    "type": "email",
+    "hashed": true,
+    "salt": "deadsea",
+    "id": "sha256$c7ef86405ba71b85acd8e2e95166c4b111448089f2e1599f42fe1bba46e865c5"
+  },
   salt: "deadsea",
   image: "https://example.org/beths-robot-badge.png",
   evidence: "https://example.org/beths-robot-work.html",
@@ -67,7 +73,7 @@ const EXPECTATION = {
     "url": "https://example.org/beths-robotics-badge.json"
   },
   badge: {
-    "url": "https://example.org/robotics-badge.json",
+    "_location": "https://example.org/robotics-badge.json",
     "name": "Awesome Robotics Badge",
     "description": "For doing awesome things with robots that people think is pretty great.",
     "image": "https://example.org/robotics-badge.png",
@@ -84,6 +90,7 @@ const EXPECTATION = {
       }
     ],
     issuer: {
+      "_location": "https://example.org/organization.json",
       "name": "An Example Badge Issuer",
       "image": "https://example.org/logo.png",
       "url": "https://example.org/some/path",
