@@ -47,16 +47,23 @@
     {% if issuers.length %}
       {% for issuer in issuers %}
         <div class="item">
-          <h4>{{ issuer.domain }}</h4>
-          <p>The website at <a href="{{ issuer.origin }}">{{ issuer.domain }}</a> has
-            permission to:</p>
-          {% set permissions = issuer.permissions %}
-          {% include 'permissions.html' %}
-          <button type="button" class="btn btn-danger js-revoke"
-                  autocomplete="off"
-                  data-loading-text="Revoking..."
-                  data-revoke="{{ issuer.origin }}">Revoke
-            access for {{ issuer.domain }}</button>
+          <span class="title">
+            <strong>{{ issuer.domain }}</strong>
+            <small>
+              <p>The website at 
+                <a href="{{ issuer.origin }}">{{ issuer.domain }}</a> has
+                permission to:</p>
+              {% set permissions = issuer.permissions %}
+              {% include 'permissions.html' %}
+            </small>
+          </span>
+          <div class="content">
+            <button type="button" class="btn btn-danger js-revoke"
+                    autocomplete="off"
+                    data-loading-text="Revoking..."
+                    data-revoke="{{ issuer.origin }}">Revoke
+              access for {{ issuer.domain }}</button>
+          </div>
         </div>
       {% endfor %}
     {% else %}
