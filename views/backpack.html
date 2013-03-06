@@ -4,13 +4,58 @@
 
 {% block body %}
 
+<form style="display: none" action=''>
+  <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+</form>
+
 {% if not badges.length %}
 <h1>No badges.  Better get out there and start earning some!</h1>
 <p>By the way, <a href="http://p2pu.org">P2PU</a> would be a great place to start
 {% endif %}
 
 <div class="row" style="position: relative;">
-  <div class="span4 column">
+
+  <div id='groups' class="span4 column">
+  {% if badges.length %}
+    <h2>Groups</h2>
+    {% for group in groups %}
+    <div class='group' data-id="{{group.attributes.id}}" data-url="{{group.attributes.url}}">
+      <input class='groupName' type='text' value='{{group.attributes.name}}' style='display: block'>
+      <span class='icon delete'>&times;</span>
+      <span class='icon share' {% if not group.attributes.badgeObjects %}style='display: none'{% endif %} title='Share this group'>5</span>
+
+      <span class='public'>
+        <label>
+          <input type='checkbox' class='js-privacy' {% if group.attributes.public %}checked{% endif %}>
+          <span>public</span>
+        </label>
+      </span>
+
+      {% for badge in group.attributes.badgeObjects %}
+      <span draggable="true" class="openbadge" data-id="{{badge.attributes.id}}">
+        <img src="{{badge.attributes.image_path}}" width="64px"/>
+      </span>
+      {% endfor %}
+      
+    </div>
+    {% endfor %}
+
+    <div class='group isNew'>
+      <input class='groupName' type='text' value='New Group'>
+      <span class='icon delete'>&times;</span>
+      <span class='icon share' title='share this group'>5</span>
+      <h3 class='instructions'>Drag a Badge Here</h3>
+      <span class='public'>
+        <label>
+          <input type='checkbox' class='js-privacy'>
+          <span>public</span>
+        </label>
+      </span>
+    </div>
+  {% endif %}
+  </div>
+
+  <div class="span8 column">
     {% if badges.length %}
     <h2>Badges</h2>
     <div id="badges" class="js-badges">
@@ -21,63 +66,8 @@
       {% endfor %}
     </div>
     {% endif %}
-
-    <div class="upload">
-      <h3>Upload Badges</h3>
-      <p>If you have badges you've been awarded, you can upload them manually</p>
-      <form action="/backpack/badge" method="post" enctype="multipart/form-data">
-        <fieldset>
-          <div class="clearfix">
-            <input type="hidden" name="_csrf" value="{{ csrfToken }}"></input>
-            <input id="userBadge" type="file" name="userBadge" accept="image/png"></input>
-          </div>
-        </fieldset>
-        <div class="clearfix">
-          <input class="btn btn-primary" type="submit" value="Upload"></input>
-        </div>
-      </form>
-    </div>
   </div>
 
-  {% if badges.length %}
-    <div id='groups' class="span8 column">
-      <h2>Groups</h2>
-      {% for group in groups %}
-        <div class='group' data-id="{{group.attributes.id}}" data-url="{{group.attributes.url}}">
-        <input class='groupName' type='text' value='{{group.attributes.name}}' style='display: block'>
-        <span class='icon delete'>&times;</span>
-        <span class='icon share' {% if not group.attributes.badgeObjects %}style='display: none'{% endif %} title='Share this group'>5</span>
-
-        <span class='public'>
-          <label>
-            <input type='checkbox' class='js-privacy' {% if group.attributes.public %}checked{% endif %}>
-            <span>public</span>
-          </label>
-        </span>
-
-          {% for badge in group.attributes.badgeObjects %}
-            <span draggable="true" class="openbadge" data-id="{{badge.attributes.id}}">
-              <img src="{{badge.attributes.image_path}}" width="64px"/>
-            </span>
-          {% endfor %}
-        </div>
-      {% endfor %}
-
-      <div class='group isNew'>
-        <input class='groupName' type='text' value='New Group'>
-        <span class='icon delete'>&times;</span>
-        <span class='icon share' title='share this group'>5</span>
-        <h3 class='instructions'>Drag a Badge Here</h3>
-        <span class='public'>
-          <label>
-            <input type='checkbox' class='js-privacy'>
-            <span>public</span>
-          </label>
-        </span>
-      </div>
-
-    </div>
-  {% endif %}
 </div>
 
 {% endblock %}
