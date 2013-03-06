@@ -168,6 +168,27 @@ form.baker #assertion {
   }
 }
 
+.sticky {
+  position: fixed;
+  /* top: height + borders
+     TODO: extract variables & use consistently 
+   */
+  top: @navbarHeight + 4px + 2px; 
+  bottom: 0;
+
+  .scroll {
+    overflow-y: scroll;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    margin: 130px 0 20px;
+    padding: 0 12px 12px 12px; 
+    .box-sizing(border-box);
+    border-radius: 5px;
+    background-color: @gray;
+  }
+}
+
 .group input.groupName {
   -webkit-transition: all 0.4s ease;
   -moz-transition: all 0.4s ease;
@@ -219,7 +240,6 @@ form.baker #assertion {
   border-radius: 5px;
   background: url('/images/texturetastic_gray.png');
   overflow: hidden;
-  box-shadow: 2px 2px 5px 3px #ddd;
   -webkit-transition: all 0.25s ease;
   -moz-transition: all 0.25s ease;
   -ms-transition: all 0.25s ease;

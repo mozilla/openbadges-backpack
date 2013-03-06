@@ -15,44 +15,49 @@
 
 <div class="row" style="position: relative;">
 
-  <div id='groups' class="span4 column">
-  {% if badges.length %}
-    <h2>Collections</h2>
-    {% for group in groups %}
-    <div class='group' data-id="{{group.attributes.id}}" data-url="{{group.attributes.url}}">
-      <input class='groupName' type='text' value='{{group.attributes.name}}' style='display: block'>
-      <span class='icon delete'>&times;</span>
-      <span class='icon share' {% if not group.attributes.badgeObjects %}style='display: none'{% endif %} title='Share this group'>5</span>
+  <div class="span4 column">
+    <div class="row">
+    {% if badges.length %}
+      <div class="sticky span4">
+        <h2>Collections</h2>
+        <div id="groups" class="scroll span4">
+          {% for group in groups %}
+          <div class='group' data-id="{{group.attributes.id}}" data-url="{{group.attributes.url}}">
+            <input class='groupName' type='text' value='{{group.attributes.name}}' style='display: block'>
+            <span class='icon delete'>&times;</span>
+            <span class='icon share' {% if not group.attributes.badgeObjects %}style='display: none'{% endif %} title='Share this group'>5</span>
 
-      <span class='public'>
-        <label>
-          <input type='checkbox' class='js-privacy' {% if group.attributes.public %}checked{% endif %}>
-          <span>public</span>
-        </label>
-      </span>
+            <span class='public'>
+              <label>
+                <input type='checkbox' class='js-privacy' {% if group.attributes.public %}checked{% endif %}>
+                <span>public</span>
+              </label>
+            </span>
 
-      {% for badge in group.attributes.badgeObjects %}
-      <span draggable="true" class="openbadge" data-id="{{badge.attributes.id}}">
-        <img src="{{badge.attributes.image_path}}" width="64px"/>
-      </span>
-      {% endfor %}
-      
+            {% for badge in group.attributes.badgeObjects %}
+            <span draggable="true" class="openbadge" data-id="{{badge.attributes.id}}">
+              <img src="{{badge.attributes.image_path}}" width="64px"/>
+            </span>
+            {% endfor %}
+          </div>
+          {% endfor %}
+
+          <div class='group isNew'>
+            <input class='groupName' type='text' value='New Group'>
+            <span class='icon delete'>&times;</span>
+            <span class='icon share' title='share this group'>5</span>
+            <h3 class='instructions'>Drag a Badge Here</h3>
+            <span class='public'>
+              <label>
+                <input type='checkbox' class='js-privacy'>
+                <span>public</span>
+              </label>
+            </span>
+          </div>
+        </div>
+      </div>
+    {% endif %}
     </div>
-    {% endfor %}
-
-    <div class='group isNew'>
-      <input class='groupName' type='text' value='New Group'>
-      <span class='icon delete'>&times;</span>
-      <span class='icon share' title='share this group'>5</span>
-      <h3 class='instructions'>Drag a Badge Here</h3>
-      <span class='public'>
-        <label>
-          <input type='checkbox' class='js-privacy'>
-          <span>public</span>
-        </label>
-      </span>
-    </div>
-  {% endif %}
   </div>
 
   <div class="span8 column">
