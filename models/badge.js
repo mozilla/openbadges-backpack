@@ -82,6 +82,16 @@ Badge.prototype.checkHash = function checkHash() {
   return sha256(JSON.stringify(this.get('body'))) === this.get('body_hash');
 };
 
+Badge.prototype.getFromBody = function getFromBody(dotstring) {
+  const parts = dotstring.split('.');
+  const last = parts.pop();
+  const obj = parts.reduce(function (obj, field) {
+    if (!obj) return undefined;
+    return obj[field];
+  }, this.get('body'));
+  return obj && obj[last];
+};
+
 // Validators called by `save()` (see mysql-base) in preparation for saving.
 // A valid pass returns nothing (or a falsy value); an invalid pass returns a
 // message about why a thing was invalid.
@@ -93,12 +103,14 @@ Badge.prototype.checkHash = function checkHash() {
 // them to figure out how to handle the error
 Badge.validators = {
   image_path: function (value) {
-    if (!value) { return "Must have an image_path."; }
+    if (!value)
+      return "Must have an image_path.";
   },
   body: function (value) {
-    if (!value) { return "Must have a body."; }
-    if (String(value) !== '[object Object]') { return "body must be an object"; }
-    if (Badge.validateBody(value) instanceof Error) { return "invalid body"; }
+    if (!value)
+      return "Must have a body.";
+    if (String(value) !== '[object Object]')
+      return "body must be an object";
   }
 };
 
