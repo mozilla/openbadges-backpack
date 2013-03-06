@@ -25,7 +25,7 @@
   <input name="scope" type="hidden" value="{{ joinedScope }}">
   <button class="btn btn-primary" type="submit">Grant permission
     to {{ clientDomain }}.</button>
-  <a class="btn" href="{{ callback }}?error=access_denied">Deny permission</a>
+  <a class="btn" href="{{ denyCallback }}">Deny permission</a>
   <a class="btn" href="/backpack/signout">I am not 
     {{ user.attributes.email }}.</a>
 </form>

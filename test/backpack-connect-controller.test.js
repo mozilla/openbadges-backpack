@@ -326,7 +326,8 @@ testUtils.prepareDatabase({
         csrfToken: 'a_csrf',
         joinedScope: "foo_perm,bar_perm",
         scopes: ["foo_perm", "bar_perm"],
-        callback: "http://foo.org"
+        callback: "http://foo.org",
+        denyCallback: "http://foo.org/?error=access_denied"
       });
       t.equal(mock.status, 200);
       t.end();

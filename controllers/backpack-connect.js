@@ -1,6 +1,5 @@
-var querystring = require('querystring');
 var url = require('url');
-
+var utils = require('../lib/utils');
 var logger = require('../lib/logging').logger;
 
 var BackpackConnect = module.exports = function BackpackConnect(options) {
@@ -113,7 +112,8 @@ function requestAccess(req, res) {
     csrfToken: req.session._csrf,
     joinedScope: req.query.scope,
     scopes: scopes,
-    callback: req.query.callback
+    callback: req.query.callback,
+    denyCallback: utils.extendUrl(req.query.callback, {error: 'access_denied'})
   });
 }
 
@@ -149,7 +149,7 @@ function allowAccess(req, res, next) {
       logger.debug(err);
       return next(err);
     }
-    return res.redirect(req.body.callback + "?" + querystring.stringify({
+    return res.redirect(utils.extendUrl(req.body.callback, {
       access_token: session.get('access_token'),
       refresh_token: session.get('refresh_token'),
       expires: session.tokenLifetime,
