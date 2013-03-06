@@ -1,12 +1,13 @@
-var _ = require('underscore');
-var request = require('request');
-var fs = require('fs');
-var url = require('url');
-var logger = require('../lib/logging').logger;
-var awardBadge = require('../lib/award');
-var remote = require('../lib/remote');
-var Badge = require('../models/badge.js');
-var regex = require('../lib/regex.js');
+const _ = require('underscore');
+const request = require('request');
+const fs = require('fs');
+const url = require('url');
+const logger = require('../lib/logging').logger;
+const awardBadge = require('../lib/award');
+const remote = require('../lib/remote');
+const Badge = require('../models/badge.js');
+const regex = require('../lib/regex.js');
+const analyzeAssertion = require('../lib/analyze-assertion');
 
 /**
  * Fully qualify a url.
@@ -141,9 +142,10 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
    */
 
   logger.debug("here's my full url " + req.originalUrl);
-  var user = req.user;
-  var error = req.flash('error');
-  var success = req.flash('success');
+  const user = req.user;
+  const error = req.flash('error');
+  const success = req.flash('success');
+  var assertionUrl;
 
   // is the user logged in? if not, suggest they redirect to the login page
   if (!user) return res.json({
@@ -152,7 +154,7 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
   }, 403);
 
   // get the url param (lots of debugging statements here)
-  var assertionUrl = req.query.url; // if it was as a query param in the GET
+  assertionUrl = req.query.url; // if it was as a query param in the GET
   if (!assertionUrl) {
     logger.debug("I'm doing a " + req.method);
     logger.debug("tried GET assertionUrl, didn't get anything " + req.param());
@@ -178,117 +180,99 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
     return res.json({ message: 'malformed url' }, 400);
   }
 
-  /* grabbing the remote assertion, 3 nested steps -
-   *
-   * 1) grab the remote assertion
-   * 2) grab the remote badge image
-   * if the request is a POST
-   * 3) award the badge
-   */
-  remote.getHostedAssertion(assertionUrl, function (err, assertion) {
-    var recipient = user.get('email');
-    if (err || !assertion) {
-      var error_msg = "trying to grab url " + assertionUrl + " got error " + err;
-      logger.error(error_msg);
-      return res.json({ message: error_msg }, 502);
+  analyzeAssertion(assertionUrl, function (err, data) {
+    if (err) {
+      if (err.code === 'resources')
+        err.message = 'could not get all linked resources';
+      if (err.code === 'structure')
+        err.message = 'invalid assertion structure';
+      return res.json(err, 400);
     }
+    const assertion = data.assertion;
+    const recipient = user.get('email');
+    const userOwnsBadge = Badge.confirmRecipient(assertion, recipient);
+    const origin = assertion.badge.issuer.origin;
 
-    var userOwnsBadge = Badge.confirmRecipient(assertion, recipient);
     if (req.method == 'POST' &&  !userOwnsBadge) {
       return res.json({
         message: "badge assertion is for a different user"
       }, 403);
     }
 
-    // #TODO: write tests for invalid assertions, potentially move this check
-    //   into remote.getHostedAssertion?
-    // Badge.validateBody is ill named -- it returns null if the badge is
-    // valid, an error object if the badge is not valid.
-    if (Badge.validateBody(assertion)) {
-      return res.json({
-        message: "badge assertion appears to be invalid"
-      }, 400);
-    }
-
     if (req.backpackConnect &&
-        req.backpackConnect.get('origin') != assertion.badge.issuer.origin)
+        req.backpackConnect.get('origin') != origin)
       return res.json({
         message: "issuer origin must be identical to bearer token origin"
       }, 400);
 
-    // grabbing the remote badge image
-    var imageUrl = qualifyUrl(assertion.badge.image, assertion.badge.issuer.origin);
-    remote.badgeImage(imageUrl, function (err, imagedata) {
-      if (err) {
-        var error_msg = "trying to grab image at url " + imageUrl + " got error " + err;
-        logger.error(error_msg);
-        return res.json({ message: error_msg }, 502);
-      }
-      // awarding the badge, only done if this is a POST
-      if (req.method == 'POST') {
-        var opts = {
-          assertion: assertion,
-          url: assertionUrl,
-          imagedata: imagedata,
-          recipient: recipient
-        };
+    // awarding the badge, only done if this is a POST
+    if (req.method == 'POST') {
+      const imagedata = data.resources['badge.image'];
+      const opts = {
+        assertion: assertion,
+        url: assertionUrl,
+        imagedata: imagedata,
+        recipient: recipient
+      };
 
-        awardBadge(opts, function (err, badge) {
-          if (err) {
-            var error_message = "badge error " + assertionUrl + err;
-            logger.error(error_message);
-            // check if this badge is a duplicate, currently in the
-            // error message
-            logger.error(err);
-            var dupe_regex = /Duplicate entry/;
-            if (dupe_regex.test(err)) {
-              return res.json({
-                badge: assertion,
-                exists: true,
-                message: "badge already exists"
-              }, 304);
-            }
-            // return a general error message
+      return awardBadge(opts, function (err, badge) {
+        if (err) {
+          const errorMessage = "badge error " + assertionUrl + err;
+          logger.error(errorMessage);
+          // check if this badge is a duplicate, currently in the
+          // error message
+          logger.error(err);
+          const dupeRegex = /Duplicate entry/;
+          if (dupeRegex.test(err)) {
             return res.json({
               badge: assertion,
-              exists: false,
-              message: error_message
-            }, 500);
+              exists: true,
+              message: "badge already exists"
+            }, 304);
           }
-          logger.debug("badge added " + assertionUrl);
+          // return a general error message
           return res.json({
+            badge: assertion,
             exists: false,
-            badge: assertion
-          }, 201);
-        });
-      }
-
-      // if this is a GET, we still need to return the badge
-      else {
-        assertion.badge.image = imageUrl;
-
-        var response = {
+            message: error_message
+          }, 500);
+        }
+        logger.debug("badge added " + assertionUrl);
+        return res.json({
           exists: false,
-          badge: assertion,
-          recipient: recipient
-        };
-        Badge.findOne({endpoint: assertionUrl}, function (err, badge) {
-          if (err) {
-            logger.error(err);
-            return res.json({message: "internal server error"}, 500);
-          }
+          badge: assertion
+        }, 201);
+      });
+    }
 
-          if (badge && badge.get("user_id") == req.user.get("id"))
-            response.exists = true;
+    // if this is a GET, we still need to return the badge
 
-          if (Badge.confirmRecipient(assertion, req.user.get('email')))
-            response.owner = true;
+    // we want to be able to display the badge in the issuer
+    // workflow, so we need to make sure the image url is absolute
+    const rawImageUrl = assertion.badge.image
+    const absoluteImageUrl = qualifyUrl(rawImageUrl, origin);
+    assertion.badge.image = absoluteImageUrl;
 
-          return res.json(response, 200);
-        });
+    const response = {
+      exists: false,
+      badge: assertion,
+      recipient: recipient
+    };
+    Badge.findOne({endpoint: assertionUrl}, function (err, badge) {
+      if (err) {
+        logger.error(err);
+        return res.json({message: "internal server error"}, 500);
       }
+
+      if (badge && badge.get("user_id") == req.user.get("id"))
+        response.exists = true;
+
+      if (Badge.confirmRecipient(assertion, req.user.get('email')))
+        response.owner = true;
+
+      return res.json(response, 200);
     });
-  }); // end of the assertion grabbing badge adding.
+  });
 };
 
 exports.welcome = function(request, response, next) {
