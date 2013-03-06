@@ -17,7 +17,7 @@
 
   <div id='groups' class="span4 column">
   {% if badges.length %}
-    <h2>Groups</h2>
+    <h2>Collections</h2>
     {% for group in groups %}
     <div class='group' data-id="{{group.attributes.id}}" data-url="{{group.attributes.url}}">
       <input class='groupName' type='text' value='{{group.attributes.name}}' style='display: block'>
@@ -56,16 +56,19 @@
   </div>
 
   <div class="span8 column">
-    {% if badges.length %}
-    <h2>Badges</h2>
-    <div id="badges" class="js-badges">
-      {% for badge in badges %}
-        <span draggable="true" class="openbadge" data-id="{{badge.attributes.id}}" rel="popinfo" data-title="{{badge.attributes.body.badge.name|escape}}" data-content="<span>{{badge.attributes.body.badge.description|escape}}</span><span>Issuer: {{badge.attributes.body.badge.issuer.name|escape}}</span>">
-          <img src="{{badge.attributes.image_path}}" width="64px"/>
-        </span>
-      {% endfor %}
+    <div class="row">
+      <ul id="badges" class="js-badges badge-list small-cards">
+        {% for badge in badges %}
+          <li class="span3">
+            <div class="openbadge" data-id="{{badge.attributes.id}}">
+              <img src="{{ badge.attributes.image_path }}" width="64">
+              <p class="title">{{ badge.attributes.body.badge.name }}</p>
+              <p class="issuer">Issuer: {{ badge.attributes.body.badge.issuer.name }}</p>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
     </div>
-    {% endif %}
   </div>
 
 </div>
