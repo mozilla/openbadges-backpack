@@ -164,33 +164,6 @@ form.baker #assertion {
   }
 }
 
-.small-cards {
-  .span3 {
-    width: 193px; /* reduce span to 2.6667 */
-  }
-}
-
-.sticky {
-  position: fixed;
-  /* top: height + borders
-     TODO: extract variables & use consistently 
-   */
-  top: @navbarHeight + 4px + 2px; 
-  bottom: 0;
-
-  .scroll {
-    overflow-y: scroll;
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    margin: 130px 0 20px;
-    padding: 0 12px;
-    .box-sizing(border-box);
-    border-radius: 5px;
-    background-color: @gray;
-  }
-}
-
 [draggable=true] {
   -khtml-user-drag: element;
 }
