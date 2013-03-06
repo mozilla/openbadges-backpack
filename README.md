@@ -121,7 +121,7 @@ and then back in windows you can fire up your favourite browser and connect to t
 
 3. Install local dependencies: `npm install`
 
-4. Install submodules: `npm submodule update --init`
+4. Install submodules: `git submodule update --init`
 
 5. Run the test suite: `npm test`
 
