@@ -214,7 +214,7 @@ appUtils.prepareApp(function(a) {
 
     // Ensure the hash endpoint works.
     
-    a.verifyRequest('GET', '/api/hash', {
+    a.verifyRequest('GET', '/api/identity', {
       headers: {
         'authorization': 'Bearer ' + b64enc('1234')
       }
@@ -229,7 +229,7 @@ appUtils.prepareApp(function(a) {
 
     // Ensure the hash endpoint requires auth.
     
-    a.verifyRequest('GET', '/api/hash', {
+    a.verifyRequest('GET', '/api/identity', {
       statusCode: 401,
       body: 'access token expected'
     });

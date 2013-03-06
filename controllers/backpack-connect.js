@@ -24,7 +24,7 @@ function fullUrl(pathname) {
 }
 
 BackpackConnect.prototype = {
-  hash: function() { return hash.bind(this); },
+  hashIdentity: function() { return hashIdentity.bind(this); },
   revokeOrigin: function() { return revokeOrigin.bind(this); },
   refresh: function() { return refresh.bind(this); },
   requestAccess: function() { return requestAccess.bind(this); },
@@ -33,7 +33,7 @@ BackpackConnect.prototype = {
   authorize: function(perm) { return authorize.bind(this, perm); }
 };
 
-function hash(req, res, next) {
+function hashIdentity(req, res, next) {
   return res.send(this.Model.makeRecipientHash(req.user.get('email')));
 }
 
