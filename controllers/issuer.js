@@ -7,6 +7,7 @@ const awardBadge = require('../lib/award');
 const Badge = require('../models/badge.js');
 const regex = require('../lib/regex.js');
 const analyzeAssertion = require('../lib/analyze-assertion');
+const normalizeAssertion = require('../lib/normalize-assertion');
 
 /**
  * Fully qualify a url.
@@ -187,7 +188,7 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
         err.message = 'invalid assertion structure';
       return res.json(err, 400);
     }
-    const assertion = data.assertion;
+    const assertion = normalizeAssertion(data);
     const recipient = user.get('email');
     const userOwnsBadge = Badge.confirmRecipient(assertion, recipient);
     const origin = assertion.badge.issuer.origin;
