@@ -223,7 +223,8 @@ appUtils.prepareApp(function(a) {
       body: {
         recipient: 'sha256$2a5712a82a3bc8f7ce25fe686ead768b5a538f5c248' +
                    '2214addee66a4ae29e2f8',
-        salt: '1234'
+        salt: '1234',
+        type: 'email'
       }
     });
 

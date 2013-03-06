@@ -39,7 +39,8 @@ function SessionFactory(options) {
     var sha = crypto.createHash('sha256');
     return {
       recipient: 'sha256$' + sha.update(email + salt).digest('hex'),
-      salt: salt
+      salt: salt,
+      type: 'email'
     };
   };
 
