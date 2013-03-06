@@ -4,7 +4,6 @@ const fs = require('fs');
 const url = require('url');
 const logger = require('../lib/logging').logger;
 const awardBadge = require('../lib/award');
-const remote = require('../lib/remote');
 const Badge = require('../models/badge.js');
 const regex = require('../lib/regex.js');
 const analyzeAssertion = require('../lib/analyze-assertion');
