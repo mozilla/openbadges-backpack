@@ -29,7 +29,7 @@ function withFakeGraphServer(cb) {
         resolve: resolve
       });
 
-      t.test("shut down issuer server", function(t) {
+      t.test("(shutting down issuer server)", function(t) {
         server.close();
         t.end();
       });
@@ -44,7 +44,7 @@ test("publishComment() works", withFakeGraphServer(function(t, graph) {
     return res.send(body, status);
   });
 
-  t.test("returning error works", function(t) {
+  t.test("when fb returns error", function(t) {
     body = "NO U";
     status = 500;
     facebook.publishComment("obj_id", "access_token", "hi", function(err) {
@@ -53,7 +53,7 @@ test("publishComment() works", withFakeGraphServer(function(t, graph) {
     });
   });
 
-  t.test("returning non-JSON response works", function(t) {
+  t.test("when fb returns non-JSON 200 response", function(t) {
     body = "I AM NOT JSON";
     status = 200;
     facebook.publishComment("obj_id", "access_token", "hi", function(err) {
@@ -62,7 +62,7 @@ test("publishComment() works", withFakeGraphServer(function(t, graph) {
     });
   });
 
-  t.test("returning JSON response works", function(t) {
+  t.test("when fb returns JSON 200 response", function(t) {
     body = {id: 15};
     status = 200;
     facebook.publishComment("obj_id", "access_token", "hi", function(err, id) {
