@@ -227,16 +227,7 @@ exports.manage = function manage(request, response, next) {
   function getBadges(err, results) {
     if (err) return next(err);
     groups = results;
-    Badge.find({email: user.get('email')}, function(err, badges){
-      if (err) return next(err);
-      badges.sort(function(a, b) {
-        var aid = a.get('id'),
-            bid = b.get('id');
-        if (aid == bid) return 0;
-        return bid - aid;
-      });
-      makeResponse(null, badges);
-    });
+    user.getAllBadges(makeResponse);
   }
 
   function modifyGroups(groups) {
