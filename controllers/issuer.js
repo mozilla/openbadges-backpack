@@ -188,6 +188,7 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
         err.message = 'invalid assertion structure';
       return res.json(err, 400);
     }
+
     const assertion = normalizeAssertion(data);
     const recipient = user.get('email');
     const userOwnsBadge = Badge.confirmRecipient(assertion, recipient);
