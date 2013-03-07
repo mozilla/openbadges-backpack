@@ -1,4 +1,12 @@
 {% extends "layout.html" %}
+{% block head %}
+<style>
+a.logout {
+  display: block;
+  padding-top: 20px;
+}
+</style>
+{% endblock %}
 {% block body %}
 <h1><span class="client">{{ clientDomain }}</span> would like permission 
   to:</h1>
@@ -23,8 +31,9 @@
   <input name="scope" type="hidden" value="{{ joinedScope }}">
   <button class="btn btn-primary" type="submit">Grant permission</button>
   <a class="btn" href="{{ denyCallback }}">Deny permission</a>
-  <a class="btn" href="/backpack/signout">I am not 
-    {{ user.attributes.email }}.</a>
+  <a href="/backpack/signout" class="logout">
+    I am not <span class="email">{{ user.attributes.email }}</span>.
+  </a>
 </form>
 {% endif %}
 {% endblock %}
