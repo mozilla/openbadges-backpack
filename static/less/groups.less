@@ -16,6 +16,10 @@
   -o-transition: all 0.25s ease;
   transition: all 0.25s ease;
 
+  hgroup {
+    margin: 0;
+  }
+
   .instructions {
     color: #444;
     padding: 0;
@@ -177,6 +181,8 @@
        gets left out of scroll by FF.
      */
     margin-bottom: 20px;
+    padding: 20px;
+    text-align: left;
 
     input.groupName {
       display: none;
@@ -223,7 +229,7 @@
     position: fixed;
     top: 0;
     bottom: 0;
-    margin: 130px 0 20px;
+    margin: 160px 0 20px;
     padding: 0 12px;
     .box-sizing(border-box);
     border-radius: 5px;
@@ -232,3 +238,21 @@
     border-width: 8px 2px;
   }
 }
+
+hgroup {
+  margin-left: 20px;
+  margin-right: 20px;
+  padding-bottom: 0.8em;
+
+  &.separator {
+    border-bottom: 1px dotted @gray;
+  }
+
+  h1, h2 {
+    margin-bottom: 2px;
+  }
+  h3 {
+    margin-bottom: 0;
+  }
+}
+

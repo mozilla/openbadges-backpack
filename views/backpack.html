@@ -19,7 +19,10 @@
     <div class="row">
     {% if badges.length %}
       <div class="sticky span4">
-        <h2>Collections</h2>
+        <hgroup class="separator">
+          <h2>My Collections</h2>
+          Organize badges the way you want
+        </hgroup>
         <div id="groups" class="scroll span4">
           {% for group in groups %}
           <div class='group' data-id="{{group.attributes.id}}" data-url="{{group.attributes.url}}">
@@ -43,10 +46,13 @@
           {% endfor %}
 
           <div class='group isNew'>
-            <input class='groupName' type='text' value='New Group'>
+            <input class='groupName' type='text' value='New Collection'>
             <span class='icon delete'>&times;</span>
             <span class='icon share' title='share this group'>5</span>
-            <h3 class='instructions'>Drag a Badge Here</h3>
+            <hgroup class="instructions">
+              <h3>Drag a badge here</h3>
+              to create a Collection.
+            </hgroup>
             <span class='public'>
               <label>
                 <input type='checkbox' class='js-privacy'>
