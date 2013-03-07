@@ -61,7 +61,7 @@ appUtils.prepareApp(function(a) {
       }
     });
 
-    // // Now put the example badge in the user's backpack.
+    // Now put the example badge in the user's backpack.
     a.verifyRequest('POST', '/issuer/assertion', {
       form: {
         '_csrf': a.csrf,
@@ -77,7 +77,6 @@ appUtils.prepareApp(function(a) {
 
     // Ensure putting the example badge in the user's backpack again results
     // in a 304 Not Modified.
-
     a.verifyRequest('POST', '/issuer/assertion', {
       form: {
         '_csrf': a.csrf,
@@ -88,7 +87,6 @@ appUtils.prepareApp(function(a) {
     });
 
     // Now ensure that the example badge is in the user's backpack.
-
     a.verifyRequest('GET', '/issuer/assertion?url=' + EXAMPLE_URL, {
       statusCode: 200,
       body: {
