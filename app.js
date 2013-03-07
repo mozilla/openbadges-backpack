@@ -14,6 +14,13 @@ var app = express();
 app.logger = logger;
 app.config = configuration;
 
+// if this is included, you need to configure the new relic agent
+// https://npmjs.org/package/newrelic
+if (configuration.new_relic) {
+  console.log("including New Relic");
+  require('newrelic');
+}
+
 // View helpers. `user` and `badges` are set so we can use them in `if`
 // statements without getting undefined errors and without having to use typeof
 // checks.
