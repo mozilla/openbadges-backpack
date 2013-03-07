@@ -3,21 +3,18 @@
 <link rel="stylesheet" href="/css/socialmedia.css">
 
 <div class='portfolio'>
-{% if message %}
-  <div class='message-container'>
-    <div class="alert alert-info">
-      <a class="close" data-dismiss="alert">×</a>
-      {{message}}
-      {{socialcode}}
+{% if owner %}
+  <div class="alert alert-info">
+    <div class="socialshare" style="float: left;" tabindex="0" onclick="injectSocialMedia(this)">
+      <span class="msg">Share this on twitter, google+ or facebook</span>
+      <div class="social-medium twitter"></div>
+      <div class="social-medium google"></div>
+      <div class="social-medium facebook"></div>
     </div>
+    <a href="edit" class='edit btn btn-primary'>Edit this page</a>
+    <strong class="shareMessage">This is how your portfolio page will look to the public.</strong>
   </div>
 {% endif %}
-
-  {% if owner %}
-  <div class='edit'>
-    <a href="edit" class='edit btn btn-primary'>Edit this page</a>
-  </div>
-  {% endif %}
 
   <header>
     {% if portfolio.attributes.title %}
