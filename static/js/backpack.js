@@ -83,7 +83,7 @@ Badge.Model = Backbone.Model.extend({
 Group.Model = Backbone.Model.extend({
   urlRoot: '/group',
   defaults: {
-    name: "New Group",
+    name: "New Collection",
     "public": false
   }
 });

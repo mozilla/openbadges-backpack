@@ -227,7 +227,7 @@ exports.manage = function manage(request, response, next) {
   function getBadges(err, results) {
     if (err) return next(err);
     groups = results;
-    Badge.find({email: user.get('email')}, makeResponse);
+    user.getAllBadges(makeResponse);
   }
 
   function modifyGroups(groups) {
