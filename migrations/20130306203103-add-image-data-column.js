@@ -30,7 +30,7 @@ exports.up = function(db, callback) {
 
   async.waterfall([
     function addColumn(callback) {
-      const sql = 'ALTER TABLE `badge` ADD image_data BLOB DEFAULT NULL;';
+      const sql = 'ALTER TABLE `badge` ADD image_data LONGBLOB DEFAULT NULL;';
       return db.runSql(sql, wrap(callback))
     },
     function getImagePaths(data, callback) {
