@@ -40,6 +40,44 @@ function withFakeGraphServer(cb) {
   };
 }
 
+test("publishBadge() works", withFakeGraphServer(function(t, graph) {
+  var body, status;
+
+  graph.app.post('/userid/open-badges:award', function(req, res) {
+    t.equal(req.query.access_token, 'token');
+    t.equal(url.parse(req.query.badge).pathname, '/share/badge/hash');
+    return res.send(body, status);
+  });
+
+  t.test("when fb is nice", function(t) {
+    body = {id: "newid"};
+    status = 200;
+    facebook.publishBadge('token', 'hash', 'userid', function(err, id) {
+      t.equal(err, null);
+      t.equal(id, "newid");
+      t.end();
+    });
+  });
+
+  t.test("when fb returns non-200 response", function(t) {
+    body = "NO U";
+    status = 500;
+    facebook.publishBadge('token', 'hash', 'userid', function(err, id) {
+      t.equal(err, "There was a problem sharing with Facebook.");
+      t.end();
+    });
+  });
+
+  t.test("when fb returns non-JSON 200 response", function(t) {
+    body = "NO U";
+    status = 200;
+    facebook.publishBadge('token', 'hash', 'userid', function(err, id) {
+      t.equal(err, "There was a problem sharing with Facebook.");
+      t.end();
+    });
+  });
+}));
+
 test("publishComment() works", withFakeGraphServer(function(t, graph) {
   var body, status;
 
