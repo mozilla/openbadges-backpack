@@ -328,6 +328,21 @@ exports.settings = function(options) {
 };
 
 /**
+ * Display badge-upload form
+ */
+
+exports.addBadge = function addBadge(request, response) {
+  var error = request.flash('error');
+  var success = request.flash('success');
+
+  response.render('addBadge.html', {
+    error: error,
+    success: success,
+    csrfToken: request.session._csrf
+  });
+}
+
+/**
  * Handle upload of a badge from a user's filesystem. Gets embedded data from
  * uploaded PNG with `urlFromUpload` from lib/baker, retrieves the assertion
  * using `getHostedAssertion` from lib/remote and finally awards the badge
@@ -343,13 +358,16 @@ exports.userBadgeUpload = function userBadgeUpload(request, response) {
   var tmpfile = request.files.userBadge;
 
   // go back to the manage page and potentially show an error
-  function redirect(err) {
+  function redirect(err, redirect) {
+    if (!redirect) {
+      redirect = '/backpack/add'
+    }
     if (err) {
       logger.warn('There was an error uploading a badge');
       logger.debug(err);
       request.flash('error', err.message);
     }
-    return response.redirect('/', 303);
+    return response.redirect(redirect, 303);
   }
 
   if (!user)
@@ -389,7 +407,7 @@ exports.userBadgeUpload = function userBadgeUpload(request, response) {
           logger.debug(err);
           return redirect(new Error('There was a problem saving your badge!'));
         }
-        return redirect();
+        return redirect(null, '/');
       });
     });
   });
