@@ -33,7 +33,7 @@ jenkins_build:
 migrate:
 	./bin/db-migrate up
 
-start: migrate
-	./node_modules/.bin/up -w -n 1 -p 8888 app.js
+start:
+	npm start
 
 .PHONY: fakeissuer start migrate test npm clean lint default
