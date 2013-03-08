@@ -14,10 +14,10 @@
         <form action="/backpack/facebook" method="POST" class="facebook-share">
         <input type="hidden" name="_csrf" value="{{ csrfToken }}"></input>
         <input type="hidden" name="badge_body_hash" value="{{badge.attributes.body_hash}}"></input>
-        <strong>{{badge.attributes.body.badge.issuer.name}}</strong><br />
-        {{badge.attributes.body.badge.description|escape}}
+        <strong>{{badge.attributes.body.badge.issuer.name}}</strong>
+        <p>{{badge.attributes.body.badge.description|escape}}</p>
         <textarea name='facebookcomment' tabindex=1 class='comment' placeholder='Add your personal comment'></textarea>
-        <input type="checkbox" name="facebook_automatic_push" value="facebook_automatic_push">Automatically publish badges to Facebook when they are added to my backpack.</td>
+        <span class="auto_push"><input type="checkbox" name="facebook_automatic_push" value="facebook_automatic_push">Automatically publish badges to Facebook when they are added to my backpack.</span></td>
       </td>
     </tr>
     <tr>
