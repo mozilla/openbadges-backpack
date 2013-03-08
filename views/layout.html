@@ -39,15 +39,15 @@
           <ul class="nav pull-right">
           {% if user %}
             <li {% if activeNav == 'badges' %}class="active"{% endif %}>
-              <a href="/" class="badge-link"><span>Badges</span></a>
+              <a href="/" class="icon badge-link"><span>Badges</span></a>
             </li>
             <li {% if activeNav == 'collections' %}class="active"{% endif %}>
-              <a href="/backpack" class="collection-link"><span>Collections</span></a>
+              <a href="/backpack" class="icon collection-link"><span>Collections</span></a>
             </li>
             <li class="user navbar-text">{{user.attributes.email}}</li>
             <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                <i class="icon-cog"></i><b class="caret"></b>
+              <a href="#" class="icon gear-link dropdown-toggle" data-toggle="dropdown">
+                <span><b class="caret"></b></span>
               </a>
               <ul class="dropdown-menu">
                 <li><a href="/backpack/settings">Settings</a></li>
