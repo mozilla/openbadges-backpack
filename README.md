@@ -125,7 +125,7 @@ and then back in windows you can fire up your favourite browser and connect to t
 
 5. Run the test suite: `npm test`
 
-6. Start your server: `make start`
+6. Start your server: `npm start`
 
 No matter which way you choose, you should join the
 [Open Badges Google Group](https://groups.google.com/forum/#!forum/openbadges). If
@@ -161,7 +161,7 @@ migration. You can do this as follows:
 
 5. Try rolling back your migration using `./bin/db-migrate down`.
 
-And finally, note that during development, `make start` automatically runs
+And finally, note that during development, `npm start` automatically runs
 `./bin/db-migrate up` for you. For production use, you'll need to manually
 run this command yourself whenever you deploy changes that involve a
 schema change.
