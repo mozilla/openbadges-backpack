@@ -13,7 +13,10 @@ exports.up = function(db, callback) {
     if (!entry.image_path) return callback();
     const data = fs.readFileSync(pathutil.join(path, entry.image_path));
     const sql = 'UPDATE `badge` SET `image_data` = ? WHERE `id` = ? LIMIT 1';
-    db.runSql(sql, [data.toString('base64'), entry.id], callback);
+    db.runSql(sql, [data.toString('base64'), entry.id], function () {
+      delete data;
+      return callback();
+    });
   }
 
   function wrap(callback) {
@@ -30,7 +33,7 @@ exports.up = function(db, callback) {
       return db.runSql(sql, wrap(callback));
     },
     function storeImages(data, callback) {
-      async.map(data, storeImageData, callback)
+      async.eachSeries(data, storeImageData, callback)
     }
   ], callback);
 };
