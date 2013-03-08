@@ -7,6 +7,8 @@ var type = dbm.dataType;
 
 exports.up = function(db, callback) {
 
+  const path = conf.get('badge_path').replace(/static.*/, 'static');
+
   function storeImageData(entry, callback) {
     if (!entry.image_path) return callback();
     const data = fs.readFileSync(pathutil.join(path, entry.image_path));
@@ -18,7 +20,6 @@ exports.up = function(db, callback) {
     return function (err, data) { return callback(err, data) }
   }
 
-  const path = conf.get('badge_path').replace(/static.*/, 'static');
   async.waterfall([
     function addColumn(callback) {
       const sql = 'ALTER TABLE `badge` ADD image_data BLOB DEFAULT NULL;';
