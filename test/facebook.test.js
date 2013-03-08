@@ -15,6 +15,7 @@ function withFakeGraphServer(cb) {
       var HOST = HOSTNAME + ':' + PORT;
       var PROTOCOL = 'http:';
       var BASE_URL = PROTOCOL + '//' + HOST;
+      var originalBaseUrl = facebook.BASE_URL;
       var resolve = function(path) { return url.resolve(BASE_URL, path); };
 
       facebook.BASE_URL = BASE_URL;
@@ -30,7 +31,8 @@ function withFakeGraphServer(cb) {
         resolve: resolve
       });
 
-      t.test("(shutting down issuer server)", function(t) {
+      t.test("(shutting down fake graph server)", function(t) {
+        facebook.BASE_URL = originalBaseUrl;
         server.close();
         t.end();
       });
