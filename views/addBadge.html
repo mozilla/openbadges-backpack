@@ -1,0 +1,31 @@
+{% extends 'layout.html' %}
+
+{% set activeNav = 'badges' %}
+
+{% block body %}
+  {% block badgeNav %}
+    <p class="badge-nav">
+      <span class="hide">Show</span>
+      <a href="/">Recent</a>
+      <span class="hide">,</span>
+      <a href="/backpack/badges">Everything</a>
+      <span class="hide">or</span>
+      <a href="/backpack/add" class="selected upload-badge">Upload</a>
+      <span class="hide">a new badge</span>
+    </p>
+  {% endblock %}
+
+  <h3>Upload Badges</h3>
+  <p>If you have badges you've been awarded, you can upload them manually</p>
+  <form action="/backpack/badge" method="post" enctype="multipart/form-data">
+    <fieldset>
+      <div class="clearfix">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}"></input>
+        <input id="userBadge" type="file" name="userBadge" accept="image/png"></input>
+      </div>
+    </fieldset>
+    <div class="clearfix">
+      <input class="btn btn-primary" type="submit" value="Upload"></input>
+    </div>
+  </form>
+{% endblock %}

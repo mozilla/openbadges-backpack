@@ -135,8 +135,9 @@ app.get('/demo/invalid.json', demo.badBadge);
 app.post('/demo/award', demo.award);
 
 app.get('/', backpack.recentBadges);
-app.get('/backpack', backpack.manage)
-app.get('/backpack/badges', backpack.allBadges)
+app.get('/backpack', backpack.manage);
+app.get('/backpack/badges', backpack.allBadges);
+app.get('/backpack/add', backpack.addBadge);
 app.get('/backpack/login', backpack.login);
 app.get('/backpack/signout', backpack.signout);
 app.post('/backpack/badge', backpack.userBadgeUpload);
