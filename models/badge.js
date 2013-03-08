@@ -22,10 +22,6 @@ Badge.prototype.presave = function () {
   }
 };
 
-Badge.prototype.getImageUrl = function () {
-  return this.get('imageUrl');
-};
-
 Badge.confirmRecipient = function confirmRecipient(assertion, email) {
   // can't validate if not given an assertion
   if (!assertion)
