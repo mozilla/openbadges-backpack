@@ -11,7 +11,12 @@ exports.up = function(db, callback) {
 
   function storeImageData(entry, callback) {
     if (!entry.image_path) return callback();
-    const data = fs.readFileSync(pathutil.join(path, entry.image_path));
+    try {
+      const data = fs.readFileSync(pathutil.join(path, entry.image_path));
+    } catch (e) {
+      console.log('skipping ', pathutil.join(path, entry.image_path));
+      return callback();
+    }
     const sql = 'UPDATE `badge` SET `image_data` = ? WHERE `id` = ? LIMIT 1';
     db.runSql(sql, [data.toString('base64'), entry.id], function () {
       delete data;
