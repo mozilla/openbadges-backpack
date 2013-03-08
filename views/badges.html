@@ -6,8 +6,7 @@
 
 {% if not badges.length %}
   {% block noBadges %}
-    <h1>No badges.  Better get out there and start earning some!</h1>
-    <p>By the way, <a href="http://p2pu.org">P2PU</a> would be a great place to start
+    {% include 'no-badges.html' %}
   {% endblock %}
 {% else %}
   <input type="hidden" name="_csrf" value="{{ csrfToken }}">
