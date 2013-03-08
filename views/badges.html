@@ -10,6 +10,7 @@
     <p>By the way, <a href="http://p2pu.org">P2PU</a> would be a great place to start
   {% endblock %}
 {% else %}
+  <input type="hidden" name="_csrf" value="{{ csrfToken }}">
   {% block badgeNav %}
     <p class="badge-nav">
       <span class="hide">Show</span>
@@ -23,10 +24,10 @@
       <ul id="badges" class="js-badges badge-list">
         {% block badgeItems %}
           {% for badge in badges %}
-            <li class="span3">
+            <li class="span3 openbadge-container">
               <div class="openbadge" data-id="{{badge.attributes.id}}">
                 <img src="{{ badge.attributes.image_path }}" width="64">
-                <p class="title">{{ badge.attributes.body.badge.name }}</p>
+                <p class="title" title="{{ badge.attributes.body.badge.name }}">{{ badge.attributes.body.badge.name }}</p>
                 <p class="issuer">Issuer: {{ badge.attributes.body.badge.issuer.name }}</p>
               </div>
             </li>
