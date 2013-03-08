@@ -1,6 +1,6 @@
+const $ = require('./');
 const jws = require('jws');
 const test = require('tap').test;
-const testUtils = require('./');
 const fs = require('fs');
 const path = require('path');
 const awardBadge = require('../lib/award');
@@ -8,7 +8,7 @@ const mysql = require('../lib/mysql');
 const Badge = require('../models/badge');
 const normalize = require('../lib/normalize-assertion');
 
-const TEST_ASSERTION = testUtils.makeAssertion();
+const TEST_ASSERTION = $.makeAssertion();
 const BADGE_DIRECTORY = path.basename(require('../lib/configuration').get('badge_path'));
 const PNG_DATA = fs.readFileSync(path.join(__dirname, '/utils/images/no-badge-data.png'));
 
@@ -60,7 +60,7 @@ const NEW_ASSERTION = {
   }
 };
 
-testUtils.prepareDatabase(function (done) {
+$.prepareDatabase(function (done) {
   test('awardBadge: old assertion', function (t) {
     const endpoint = 'http://example.com/badge';
     const badgeData = {
@@ -75,7 +75,7 @@ testUtils.prepareDatabase(function (done) {
       Badge.find({endpoint: endpoint}, function (err, badges) {
         t.notOk(err, 'should not have an error');
         t.same(badges.length, 1, 'should have exactly one badge');
-        var badgePath = badges[0].get('image_path');
+        const badgePath = badges[0].get('image_path');
         t.ok(badgePath.match(BADGE_DIRECTORY), 'should match');
         t.end();
       });
@@ -103,5 +103,5 @@ testUtils.prepareDatabase(function (done) {
     });
   });
 
-  testUtils.finish(test);
+  $.finish(test);
 });

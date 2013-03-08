@@ -16,7 +16,7 @@ function hash(thing, salt) {
 
 $.prepareDatabase({
   '1-user': new User({
-    email: 'brian@example.com'
+    email: $.EMAIL
   }),
 }, function (fixtures) {
 
@@ -37,7 +37,7 @@ $.prepareDatabase({
     conmock({
       handler: backpack.signout,
       request: {
-        session: { email: 'brian@example.org' }
+        session: { email: $.EMAIL }
       }
     }, function (err, mock, req) {
       t.same(mock.path, '/backpack/login', 'should redirect to the login page');
