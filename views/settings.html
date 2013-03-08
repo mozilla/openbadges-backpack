@@ -5,6 +5,8 @@
 <form method="post" class="settings">
   <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
+  <!-- TODO: Re-enable this when sharing actually works well.
+
   <fieldset id="accounts">
     <legend>Connected Accounts</legend>
     <div class="item">
@@ -42,6 +44,8 @@
       {% endif %}
     </div>
   </fieldset>
+
+  -->
   <fieldset id="issuer-acceptance">
     <legend>Connected Issuers</legend>
     {% if issuers.length %}
