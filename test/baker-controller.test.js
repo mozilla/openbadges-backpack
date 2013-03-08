@@ -5,6 +5,7 @@ const fs = require('fs');
 const bakery = require('openbadges-bakery');
 const baker = require('../controllers/baker');
 const conmock = require('./conmock');
+const User = require('../models/user');
 
 const makeAssertion = $.makeAssertion;
 const IMAGEDATA = fs.readFileSync(__dirname + '/utils/images/no-badge-data.png')
@@ -13,7 +14,11 @@ function makeRequestObj(url, award) {
   return {query: { assertion: $.makeUrl(url), award: award }};
 }
 
-$.prepareDatabase(function () {
+$.prepareDatabase({
+  '1-user': new User({
+    email: $.EMAIL
+  }),
+}, function () {
   const handler = baker.baker;
   test('without an assertion', function (t) {
     conmock(handler, function (err, mock) {
