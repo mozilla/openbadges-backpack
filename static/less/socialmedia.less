@@ -1,15 +1,19 @@
 .shareMessage {
+  display: block;
+  width: 100%;
+  text-align: center;
+  line-height: 30px;
+}
+.btn.edit {
   float: right;
-  margin-right: 25%;
-  font-size: 110%;
-  font-weight: bold;
+  vertical-align: middle;
 }
 
 .socialshare {
   float: left;
   text-shadow: 2px 2px 4px rgba(0, 200, 160, 0.2);
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-  margin-right: -2em;
+  line-height: 30px;
 }
 
 .socialshare:focus {
@@ -24,8 +28,9 @@
 
 .social-medium {
   display: table-cell;
-  vertical-align: top;
+  vertical-align: middle;
   height: 20px;
+  padding-top: 4px;
 }
 
 .social-medium + .social-medium {
@@ -40,8 +45,9 @@
 
 /* override on the alert styling, since visibility should not be hidden */
 
-.portfolio .message-container .alert {
-  overflow: visible !important;
+.portfolio .alert {
+  overflow: visible;
+  padding: 8px 20px;
   min-height: 1.5em;
 }
 
@@ -50,4 +56,15 @@
 .fb_iframe_widget_lift {
   background-color: transparent !important;
   box-shadow: none !important;
+}
+
+.facebook {
+  position: relative;
+  top: -1px;
+}
+
+.fb_iframe_widget {
+  span {
+    display: block
+  }
 }
