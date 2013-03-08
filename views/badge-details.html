@@ -8,16 +8,13 @@
 
       <div class='confirm-disown'>
         <p>
-          This will remove the badge from your account. It will also be
-          removed from all groups. The only way to get this badge back will be
-          to go to the place where it was issued
-          (<a href='{{badge.attributes.body.badge.issuer.origin}}'>{{badge.attributes.body.badge.issuer.name}}</a>)
-          and get it re-issued.
+          Do you want to remove this badge? </p>
+          <p> If so, you'd need to reconnect with the issuer (<a href='{{badge.attributes.body.badge.issuer.origin}}'>{{badge.attributes.body.badge.issuer.name}}</a>) to have this badge sent to your Backpack again.
         </p>
 
         <div class='buttons'>
-          <button class='btn nope'>Nevermind, I want to keep this badge</button>
-          <button class='btn yep btn-danger'>Yes, remove this badge</button>
+          <button class='btn nope'>Cancel</button>
+          <button class='btn yep btn-danger'>Yes</button>
         </div>
       </div>
       {% include 'badge-data.html' %}

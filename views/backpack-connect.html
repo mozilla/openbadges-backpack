@@ -1,4 +1,12 @@
 {% extends "layout.html" %}
+{% block head %}
+<style>
+a.logout {
+  display: block;
+  padding-top: 20px;
+}
+</style>
+{% endblock %}
 {% block body %}
 <h1><span class="client">{{ clientDomain }}</span> would like permission 
   to:</h1>
@@ -8,10 +16,8 @@
 
 {% if not user %}
 
-<p>Don't have a backpack account yet? 
-  <a class="js-browserid-link" href="#">Sign up</a> to start 
-  displaying your skills and achievements that happen online or 
-  anywhere in the universe.</p>
+<p>Want to create a Backpack?  
+  <a class="js-browserid-link" href="#">Sign up</a> to share your skills and interests, create badge collections, and more!</p>
 
 <a class="js-browserid-link" href="#">
   <img src="https://browserid.org/i/sign_in_green.png"/>
@@ -23,11 +29,11 @@
   <input name="_csrf" type="hidden" value="{{ csrfToken }}">
   <input name="callback" type="hidden" value="{{ callback }}">
   <input name="scope" type="hidden" value="{{ joinedScope }}">
-  <button class="btn btn-primary" type="submit">Grant permission
-    to {{ clientDomain }}.</button>
+  <button class="btn btn-primary" type="submit">Grant permission</button>
   <a class="btn" href="{{ denyCallback }}">Deny permission</a>
-  <a class="btn" href="/backpack/signout">I am not 
-    {{ user.attributes.email }}.</a>
+  <a href="/backpack/signout" class="logout">
+    I am not <span class="email">{{ user.attributes.email }}</span>.
+  </a>
 </form>
 {% endif %}
 {% endblock %}
