@@ -214,9 +214,6 @@ testUtils.prepareDatabase({
     t.ok(hasError(err, 'type'), 'type error if signed without public_key');
     t.ok(hasError(err, 'public_key'), 'public_key error if signed without jwt');
 
-    err = validate({image_path: null});
-    t.ok(hasError(err, 'image_path'), 'image_path is required');
-
     err = validate({body: null});
     t.ok(hasError(err, 'body'), 'body is required');
 
@@ -309,6 +306,14 @@ testUtils.prepareDatabase({
     catch (e) { t.fail('should not have thrown') }
     t.same(value, expect, 'got expected value');
     t.end();
+  });
+
+  test('Badge has image url when it comes out of the db', function (t) {
+    const expect = fixtures['2-existing-badge'];
+    Badge.findById(expect.get('id'), function (err, badge) {
+      t.ok(badge.get('imageUrl').match(RegExp(badge.get('body_hash'))), 'image url should match body hash');
+      t.end();
+    })
   });
 
   testUtils.finish(test);
