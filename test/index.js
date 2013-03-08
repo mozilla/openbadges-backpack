@@ -159,6 +159,13 @@ exports.makeSignature = function makeSignature(appHarness) {
     privateKey: keys.private
   });
 }
+exports.makeBadSignature = function makeSignature(whatever) {
+  return jws.sign({
+    header: { alg: 'rs256' },
+    payload: whatever,
+    privateKey: keys.private
+  });
+};
 
 
 function recreateDatabase(callback) {
