@@ -41,7 +41,6 @@ exports.findByUrl = function findByUrl(req, res, next, url) {
 };
 
 exports.findByHash = function findByHash (req, res, next, hash) {
-  // #TODO: should render a 404 page when badge isn't found
   Badge.findOne({body_hash: hash}, function (err, badge) {
     if (err)
       return next(err);
