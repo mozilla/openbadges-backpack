@@ -329,7 +329,6 @@ exports.settings = function(options) {
 };
 
 exports.userBadgeUpload = function userBadgeUpload(req, res) {
-  // go back to the manage page and potentially show an error
   function redirect(err) {
     if (err) {
       logger.warn('There was an error uploading a badge');

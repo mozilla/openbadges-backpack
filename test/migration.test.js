@@ -97,7 +97,7 @@ testMigration("initial", function(t, id) {
 testMigration("add-public-columns", function(t, id, previousId) {
   return [
     up({destination: previousId}),
-    sql("INSERT INTO `user` VALUES (1,'foo@bar.org',NULL,1,NULL,NULL);"),
+    sql("INSERT INTO `user` (id, email) VALUES (1,'foo@bar.org');"),
     sql("INSERT INTO `badge` VALUES (1,1,'hosted','http://foo',NULL,NULL," +
         "'/blah.png',0,'i am a json assertion','i am a json assertion hash'" +
         ",now());"),
@@ -116,7 +116,7 @@ testMigration("add-public-columns", function(t, id, previousId) {
 testMigration("drop-public-key-field", function(t, id, previousId) {
   return [
     up({destination: previousId}),
-    sql("INSERT INTO `user` VALUES (1,'foo@bar.org',NULL,1,NULL,NULL);"),
+    sql("INSERT INTO `user` (id, email) VALUES (1,'foo@bar.org');"),
     sql("INSERT INTO `badge` (id, user_id, type, image_path, body, body_hash) VALUES (1,1,'hosted','image.png','body','hash')"),
     up({count: 1}),
     sqlError("SELECT public_key FROM badge", t, "ERROR_BAD_FIELD_ERROR"),
@@ -126,7 +126,7 @@ testMigration("drop-public-key-field", function(t, id, previousId) {
 testMigration("rename-jwt-to-signature", function(t, id, previousId) {
   return [
     up({destination: previousId}),
-    sql("INSERT INTO `user` VALUES (1,'foo@bar.org',NULL,1,NULL,NULL);"),
+    sql("INSERT INTO `user` (id, email) VALUES (1,'foo@bar.org');"),
     sql("INSERT INTO `badge` (id, user_id, type, jwt, image_path, body, body_hash) VALUES (1,1,'hosted', 'sup', 'image.png','body','hash')"),
     up({count: 1}),
     sql("SELECT signature FROM badge WHERE id=1", function(results) {
@@ -142,7 +142,7 @@ testMigration("rename-jwt-to-signature", function(t, id, previousId) {
 testMigration("drop-badge-type-column", function(t, id, previousId) {
   return [
     up({destination: previousId}),
-    sql("INSERT INTO `user` VALUES (1,'foo@bar.org',NULL,1,NULL,NULL);"),
+    sql("INSERT INTO `user` (id, email) VALUES (1,'foo@bar.org');"),
     sql("INSERT INTO `badge` (id, user_id, type, signature, image_path, body, body_hash) VALUES (1,1,'hosted', 'sup', 'image.png','body','hash')"),
     up({count: 1}),
     sqlError("SELECT `type` FROM badge", t, "ERROR_BAD_FIELD_ERROR"),
@@ -152,7 +152,7 @@ testMigration("drop-badge-type-column", function(t, id, previousId) {
 testMigration("drop-rejected-column-from-badge", function(t, id, previousId) {
   return [
     up({destination: previousId}),
-    sql("INSERT INTO `user` VALUES (1,'foo@bar.org',NULL,1,NULL,NULL);"),
+    sql("INSERT INTO `user` (id, email) VALUES (1,'foo@bar.org');"),
     sql("INSERT INTO `badge` (id, user_id, image_path, body, body_hash) VALUES (1,1, 'image.png','body','hash')"),
     up({count: 1}),
     sqlError("SELECT `rejected` FROM badge", t, "ERROR_BAD_FIELD_ERROR"),
@@ -168,7 +168,7 @@ testMigration("add-image-data-column", function(t, id, previousId) {
 
   return [
     up({destination: previousId}),
-    sql("INSERT INTO `user` VALUES (1,'foo@bar.org',NULL,1,NULL,NULL);"),
+    sql("INSERT INTO `user` (id, email) VALUES (1,'foo@bar.org');"),
     sql("INSERT INTO `badge` (id, user_id, image_path, body, body_hash) VALUES (1,1, '/_badges/image1.png','body','hsh1')"),
     sql("INSERT INTO `badge` (id, user_id, image_path, body, body_hash) VALUES (2,1, '/_badges/image2.png','body','hsh2')"),
     up({count: 1}),
