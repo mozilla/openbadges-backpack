@@ -128,7 +128,8 @@ form.baker #assertion {
     margin-bottom: 20px;
   }
 
-  .openbadge {
+  .openbadge,
+  .add-openbadge {
     display: block;
     background: #FFF;
     border: solid 1px #8D8D8D;
@@ -152,13 +153,17 @@ form.baker #assertion {
     }
   }
 
-  .add-badge {
-    display: block;
-    text-align: center;
-    padding: 20px;
-    border: dashed 1px #8F8F8F;
-    min-height: 134px;
-    line-height: 134px;
+  .add-openbadge {
+    background: none;
+    color: inherit;
+    font-weight: bold;
+    border: dashed 3px #8F8F8F;
+    box-shadow: none;
+
+    .issuer {
+      background: none;
+      margin-top: 6px;
+    }
   }
 }
 
