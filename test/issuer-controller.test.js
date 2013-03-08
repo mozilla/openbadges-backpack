@@ -1,20 +1,20 @@
+const $ = require('./');
 const _ = require('underscore');
 const test = require('tap').test;
-const testUtils = require('./');
 const conmock = require('./conmock');
 const issuer = require('../controllers/issuer');
 
 const User = require('../models/user');
 const Badge = require('../models/badge');
 
-testUtils.prepareDatabase({
+$.prepareDatabase({
   '1-user': new User({ email: 'brian@example.org' }),
   '2-badge': new Badge({
     user_id: 1,
     endpoint: 'endpoint',
     image_path: 'image_path',
     body_hash: 'body_hash',
-    body: testUtils.makeAssertion({})
+    body: $.makeAssertion({})
   }),
 }, function (fixtures) {
 
@@ -90,12 +90,11 @@ testUtils.prepareDatabase({
     }, function (err, mock) {
       t.same(mock.fntype, 'send');
       t.same(mock.status, 400);
-      t.same(mock.body, 'malformed url');
       t.end();
     });
   });
 
 
-  testUtils.finish(test);
+  $.finish(test);
 });
 

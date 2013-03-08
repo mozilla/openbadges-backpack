@@ -2,6 +2,7 @@ const _ = require('underscore');
 const request = require('request');
 const fs = require('fs');
 const url = require('url');
+const validator = require('openbadges-validator');
 const logger = require('../lib/logging').logger;
 const awardBadge = require('../lib/award');
 const Badge = require('../models/badge.js');
@@ -31,16 +32,12 @@ function qualifyUrl(pathOrUrl, origin) {
 }
 
 function validUrl(url) {
-  //check if the assertion url is malformed
-  if (!regex.url.test(url)) {
-    // try one pass of decoding
-    logger.debug('url did not pass, trying to decodeURIComponent');
-    url = decodeURIComponent(url);
-    if (!regex.url.test(url)) {
-      return false;
-    }
-  }
-  return true;
+  if (regex.url.test(url))
+    return true;
+  url = decodeURIComponent(url);
+  if (regex.url.test(url))
+    return true;
+  return false;
 }
 
 var myFiles = [
@@ -110,20 +107,19 @@ exports.frame = function (req, res) {
 };
 
 exports.frameless = function (req, res) {
-  var assertionUrls = req.body.assertions || [];
-  assertionUrls = typeof assertionUrls === 'string' ? [assertionUrls] : assertionUrls;
-  for (var i = 0; i < assertionUrls.length; i++) {
-    var url = assertionUrls[i];
-    if (!validUrl(url)) {
-      logger.error("malformed url " + url + " returning 400");
-      return res.send('malformed url', 400);
+  const assertions = req.body.assertions || [];
+  assertions = typeof assertions === 'string' ? [assertions] : assertions;
+  for (var i=0, assertion; assertion = assertions[i]; i++) {
+    if (!validUrl(assertion) && !validator.isSignedBadge(assertion)) {
+      logger.error("malformed assertion " + assertion + " returning 400");
+      return res.send('assertion must be url or signature', 400);
     }
   }
   res.header('Cache-Control', 'no-cache, must-revalidate');
   res.render('badge-accept.html', {
     layout: null,
     framed: false,
-    assertions: JSON.stringify(assertionUrls),
+    assertions: JSON.stringify(assertions),
     csrfToken: req.session._csrf,
     email: req.session.emails && req.session.emails[0]
   });
@@ -136,8 +132,8 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
    * sure what caching options we have currently, so just going ahead and
    * making a double request.
    *
-   * request can either be a GET or a POST, one required param 'url'
-   * which points to a badge assertion.
+   * request can either be a GET or a POST, one required param 'assertion'
+   * which is either a url pointing to a badge assertion or a signed assertion
    *
    */
 
@@ -145,7 +141,6 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
   const user = req.user;
   const error = req.flash('error');
   const success = req.flash('success');
-  var assertionUrl;
 
   // is the user logged in? if not, suggest they redirect to the login page
   if (!user) return res.json({
@@ -153,39 +148,40 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
     redirect_to: '/backpack/login'
   }, 403);
 
-  // get the url param (lots of debugging statements here)
-  assertionUrl = req.query.url; // if it was as a query param in the GET
-  if (!assertionUrl) {
-    logger.debug("I'm doing a " + req.method);
-    logger.debug("tried GET assertionUrl, didn't get anything " + req.param());
-    logger.debug("full query " + JSON.stringify(req.query));
-    // if the param was in a POST body
-    assertionUrl = req.body['url'] || req.body['badge'];
-    logger.debug("POST attempt got " + assertionUrl);
-    // more debugging
-    if (!assertionUrl && req.method == 'GET') {
-      logger.debug("GET is erroring this was the original url " + req.originalUrl);
-      logger.debug(JSON.stringify(req.body));
-    }
+  const input = req.query.assertion || req.body.assertion || req.body.badge;
+  const assertionIsSignature = validator.isSignedBadge(input);
+  const assertionIsUrl = validUrl(input);
+
+  // no assertion was passed, return error
+  if (!input) {
+    logger.error("didn't receive an assertion returning 400");
+    return res.json({
+      message: 'must provide either url or signature'
+    }, 400);
   }
 
-  // no assertionUrl was passed, return error
-  if (!assertionUrl) {
-    logger.error("didn't receive an assertionUrl returning 400");
-    return res.json({message: 'url is a required param'}, 400);
+  if (!assertionIsUrl && !assertionIsSignature) {
+    logger.error("malformed assertion " + input + " returning 400");
+    return res.json({
+      message: 'malformed assertion, must be a url or signature'
+    }, 400);
   }
 
-  if (!validUrl(assertionUrl)) {
-    logger.error("malformed url " + assertionUrl + " returning 400");
-    return res.json({ message: 'malformed url' }, 400);
-  }
-
-  analyzeAssertion(assertionUrl, function (err, data) {
+  analyzeAssertion(input, function (err, data) {
     if (err) {
+      logger.debug('there was an error analyzing the assertion');
+      logger.debug(JSON.stringify(err));
+      logger.debug('here is what we know');
+      logger.debug(JSON.stringify(data));
+
       if (err.code === 'resources')
-        err.message = 'could not get all linked resources';
+        err.message = 'Could not get all linked resources';
       if (err.code === 'structure')
-        err.message = 'invalid assertion structure';
+        err.message = 'Invalid assertion structure';
+      if (err.code === 'parse')
+        err.message = 'Could not parse the '+err.field+' file at '+err.url+' file';
+      if (err.code === 'http-status')
+        err.message = 'Tried to get '+err.field+' file at '+err.url+' and got an HTTP '+err.received;
       return res.json(err, 400);
     }
 
@@ -211,14 +207,14 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
       const imagedata = data.resources['badge.image'];
       const opts = {
         assertion: assertion,
-        url: assertionUrl,
         imagedata: imagedata,
-        recipient: recipient
+        recipient: recipient,
+        url: assertionIsUrl ? input : null,
+        signature: assertionIsSignature ? input: null,
       };
-
       return awardBadge(opts, function (err, badge) {
         if (err) {
-          const errorMessage = "badge error " + assertionUrl + err;
+          const errorMessage = "badge error " + input + err;
           logger.error(errorMessage);
           // check if this badge is a duplicate, currently in the
           // error message
@@ -235,10 +231,10 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
           return res.json({
             badge: assertion,
             exists: false,
-            message: error_message
+            message: errorMessage
           }, 500);
         }
-        logger.debug("badge added " + assertionUrl);
+        logger.debug("badge added " + input);
         return res.json({
           exists: false,
           badge: assertion
@@ -259,7 +255,12 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
       badge: assertion,
       recipient: recipient
     };
-    Badge.findOne({endpoint: assertionUrl}, function (err, badge) {
+    const conditions = {};
+    if (assertionIsUrl)
+      conditions.endpoint = input;
+    if (assertionIsSignature)
+      conditions.signature = input;
+    Badge.findOne(conditions, function (err, badge) {
       if (err) {
         logger.error(err);
         return res.json({message: "internal server error"}, 500);
