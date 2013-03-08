@@ -2,6 +2,7 @@ var mysql = require('../lib/mysql');
 var regex = require('../lib/regex');
 var crypto = require('crypto');
 var Base = require('./mysql-base');
+const utils = require('../lib/utils');
 
 function sha256(value) {
   var sum = crypto.createHash('sha256');
@@ -19,6 +20,11 @@ Badge.prototype.presave = function () {
   if (!this.get('id')) {
     this.set('body_hash', sha256(JSON.stringify(this.get('body'))));
   }
+};
+
+Badge.prototype.getImageUrl = function () {
+  // #TODO: probably shouldn't hardcode prefix
+  return utils.fullUrl('/images/badge/' + this.get('body_hash') + '.png');
 };
 
 Badge.confirmRecipient = function confirmRecipient(assertion, email) {
@@ -67,7 +73,7 @@ Badge.confirmRecipient = function confirmRecipient(assertion, email) {
 Badge.prototype.share = function share(callback) {
   if (this.get('public_path'))
     return callback(null, this);
-  
+
   this.presave();
   this.set('public_path', this.get('body_hash'));
   this.save(callback);
@@ -121,9 +127,6 @@ Badge.validators = {
     if (!value && attributes.type === 'signed') {
       return "If type is signed, public_key must be set";
     }
-  },
-  image_path: function (value) {
-    if (!value) { return "Must have an image_path."; }
   },
   body: function (value) {
     if (!value) { return "Must have a body."; }
