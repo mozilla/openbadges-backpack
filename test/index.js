@@ -18,10 +18,12 @@ const FAKE_HARNESS =  {
 }
 exports.keys = keys;
 exports.HTTP_SCOPE = nock(ORIGIN);
+exports.EMAIL = FAKE_HARNESS.email;
 exports.mockHttp = function mockHttp() {
   return (
     exports.HTTP_SCOPE
       .get('/').reply(200, 'root')
+      .get('/404').reply(404)
       .get('/criteria').reply(200, 'criteria')
       .get('/evidence').reply(200, 'evidence')
       .get('/image').reply(200, 'image', { 'content-type': 'image/png' })
