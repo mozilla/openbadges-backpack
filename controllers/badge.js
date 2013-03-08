@@ -73,7 +73,7 @@ exports.show = function show(req, res, next) {
       { property: 'type', content: 'open-badges:badge' },
       { property: 'title', content: req.badge.attributes.body.badge.issuer.name },
       { property: 'url', content: utils.fullUrl(req.url) },
-      { property: 'image', content: req.badge.getImageUrl() },
+      { property: 'image', content: req.badge.get('imageUrl') },
       { property: 'description', content: req.badge.attributes.body.badge.description },
       ],
     fb: [
