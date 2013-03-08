@@ -34,12 +34,12 @@ var requestLogger = express.logger({
   }
 });
 
-const imgRegex = /^\/images\/badge/i;
+const imgPrefix = '/images/badge/';
 exports.logRequests = function logRequests() {
   return function (req, res, next) {
     var ua = req.headers['user-agent'] || '';
     var heartbeat = (ua.indexOf('HTTP-Monitor') === 0);
-    if (heartbeat || imgRegex.test(req.url))
+    if (heartbeat || req.url.indexOf(imgPrefix) === 0)
       return next();
     requestLogger(req, res, next);
   };
