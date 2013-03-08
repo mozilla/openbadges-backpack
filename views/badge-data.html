@@ -7,7 +7,7 @@
   <tbody>
     <tr>
       <td rowspan="100" class='image'>
-        <img src="{{badge.attributes.getImageUrl()}}">
+        <img src="{{ badge.attributes.imageUrl }}">
         {% if disownable %}
         <button class='btn btn-danger disown'>Remove this Badge</button>
         <!-- TODO: Re-enable this when sharing actually works well.

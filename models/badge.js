@@ -22,11 +22,6 @@ Badge.prototype.presave = function () {
   }
 };
 
-Badge.prototype.getImageUrl = function () {
-  // #TODO: probably shouldn't hardcode prefix
-  return utils.fullUrl('/images/badge/' + this.get('body_hash') + '.png');
-};
-
 Badge.confirmRecipient = function confirmRecipient(assertion, email) {
   // can't validate if not given an assertion
   if (!assertion)
@@ -142,7 +137,14 @@ Badge.findByUrl = function (url, callback) {
 // Prepare a field as it goes into or comes out of the database.
 Badge.prepare = {
   'in': { body: function (value) { return JSON.stringify(value); } },
-  'out': { body: function (value) { return JSON.parse(value); } }
+  'out': {
+    body: function (value) {
+      return JSON.parse(value);
+    },
+    imageUrl: function (value, attr) {
+      return utils.fullUrl('/images/badge/' + attr['body_hash'] + '.png');
+    },
+  }
 };
 
 // Virtual finders. By default, `find()` will take the keys of the criteria
