@@ -1,11 +1,16 @@
+const $ = require('./');
 const _ = require('underscore');
 const test = require('tap').test;
-const testUtils = require('./');
 
 const Badge = require('../models/badge');
 const User = require('../models/user');
 
-testUtils.prepareDatabase({
+  function hash(algo, string) {
+    console.log(string)
+    return (algo+'$'+require('crypto').createHash(algo).update(string).digest('hex'));
+  }
+
+$.prepareDatabase({
   '1-user': new User({
     email: 'brian@example.com'
   }),
@@ -13,7 +18,7 @@ testUtils.prepareDatabase({
     user_id: 1,
     endpoint: 'endpoint',
     image_path: 'image_path',
-    body: testUtils.makeAssertion({recipient: 'brian@example.org'})
+    body: $.makeAssertion({recipient: 'brian@example.org'})
   })
 }, function (fixtures) {
 
@@ -29,7 +34,7 @@ testUtils.prepareDatabase({
   test('Badge#save: sets the `body_hash` correctly', function (t) {
     const SHA256_LENGTH = 64;
     const expect = SHA256_LENGTH;
-    const assertion = testUtils.makeAssertion({'badge.name': 'Bodyhash Test'});
+    const assertion = $.makeAssertion({'badge.name': 'Bodyhash Test'});
     const badge = new Badge({
       user_id: 1,
       endpoint: 'endpoint',
@@ -46,11 +51,11 @@ testUtils.prepareDatabase({
   test('Badge#validate', function (t) {
     // Test helpers
     function randomAssertion() {
-      return testUtils.makeAssertion({
-        'badge.name': testUtils.randomstring(128),
-        'badge.description': testUtils.randomstring(128),
-        'badge.issuer.name': testUtils.randomstring(128),
-        'badge.issuer.org': testUtils.randomstring(128),
+      return $.makeAssertion({
+        'badge.name': $.randomstring(128),
+        'badge.description': $.randomstring(128),
+        'badge.issuer.name': $.randomstring(128),
+        'badge.issuer.org': $.randomstring(128),
       })
     }
     function newBadge(modifications) {
@@ -108,9 +113,6 @@ testUtils.prepareDatabase({
     t.end();
   });
 
-  function hash(algo, string) {
-    return (algo+'$'+require('crypto').createHash(algo).update(string).digest('hex'));
-  }
 
   test('Badge.confirmRecipient: hashed recipient', function (t) {
     const email = 'brian@example.org';
@@ -159,12 +161,26 @@ testUtils.prepareDatabase({
     t.end();
   })
 
-  test('Badge.confirmRecipient: new assertions should fail at the moment', function (t) {
+  test('Badge.confirmRecipient: new assertions', function (t) {
     const assertion = { recipient: { identity: "brian@mozillafoundation.org" } };
-    const expect = false;
-    var value;
-    try { value = Badge.confirmRecipient(assertion, 'whatever') }
-    catch (e) { t.fail('should not have thrown') }
+    const expect = true;
+    const value = Badge.confirmRecipient(assertion, 'brian@mozillafoundation.org');
+    t.same(value, expect, 'got expected value');
+    t.end();
+  });
+
+  test('Badge.confirmRecipient: new assertions, hashed', function (t) {
+    const email = 'brian@example.org';
+    const id = hash('sha256', email+'deadsea');
+    const assertion = {
+      recipient: {
+        identity: id,
+        salt: 'deadsea',
+        hashed: true,
+      }
+    };
+    const expect = true;
+    const value = Badge.confirmRecipient(assertion, email);
     t.same(value, expect, 'got expected value');
     t.end();
   });
@@ -176,5 +192,5 @@ testUtils.prepareDatabase({
     t.end();
   });
 
-  testUtils.finish(test);
+  $.finish(test);
 });

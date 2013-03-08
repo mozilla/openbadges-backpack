@@ -9,6 +9,11 @@ function sha256(value) {
   return sum.digest('hex');
 }
 
+
+function isObject(thing) {
+  return Object.prototype.toString.call(thing) === '[object Object]';
+}
+
 var Badge = function (attributes) {
   this.attributes = attributes;
 };
@@ -26,8 +31,12 @@ Badge.confirmRecipient = function confirmRecipient(assertion, email) {
   if (!assertion)
     return false;
 
-  const recipient = assertion.recipient;
-  const salt = assertion.salt || '';
+  const recipient = isObject(assertion.recipient)
+    ? assertion.recipient.identity
+    : assertion.recipient
+  const salt = isObject(assertion.recipient)
+    ? assertion.recipient.salt || ''
+    : assertion.salt || ''
 
   if (!recipient || !email)
     return false;
