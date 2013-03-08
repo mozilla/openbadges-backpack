@@ -7,7 +7,8 @@ appUtils.prepareApp(function(a) {
     var BAD_IMG_URL = issuer.resolve('/bad_img');
     var EXAMPLE_URL = issuer.resolve('/example');
     var BAD_ASSERTION_URL = issuer.resolve('/bad_assertion');
-    var SIGNATURE = $.makeSignature({email: a.email, resolve: issuer.resolve});
+    var GOOD_SIGNATURE = $.makeSignature({email: a.email, resolve: issuer.resolve});
+    var BAD_SIGNATURE = $.makeBadSignature('some garbage');
 
     a.login();
 
@@ -100,20 +101,25 @@ appUtils.prepareApp(function(a) {
     });
 
     // signed badges!
-    a.verifyRequest('GET', '/issuer/assertion?assertion=' + SIGNATURE, {
+    a.verifyRequest('GET', '/issuer/assertion?assertion=' + GOOD_SIGNATURE, {
       statusCode: 200,
       body: function (t, body) {
-        console.dir(body);
-        //body = JSON.parse(body)
-        //t.same(body.badge.recipient, body.badge._originalRecipient.identity)
+        body = JSON.parse(body)
+        t.same(body.badge.recipient, body.badge._originalRecipient.identity)
       }
     });
+
     a.verifyRequest('POST', '/issuer/assertion', {
       form: {
         '_csrf': a.csrf,
-        'assertion': SIGNATURE
+        'assertion': GOOD_SIGNATURE
       }
     }, { statusCode: 201, });
+
+    a.verifyRequest('GET', '/issuer/assertion?assertion=' + BAD_SIGNATURE, {
+      statusCode: 400,
+      body: /malformed/i
+    });
 
     issuer.end();
     a.end();
