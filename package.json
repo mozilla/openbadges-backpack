@@ -30,7 +30,7 @@
     "winston": "~0.5.10",
     "tap": "~0.3.2",
     "optimist": "~0.3.0",
-    "async": "~0.1.22"
+    "async": "~0.2.6"
   },
   "engines": {
     "node": "0.8.x"
