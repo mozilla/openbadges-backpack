@@ -34,7 +34,6 @@ jenkins_build:
 	echo 'yep'
 
 start:
-	./bin/db-migrate up
-	./node_modules/.bin/up -w -n 1 -p 8888 app.js
+	npm start
 
 .PHONY: fakeissuer
