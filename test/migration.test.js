@@ -113,52 +113,6 @@ testMigration("add-public-columns", function(t, id, previousId) {
   ];
 });
 
-testMigration("drop-public-key-field", function(t, id, previousId) {
-  return [
-    up({destination: previousId}),
-    sql("INSERT INTO `user` (id, email) VALUES (1,'foo@bar.org');"),
-    sql("INSERT INTO `badge` (id, user_id, type, image_path, body, body_hash) VALUES (1,1,'hosted','image.png','body','hash')"),
-    up({count: 1}),
-    sqlError("SELECT public_key FROM badge", t, "ERROR_BAD_FIELD_ERROR"),
-  ];
-});
-
-testMigration("rename-jwt-to-signature", function(t, id, previousId) {
-  return [
-    up({destination: previousId}),
-    sql("INSERT INTO `user` (id, email) VALUES (1,'foo@bar.org');"),
-    sql("INSERT INTO `badge` (id, user_id, type, jwt, image_path, body, body_hash) VALUES (1,1,'hosted', 'sup', 'image.png','body','hash')"),
-    up({count: 1}),
-    sql("SELECT signature FROM badge WHERE id=1", function(results) {
-      t.equal(results[0].signature, 'sup', "'jwt' should have been renamed");
-    }),
-    down({count: 1}),
-    sql("SELECT jwt FROM badge WHERE id=1", function(results) {
-      t.equal(results[0].jwt, 'sup', "'jwt' should have risen from the grave like a phoenix");
-    }),
-  ];
-});
-
-testMigration("drop-badge-type-column", function(t, id, previousId) {
-  return [
-    up({destination: previousId}),
-    sql("INSERT INTO `user` (id, email) VALUES (1,'foo@bar.org');"),
-    sql("INSERT INTO `badge` (id, user_id, type, signature, image_path, body, body_hash) VALUES (1,1,'hosted', 'sup', 'image.png','body','hash')"),
-    up({count: 1}),
-    sqlError("SELECT `type` FROM badge", t, "ERROR_BAD_FIELD_ERROR"),
-  ];
-});
-
-testMigration("drop-rejected-column-from-badge", function(t, id, previousId) {
-  return [
-    up({destination: previousId}),
-    sql("INSERT INTO `user` (id, email) VALUES (1,'foo@bar.org');"),
-    sql("INSERT INTO `badge` (id, user_id, image_path, body, body_hash) VALUES (1,1, 'image.png','body','hash')"),
-    up({count: 1}),
-    sqlError("SELECT `rejected` FROM badge", t, "ERROR_BAD_FIELD_ERROR"),
-  ];
-});
-
 testMigration("add-image-data-column", function(t, id, previousId) {
   const fs = require('fs');
   const conf = require('../lib/configuration')
