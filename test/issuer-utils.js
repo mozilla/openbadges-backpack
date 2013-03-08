@@ -1,3 +1,4 @@
+const $ = require('./');
 const express = require('express');
 const http = require('http');
 const url = require('url');
@@ -86,6 +87,18 @@ exports.createIssuer = function createIssuer(appTestHarness, cb) {
       return res.send('criteria');
     }).get('/evidence', function(req, res) {
       return res.send('evidence');
+    }).get('/badge', function (req, res) {
+      return res.json($.makeBadgeClass({resolve: resolve}));
+    }).get('/issuer', function (req, res) {
+      return res.send($.makeIssuer({resolve: resolve}));
+    }).get('/assertion-image', function (req, res) {
+      res.type('image/png');
+      return res.send($.makeImage());
+    }).get('/badge-image', function (req, res) {
+      res.type('image/png');
+      return res.send($.makeImage());
+    }).get('/public-key', function (req, res) {
+      return res.send($.keys.public);
     });
 
     cb({

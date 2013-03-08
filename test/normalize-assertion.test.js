@@ -1,3 +1,4 @@
+const $ = require('./');
 const test = require('tap').test;
 const normalize = require('../lib/normalize-assertion');
 
@@ -9,7 +10,6 @@ const OLD_ASSERTION = {
     }
   }
 };
-
 const NEW_ASSERTION = {
   version: '1.0.0',
   structures: {

@@ -98,7 +98,7 @@ asyncTest('Issuing a single badge', function(){
   });
   b.always(function(){
     equal(this.state, 'complete');
-    equal(this.assertionUrl, 'foo');
+    equal(this.assertion, 'foo');
     start();
   });
   b.build();
@@ -120,7 +120,7 @@ asyncTest('Badge fails build', function(){
   });
   b.always(function(){
     equal(this.state, 'failed');
-    deepEqual(this.error, {url: 'foo', reason: 'asplode'});
+    deepEqual(this.error, {assertion: 'foo', reason: 'asplode'});
     start();
   });
   b.build();
@@ -145,7 +145,7 @@ asyncTest('Badge fails issue', function(){
   b.always(function(){
     ok(built, 'saw built event');
     equal(this.state, 'failed');
-    deepEqual(this.error, {url: 'foo', reason: 'asplode'});
+    deepEqual(this.error, {assertion: 'foo', reason: 'asplode'});
     start();
   });
   b.build();
@@ -164,7 +164,7 @@ asyncTest('Badge rejected by user', function(){
   });
   b.always(function(){
     equal(this.state, 'failed');
-    deepEqual(this.error, {url: 'foo', reason: 'DENIED'});
+    deepEqual(this.error, {assertion: 'foo', reason: 'DENIED'});
     start();
   });
   b.build();
@@ -179,7 +179,7 @@ asyncTest('Rejection reason and data', function(){
     b.issue();
   });
   b.always(function(){
-    deepEqual(this.error, {url: 'foo', reason: 'asplode', other: 'data', goes: 'here'});
+    deepEqual(this.error, {assertion: 'foo', reason: 'asplode', other: 'data', goes: 'here'});
     start();
   });
   b.build();
@@ -252,18 +252,18 @@ asyncTest('badge.result() for failed', function(){
   });
   b.build();
   b.always(function(){
-    deepEqual(this.result(), {url: 'foo', reason: 'asplode'});
+    deepEqual(this.result(), {assertion: 'foo', reason: 'asplode'});
     start();
   });
 });
 
 asyncTest('Building badge data', function(){
   var b = Badge('foo', {
-    build: function(assertionUrl){ return {url: assertionUrl, extra: 'stuff'}; }
+    build: function(assertionUrl){ return {assertion: assertionUrl, extra: 'stuff'}; }
   });
   equal(b.data, undefined);
   b.on('built', function(){
-    deepEqual(b.data, {url: 'foo', extra: 'stuff'});
+    deepEqual(b.data, {assertion: 'foo', extra: 'stuff'});
     start();
   });
   b.build();
@@ -274,14 +274,14 @@ asyncTest('Building badge data with deferred', function(){
     build: function(assertionUrl){
       var build = $.Deferred();
       setTimeout(function(){
-	build.resolve({url: assertionUrl, extra: 'stuff'});
+	build.resolve({assertion: assertionUrl, extra: 'stuff'});
       }, 500);
       return build;
     }
   });
   equal(b.data, undefined, 'no data before build');
   b.on('built', function(){
-    deepEqual(b.data, {url: 'foo', extra: 'stuff'}, 'badgeData holds build');
+    deepEqual(b.data, {assertion: 'foo', extra: 'stuff'}, 'badgeData holds build');
     start();
   });
   b.build();
@@ -294,7 +294,7 @@ asyncTest('Building badge data and failing', function(){
     }
   });
   b.always(function(){
-    deepEqual(b.error, {url: 'foo', reason: 'reason', error: 'data'});
+    deepEqual(b.error, {assertion: 'foo', reason: 'reason', error: 'data'});
     deepEqual(b.data, {badge: 'data'});
     start();
   });
@@ -315,7 +315,7 @@ asyncTest('Rejecting without badge data does not clobber', function(){
   });
   b.always(function(){
     deepEqual(b.data, {some: 'data'});
-    deepEqual(b.error, {url: 'foo', reason: 'reason'});
+    deepEqual(b.error, {assertion: 'foo', reason: 'reason'});
     start();
   });
   b.build();
@@ -335,9 +335,9 @@ asyncTest('Failing a failed badge does nothing', function(){
     build: function(assertionUrl){ return $.Deferred().reject('first'); }
   });
   b.fail(function(){
-    deepEqual(b.result(), {url: 'foo', reason: 'first'});
+    deepEqual(b.result(), {assertion: 'foo', reason: 'first'});
     b.reject('second');
-    deepEqual(b.result(), {url: 'foo', reason: 'first'});
+    deepEqual(b.result(), {assertion: 'foo', reason: 'first'});
     start();
   });
   b.build();
@@ -392,7 +392,7 @@ asyncTest('Accept a single badge', function(){
     ready = true;
     equal(failures.length, 0);
     equal(badges.length, 1);
-    equal(badges[0].assertionUrl, 'foo');
+    equal(badges[0].assertion, 'foo');
     badges[0].issue();
   });
   var completeSeen = false;
@@ -420,13 +420,13 @@ asyncTest('Reject a single badge', function(){
     ready = true;
     equal(failures.length, 0);
     equal(badges.length, 1);
-    equal(badges[0].assertionUrl, 'foo');
+    equal(badges[0].assertion, 'foo');
     badges[0].reject('DENIED');
   });
   app.on('badges-complete', function(failures, successes, total){
     ok(ready, 'Saw badges-ready event');
     ok(true, 'badges-complete event');
-    deepEqual(results(failures), [{url: 'foo', reason: 'DENIED'}], 'foo a failure');
+    deepEqual(results(failures), [{assertion: 'foo', reason: 'DENIED'}], 'foo a failure');
     deepEqual(successes, [], 'empty successes');
     equal(total, 1, '1 total badges');
     start();
@@ -442,11 +442,11 @@ asyncTest('Single badge fails build', function(){
   app.on('badges-ready', function(failures, badges){
     ready = true;
     equal(failures.length, 1, 'one failure');
-    deepEqual(results(failures), [{url: 'FAILME', reason: 'you suck'}], 'FAILME a failure');
+    deepEqual(results(failures), [{assertion: 'FAILME', reason: 'you suck'}], 'FAILME a failure');
   });
   app.on('badges-complete', function(failures, successes, total){
     ok(ready, 'saw ready event');
-    deepEqual(results(failures), [{url: 'FAILME', reason: 'you suck'}], 'FAILME a failure');
+    deepEqual(results(failures), [{assertion: 'FAILME', reason: 'you suck'}], 'FAILME a failure');
     start();
   });
   app.start();
@@ -465,7 +465,7 @@ asyncTest('Single badge fails issue', function(){
   });
   app.on('badges-complete', function(failures, successes, total){
     ok(ready, 'Saw badges-ready');
-    deepEqual(results(failures), [{url: 'HAZIT', reason: 'you have that one'}], 'HAZIT a failure');
+    deepEqual(results(failures), [{assertion: 'HAZIT', reason: 'you have that one'}], 'HAZIT a failure');
     start();
   });
   app.start();
@@ -500,12 +500,12 @@ asyncTest('Two badges - one good, one bad', function(){
   app.on('badges-ready', function(failures, badges){
     ready = true;
     equal(badges.length, 1);
-    equal(badges[0].assertionUrl, 'foo');
+    equal(badges[0].assertion, 'foo');
     badges[0].issue();
   });
   app.on('badges-complete', function(f, s, t){
     ok(ready, 'saw ready event');
-    deepEqual(results(f), [{url: 'bar', reason: 'NO BARS!'}], 'bar fails');
+    deepEqual(results(f), [{assertion: 'bar', reason: 'NO BARS!'}], 'bar fails');
     deepEqual(results(s), ['foo'], 'foo succeeds');
     equal(t, 2);
     start();
@@ -524,7 +524,7 @@ asyncTest('Two badges - both fail', function(){
     });
   });
   app.on('badges-complete', function(f, s, t){
-    deepEqual(results(f), [{url: 'foo', reason: "foo won't issue"}, {url: 'bar', reason: "bar won't build"}]);
+    deepEqual(results(f), [{assertion: 'foo', reason: "foo won't issue"}, {assertion: 'bar', reason: "bar won't build"}]);
     deepEqual(results(s), []);
     equal(t, 2);
     start();
@@ -551,9 +551,9 @@ asyncTest('Abort after app.start()', function(){
   });
   app.on('badges-aborted', function(f, s, t){
     deepEqual(results(f), [
-      {url: 'foo', reason: 'DENIED'},
-      {url: 'bar', reason: 'failed build'},
-      {url: 'baz', reason: 'DENIED'}
+      {assertion: 'foo', reason: 'DENIED'},
+      {assertion: 'bar', reason: 'failed build'},
+      {assertion: 'baz', reason: 'DENIED'}
     ]);
     start();
   });
@@ -569,9 +569,9 @@ asyncTest('Abort before app.start()', function(){
   });
   app.on('badges-aborted', function(f, s, t){
     deepEqual(results(f), [
-      {url: 'foo', reason: 'DENIED'},
-      {url: 'bar', reason: 'DENIED'},
-      {url: 'baz', reason: 'DENIED'}
+      {assertion: 'foo', reason: 'DENIED'},
+      {assertion: 'bar', reason: 'DENIED'},
+      {assertion: 'baz', reason: 'DENIED'}
     ]);
     start();
   });
@@ -590,7 +590,7 @@ asyncTest('Using badges-failed event', function(){
   };
   app.on('badge-failed', function(badge){
     failed++;
-    equal(badge.error.reason, expected[badge.assertionUrl].reason, 'reason good');
+    equal(badge.error.reason, expected[badge.assertion].reason, 'reason good');
   });
   app.on('badges-ready', function(f, badges){
     badges.forEach(function(badge){
