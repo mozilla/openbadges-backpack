@@ -87,7 +87,7 @@ app.configure('development', function () {
     var sha = gitUtil.findSHA();
     app.set('sha', sha);
   }
-  catch (ex) { 
+  catch (ex) {
     logger.warn(ex.message);
   }
 });
@@ -119,6 +119,7 @@ app.param('apiGroupId', displayer.findGroupById);
 app.param('groupId', group.findById);
 app.param('groupUrl', share.findGroupByUrl);
 app.param('badgeUrl', badge.findByUrl);
+app.param('badgeHash', badge.findByHash);
 
 app.get('/baker', baker.baker);
 app.get('/issuer.js', issuer.generateScript);
@@ -142,8 +143,9 @@ app.get('/demo/invalid.json', demo.badBadge);
 app.post('/demo/award', demo.award);
 
 app.get('/', backpack.recentBadges);
-app.get('/backpack', backpack.manage)
-app.get('/backpack/badges', backpack.allBadges)
+app.get('/backpack', backpack.manage);
+app.get('/backpack/badges', backpack.allBadges);
+app.get('/backpack/add', backpack.addBadge);
 app.get('/backpack/login', backpack.login);
 app.get('/backpack/signout', backpack.signout);
 app.post('/backpack/badge', backpack.userBadgeUpload);
@@ -159,6 +161,8 @@ app.delete('/badge/:badgeId', badge.destroy);
 app.post('/group', group.create);
 app.put('/group/:groupId', group.update);
 app.delete('/group/:groupId', group.destroy);
+
+app.get('/images/badge/:badgeHash.png', badge.image);
 
 app.post('/share/badge/:badgeId', badge.share);
 app.get('/share/badge/:badgeUrl', badge.show);

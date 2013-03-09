@@ -226,7 +226,7 @@ exports.userGroupBadges = function userGroupBadges(req, res, next) {
         assertionType: badge.get('type'),
         hostedUrl: badge.get('endpoint'),
         assertion: badge.get('body'),
-        imageUrl: utils.fullUrl(badge.get('image_path'))
+        imageUrl: badge.get('imageUrl'),
       };
     });
     return formatResponse({

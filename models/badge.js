@@ -2,6 +2,7 @@ var mysql = require('../lib/mysql');
 var regex = require('../lib/regex');
 var crypto = require('crypto');
 var Base = require('./mysql-base');
+const utils = require('../lib/utils');
 
 function sha256(value) {
   var sum = crypto.createHash('sha256');
@@ -67,7 +68,7 @@ Badge.confirmRecipient = function confirmRecipient(assertion, email) {
 Badge.prototype.share = function share(callback) {
   if (this.get('public_path'))
     return callback(null, this);
-  
+
   this.presave();
   this.set('public_path', this.get('body_hash'));
   this.save(callback);
@@ -122,9 +123,6 @@ Badge.validators = {
       return "If type is signed, public_key must be set";
     }
   },
-  image_path: function (value) {
-    if (!value) { return "Must have an image_path."; }
-  },
   body: function (value) {
     if (!value) { return "Must have a body."; }
     if (String(value) !== '[object Object]') { return "body must be an object"; }
@@ -139,7 +137,14 @@ Badge.findByUrl = function (url, callback) {
 // Prepare a field as it goes into or comes out of the database.
 Badge.prepare = {
   'in': { body: function (value) { return JSON.stringify(value); } },
-  'out': { body: function (value) { return JSON.parse(value); } }
+  'out': {
+    body: function (value) {
+      return JSON.parse(value);
+    },
+    imageUrl: function (value, attr) {
+      return utils.fullUrl('/images/badge/' + attr['body_hash'] + '.png');
+    },
+  }
 };
 
 // Virtual finders. By default, `find()` will take the keys of the criteria

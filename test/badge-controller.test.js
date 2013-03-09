@@ -3,14 +3,24 @@ const test = require('tap').test;
 const testUtils = require('./');
 const badge = require('../controllers/badge');
 const conmock = require('./conmock');
-
 const User = require('../models/user');
 const Badge = require('../models/badge');
+const images = require('./test-images.js');
 
 function makeHash (email, salt) {
   const sha = require('crypto').createHash('sha256');
   return 'sha256$' + sha.update(email + salt).digest('hex');
 }
+
+const RAW_ASSERTION = testUtils.makeAssertion({
+  recipient: 'brian@example.org',
+  criteria: '/ohsup.html'
+});
+
+const HASHED_ASSERTION = testUtils.makeAssertion({
+  recipient: makeHash('brian@example.org', 'hashbrowns'),
+  salt: 'hashbrowns'
+});
 
 testUtils.prepareDatabase({
   '1-real-user': new User({ email: 'brian@example.org' }),
@@ -20,23 +30,17 @@ testUtils.prepareDatabase({
     type: 'hosted',
     endpoint: 'endpoint',
     image_path: 'image_path',
-    body_hash: 'body_hash',
-    body: testUtils.makeAssertion({
-      recipient: 'brian@example.org',
-      criteria: '/ohsup.html'
-    })
+    image_data: images.unbaked.toString('base64'),
+    body: RAW_ASSERTION
   }),
   '4-badge-hashed': new Badge({
     user_id: 1,
     type: 'hosted',
     endpoint: 'endpoint',
     image_path: 'image_path',
-    body_hash: 'body_hash',
+    image_data: images.unbaked.toString('base64'),
     public_path: '4-badge-hashed-pth',
-    body: testUtils.makeAssertion({
-      recipient: makeHash('brian@example.org', 'hashbrowns'),
-      salt: 'hashbrowns'
-    })
+    body: HASHED_ASSERTION
   })
 }, function (fixtures) {
   test('badge#findByUrl sets req.badge when url is valid', function(t) {
@@ -61,7 +65,7 @@ testUtils.prepareDatabase({
       t.end();
     });
   });
-  
+
   test('badge#save does not leave body serialized as JSON', function(t) {
     var b = fixtures['3-badge-raw'];
     t.same(b.get('body').recipient, 'brian@example.org');
@@ -71,7 +75,7 @@ testUtils.prepareDatabase({
       t.end();
     });
   });
-  
+
   test('badge#share works when public_path doesn\'t exist', function(t) {
     var b = fixtures['3-badge-raw'];
     t.same(b.get('public_path'), undefined, 'public_path doesn\'t exist');
@@ -105,7 +109,7 @@ testUtils.prepareDatabase({
       t.end();
     });
   });
-  
+
   test('badge#show', function(t) {
     conmock({
       handler: badge.show,
@@ -121,7 +125,7 @@ testUtils.prepareDatabase({
       t.end();
     });
   });
-  
+
   test('badge#destroy', function (t) {
     const owner = fixtures['1-real-user'];
     const thief = fixtures['2-false-user'];
@@ -164,6 +168,36 @@ testUtils.prepareDatabase({
       t.same(mock.status, 200, 'should delete badge with hashed email');
       t.end();
     })
+  });
+
+  test('badge#image', function (t) {
+    const badgeRaw = fixtures['3-badge-raw'];
+    const badgeHashed = fixtures['4-badge-hashed'];
+    const handler = badge.image;
+
+    const expect = images.unbaked;
+
+    conmock({
+      handler: handler,
+      request: { badge: badgeRaw },
+    }, function (err, mock) {
+      t.same(mock.body, expect);
+    });
+
+    conmock({
+      handler: handler,
+      request: { badge: badgeHashed },
+    }, function (err, mock) {
+      t.same(mock.body, expect);
+    });
+
+    conmock({
+      handler: handler,
+      request: { },
+    }, function (err, mock) {
+      t.same(mock.status, 404);
+      t.end();
+    });
   });
 
   testUtils.finish(test);

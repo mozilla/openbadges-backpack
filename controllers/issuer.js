@@ -209,7 +209,7 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
       return res.json({
         message: "issuer origin must be identical to bearer token origin"
       }, 400);
-      
+
     // grabbing the remote badge image
     var imageUrl = qualifyUrl(assertion.badge.image, assertion.badge.issuer.origin);
     remote.badgeImage(imageUrl, function (err, imagedata) {
@@ -241,7 +241,6 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
             // return a general error message
             return res.json({badge: assertion, exists: false, 'message': error_message}, 500);
           }
-          logger.debug("badge added " + assertionUrl);
           return res.json({exists: false, badge: assertion}, 201);
         });
       }

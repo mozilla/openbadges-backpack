@@ -83,7 +83,7 @@ Badge.Model = Backbone.Model.extend({
 Group.Model = Backbone.Model.extend({
   urlRoot: '/group',
   defaults: {
-    name: "New Group",
+    name: "New Collection",
     "public": false
   }
 });
@@ -351,11 +351,20 @@ Details.View = Backbone.View.extend({
         collection.remove(badge);
       }
     });
+    this.hide();
     _.each(Badge.View.all, function (view) {
-      if (view.model.id === badge.id) view.$el.fadeOut('fast');
+      if (view.model.id === badge.id) {
+        view.$el.fadeOut('slow', function() {
+          var $parent = $(this.parentNode);
+          if ($parent.hasClass('openbadge-container')) {
+            $parent.remove();
+          } else {
+            $(this).remove();
+          }
+        });
+      }
     });
     badge.destroy();
-    this.hide();
   },
 
   nothing: function (event) {

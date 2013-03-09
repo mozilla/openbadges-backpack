@@ -1,0 +1,258 @@
+/* Styles specific to the Collections page */
+
+.group {
+  min-height: 64px;
+  position: relative;
+  margin: 20px 0 0 0;
+  padding: 45px 20px 20px;
+  text-align: center;
+  border: 1px dotted #999;
+  border-radius: 5px;
+  background: url('/images/texturetastic_gray.png');
+  overflow: hidden;
+  -webkit-transition: all 0.25s ease;
+  -moz-transition: all 0.25s ease;
+  -ms-transition: all 0.25s ease;
+  -o-transition: all 0.25s ease;
+  transition: all 0.25s ease;
+
+  hgroup {
+    margin: 0;
+  }
+
+  .instructions {
+    color: #444;
+    padding: 0;
+    margin: 0;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .hovering {
+    -webkit-transition: all 0.25s ease;
+    -moz-transition: all 0.25s ease;
+    -ms-transition: all 0.25s ease;
+    -o-transition: all 0.25s ease;
+    transition: all 0.25s ease;
+    -webkit-box-shadow: 2px 2px 5px 3px #afa;
+    box-shadow: 2px 2px 5px 3px #afa;
+
+    .instructions {
+      -webkit-transition: all 0.25s ease;
+      -moz-transition: all 0.25s ease;
+      -ms-transition: all 0.25s ease;
+      -o-transition: all 0.25s ease;
+      transition: all 0.25s ease;
+    }
+  }
+
+  .public {
+    bottom: 2px;
+    left: 10px;
+    position: absolute;
+
+    * {
+      -webkit-transition: all 0.25s ease;
+      -moz-transition: all 0.25s ease;
+      -ms-transition: all 0.25s ease;
+      -o-transition: all 0.25s ease;
+      transition: all 0.25s ease;
+    }
+
+    label {
+      margin: 0px;
+      color: #868;
+      font-size: 12px;
+      line-height: 12px;
+      display: inline-block;
+
+      input {
+        display: inline-block;
+
+        &:checked ~ span {
+          color: #181;
+          font-weight: bold;
+        }
+      }
+    }
+  }
+
+  input.groupName {
+    -webkit-transition: all 0.4s ease;
+    -moz-transition: all 0.4s ease;
+    -ms-transition: all 0.4s ease;
+    -o-transition: all 0.4s ease;
+    font-size: 1.5em;
+    height: 1.3em;
+    font-weight: bold;
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 4px 0 0 4px;
+    background: transparent;
+    border: 1px solid transparent;
+    text-shadow: #eee 1px 1px;
+    opacity: 1;
+
+    &:hover,
+    &.hover {
+      -webkit-transition: all 0.4s ease;
+      -moz-transition: all 0.4s ease;
+      -ms-transition: all 0.4s ease;
+      -o-transition: all 0.4s ease;
+      border: 1px solid #ccc;
+      background: rgba(255,255,255,0.2);
+      color: #444;
+    }
+
+    &:focus {
+      -webkit-transition: all 0.4s ease;
+      -moz-transition: all 0.4s ease;
+      -ms-transition: all 0.4s ease;
+      -o-transition: all 0.4s ease;
+      background: rgba(255,255,255,0.6);
+      color: #222;
+    }
+  }
+
+  .icon {
+    position: absolute;
+    font-size: 3em;
+    font-weight: bold;
+    height: 24px;
+    width: 24px;
+    text-shadow: #fff 1px 1px 2px;
+    color: #bbb;
+    padding: 0;
+    margin: 0;
+    opacity: 1;
+    right: 8px;
+
+    &:hover {
+      -webkit-transition: color,text-shadow 0.25s ease;
+      -moz-transition: color,text-shadow 0.25s ease;
+      -ms-transition: color,text-shadow 0.25s ease;
+      -o-transition: color,text-shadow 0.25s ease;
+      transition: color,text-shadow 0.25s ease;
+      cursor: pointer;
+      color: #c00;
+      text-shadow: #aaa 1px 1px 2px;
+    }
+  }
+
+  .delete {
+    -webkit-transition: opacity,color,text-shadow 0.25s ease;
+    -moz-transition: opacity,color,text-shadow 0.25s ease;
+    -ms-transition: opacity,color,text-shadow 0.25s ease;
+    -o-transition: opacity,color,text-shadow 0.25s ease;
+    transition: opacity,color,text-shadow 0.25s ease;
+    top: 6px;
+
+    &:active {
+      top: 8px;
+      right: 6px;
+      text-shadow: #aaa -1px -1px 2px;
+    }
+  }
+
+  .share {
+    font-family: 'EntypoRegular';
+    font-size: 3.3em;
+    bottom: 10px;
+
+    &:hover {
+      color: #66f;
+      text-shadow: #fff 1px 1px 2px;
+    }
+    &.share:active {
+      bottom: 8px;
+      right: 6px;
+      text-shadow: #aaa -1px -1px 2px;
+    }
+  }
+
+  .openbadge {
+    margin: 4px 2px;
+  }
+
+  &.isNew { 
+    /* Use margin-bottom here instead of
+       padding in .sticky > .scroll, which
+       gets left out of scroll by FF.
+     */
+    margin-bottom: 20px;
+    padding: 20px;
+    text-align: left;
+
+    input.groupName {
+      display: none;
+    }
+
+    .icon {
+      display: none;
+    }
+
+    .public {
+      display: none;
+    }
+  }
+
+  &.dying {
+    -webkit-transition: none;
+    -moz-transition: none;
+    -ms-transition: none;
+    -o-transition: none;
+    transition: none;
+  }
+}
+
+.badge-area {
+  padding-top: 28px;
+}
+
+.small-cards {
+  .span3 {
+    width: 193px; /* reduce span3 to span2.6667 */
+  }
+}
+
+.sticky {
+  position: fixed;
+  /* top: height + borders
+     TODO: extract variables & use consistently 
+   */
+  top: @navbarHeight + 4px + 2px; 
+  bottom: 0;
+
+  .scroll {
+    overflow-y: scroll;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    margin: 160px 0 20px;
+    padding: 0 12px;
+    .box-sizing(border-box);
+    border-radius: 5px;
+    background-color: @gray;
+    border: solid @gray;
+    border-width: 8px 2px;
+  }
+}
+
+hgroup {
+  margin-left: 20px;
+  margin-right: 20px;
+  padding-bottom: 0.8em;
+
+  &.separator {
+    border-bottom: 1px dotted @gray;
+  }
+
+  h1, h2 {
+    margin-bottom: 2px;
+  }
+  h3 {
+    margin-bottom: 0;
+  }
+}
+

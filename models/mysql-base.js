@@ -1,3 +1,4 @@
+var logger = require('../lib/logging').logger;
 var client = require('../lib/mysql').client;
 
 var Base = function () { };
@@ -6,11 +7,10 @@ Base.apply = function apply(Model, table) {
   Model.fromDbResult = function fromDbResult(attributes) {
     if (attributes === undefined) return null;
 
-    Object.keys(attributes).forEach(function (key) {
-      var prep = (Model.prepare || {})['out'] || {};
-      if (key in prep) {
-        attributes[key] = Model.prepare.out[key](attributes[key]);
-      }
+    var prep = (Model.prepare || {})['out'] || {};
+    Object.keys(prep).forEach(function (key) {
+      var mutator = prep[key];
+      attributes[key] = mutator(attributes[key], attributes);
     });
 
     return new Model(attributes);
@@ -43,7 +43,8 @@ Base.apply = function apply(Model, table) {
 
   Model.findOne = function (criteria, callback) {
     Model.find(criteria, function (err, results) {
-      if (err) callback(err);
+      if (err)
+        return callback(err);
       callback(null, results.pop());
     });
   };
@@ -73,12 +74,12 @@ Base.prototype.validate = function validate(attributes) {
   var validators = this.model.validators || {};
   attributes = (attributes || this.attributes);
   err.fields = {};
-  
+
   Object.keys(validators).forEach(function (field) {
     var msg = validators[field](attributes[field], attributes);
     if (msg) { err.fields[field] = msg; }
   });
-  
+
   if (Object.keys(err.fields).length > 0) {
     return err;
   }
@@ -91,7 +92,7 @@ Base.prototype.save = function save(callback) {
   var model = this.model;
   var prepMethods = (model.prepare || {})['in'] || {};
   var preppedAttributes = {};
-  
+
   function parseResult(err, result) {
     if (err) { return callback(err, null); }
     if (!attributes.id && result.insertId)
@@ -104,7 +105,7 @@ Base.prototype.save = function save(callback) {
 
   if ('function' === typeof this.presave)
     this.presave();
-  
+
   Object.keys(attributes).forEach(function (key) {
     var prep = prepMethods[key] || function(x) { return x; };
     preppedAttributes[key] = prep(attributes[key], attributes);

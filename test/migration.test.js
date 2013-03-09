@@ -40,7 +40,7 @@ function sql(sql, testFunc) {
 function findMigration(name) {
   var filename, candidate;
   var previous = null;
-  
+
   for (var i = 0; i < migrationDirFiles.length; i++) {
     filename = migrationDirFiles[i];
     match = filename.match(/^([0-9]+)-(.*)\.js$/);
@@ -61,7 +61,7 @@ function testMigration(name, getSeries) {
     mysql.createTestDatabase,
     mysql.useTestDatabase
   ];
-  
+
   if (!migration.previous)
     migration.previous = "empty database";
 
@@ -97,7 +97,7 @@ testMigration("initial", function(t, id) {
 testMigration("add-public-columns", function(t, id, previousId) {
   return [
     up({destination: previousId}),
-    sql("INSERT INTO `user` VALUES (1,'foo@bar.org',NULL,1,NULL,NULL);"),
+    sql("INSERT INTO `user` (id, email) VALUES (1,'foo@bar.org');"),
     sql("INSERT INTO `badge` VALUES (1,1,'hosted','http://foo',NULL,NULL," +
         "'/blah.png',0,'i am a json assertion','i am a json assertion hash'" +
         ",now());"),
@@ -112,3 +112,26 @@ testMigration("add-public-columns", function(t, id, previousId) {
     sqlError("SELECT public FROM badge", t, "ERROR_BAD_FIELD_ERROR")
   ];
 });
+
+testMigration("add-image-data-column", function(t, id, previousId) {
+  const fs = require('fs');
+  const conf = require('../lib/configuration')
+  const image1 = fs.readFileSync(__dirname + '/data/static/_badges/image1.png');
+  const image2 = fs.readFileSync(__dirname + '/data/static/_badges/image2.png');
+  conf.set('badge_path', __dirname + '/data/static/_badges');
+
+  return [
+    up({destination: previousId}),
+    sql("INSERT INTO `user` (id, email) VALUES (1,'foo@bar.org');"),
+    sql("INSERT INTO `badge` (id, user_id, image_path, body, body_hash) VALUES (1,1, '/_badges/image1.png','body','hsh1')"),
+    sql("INSERT INTO `badge` (id, user_id, image_path, body, body_hash) VALUES (2,1, '/_badges/image2.png','body','hsh2')"),
+    up({count: 1}),
+    sql("SELECT image_data FROM badge ORDER BY `id` ASC", function(results) {
+      t.same(Buffer(results[0].image_data, 'base64'), image1);
+      t.same(Buffer(results[1].image_data, 'base64'), image2);
+    }),
+    down({count: 1}),
+    sqlError("SELECT image_data FROM badge", t, "ERROR_BAD_FIELD_ERROR"),
+  ];
+});
+
