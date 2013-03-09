@@ -1,9 +1,11 @@
+var logger = require('../lib/logging').logger;
 var client = require('../lib/mysql').client;
 
 var Base = function () { };
 
 Base.apply = function apply(Model, table) {
   Model.fromDbResult = function fromDbResult(attributes) {
+    logger.debug('generating from db result');
     if (attributes === undefined) return null;
 
     var prep = (Model.prepare || {})['out'] || {};
@@ -23,6 +25,9 @@ Base.apply = function apply(Model, table) {
   };
 
   Model.find = function find(criteria, callback) {
+    logger.debug('finding from the database');
+    logger.debug('criteria:' + JSON.stringify(criteria));
+
     var finders = Model.finders || {};
     var keys = Object.keys(criteria);
     var firstKey = keys[0];
@@ -30,6 +35,7 @@ Base.apply = function apply(Model, table) {
     var qstring = 'SELECT * FROM `' + table + '` WHERE ' + keys.map(function (key) { return (key + ' = ?')}).join(' AND ');
 
     function parseResults(err, results) {
+      logger.debug('parsing results');
       if (err) callback(err);
       else callback(null, results.map(Model.fromDbResult));
     }
