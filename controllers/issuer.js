@@ -184,6 +184,7 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
    * 3) award the badge
    */
   remote.getHostedAssertion(assertionUrl, function (err, assertion) {
+    logger.debug('back in issuer');
     var recipient = user.get('email');
     if (err || !assertion) {
       var error_msg = "trying to grab url " + assertionUrl + " got error " + err;
@@ -209,10 +210,11 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
       return res.json({
         message: "issuer origin must be identical to bearer token origin"
       }, 400);
-      
+
     // grabbing the remote badge image
     var imageUrl = qualifyUrl(assertion.badge.image, assertion.badge.issuer.origin);
     remote.badgeImage(imageUrl, function (err, imagedata) {
+      logger.debug('back in issuer');
       if (err) {
         var error_msg = "trying to grab image at url " + imageUrl + " got error " + err;
         logger.error(error_msg);
@@ -251,7 +253,10 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
         assertion.badge.image = imageUrl;
 
         var response = {exists: false, badge: assertion, recipient: recipient};
+        logger.debug('finding badge');
         Badge.findOne({endpoint: assertionUrl}, function (err, badge) {
+          logger.debug('found badge');
+
           if (err) {
             logger.error(err);
             return res.json({message: "internal server error"}, 500);
