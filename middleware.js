@@ -34,12 +34,14 @@ var requestLogger = express.logger({
   }
 });
 
+const imgPrefix = '/images/badge/';
 exports.logRequests = function logRequests() {
-  return function (request, response, next) {
-    var ua = request.headers['user-agent'] || '';
+  return function (req, res, next) {
+    var ua = req.headers['user-agent'] || '';
     var heartbeat = (ua.indexOf('HTTP-Monitor') === 0);
-    if (heartbeat) return next();
-    requestLogger(request, response, next);
+    if (heartbeat || req.url.indexOf(imgPrefix) === 0)
+      return next();
+    requestLogger(req, res, next);
   };
 };
 

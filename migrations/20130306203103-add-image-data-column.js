@@ -6,22 +6,29 @@ var conf = require('../lib/configuration');
 var type = dbm.dataType;
 
 exports.up = function(db, callback) {
-
+  const path = conf.get('badge_path').replace(/static.*/, 'static');
   function storeImageData(entry, callback) {
     if (!entry.image_path) return callback();
-    const data = fs.readFileSync(pathutil.join(path, entry.image_path));
+    try {
+      const data = fs.readFileSync(pathutil.join(path, entry.image_path));
+    } catch (e) {
+      console.log('skipping ', pathutil.join(path, entry.image_path));
+      return callback();
+    }
     const sql = 'UPDATE `badge` SET `image_data` = ? WHERE `id` = ? LIMIT 1';
-    db.runSql(sql, [data.toString('base64'), entry.id], callback);
+    db.runSql(sql, [data.toString('base64'), entry.id], function () {
+      delete data;
+      return callback();
+    });
   }
 
   function wrap(callback) {
     return function (err, data) { return callback(err, data) }
   }
 
-  const path = conf.get('badge_path').replace(/static.*/, 'static');
   async.waterfall([
     function addColumn(callback) {
-      const sql = 'ALTER TABLE `badge` ADD image_data BLOB DEFAULT NULL;';
+      const sql = 'ALTER TABLE `badge` ADD image_data LONGBLOB DEFAULT NULL;';
       return db.runSql(sql, wrap(callback))
     },
     function getImagePaths(data, callback) {
@@ -29,7 +36,7 @@ exports.up = function(db, callback) {
       return db.runSql(sql, wrap(callback));
     },
     function storeImages(data, callback) {
-      async.map(data, storeImageData, callback)
+      async.eachSeries(data, storeImageData, callback)
     }
   ], callback);
 };

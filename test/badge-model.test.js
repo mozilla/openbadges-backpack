@@ -79,9 +79,6 @@ $.prepareDatabase({
     var err;
     t.notOk(newBadge().validate(), 'should have no errors with the defaults');
 
-    err = validate({image_path: null});
-    t.ok(hasError(err, 'image_path'), 'image_path is required');
-
     err = validate({body: null});
     t.ok(hasError(err, 'body'), 'body is required');
 
@@ -190,6 +187,14 @@ $.prepareDatabase({
     t.same(badge.getFromBody('badge.issuer'), badge.get('body').badge.issuer);
     t.notOk(badge.getFromBody('badge.issuer.looooooooooool'), 'should be undefined');
     t.end();
+  });
+
+  test('Badge has image url when it comes out of the db', function (t) {
+    const expect = fixtures['2-existing-badge'];
+    Badge.findById(expect.get('id'), function (err, badge) {
+      t.ok(badge.get('imageUrl').match(RegExp(badge.get('body_hash'))), 'image url should match body hash');
+      t.end();
+    })
   });
 
   $.finish(test);

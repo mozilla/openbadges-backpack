@@ -14,6 +14,13 @@ var app = express();
 app.logger = logger;
 app.config = configuration;
 
+// if this is included, you need to configure the new relic agent
+// https://npmjs.org/package/newrelic
+if (configuration.new_relic) {
+  console.log("including New Relic");
+  require('newrelic');
+}
+
 // View helpers. `user` and `badges` are set so we can use them in `if`
 // statements without getting undefined errors and without having to use typeof
 // checks.
@@ -111,6 +118,7 @@ app.param('apiGroupId', displayer.findGroupById);
 app.param('groupId', group.findById);
 app.param('groupUrl', share.findGroupByUrl);
 app.param('badgeUrl', badge.findByUrl);
+app.param('badgeHash', badge.findByHash);
 
 app.get('/baker', baker.baker);
 app.get('/issuer.js', issuer.generateScript);
@@ -132,8 +140,9 @@ app.get('/demo/invalid.json', demo.badBadge);
 app.post('/demo/award', demo.award);
 
 app.get('/', backpack.recentBadges);
-app.get('/backpack', backpack.manage)
-app.get('/backpack/badges', backpack.allBadges)
+app.get('/backpack', backpack.manage);
+app.get('/backpack/badges', backpack.allBadges);
+app.get('/backpack/add', backpack.addBadge);
 app.get('/backpack/login', backpack.login);
 app.get('/backpack/signout', backpack.signout);
 app.post('/backpack/badge', backpack.userBadgeUpload);
@@ -149,6 +158,8 @@ app.delete('/badge/:badgeId', badge.destroy);
 app.post('/group', group.create);
 app.put('/group/:groupId', group.update);
 app.delete('/group/:groupId', group.destroy);
+
+app.get('/images/badge/:badgeHash.png', badge.image);
 
 app.post('/share/badge/:badgeId', badge.share);
 app.get('/share/badge/:badgeUrl', badge.show);

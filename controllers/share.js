@@ -113,16 +113,6 @@ exports.show = function (request, response, next) {
     portfolio.save();
   }
 
-  // if this is the user's page, show SocialShare button
-  if (owner) {
-    message = '<p class="shareMessage">This is what your portfolio page looks like to the public.</p>';
-    socialcode = '<div class="socialshare" style="float: left;" tabindex="0" onclick="injectSocialMedia(this)">'
-      + '<span class="msg">Share this on twitter, google+ or facebook</span>'
-      + '<div class="social-medium twitter"></div>'
-      + '<div class="social-medium google"></div>'
-      + '<div class="social-medium facebook"></div>';
-  }
-
   request.group.getBadgeObjects(function (err, badges) {
     var badgesWithStories = _.map(badges, badgeModifierFactory(portfolio));
     portfolio.badges = badgesWithStories;
@@ -135,8 +125,6 @@ exports.show = function (request, response, next) {
         { property: 'url', content: makeLinkUrl(request.url, configuration) }
       ],
       portfolio: portfolio,
-      message: message || null,
-      socialcode: socialcode || null,
       owner: owner
     });
   });

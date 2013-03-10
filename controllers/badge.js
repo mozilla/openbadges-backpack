@@ -40,6 +40,25 @@ exports.findByUrl = function findByUrl(req, res, next, url) {
   });
 };
 
+exports.findByHash = function findByHash (req, res, next, hash) {
+  Badge.findOne({body_hash: hash}, function (err, badge) {
+    if (err)
+      return next(err);
+    if (!badge)
+      return res.render('errors/404.html', {url: req.url});
+    req.badge = badge;
+    return next();
+  })
+};
+
+exports.image = function image(req, res, next) {
+  const badge = req.badge;
+  if (!badge) return res.send(404);
+  const image = Buffer(badge.get('image_data'), 'base64');
+  res.type('image/png');
+  return res.send(200, image);
+}
+
 exports.share = function share(req, res, next) {
   req.badge.share(function(err, badge) {
     if (err) throw err;
@@ -54,7 +73,7 @@ exports.show = function show(req, res, next) {
       { property: 'type', content: 'open-badges:badge' },
       { property: 'title', content: req.badge.attributes.body.badge.issuer.name },
       { property: 'url', content: utils.fullUrl(req.url) },
-      { property: 'image', content: utils.fullUrl(req.badge.attributes.image_path) },
+      { property: 'image', content: req.badge.get('imageUrl') },
       { property: 'description', content: req.badge.attributes.body.badge.description },
       ],
     fb: [

@@ -2,6 +2,7 @@ var mysql = require('../lib/mysql');
 var regex = require('../lib/regex');
 var crypto = require('crypto');
 var Base = require('./mysql-base');
+const utils = require('../lib/utils');
 
 function sha256(value) {
   var sum = crypto.createHash('sha256');
@@ -111,10 +112,6 @@ Badge.prototype.getFromBody = function getFromBody(dotstring) {
 // TODO: make these errors more than strings so we don't have to parse
 // them to figure out how to handle the error
 Badge.validators = {
-  image_path: function (value) {
-    if (!value)
-      return "Must have an image_path.";
-  },
   body: function (value) {
     if (!value)
       return "Must have a body.";
@@ -130,7 +127,14 @@ Badge.findByUrl = function (url, callback) {
 // Prepare a field as it goes into or comes out of the database.
 Badge.prepare = {
   'in': { body: function (value) { return JSON.stringify(value); } },
-  'out': { body: function (value) { return JSON.parse(value); } }
+  'out': {
+    body: function (value) {
+      return JSON.parse(value);
+    },
+    imageUrl: function (value, attr) {
+      return utils.fullUrl('/images/badge/' + attr['body_hash'] + '.png');
+    },
+  }
 };
 
 // Virtual finders. By default, `find()` will take the keys of the criteria

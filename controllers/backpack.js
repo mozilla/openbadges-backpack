@@ -228,7 +228,7 @@ exports.manage = function manage(request, response, next) {
   function getBadges(err, results) {
     if (err) return next(err);
     groups = results;
-    Badge.find({email: user.get('email')}, makeResponse);
+    user.getAllBadges(makeResponse);
   }
 
   function modifyGroups(groups) {
@@ -328,8 +328,37 @@ exports.settings = function(options) {
   };
 };
 
+/**
+ * Display badge-upload form
+ */
+
+exports.addBadge = function addBadge(request, response) {
+  var error = request.flash('error');
+  var success = request.flash('success');
+
+  response.render('addBadge.html', {
+    error: error,
+    success: success,
+    csrfToken: request.session._csrf
+  });
+}
+
+/**
+ * Handle upload of a badge from a user's filesystem. Gets embedded data from
+ * uploaded PNG with `urlFromUpload` from lib/baker, retrieves the assertion
+ * using `getHostedAssertion` from lib/remote and finally awards the badge
+ * using `award` from lib/award.
+ *
+ * @param {File} userBadge uploaded badge from user (from request)
+ * @return {HTTP 303} redirects to manage (with error, if necessary)
+ */
+
+
 exports.userBadgeUpload = function userBadgeUpload(req, res) {
-  function redirect(err) {
+  function redirect(err, redirect) {
+    if (!redirect) {
+      redirect = '/backpack/add'
+    }
     if (err) {
       logger.warn('There was an error uploading a badge');
       logger.debug(err);
@@ -379,7 +408,6 @@ exports.userBadgeUpload = function userBadgeUpload(req, res) {
       awardOptions.assertion = assertion;
       awardBadge(awardOptions, callback);
     }
-
   ], redirect);
 };
 
