@@ -9,16 +9,12 @@
 </form>
 
 {% if not badges.length %}
-<h1>It's time to start earning open badges!</h1>
-<p>You might explore <a href="http://badges.webmaker.org">Webmaker Badges</a> as well as thousands of <a href="hyperlink: https://wiki.mozilla.org/Badges/Issuers">other offerings from  badge issuers.</a></p>
-<p>You can also manually upload any of the open badges you've earned.</p>
-{% endif %}
-
+  {% include 'no-badges.html' %}
+{% else %}
 <div class="row" style="position: relative;">
 
   <div class="span4">
     <div class="row">
-    {% if badges.length %}
       <div class="sticky span4">
         <hgroup class="separator">
           <h2>My Collections</h2>
@@ -62,7 +58,6 @@
           </div>
         </div>
       </div>
-    {% endif %}
     </div>
   </div>
 
@@ -83,6 +78,7 @@
   </div>
 
 </div>
+{% endif %}
 
 {% endblock %}
 {% block scripts %}
