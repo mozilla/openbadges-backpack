@@ -10,14 +10,9 @@
         <img src="{{ badge.attributes.imageUrl }}">
         {% if disownable %}
         <button class='btn btn-danger disown'>Remove this Badge</button>
-        <!-- TODO: Re-enable this when sharing actually works well.
 
-        <form action="/share/badge/{{ badge.attributes.id }}" method="post">
-          <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-          <input class="btn" type="submit" value="Share">
-        </form>
-
-        -->
+        <p class="facebook-share">Facebook</p>
+        <p class="twitter-share">Twitter</p>
         {% endif %}
       </td>
 
