@@ -7,4 +7,5 @@ exports.up = function(db, callback) {
 
 exports.down = function(db, callback) {
   // no down since there's no way to recover dropped data.
+  throw new Error('Cannot rewind migration: dropped column `badge`.`type`.')
 };
