@@ -364,6 +364,9 @@ exports.userBadgeUpload = function userBadgeUpload(req, res) {
       logger.debug(err);
       req.flash('error', err.message);
     }
+    // We use store errors in res._error so we can check them in our
+    // controller mock tests. This isn't some magic variable, `_error`
+    // is just a convenient property name.
     res._error = err;
     return res.redirect('/', 303);
   }
@@ -378,10 +381,8 @@ exports.userBadgeUpload = function userBadgeUpload(req, res) {
   // imposing here.
   const MAX_IMAGE_SIZE = 1024*256;
 
-  if (!user) {
-    res._error = new Error('no user');
-    return res.redirect('/', 303);
-  }
+  if (!user)
+    return redirect(new Error('no user'));
 
   if (!tmpfile.size)
     return redirect(new Error('You must choose a badge to upload.'));
