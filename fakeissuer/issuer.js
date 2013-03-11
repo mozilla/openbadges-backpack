@@ -77,7 +77,8 @@ app.get('/hashed.json', function (req, res) {
     "uid": "f2c20",
     "recipient": {
       "type": "email",
-      "hashed": false,
+      "hashed": true,
+      "salt": salt,
       "identity": makeHash(req.query.email, salt)
     },
     "issuedOn": 1359217910,
