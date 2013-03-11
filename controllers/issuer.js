@@ -110,11 +110,16 @@ exports.frame = function (req, res) {
   });
 };
 
+function isValidInput(input) {
+  return validUrl(input) || validator.isSignedBadge(input)
+}
 exports.frameless = function (req, res) {
-  const assertions = req.body.assertions || [];
-  assertions = typeof assertions === 'string' ? [assertions] : assertions;
-  for (var i=0, assertion; assertion = assertions[i]; i++) {
-    if (!validUrl(assertion) && !validator.isSignedBadge(assertion)) {
+  var assertions = req.body.assertions || [];
+  assertions = (typeof assertions === 'string')
+    ? [assertions]
+    : assertions;
+  for (var i = 0, assertion; assertion = assertions[i]; i++) {
+    if (!isValidInput(assertion)) {
       logger.error("malformed assertion " + assertion + " returning 400");
       return res.send('assertion must be url or signature', 400);
     }
