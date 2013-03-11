@@ -372,6 +372,12 @@ exports.userBadgeUpload = function userBadgeUpload(req, res) {
   const tmpfile = req.files.userBadge;
   const awardOptions = {recipient: user.get('email')};
 
+  // While the openbadges assertion specification doesn't specify a size
+  // limit, our backpack does. We don't want to store lots of huge images,
+  // and badges really shouldn't be larger than 256k so that's what we're
+  // imposing here.
+  const MAX_IMAGE_SIZE = 1024*256;
+
   if (!user) {
     res._error = new Error('no user');
     return res.redirect('/', 303);
@@ -380,8 +386,8 @@ exports.userBadgeUpload = function userBadgeUpload(req, res) {
   if (!tmpfile.size)
     return redirect(new Error('You must choose a badge to upload.'));
 
-  if (tmpfile.size > 1024*256)
-    return redirect(new Error('Maximum badge size is 256kb'));
+  if (tmpfile.size > MAX_IMAGE_SIZE)
+    return redirect(new Error('Maximum badge size is ' + MAX_IMAGE_SIZE / 1024 + 'KB'));
 
   async.waterfall([
     function getBadgeImageData(callback) {
