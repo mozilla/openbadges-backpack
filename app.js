@@ -179,6 +179,8 @@ app.all('/api/*', backpackConnect.allowCors());
 app.post('/api/token', backpackConnect.refresh());
 app.post('/api/issue', backpackConnect.authorize("issue"),
                        issuer.issuerBadgeAddFromAssertion);
+app.get('/api/identity', backpackConnect.authorize("issue"),
+                         backpackConnect.hashIdentity());
 
 if (!module.parent) {
   var start_server = function start_server(app) {

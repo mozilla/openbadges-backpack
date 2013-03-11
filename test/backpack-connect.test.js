@@ -212,6 +212,29 @@ appUtils.prepareApp(function(a) {
       responseHeaders: {'access-control-allow-origin': issuer.BASE_URL}
     });
 
+    // Ensure the hash endpoint works.
+    
+    a.verifyRequest('GET', '/api/identity', {
+      headers: {
+        'authorization': 'Bearer ' + b64enc('1234')
+      }
+    }, {
+      statusCode: 200,
+      body: {
+        recipient: 'sha256$2a5712a82a3bc8f7ce25fe686ead768b5a538f5c248' +
+                   '2214addee66a4ae29e2f8',
+        salt: '1234',
+        type: 'email'
+      }
+    });
+
+    // Ensure the hash endpoint requires auth.
+    
+    a.verifyRequest('GET', '/api/identity', {
+      statusCode: 401,
+      body: 'access token expected'
+    });
+
     issuer.end();
     a.end();
   });

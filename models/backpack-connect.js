@@ -1,4 +1,5 @@
 var url = require('url');
+var crypto = require('crypto');
 var _ = require('underscore');
 var mysql = require('../lib/mysql');
 var Base = require('./mysql-base');
@@ -32,6 +33,16 @@ function SessionFactory(options) {
   };
 
   Base.apply(Session, 'bpc_session');
+
+  Session.makeRecipientHash = function(email) {
+    var salt = uid(this.tokenLength);
+    var sha = crypto.createHash('sha256');
+    return {
+      recipient: 'sha256$' + sha.update(email + salt).digest('hex'),
+      salt: salt,
+      type: 'email'
+    };
+  };
 
   Session.revokeOriginForUser = function(options, cb) {
     this.findAndDestroy({
