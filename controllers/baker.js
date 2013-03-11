@@ -7,6 +7,7 @@ const bakery = require('openbadges-bakery');
 const async = require('async');
 
 // local requirements
+const regex = require('../lib/regex');
 const logger = require('../lib/logging').logger;
 const awardBadge = require('../lib/award');
 const Badge = require('../models/badge');
@@ -34,7 +35,7 @@ exports.baker = function (req, res) {
 
   res.setHeader('Content-Type', 'application/json');
 
-  if (!/^http/.exec(url))
+  if (!regex.absoluteUrl.exec(url))
     return res.json(400, {message: 'must provide a valid assertion url'})
 
   const awardOptions = {};
