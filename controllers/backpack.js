@@ -20,6 +20,8 @@ const User = require('../models/user');
  */
 
 exports.login = function login(request, response) {
+  if (request.user)
+    response.redirect('/', 303);
   // request.flash returns an array. Pass on the whole thing to the view and
   // decide there if we want to display all of them or just the first one.
   response.render('login.html', {
