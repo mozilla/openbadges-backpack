@@ -15,12 +15,13 @@
 {% endif %}
 <link rel="stylesheet" href="/css/badge-accept.css" type="text/css" media="all" />
 <title>Accept Your Badges</title>
+<body class="{% if framed %}framed{% else %}frameless{% endif %}">
 <div class="navbar navbar-fixed-top">
   <div class="navbar-inner">
     <div class="container-fluid" style="position: relative;">
       <img class="brand" src="/images/logo.png" alt="Mozilla Backpack logo" />
       <img src="/images/ajax-loader.gif" id="ajax-loader">
-      {% if framed %}<a class="close closeFrame" href="#">&times;</a>{% endif %}
+      <a class="close closeFrame" href="#">&times;</a>
     </div>
   </div>
 </div>
@@ -162,3 +163,4 @@
     });
   </script>
 {% endif %}
+</body>

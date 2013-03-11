@@ -3,7 +3,6 @@
 body {
   max-width: 660px;
   margin: 0 auto;
-  padding-top: @navbarHeight;
 }
 
 .narrow {
@@ -16,7 +15,19 @@ button,
   display: block;
 }
 
+.framed #body {
+  overflow-y: scroll;
+}
+
+.frameless .closeFrame {
+  display: none;
+}
+
 #body {
+  height: 100%;
+  .box-sizing(border-box);
+  padding-top: @navbarHeight + 20px;
+
   p, a,
   button, .btn,
   h1, h2, h3 {
