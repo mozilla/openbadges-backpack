@@ -31,11 +31,15 @@ function qualifyUrl(pathOrUrl, origin) {
   return url.format(parts);
 }
 
+
 function validUrl(url) {
   if (regex.url.test(url))
     return true;
-  url = decodeURIComponent(url);
-  if (regex.url.test(url))
+  // Occasionally we get requests where the URL is double-encoded, so it
+  // remains encoded even after express does one pass of decoding. To
+  // handle those cases we try one more pass of decoding before giving
+  // up and rejecting the URL.
+  if (regex.url.test(decodeURIComponent(url)))
     return true;
   return false;
 }
