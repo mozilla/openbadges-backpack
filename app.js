@@ -1,3 +1,9 @@
+// Newrelic *must* be the first module loaded. Do not move this require module!
+// docs, https://npmjs.org/package/newrelic
+if ( process.env.NEW_RELIC_HOME ) {
+  require( 'newrelic' );
+}
+
 // Configure & start express.
 var express = require('express');
 var http = require('http');
@@ -13,13 +19,6 @@ var less = require('less-middleware');
 var app = express();
 app.logger = logger;
 app.config = configuration;
-
-// if this is included, you need to configure the new relic agent
-// https://npmjs.org/package/newrelic
-if (configuration.new_relic) {
-  console.log("including New Relic");
-  require('newrelic');
-}
 
 // View helpers. `user` and `badges` are set so we can use them in `if`
 // statements without getting undefined errors and without having to use typeof
