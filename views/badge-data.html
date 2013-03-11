@@ -11,8 +11,16 @@
         {% if disownable %}
         <button class='btn btn-danger disown'>Remove this Badge</button>
 
-        <p class="facebook-share">Facebook</p>
-        <p class="twitter-share">Twitter</p>
+        <!-- TODO: Re-enable this when sharing actually works well.
+                   We may drop the "Share" button altogether, but it's 
+                   a nice guide for now.
+          <form action="/share/badge/{{ badge.attributes.id }}" method="post">
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+            <input class="btn" type="submit" value="Share">
+          </form>
+          <p class="facebook-share">Facebook</p>
+          <p class="twitter-share">Twitter</p>
+        -->
         {% endif %}
       </td>
 
