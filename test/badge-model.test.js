@@ -182,10 +182,10 @@ $.prepareDatabase({
     t.end();
   });
 
-  test('Badge#getFromBody', function (t) {
+  test('Badge#getFromAssertion', function (t) {
     const badge = fixtures['2-existing-badge'];
-    t.same(badge.getFromBody('badge.issuer'), badge.get('body').badge.issuer);
-    t.notOk(badge.getFromBody('badge.issuer.looooooooooool'), 'should be undefined');
+    t.same(badge.getFromAssertion('badge.issuer'), badge.get('body').badge.issuer);
+    t.notOk(badge.getFromAssertion('badge.issuer.looooooooooool'), 'should be undefined');
     t.end();
   });
 

@@ -92,7 +92,7 @@ Badge.prototype.checkHash = function checkHash() {
   return sha256(JSON.stringify(this.get('body'))) === this.get('body_hash');
 };
 
-Badge.prototype.getFromBody = function getFromBody(dotstring) {
+Badge.prototype.getFromAssertion = function getFromAssertion(dotstring) {
   const parts = dotstring.split('.');
   const last = parts.pop();
   const obj = parts.reduce(function (obj, field) {
