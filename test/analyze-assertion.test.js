@@ -22,20 +22,7 @@ test('analyzeAssertion: invalid old assertion, bad form', function (t) {
   delete assertion.badge.image;
   analyzeAssertion(assertion, function (err, info) {
     t.same(err.code, 'structure');
-    t.ok(err.extra['badge.criteria'], 'should have criteria error');
     t.ok(err.extra['badge.image'], 'should have image error');
-    t.end();
-  });
-});
-
-test('analyzeAssertion: invalid old assertion, bad criteria resource', function (t) {
-  $.mockHttp()
-    .get('/bad-criteria').reply(404)
-  const assertion = $.makeOldAssertion();
-  assertion.badge.criteria = '/bad-criteria';
-  analyzeAssertion(assertion, function (err, info) {
-    t.same(err.code, 'resources');
-    t.ok(err.extra['badge.criteria'], 'error should be for criteria');
     t.end();
   });
 });
