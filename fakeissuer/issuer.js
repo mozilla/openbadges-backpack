@@ -64,8 +64,8 @@ app.get('/raw.json', function (req, res) {
     },
     "issuedOn": 1359217910,
     "verify": {
-      "type": "signed",
-      "url": "http://localhost:8889/public-key"
+      "type": "hosted",
+      "url": "http://localhost:8889/raw.json?email=" + req.query.email
     }
   });
 });
@@ -82,8 +82,8 @@ app.get('/hashed.json', function (req, res) {
     },
     "issuedOn": 1359217910,
     "verify": {
-      "type": "signed",
-      "url": "http://localhost:8889/public-key"
+      "type": "hosted",
+      "url": "http://localhost:8889/hashed.json?email=" + req.query.email
     }
   });
 });

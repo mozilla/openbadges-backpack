@@ -25,7 +25,7 @@
     "up": "~0.2.2",
     "winston": "~0.5.10",
     "optimist": "~0.3.0",
-    "openbadges-validator": "0.0.13",
+    "openbadges-validator": "0.0.16",
     "openbadges-bakery": "0.2.0",
     "jws": "~0.2.1",
     "newrelic": "~0.9.19",

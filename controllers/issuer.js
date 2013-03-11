@@ -174,9 +174,7 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
   analyzeAssertion(input, function (err, data) {
     if (err) {
       logger.debug('there was an error analyzing the assertion');
-      logger.debug(JSON.stringify(err));
-      logger.debug('here is what we know');
-      logger.debug(JSON.stringify(data));
+      console.dir(err);
 
       if (err.code === 'resources')
         err.message = 'Could not get all linked resources';
