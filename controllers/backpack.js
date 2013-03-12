@@ -39,44 +39,39 @@ exports.login = function login(request, response) {
  *   on success: redirect to `backpack.manage`
  */
 
-exports.authenticate = function authenticate(request, response) {
+exports.authenticate = function authenticate(req, res) {
   function formatResponse(to, apiError, humanReadableError) {
-    if (jsonResponse) {
+    const preferJsonOverHtml = req.accepts('html, json') === 'json';
+    if (preferJsonOverHtml) {
       if (apiError)
-        return response.send({status: 'error', reason: apiError}, 400);
-      else
-        return response.send({status: 'ok', email: request.session.emails[0]});
-    } else {
-      if (humanReadableError)
-        request.flash('error', humanReadableError);
-      return response.redirect(303, to);
+        return res.send(400, {status: 'error', reason: apiError});
+      return res.send(200, {status: 'ok', email: req.session.emails[0]});
     }
+    if (humanReadableError)
+      req.flash('error', humanReadableError);
+    return res.redirect(303, to);
   }
 
-  var jsonResponse = request.headers['accept'] &&
-                     request.headers['accept'].indexOf('application/json') != -1;
+  const assertion = req.body && req.body.assertion;
+  const verifierUrl = browserid.getVerifierUrl(configuration);
+  const audience = browserid.getAudience(req);
 
-  if (!request.body || !request.body['assertion']) {
+  if (!assertion)
     return formatResponse('/backpack/login', "assertion expected");
-  }
 
-  var ident = configuration.get('identity');
-  var uri = ident.protocol + '://' +  ident.server + ident.path;
-  var assertion = request.body['assertion'];
-  var audience = configuration.get('hostname');
-
-  browserid.verify(uri, assertion, audience, function (err, verifierResponse) {
+  browserid.verify({
+    url: verifierUrl,
+    assertion: assertion,
+    audience: audience,
+  }, function (err, email) {
     if (err) {
       logger.error('Failed browserID verification: ');
-      logger.debug('Type: ' + err.type + "; Body: " + err.body);
-      return formatResponse('back', "browserID verification failed: " + err.type,
+      logger.debug('Code: ' + err.code + "; Extra: " + err.extra);
+      return formatResponse('back', "browserID verification failed: " + err.message,
                             "Could not verify with browserID!");
     }
 
-    if (!request.session.emails) request.session.emails = [];
-
-    logger.debug('browserid verified, attempting to authenticate user');
-    request.session.emails = [verifierResponse.email];
+    req.session.emails = [email];
     return formatResponse('/');
   });
 };
