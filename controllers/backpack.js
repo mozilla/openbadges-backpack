@@ -41,8 +41,8 @@ exports.login = function login(request, response) {
 
 exports.authenticate = function authenticate(req, res) {
   function formatResponse(to, apiError, humanReadableError) {
-    const jsonResponse = req.accepts('html, json') === 'json';
-    if (jsonResponse) {
+    const preferJsonOverHtml = req.accepts('html, json') === 'json';
+    if (preferJsonOverHtml) {
       if (apiError)
         return res.send(400, {status: 'error', reason: apiError});
       return res.send(200, {status: 'ok', email: req.session.emails[0]});
