@@ -44,8 +44,8 @@ exports.authenticate = function authenticate(req, res) {
     const jsonResponse = req.accepts('html, json') === 'json';
     if (jsonResponse) {
       if (apiError)
-        return res.send({status: 'error', reason: apiError}, 400);
-      return res.send({status: 'ok', email: req.session.emails[0]});
+        return res.send(400, {status: 'error', reason: apiError});
+      return res.send(200, {status: 'ok', email: req.session.emails[0]});
     }
     if (humanReadableError)
       req.flash('error', humanReadableError);
