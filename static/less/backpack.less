@@ -3,9 +3,30 @@
 @import "groups";
 @import "font-faces";
 @import "devsite";
-@import "login";
+@import "persona-buttons";  /* Don't edit directly */
+@import "login";            
 @import "navbar";
 @import "lightbox";
+
+.persona-button {
+
+  &:hover {
+    color: #fff;
+  }
+
+  &.big {
+    font-size: 20px;
+
+    span {
+      padding-left: 44px;
+    }
+
+    &:before {
+      left: 6px;
+    }
+  }
+}
+
 
 html {
   height: 100%;
