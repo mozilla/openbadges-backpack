@@ -3,7 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 # we don't want to try to install the npm packages
-all: lint
+test: npm
 	npm test
 
 lint:
@@ -21,19 +21,19 @@ rpm: srpm
 srpm:
 	scripts/rpmbuild.sh src
 
-test: npm
-	npm test
-
 start-issuer:
 	node fakeissuer/issuer.js > issuer.pid&
 
 stop-issuer:
 	kill `cat issuer.pid`
 
-jenkins_build: 
+jenkins_build:
 	echo 'yep'
+
+migrate:
+	./bin/db-migrate up
 
 start:
 	npm start
 
-.PHONY: fakeissuer
+.PHONY: fakeissuer start migrate test npm clean lint default

@@ -27,7 +27,6 @@ testUtils.prepareDatabase({
   '2-false-user': new User({ email: 'thief@example.org' }),
   '3-badge-raw': new Badge({
     user_id: 1,
-    type: 'hosted',
     endpoint: 'endpoint',
     image_path: 'image_path',
     image_data: images.unbaked.toString('base64'),
@@ -35,7 +34,6 @@ testUtils.prepareDatabase({
   }),
   '4-badge-hashed': new Badge({
     user_id: 1,
-    type: 'hosted',
     endpoint: 'endpoint',
     image_path: 'image_path',
     image_data: images.unbaked.toString('base64'),

@@ -1,3 +1,4 @@
+const $ = require('./');
 const express = require('express');
 const http = require('http');
 const url = require('url');
@@ -12,13 +13,13 @@ function makeBadges(appTestHarness, baseUrl) {
     '/bad_img': {
       "recipient": makeHash(appTestHarness.email, "ballertime"),
       "salt": "ballertime",
-      "evidence": "/badges/html5-basic/example",
+      "evidence": "/evidence",
       "badge": {
         "version": "0.5.0",
         "name": "HTML5 Fundamental",
         "image": "/CANT_BE_REACHED.png",
         "description": "Knows the difference between a <section> and a b",
-        "criteria": "/badges/html5-basic",
+        "criteria": "/criteria",
         "issuer": {
           "origin": baseUrl,
           "name": "P2PU",
@@ -30,15 +31,30 @@ function makeBadges(appTestHarness, baseUrl) {
     '/example': {
       "recipient": makeHash(appTestHarness.email, "ballertime"),
       "salt": "ballertime",
-      "evidence": "/badges/html5-basic/example",
+      "evidence": "/evidence",
       "badge": {
         "version": "0.5.0",
         "name": "HTML5 Fundamental",
         "image": appTestHarness.resolve('/_demo/cc.large.png'),
         "description": "Knows the difference between a <section> and a c",
-        "criteria": "/badges/html5-basic",
+        "criteria": "/criteria",
         "issuer": {
           "origin": baseUrl,
+          "name": "P2PU",
+          "org": "School of Webcraft",
+          "contact": "admin@p2pu.org"
+        }
+      }
+    },
+    '/bad_assertion': {
+      "salt": "ballertime",
+      "evidence": "/evidence",
+      "badge": {
+        "version": "0.5.0",
+        "image": appTestHarness.resolve('/_demo/cc.large.png'),
+        "description": "Knows the difference between a <section> and a c",
+        "criteria": "/CANT_BE_REACHED",
+        "issuer": {
           "name": "P2PU",
           "org": "School of Webcraft",
           "contact": "admin@p2pu.org"
@@ -65,7 +81,26 @@ exports.createIssuer = function createIssuer(appTestHarness, cb) {
         return res.send(BADGES[path]);
       });
     });
-    
+    issuerApp.get('/', function(req, res) {
+      return res.send('origin');
+    }).get('/criteria', function(req, res) {
+      return res.send('criteria');
+    }).get('/evidence', function(req, res) {
+      return res.send('evidence');
+    }).get('/badge', function (req, res) {
+      return res.json($.makeBadgeClass({resolve: resolve}));
+    }).get('/issuer', function (req, res) {
+      return res.send($.makeIssuer({resolve: resolve}));
+    }).get('/assertion-image', function (req, res) {
+      res.type('image/png');
+      return res.send($.makeImage());
+    }).get('/badge-image', function (req, res) {
+      res.type('image/png');
+      return res.send($.makeImage());
+    }).get('/public-key', function (req, res) {
+      return res.send($.keys.public);
+    });
+
     cb({
       BADGES: BADGES,
       PROTOCOL: PROTOCOL,

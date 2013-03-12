@@ -127,7 +127,7 @@ var fakeResponseHandlers = {
       cb(400, 'Bad Request');
   },
   "POST /issuer/assertion": function(options, cb) {
-    if (options.data.url == "http://foo.org/explodeonissue.json")
+    if (options.data.assertion == "http://foo.org/explodeonissue.json")
       cb(400, 'Bad Request', {
 	      text: JSON.stringify({
 	        message: "blah"
@@ -137,8 +137,8 @@ var fakeResponseHandlers = {
       cb(200, 'OK');
   },
   "GET /issuer/assertion": function(options, cb) {
-    if (options.data.url in RESPONSES) {
-      cb(200, 'OK', {json: RESPONSES[options.data.url]});
+    if (options.data.assertion in RESPONSES) {
+      cb(200, 'OK', {json: RESPONSES[options.data.assertion]});
     } else
       cb(404, 'Not Found');
   }
@@ -181,7 +181,7 @@ asyncTest('Test', function(){
   var app = App(ASSERTION_URLS);
 
   app.on('badges-ready', function(failed, ready){
-    deepEqual(_.map(failed, function(badge){ return badge.assertionUrl; }),
+    deepEqual(_.map(failed, function(badge){ return badge.assertion; }),
       [
         'http://foo.org/nonexistent.json',
         'http://bar.org/oldbadge.json',
@@ -191,27 +191,28 @@ asyncTest('Test', function(){
     ready.forEach(function(badge){
       badge.issue();
     });
+    start();
   });
 
   app.on('badge-failed', function(badge){
     var error = badge.error;
     // This case won't have any real data
     if (error.reason === 'INACCESSIBLE') {
-      equal(badge.assertionUrl, 'http://foo.org/nonexistent.json');
+      equal(badge.assertion, 'http://foo.org/nonexistent.json');
       ok(error.message, 'has error message');
     }
     else {
       // We expect data here
       checkDataObj(badge.data);
       if (error.reason === 'EXISTS') {
-	      equal(badge.assertionUrl, 'http://bar.org/oldbadge.json');
+	      equal(badge.assertion, 'http://bar.org/oldbadge.json');
       }
       else if (error.reason === 'INVALID') {
 	      if (badge.data.owner) {
-          equal(badge.assertionUrl, 'http://foo.org/explodeonissue.json');
+          equal(badge.assertion, 'http://foo.org/explodeonissue.json');
         }
         else {
-          equal(badge.assertionUrl, 'http://foo.org/notowner.json');
+          equal(badge.assertion, 'http://foo.org/notowner.json');
         }
       }
     }
@@ -219,7 +220,7 @@ asyncTest('Test', function(){
 
   app.on('badges-complete', function(failed, successes, total){
     equal(total, ASSERTION_URLS.length, 'all badges complete');
-    deepEqual(_.map(failed, function(badge){ return badge.assertionUrl; }),
+    deepEqual(_.map(failed, function(badge){ return badge.assertion; }),
       [
         'http://foo.org/nonexistent.json',
         'http://bar.org/oldbadge.json',
@@ -227,7 +228,7 @@ asyncTest('Test', function(){
         'http://foo.org/explodeonissue.json'
       ], 'expected failures'
     );
-    deepEqual(_.map(successes, function(badge){ return badge.assertionUrl; }),
+    deepEqual(_.map(successes, function(badge){ return badge.assertion; }),
       [
         'http://foo.org/newbadge.json',
         'http://foo.org/another_newbadge.json'

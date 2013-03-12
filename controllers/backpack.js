@@ -1,18 +1,19 @@
-var request = require('request');
-var _ = require('underscore');
-var qs = require('querystring');
-var fs = require('fs');
-var logger = require('../lib/logging').logger;
-var url = require('url');
-var configuration = require('../lib/configuration');
-var baker = require('../lib/baker');
-var remote = require('../lib/remote');
-var browserid = require('../lib/browserid');
-var awardBadge = require('../lib/award');
-var Badge = require('../models/badge');
-var Group = require('../models/group');
-var User = require('../models/user');
-var async = require('async');
+const request = require('request');
+const _ = require('underscore');
+const qs = require('querystring');
+const fs = require('fs');
+const async = require('async');
+const url = require('url');
+const bakery = require('openbadges-bakery');
+
+const logger = require('../lib/logging').logger;
+const configuration = require('../lib/configuration');
+const browserid = require('../lib/browserid');
+const awardBadge = require('../lib/award');
+const analyzeAssertion = require('../lib/analyze-assertion');
+const Badge = require('../models/badge');
+const Group = require('../models/group');
+const User = require('../models/user');
 
 /**
  * Render the login page.
@@ -112,7 +113,7 @@ exports.stats = function stats(request, response, next) {
   logger.info(user.get('email') + ' is accessing /stats');
 
   async.parallel({
-    badges: Badge.stats, 
+    badges: Badge.stats,
     users: User.totalCount
   }, function(err, results) {
     if (err) {
@@ -121,7 +122,7 @@ exports.stats = function stats(request, response, next) {
       return next(err);
     }
     return response.render('stats.html', {
-      totalBadges: results.badges.totalBadges, 
+      totalBadges: results.badges.totalBadges,
       totalPerIssuer: results.badges.totalPerIssuer,
       userCount: results.users
     })
@@ -353,11 +354,7 @@ exports.addBadge = function addBadge(request, response) {
  */
 
 
-exports.userBadgeUpload = function userBadgeUpload(request, response) {
-  var user = request.user;
-  var tmpfile = request.files.userBadge;
-
-  // go back to the manage page and potentially show an error
+exports.userBadgeUpload = function userBadgeUpload(req, res) {
   function redirect(err, redirect) {
     if (!redirect) {
       redirect = '/backpack/add'
@@ -365,52 +362,60 @@ exports.userBadgeUpload = function userBadgeUpload(request, response) {
     if (err) {
       logger.warn('There was an error uploading a badge');
       logger.debug(err);
-      request.flash('error', err.message);
+      req.flash('error', err.message);
     }
-    return response.redirect(redirect, 303);
+    // We use store errors in res._error so we can check them in our
+    // controller mock tests. This isn't some magic variable, `_error`
+    // is just a convenient property name.
+    res._error = err;
+    return res.redirect('/', 303);
   }
 
+  const user = req.user;
+  const tmpfile = req.files.userBadge;
+  const awardOptions = {recipient: user.get('email')};
+
+  // While the openbadges assertion specification doesn't specify a size
+  // limit, our backpack does. We don't want to store lots of huge images,
+  // and badges really shouldn't be larger than 256k so that's what we're
+  // imposing here.
+  const MAX_IMAGE_SIZE = 1024*256;
+
   if (!user)
-    return response.redirect('/', 303);
+    return redirect(new Error('no user'));
 
   if (!tmpfile.size)
     return redirect(new Error('You must choose a badge to upload.'));
 
-  // get the url from the uploaded badge file
-  baker.urlFromUpload(tmpfile, function (err, assertionUrl, imagedata) {
-    var recipient = user.get('email');
-    if (err) return redirect(err);
+  if (tmpfile.size > MAX_IMAGE_SIZE)
+    return redirect(new Error('Maximum badge size is ' + MAX_IMAGE_SIZE / 1024 + 'KB'));
 
-    // grab the assertion data from the endpoint
-    remote.getHostedAssertion(assertionUrl, function (err, assertion) {
-      if (err) return redirect(err);
-
-      var userOwnsBadge = Badge.confirmRecipient(assertion, recipient);
-      // bail if the badge wasn't issued to the logged in user
+  async.waterfall([
+    function getBadgeImageData(callback) {
+      fs.readFile(tmpfile.path, callback);
+    },
+    function extractAssertionUrl(imageData, callback) {
+      awardOptions.imagedata = imageData;
+      bakery.extract(imageData, callback);
+    },
+    function getAssertionData(url, callback) {
+      awardOptions.url = url;
+      analyzeAssertion(url, callback);
+    },
+    function confirmAndAward(info, callback) {
+      const recipient = awardOptions.recipient;
+      const assertion = info.structures.assertion;
+      const userOwnsBadge = Badge.confirmRecipient(assertion, recipient);
       if (!userOwnsBadge) {
-        err = new Error('This badge was not issued to you! Contact your issuer.');
+        const err = new Error('This badge was not issued to you! Contact your issuer.');
         err.name = 'InvalidRecipient';
-        return redirect(err);
+        res._error = err;
+        return callback(err);
       }
-
-      // try to issue the badge
-      var opts = {
-        assertion: assertion,
-        url: assertionUrl,
-        imagedata: imagedata,
-        recipient: recipient
-      };
-
-      awardBadge(opts, function (err, badge) {
-        if (err) {
-          logger.warn('Could not save an uploaded badge: ');
-          logger.debug(err);
-          return redirect(new Error('There was a problem saving your badge!'));
-        }
-        return redirect(null, '/');
-      });
-    });
-  });
+      awardOptions.assertion = assertion;
+      awardBadge(awardOptions, callback);
+    }
+  ], redirect);
 };
 
 /**

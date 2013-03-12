@@ -15,14 +15,12 @@ testUtils.prepareDatabase({
   }),
   '3-badge': new Badge({
     user_id: 1,
-    type: 'hosted',
     endpoint: 'endpoint',
     image_path: 'image_path',
     body: testUtils.makeAssertion({'badge.name': 'Badge One'})
   }),
   '4-badge': new Badge({
     user_id: 1,
-    type: 'hosted',
     endpoint: 'endpoint',
     image_path: 'image_path',
     body: testUtils.makeAssertion({'badge.name': 'Badge Two'})

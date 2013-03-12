@@ -6,9 +6,7 @@ var conf = require('../lib/configuration');
 var type = dbm.dataType;
 
 exports.up = function(db, callback) {
-
   const path = conf.get('badge_path').replace(/static.*/, 'static');
-
   function storeImageData(entry, callback) {
     if (!entry.image_path) return callback();
     try {

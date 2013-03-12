@@ -10,6 +10,11 @@ function sha256(value) {
   return sum.digest('hex');
 }
 
+
+function isObject(thing) {
+  return Object.prototype.toString.call(thing) === '[object Object]';
+}
+
 var Badge = function (attributes) {
   this.attributes = attributes;
 };
@@ -27,8 +32,12 @@ Badge.confirmRecipient = function confirmRecipient(assertion, email) {
   if (!assertion)
     return false;
 
-  const recipient = assertion.recipient;
-  const salt = assertion.salt || '';
+  const recipient = isObject(assertion.recipient)
+    ? assertion.recipient.identity
+    : assertion.recipient
+  const salt = isObject(assertion.recipient)
+    ? assertion.recipient.salt || ''
+    : assertion.salt || ''
 
   if (!recipient || !email)
     return false;
@@ -83,6 +92,16 @@ Badge.prototype.checkHash = function checkHash() {
   return sha256(JSON.stringify(this.get('body'))) === this.get('body_hash');
 };
 
+Badge.prototype.getFromAssertion = function getFromAssertion(dotstring) {
+  const parts = dotstring.split('.');
+  const last = parts.pop();
+  const obj = parts.reduce(function (obj, field) {
+    if (!obj) return undefined;
+    return obj[field];
+  }, this.get('body'));
+  return obj && obj[last];
+};
+
 // Validators called by `save()` (see mysql-base) in preparation for saving.
 // A valid pass returns nothing (or a falsy value); an invalid pass returns a
 // message about why a thing was invalid.
@@ -93,40 +112,11 @@ Badge.prototype.checkHash = function checkHash() {
 // TODO: make these errors more than strings so we don't have to parse
 // them to figure out how to handle the error
 Badge.validators = {
-  type: function (value, attributes) {
-    var valid = ['signed', 'hosted'];
-    if (valid.indexOf(value) === -1) {
-      return "Unknown type: " + value;
-    }
-    if (value === 'hosted' && !attributes.endpoint) {
-      return "If type is hosted, endpoint must be set";
-    }
-    if (value === 'signed' && !attributes.jwt) {
-      return "If type is signed, jwt must be set";
-    }
-    if (value === 'signed' && !attributes.public_key) {
-      return "If type is signed, public_key must be set";
-    }
-  },
-  endpoint: function (value, attributes) {
-    if (!value && attributes.type === 'hosted') {
-      return "If type is hosted, endpoint must be set";
-    }
-  },
-  jwt: function (value, attributes) {
-    if (!value && attributes.type === 'signed') {
-      return "If type is signed, jwt must be set";
-    }
-  },
-  public_key: function (value, attributes) {
-    if (!value && attributes.type === 'signed') {
-      return "If type is signed, public_key must be set";
-    }
-  },
   body: function (value) {
-    if (!value) { return "Must have a body."; }
-    if (String(value) !== '[object Object]') { return "body must be an object"; }
-    if (Badge.validateBody(value) instanceof Error) { return "invalid body"; }
+    if (!value)
+      return "Must have a body.";
+    if (String(value) !== '[object Object]')
+      return "body must be an object";
   }
 };
 

@@ -43,7 +43,7 @@ appUtils.prepareApp(function(a) {
     });
 
     // Ensure a request w/o a CSRF fails.
-    
+
     a.verifyRequest('POST', '/accept', {
       form: {
         'callback': issuer.resolve('/callback'),
@@ -52,9 +52,9 @@ appUtils.prepareApp(function(a) {
     }, {
       statusCode: 403
     });
-    
+
     // Ensure a request w/ a CSRF succeeds and gives us a token.
-    
+
     a.verifyRequest('POST', '/accept', {
       form: {
         '_csrf': a.csrf,
@@ -74,9 +74,9 @@ appUtils.prepareApp(function(a) {
     // Log out to ensure that this all works w/o any cookies.
 
     a.verifyRequest('GET', '/backpack/signout', {statusCode: 200});
-    
+
     // Ensure attempting to issue a badge w/o a token fails
-    
+
     a.verifyRequest('POST', '/api/issue', {
       statusCode: 401,
       body: 'access token expected',
@@ -86,14 +86,14 @@ appUtils.prepareApp(function(a) {
     });
 
     // Ensure attempting to issue a badge w/ a token but no URL fails.
-    
+
     a.verifyRequest('POST', '/api/issue', {
       headers: {
         'authorization': 'Bearer ' + b64enc('1234')
       }
     }, {
       statusCode: 400,
-      body: {message: 'url is a required param'}
+      body: {message: 'must provide either url or signature'}
     });
 
     // Ensure attempting to issue a badge w/ a valid URL succeeds.
@@ -158,7 +158,7 @@ appUtils.prepareApp(function(a) {
     });
 
     // Ensure refreshing the wrong token fails
-    
+
     a.verifyRequest('POST', '/api/token', {
       form: {
         'grant_type': 'refresh_token',
@@ -170,7 +170,7 @@ appUtils.prepareApp(function(a) {
     });
 
     // Ensure refreshing the token works
-    
+
     a.verifyRequest('POST', '/api/token', {
       form: {
         'grant_type': 'refresh_token',
@@ -186,7 +186,7 @@ appUtils.prepareApp(function(a) {
     });
 
     // Ensure refreshing the token from a bad origin over CORS fails
-    
+
     a.verifyRequest('POST', '/api/token', {
       headers: {'origin': 'http://blarg.org'},
       form: {
@@ -200,7 +200,7 @@ appUtils.prepareApp(function(a) {
     });
 
     // Ensure refreshing the token from a good origin over CORS fails
-    
+
     a.verifyRequest('POST', '/api/token', {
       headers: {'origin': issuer.BASE_URL},
       form: {

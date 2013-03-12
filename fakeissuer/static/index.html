@@ -10,11 +10,17 @@
     <script src="http://localhost:8888/issuer.js"></script>
   </head>
   <body>
-    <label>Email: <input id='email'></label>
+    <form method="post" action="sign">
+      <label>Make signed badge for email <input name="email" placeholder="steve.holt@example.org"></label>
+      <input type="submit" value="Do it">
+    </form>
+
+    <label>Email or Signature: <input id='email'></label>
     <label>Modaless: <input id='modaless' type='checkbox'></label>
-    <button id='unhashed'>Unhashed</button>
-    <button id='hashed'>Hashed</button>
-    <button id='invalid'>Invalid</button>
+    <button id="unhashed">Unhashed</button>
+    <button id="hashed">Hashed</button>
+    <button id="invalid">Invalid</button>
+    <button id="signature">Signature</button>
     <script>
       var unhashed = document.getElementById('unhashed');
       var hashed = document.getElementById('hashed');
@@ -45,6 +51,11 @@
       invalid.addEventListener('click', function(){
         var url = 'http://localhost:8889/invalid.json?email=' + encodeURIComponent(getEmail());
         issue(url);
+      },false)
+    
+      signature.addEventListener('click', function(){
+        var assertion = getEmail();
+        issue(assertion);
       },false)
     
     </script>

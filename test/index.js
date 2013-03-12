@@ -1,44 +1,60 @@
 const _ = require('underscore');
+const jws = require('jws');
+const fs = require('fs');
+const url = require('url');
+const async = require('async');
+const nock = require('nock');
 const mysql = require('../lib/mysql');
 const migrations = require('../lib/migrations');
-const async = require('async');
+const keys = require('./test-keys');
 
 const ALPHABET = 'abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_';
-
-/**
- * Generate a random string
- *
- * @param {Integer} length
- * @return {String}
- */
-
+const ORIGIN = 'https://example.org';
+const FAKE_HARNESS =  {
+  email: 'brian@example.org',
+  resolve: function(path) {
+    return url.resolve("https://example.org", path);
+  }
+}
+exports.keys = keys;
+exports.HTTP_SCOPE = nock(ORIGIN);
+exports.EMAIL = FAKE_HARNESS.email;
+exports.mockHttp = function mockHttp() {
+  return (
+    exports.HTTP_SCOPE
+      .get('/').reply(200, 'root')
+      .get('/404').reply(404)
+      .get('/criteria').reply(200, 'criteria')
+      .get('/evidence').reply(200, 'evidence')
+      .get('/image').reply(200, 'image', { 'content-type': 'image/png' })
+      .get('/public-key').reply(200, keys.public)
+      .get('/badge-image').reply(200, 'image', { 'content-type': 'image/png' })
+      .get('/assertion-image').reply(200, 'image', { 'content-type': 'image/png' })
+      .get('/badge').reply(200, JSON.stringify(exports.makeBadgeClass()))
+      .get('/issuer').reply(200, JSON.stringify(exports.makeIssuer()))
+  )
+}
+exports.makeUrl = function makeUrl(path) {
+  return ORIGIN + path;
+}
+exports.makeImage = function makeImage() {
+  return fs.readFileSync(__dirname + '/data/static/_badges/image1.png');
+}
+exports.makeHash = function makeHash(email, salt) {
+  var sha = require('crypto').createHash('sha256');
+  return 'sha256$' + sha.update(email + salt).digest('hex');
+}
 exports.randomstring = function randomstring(length) {
   const str = [];
   while (length--)
     str.push(randomchar(ALPHABET))
   return str.join('');
 };
-
-/**
- * Make a cleanup test that closes the database connection
- *
- * @param {Object} test
- *   A tap test object
- */
-
 exports.finish = function closeDatabase (test) {
   test('cleaning up', function (t) {
     mysql.client.destroy(); t.end();
   });
 };
-
-/**
- * Recreate the test database and optionally insert test data.
- *
- * @asyncronous
- * @return {Object} whatever fixtures were passed into it
- */
-
 exports.prepareDatabase = function prepareDatabase(fixtures, callback) {
   if (typeof fixtures === 'function')
     callback = fixtures, fixtures = {};
@@ -54,19 +70,9 @@ exports.prepareDatabase = function prepareDatabase(fixtures, callback) {
     callback(results[1]);
   });
 };
-
-/**
- * Generate a valid-looking assertion object
- *
- * @param {Object} changes
- *   An object with potential changes. For deep changes, you can use a
- *   dotted path to select, i.e. `badge.version`.
- * @return {Object} assertion object
- */
-
 exports.makeAssertion = function makeAssertion(changes) {
   changes = changes || {};
-  var assertion = makeValidAssertion();
+  var assertion = exports.makeOldAssertion();
 
   _.keys(changes).forEach(function (k) {
     const fields = k.split('.');
@@ -82,30 +88,87 @@ exports.makeAssertion = function makeAssertion(changes) {
   });
   return assertion;
 }
-
-// private
-
-function makeValidAssertion() {
+exports.makeOldAssertion = function makeOldAssertion() {
   return {
-    recipient: 'bimmy@example.com',
-    evidence: '/bimmy-badge.json',
-    expires: '2040-08-13',
-    issued_on: '2011-08-23',
-    badge: {
-      version: 'v0.5.0',
-      name: 'Open Source Contributor',
-      description: 'For rocking in the free world',
-      image: '/badge.png',
-      criteria: 'http://example.com/criteria.html',
-      issuer: {
-        origin: 'http://p2pu.org',
-        name: 'p2pu',
-        org: 'school of webcraft',
-        contact: 'admin@p2pu.org'
+    "recipient": "brian@example.org",
+    "evidence": "/evidence",
+    "expires": '2040-08-13',
+    "issued_on": '2011-08-23',
+    "badge": {
+      "version": "0.5.0",
+      "name": "badge-name",
+      "image": '/image',
+      "description": "badge-description",
+      "criteria": "/criteria",
+      "issuer": {
+        "origin": ORIGIN,
+        "name": "issuer-name",
+        "org": "issuer-org",
+        "contact": "admin@example.org"
       }
     }
   };
+};
+exports.makeNewAssertion = function makeNewAssertion(appHarness) {
+  appHarness = appHarness || FAKE_HARNESS;
+  return {
+    "badge": appHarness.resolve('/badge'),
+    "uid": "f2c20",
+    "recipient": {
+      "type": "email",
+      "hashed": true,
+      "salt": "deadsea",
+      "identity": "sha256$c7ef86405ba71b85acd8e2e95166c4b111448089f2e1599f42fe1bba46e865c5"
+    },
+    "image": appHarness.resolve("/assertion-image"),
+    "issuedOn": 1359217910,
+    "verify": {
+      "type": "hosted",
+      "url": appHarness.resolve("/assertion")
+    }
+  }
 }
+exports.makeBadgeClass =function makeBadgeClass(appHarness) {
+  appHarness = appHarness || FAKE_HARNESS;
+  return {
+    "image": appHarness.resolve("/badge-image"),
+    "criteria": appHarness.resolve("/criteria"),
+    "issuer": appHarness.resolve("/issuer"),
+    "name": "Awesome Robotics Badge",
+    "description": "For doing awesome things with robots that people think is pretty great.",
+  }
+}
+exports.makeIssuer = function makeIssuer(appHarness) {
+  appHarness = appHarness || FAKE_HARNESS;
+  return {
+    "name": "An Example Badge Issuer",
+    "url": appHarness.resolve("/"),
+    "email": "steved@example.org",
+  }
+}
+exports.makeSignature = function makeSignature(appHarness) {
+  appHarness = appHarness || FAKE_HARNESS;
+  const assertion = exports.makeNewAssertion(appHarness);
+  const email = appHarness.email;
+  assertion.verify.url = appHarness.resolve('/public-key');
+  assertion.verify.type = 'signed';
+  assertion.recipient.identity = exports.makeHash(email, 'salt')
+  assertion.recipient.hashed = true;
+  assertion.recipient.salt = 'salt';
+  return jws.sign({
+    header: { alg: 'rs256' },
+    payload: assertion,
+    privateKey: keys.private
+  });
+}
+exports.makeBadSignature = function makeSignature(whatever) {
+  return jws.sign({
+    header: { alg: 'rs256' },
+    payload: whatever,
+    privateKey: keys.private
+  });
+};
+
 
 function recreateDatabase(callback) {
   async.series([

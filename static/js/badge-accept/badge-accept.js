@@ -10,7 +10,7 @@ jQuery.extend({
  *    to override default login implementation
  */
 var Session = function Session(spec) {
-  var spec = spec || {};
+  spec = spec || {};
 
   var startLogin = spec.startLogin || function(login) {
     /* default login implementation uses Persona */
@@ -83,7 +83,7 @@ var Session = function Session(spec) {
 };
 
 /* Badge - represents a badge in the acceptance workflow
- *   Takes an assertion url
+ *   Takes an assertion, either url or signature
  *   Optionally takes build and issue methods in a spec object
  *     These should return Deferreds (or plain objects, which count
  *        as a resolved Deferred)
@@ -93,8 +93,8 @@ var Session = function Session(spec) {
  *   The Deferred is resolved if build and issue succeed, and rejected
  *   if either has an error or the badge is rejected by the user.
  */
-var Badge = function Badge(assertionUrl, spec) {
-  var spec = spec || {};
+var Badge = function Badge(assertion, spec) {
+  spec = spec || {};
   var _build = spec.build || function() { return {}; };
   var _issue = spec.issue || function() { return {}; };
 
@@ -109,12 +109,12 @@ var Badge = function Badge(assertionUrl, spec) {
       Badge.trigger('state-change', to);
     }
 
-    this.assertionUrl = assertionUrl;
+    this.assertion = assertion;
 
-    /* If the badge is rejected, error contains the url, reason,
+    /* If the badge is rejected, error contains the assertion, reason,
        and any additional data for the failure. */
     this.fail(function(reason, data) {
-      this.error = _.extend({url: assertionUrl, reason: reason}, data);
+      this.error = _.extend({assertion: assertion, reason: reason}, data);
       changeState('failed');
     });
 
@@ -125,7 +125,7 @@ var Badge = function Badge(assertionUrl, spec) {
 
     /* Kicks off building of the badge. */
     this.build = function build() {
-      buildState = _build(assertionUrl);
+      buildState = _build(assertion);
 
       jQuery.when(buildState).then(
         function buildSuccess(data) {
@@ -146,7 +146,7 @@ var Badge = function Badge(assertionUrl, spec) {
 	      throw new Error('Cannot issue unbuilt badge');
 
       changeState('pendingIssue');
-      issueState = _issue.call(this, assertionUrl);
+      issueState = _issue.call(this, assertion);
 
       jQuery.when(issueState).then(
         function issueSuccess() {
@@ -164,9 +164,9 @@ var Badge = function Badge(assertionUrl, spec) {
        to the OpenBadges.issue() callback. */
     this.result = function result() {
       if (this.inState('issued', 'complete'))
-	      return this.assertionUrl;
+	      return this.assertion;
       else if (this.inState('failed'))
-	      return { url: this.error.url, reason: this.error.reason };
+	      return { assertion: this.error.assertion, reason: this.error.reason };
       else
 	      throw new Error("Can't return result for state " + this.state);
     };
@@ -186,21 +186,21 @@ var Badge = function Badge(assertionUrl, spec) {
 /* App - watches a collection of badges and emits checkpoint
  *    events as they move through acceptance workflow
  *
- *   Takes a list of assertion urls
+ *   Takes a list of assertions (either urls or signatures)
  *   Optionally takes build and issue methods in a spec object
  *      see Badge
  */
-var App = function App(assertionUrls, spec) {
-  var assertionUrls = assertionUrls || [];
-  var spec = spec || {};
+var App = function App(assertions, spec) {
+  assertions = assertions || [];
+  spec = spec || {};
 
   /* Default build implementation is the "real" one. */
-  var build = spec.build || function(assertionUrl) {
+  var build = spec.build || function(assertion) {
     var build = jQuery.Deferred();
     jQuery.ajax({
       url: '/issuer/assertion',
       data: {
-        url: assertionUrl
+        assertion: assertion
       },
       success: function(obj) {
         if (obj.exists) {
@@ -235,14 +235,14 @@ var App = function App(assertionUrls, spec) {
 
   /* Default issue implementation is the "real" one used by
      the issuer frame. */
-  var issue = spec.issue || function(assertionUrl) {
+  var issue = spec.issue || function(assertion) {
     var issue = jQuery.Deferred();
     var self = this;
     var post = jQuery.ajax({
       type: 'POST',
       url: '/issuer/assertion',
       data: {
-	      url: assertionUrl
+	      assertion: assertion
       },
       success: function(data, textStatus, jqXHR) {
         if (jqXHR.status == 304) {
@@ -262,8 +262,8 @@ var App = function App(assertionUrls, spec) {
   var badges = [];
   var aborted = false;
 
-  assertionUrls.forEach(function(assertionUrl) {
-    var b = Badge(assertionUrl, {
+  assertions.forEach(function(assertion) {
+    var b = Badge(assertion, {
       build: build,
       issue: issue
     });
@@ -284,7 +284,7 @@ var App = function App(assertionUrls, spec) {
 
     /* Begins processing all the badges and emitting events. */
     start: function() {
-      if (assertionUrls.length === 0) {
+      if (assertions.length === 0) {
         App.trigger('badges-complete', [], [], 0);
       }
       else {
