@@ -3,7 +3,6 @@
 body {
   max-width: 660px;
   margin: 0 auto;
-  padding-top: @navbarHeight;
 }
 
 .narrow {
@@ -16,7 +15,19 @@ button,
   display: block;
 }
 
+.framed #body {
+  overflow-y: scroll;
+}
+
+.frameless .closeFrame {
+  display: none;
+}
+
 #body {
+  height: 100%;
+  .box-sizing(border-box);
+  padding-top: @navbarHeight + 20px;
+
   p, a,
   button, .btn,
   h1, h2, h3 {
@@ -42,15 +53,25 @@ button,
   }
 
   dl {
-    margin-top: 40px;
-  }
-  dt {
-    float: left;
-    clear: left;
-    min-width: 100px;
-  }
-  dd {
-    float: left;
+    margin-top: 0;
+
+    dt, dd {
+      padding: 2px 0;
+    }
+    dt {
+      float: left;
+      clear: left;
+      min-width: 100px;
+    }
+    dd {
+      max-width: 280px; /* = span5 - dt */
+      overflow: hidden;
+      text-overflow: ellipsis;
+      /* set word-wrap: normal if long urls should get truncated with ellipsis */
+      word-wrap: break-word; 
+      /* set white-space: nowrap if all metadata should be a single line */
+      white-space: normal;
+    }
   }
 }
 
