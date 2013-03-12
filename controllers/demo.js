@@ -32,7 +32,7 @@ exports.award = function (req, res) {
 
 exports.massAward = function (req, res) {
   if (!req.user) return res.send('nope');
-  var demoBadgeDir = path.join(process.cwd(), 'static', '_demo');
+  var demoBadgeDir = path.resolve(path.join(__dirname, '..', 'static', '_demo'));
   var email = req.user.get('email');
   var salt = 'ballertime';
   var hash = require('crypto').createHash('sha256').update(email + salt).digest('hex');
