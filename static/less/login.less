@@ -24,14 +24,26 @@
     font-size: 1.2em;
   }
 
-  .persona-button {
-    width: 120px;
-  }
-
   .muted {
     color: whitesmoke;
   }
   a.muted:hover {
     color: darken(whitesmoke, 10%);
+  }
+
+  .persona-button.big {
+    font-size: 20px;
+
+    span {
+      padding-left: 44px;
+    }
+
+    &:hover {
+      color: #fff;
+    }
+
+    &:before {
+      left: 6px;
+    }
   }
 }
