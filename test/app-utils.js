@@ -141,14 +141,14 @@ function replaceModuleFunctionsForTesting(port) {
     return FAKE_UID;
   };
   middleware.utils.uid = function fakeUid() { return FAKE_UID; };
-  browserid.verify = function fakeVerify(uri, assertion, audience, cb) {
+  browserid.verify = function fakeVerify(opts, cb) {
     var expected = FAKE_ASSERTION;
-    if (assertion == expected)
-      return cb(null, {email: FAKE_EMAIL});
+    if (opts.assertion == expected)
+      return cb(null, FAKE_EMAIL);
     else
-      return cb({type: 'invalid assertion',
-                 body: 'expected ' + JSON.stringify(expected) +
-                       ' but got ' + JSON.stringify(assertion)}, null);
+      return cb({code: 'invalid-assertion',
+                 message: 'expected ' + JSON.stringify(expected) +
+                       ' but got ' + JSON.stringify(opts.assertion)}, null);
   };
 
   return function undo() {
