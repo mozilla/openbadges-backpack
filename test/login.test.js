@@ -2,7 +2,7 @@ const appUtils = require('./app-utils');
 
 appUtils.prepareApp(function(a) {
   var headers = {accept: 'application/json'};
-  
+
   a.verifyRequest('POST', '/backpack/authenticate', {
     form: {'assertion': 'BAD ASSERTION'},
     headers: headers
@@ -10,7 +10,7 @@ appUtils.prepareApp(function(a) {
     statusCode: 400,
     body: {
       status: "error",
-      reason: "browserID verification failed: invalid assertion"
+      reason: 'browserID verification failed: expected "yup, it is example@example.com." but got "BAD ASSERTION"'
     }
   });
 
@@ -34,7 +34,7 @@ appUtils.prepareApp(function(a) {
       email: a.email
     }
   });
-  
+
   a.end();
 });
 
@@ -50,7 +50,7 @@ appUtils.prepareApp(function(a) {
   });
 
   a.login();
-  
+
   a.verifyRequest('GET', '/', {
     statusCode: 200,
     body: function(t, body) {
@@ -60,7 +60,7 @@ appUtils.prepareApp(function(a) {
   });
   a.verifyRequest('GET', '/404', {statusCode: 404});
   a.verifyRequest('GET', '/backpack/signout', {statusCode: 200});
-  
+
   a.verifyRequest('GET', '/', {
     statusCode: 200,
     body: function(t, body) {
