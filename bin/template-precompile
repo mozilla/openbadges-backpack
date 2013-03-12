@@ -1,0 +1,6 @@
+DIR=./views
+COMPILED=./static/js/nunjucks-templates.js
+
+echo "Precompiling $DIR to $COMPILED"
+./node_modules/nunjucks/bin/precompile $DIR > $COMPILED
+exit $?

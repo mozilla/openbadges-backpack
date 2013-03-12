@@ -62,7 +62,12 @@
 </script>
 
 <!-- third party -->
-<script type="text/javascript" src="/js/nunjucks-dev.js"></script>
+{% if settings.env == "production" %}
+  <script type="text/javascript" src="/js/nunjucks-min.js"></script>
+  <script type="text/javascript" src="/js/nunjucks-templates.js"></script>
+{% else %}
+  <script type="text/javascript" src="/js/nunjucks-dev.js"></script>
+{% endif %}
 <script type="text/javascript" src="/js/underscore.js"></script>
 <script type="text/javascript" src="/js/backbone.js"></script>
 <script type="text/javascript" src="/vendor/bootstrap/js/bootstrap-alert.js"></script>
