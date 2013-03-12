@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "test": "NODE_ENV=test ./node_modules/.bin/tap test/*.test.js",
-    "start": ./bin/db-migrate up && ./node_modules/.bin/up -w -n 1 -p 8888 app.js"
+    "start": "./bin/db-migrate up && ./node_modules/.bin/up -w -n 1 -p 8888 app.js"
   },
   "devDependencies": {
     "jshint": "~0.6.2",
