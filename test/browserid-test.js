@@ -1,7 +1,6 @@
 const $ = require('./');
 const test = require('tap').test;
 const browserid = require('../lib/browserid');
-const conf = require('../lib/configuration');
 
 const ASSERTION = '1234';
 const AUDIENCE = 'localhost';
@@ -77,12 +76,14 @@ test('getAudience', function (t) {
 });
 
 test('getVerifierUrl', function (t) {
-  conf.set('identity', {
-    protocol: 'https',
-    server: 'localhost',
-    path: '/verify'
+  const url = browserid.getVerifierUrl({
+    identity: {
+      protocol: 'https',
+      server: 'localhost',
+      path: '/verify'
+    },
+    get: function (key) { return this[key] }
   });
-  const url = browserid.getVerifierUrl(conf);
   t.same(url, 'https://localhost/verify');
   t.end();
 });
