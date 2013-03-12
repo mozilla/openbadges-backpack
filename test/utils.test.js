@@ -23,6 +23,9 @@ test('utils#determinePort', function (t) {
   t.same(utils.determinePort(makeTestConf({
     protocol: 'https', port: 8000, remote_port: '445',
   })), 445);
+  t.same(utils.determinePort(makeTestConf({
+    protocol: 'https', port: 8000, remote_port: 'default',
+  })), null);
   t.end();
 });
 
