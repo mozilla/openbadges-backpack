@@ -20,6 +20,8 @@ const User = require('../models/user');
  */
 
 exports.login = function login(request, response) {
+  if (request.user)
+    return response.redirect(303, '/');
   // request.flash returns an array. Pass on the whole thing to the view and
   // decide there if we want to display all of them or just the first one.
   response.render('login.html', {
@@ -47,7 +49,7 @@ exports.authenticate = function authenticate(request, response) {
     } else {
       if (humanReadableError)
         request.flash('error', humanReadableError);
-      return response.redirect(to, 303);
+      return response.redirect(303, to);
     }
   }
 
@@ -88,7 +90,7 @@ exports.authenticate = function authenticate(request, response) {
 
 exports.signout = function signout(request, response) {
   request.session = {};
-  response.redirect('/backpack/login', 303);
+  response.redirect(303, '/backpack/login');
 };
 
 /**
@@ -159,7 +161,7 @@ function badgePage (request, response, badges, template) {
 exports.recentBadges = function recent (request, response, next) {
   var user = request.user;
   if (!user)
-    return response.redirect('/backpack/login', 303);
+    return response.redirect(303, '/backpack/login');
 
   function startResponse () {
     return user.getLatestBadges(function(err, badges) {
@@ -174,7 +176,7 @@ exports.recentBadges = function recent (request, response, next) {
 exports.allBadges = function everything (request, response, next) {
   var user = request.user;
   if (!user)
-    return response.redirect('/backpack/login', 303);
+    return response.redirect(303, '/backpack/login');
 
   function startResponse () {
     return user.getAllBadges(function(err, badges) {
@@ -200,7 +202,7 @@ exports.manage = function manage(request, response, next) {
   var groups = [];
   var badgeIndex = {};
   if (!user)
-    return response.redirect('/backpack/login', 303);
+    return response.redirect(303, '/backpack/login');
 
   response.header('Cache-Control', 'no-cache, must-revalidate');
 
@@ -302,7 +304,7 @@ exports.settings = function(options) {
     var success = request.flash('success');
 
     if (!user)
-      return response.redirect('/backpack/login', 303);
+      return response.redirect(303, '/backpack/login');
 
     response.header('Cache-Control', 'no-cache, must-revalidate');
 
@@ -368,7 +370,7 @@ exports.userBadgeUpload = function userBadgeUpload(req, res) {
     // controller mock tests. This isn't some magic variable, `_error`
     // is just a convenient property name.
     res._error = err;
-    return res.redirect('/', 303);
+    return res.redirect(303, '/');
   }
 
   const user = req.user;
@@ -382,7 +384,7 @@ exports.userBadgeUpload = function userBadgeUpload(req, res) {
   const MAX_IMAGE_SIZE = 1024*256;
 
   if (!user)
-    return redirect(new Error('no user'));
+    return response.redirect(303, '/');
 
   if (!tmpfile.size)
     return redirect(new Error('You must choose a badge to upload.'));
