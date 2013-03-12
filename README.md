@@ -171,6 +171,16 @@ If you want to write tests for your migration, check out
 
   [node-db-migrate]: https://github.com/nearinfinity/node-db-migrate#creating-migrations
 
+### Production 
+
+The codebase behaves slightly differently when run in an environment where
+environment variable `NODE_ENV=production`. These differences include:
+
+* less verbose logging
+* using precompiled templates for client-side rendering
+  * run `bin/template-precompile` to generate
+* "Test Site" banner will not show in the UI
+
 ## Related Projects
 * https://github.com/lmorchard/django-badger -- Issuing app for Django
 * https://github.com/ralphbean/tahrir -- A pyramid (python) app for issuing your own Open Badges
