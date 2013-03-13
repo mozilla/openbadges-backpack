@@ -4,6 +4,7 @@ const express = require('express');
 const path = require('path');
 const app = express();
 const keys = require('../test/test-keys.js');
+const url = require('url');
 
 app.use(express.static(path.join(__dirname, "static")));
 app.use(express.bodyParser());
@@ -13,13 +14,17 @@ function makeHash (email, salt) {
   return 'sha256$' + sha.update(email + salt).digest('hex');
 }
 
+function makeUrl(req, path) {
+  return url.resolve('http://'+req.headers.host, path);
+}
+
 app.post('/sign', function (req, res) {
   const email = req.body.email;
   res.send(jws.sign({
     header: { alg: 'rs256' },
     privateKey: keys.private,
     payload: {
-      "badge": "http://localhost:8889/badge.json",
+      "badge": 'http://'+req.headers.host+'/badge.json',
       "uid": "f2c20",
       "recipient": {
         "type": "email",
@@ -30,7 +35,7 @@ app.post('/sign', function (req, res) {
       "issuedOn": 1359217910,
       "verify": {
         "type": "signed",
-        "url": "http://localhost:8889/public-key"
+        "url": 'http://'+req.headers.host+'/public-key'
       }
     },
   }));
@@ -39,9 +44,9 @@ app.get('/criteria', function (req, res) { res.send('criteria') })
 app.get('/public-key', function (req, res) { res.send(keys.public) })
 app.get('/badge.json', function (req, res) {
   res.json({
-    "image": "http://localhost:8889/badge.png",
-    "criteria": "http://localhost:8889/criteria",
-    "issuer": "http://localhost:8889/issuer.json",
+    "image": makeUrl(req, '/badge.png'),
+    "criteria": makeUrl(req, '/criteria'),
+    "issuer": makeUrl(req, '/issuer.json'),
     "name": "Awesome Robotics Badge",
     "description": "For doing awesome things with robots that people think is pretty great.",
   })
@@ -49,13 +54,13 @@ app.get('/badge.json', function (req, res) {
 app.get('/issuer.json', function (req, res) {
   res.json({
     "name": "An Example Badge Issuer",
-    "url": "http://localhost:8889/",
+    "url": makeUrl(req, '/'),
     "email": "steved@example.org",
   })
 })
 app.get('/raw.json', function (req, res) {
   return res.json({
-    "badge": "http://localhost:8889/badge.json",
+    "badge": makeUrl(req, '/badge.json'),
     "uid": "f2c20",
     "recipient": {
       "type": "email",
@@ -65,7 +70,7 @@ app.get('/raw.json', function (req, res) {
     "issuedOn": 1359217910,
     "verify": {
       "type": "hosted",
-      "url": "http://localhost:8889/raw.json?email=" + req.query.email
+      "url": makeUrl(req, '/raw.json?email=' + req.query.email)
     }
   });
 });
@@ -73,7 +78,7 @@ app.get('/raw.json', function (req, res) {
 app.get('/hashed.json', function (req, res) {
   var salt = 'yah';
   return res.json({
-    "badge": "http://localhost:8889/badge.json",
+    "badge": makeUrl(req, '/badge.json'),
     "uid": "f2c20",
     "recipient": {
       "type": "email",
@@ -84,7 +89,7 @@ app.get('/hashed.json', function (req, res) {
     "issuedOn": 1359217910,
     "verify": {
       "type": "hosted",
-      "url": "http://localhost:8889/hashed.json?email=" + req.query.email
+      "url": makeUrl(req, '/hashed.json?email=' + req.query.email)
     }
   });
 });
