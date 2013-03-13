@@ -20,7 +20,7 @@ exports.cookieSessions = function cookieSessions() {
     cookie: {
       httpOnly: true,
       maxAge: (7 * 24 * 60 * 60 * 1000), //one week
-      secure: (configuration.get('protocol') === 'https')
+      secure: false
     }
   });
 };
