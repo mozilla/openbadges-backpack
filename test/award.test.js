@@ -98,7 +98,6 @@ $.prepareDatabase(function (done) {
     }, function (err, badge) {
       t.same(signature, badge.get('signature'));
       t.same(normalizedAssertion.uid, badge.getFromAssertion('uid'));
-      t.same(Buffer(badge.get('image_data'), 'base64'), PNG_DATA);
       t.end();
     });
   });

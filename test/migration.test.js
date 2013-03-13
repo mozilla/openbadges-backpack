@@ -181,3 +181,23 @@ testMigration("add-image-data-column", function(t, id, previousId) {
   ];
 });
 
+testMigration("move-image-data", function(t, id, previousId) {
+  return [
+    up({destination: previousId}),
+    sql("INSERT INTO `user` (id, email) VALUES (1,'foo@bar.org');"),
+    sql("INSERT INTO `badge` (id, user_id, image_path, body, body_hash, image_data) VALUES (1,1, '/_badges/image1.png','body','hsh1', 'image1')"),
+    sql("INSERT INTO `badge` (id, user_id, image_path, body, body_hash, image_data) VALUES (2,1, '/_badges/image2.png','body','hsh2', 'image2')"),
+    up({count: 1}),
+    sql("SELECT image_data, badge_hash FROM badge_image ORDER BY `id` ASC", function(results) {
+      t.same(results[0], {image_data: 'image1', badge_hash: 'hsh1'});
+      t.same(results[1], {image_data: 'image2', badge_hash: 'hsh2'});
+    }),
+    sqlError("SELECT image_data FROM badge", t, "ERROR_BAD_FIELD_ERROR"),
+    down({count: 1}),
+    sql("SELECT id, image_data FROM badge ORDER BY `id` ASC", function(results) {
+      t.same(results[0], {image_data: 'image1', id: 1});
+      t.same(results[1], {image_data: 'image2', id: 2});
+    })
+  ];
+
+});

@@ -5,6 +5,7 @@ const badge = require('../controllers/badge');
 const conmock = require('./conmock');
 const User = require('../models/user');
 const Badge = require('../models/badge');
+const BadgeImage = require('../models/badge-image');
 const images = require('./test-images.js');
 
 function makeHash (email, salt) {
@@ -29,17 +30,23 @@ testUtils.prepareDatabase({
     user_id: 1,
     endpoint: 'endpoint',
     image_path: 'image_path',
-    image_data: images.unbaked.toString('base64'),
     body: RAW_ASSERTION
   }),
-  '4-badge-hashed': new Badge({
+  '4-badge-raw-image': new BadgeImage({
+    badge_hash: Badge.createHash(RAW_ASSERTION),
+    image_data: images.unbaked.toString('base64'),
+  }),
+  '5-badge-hashed': new Badge({
     user_id: 1,
     endpoint: 'endpoint',
     image_path: 'image_path',
-    image_data: images.unbaked.toString('base64'),
     public_path: '4-badge-hashed-pth',
     body: HASHED_ASSERTION
-  })
+  }),
+  '6-badge-hashed-image': new BadgeImage({
+    badge_hash: Badge.createHash(HASHED_ASSERTION),
+    image_data: images.unbaked.toString('base64'),
+  }),
 }, function (fixtures) {
   test('badge#findByUrl sets req.badge when url is valid', function(t) {
     conmock({
@@ -92,12 +99,12 @@ testUtils.prepareDatabase({
   });
 
   test('badge#share works when public_path already exists', function(t) {
-    t.same(fixtures['4-badge-hashed'].get('public_path'),
+    t.same(fixtures['5-badge-hashed'].get('public_path'),
            '4-badge-hashed-pth', 'public_path already exists');
     conmock({
       handler: badge.share,
       request: {
-        badge: fixtures['4-badge-hashed']
+        badge: fixtures['5-badge-hashed']
       }
     }, function(err, mock) {
       if (err) throw err;
@@ -112,7 +119,7 @@ testUtils.prepareDatabase({
     conmock({
       handler: badge.show,
       request: {
-        badge: fixtures['4-badge-hashed']
+        badge: fixtures['5-badge-hashed']
       }
     }, function(err, mock) {
       if (err) throw err;
@@ -128,7 +135,7 @@ testUtils.prepareDatabase({
     const owner = fixtures['1-real-user'];
     const thief = fixtures['2-false-user'];
     const badgeRaw = fixtures['3-badge-raw'];
-    const badgeHashed = fixtures['4-badge-hashed'];
+    const badgeHashed = fixtures['5-badge-hashed'];
     const handler = badge.destroy;
 
     conmock({
@@ -169,22 +176,22 @@ testUtils.prepareDatabase({
   });
 
   test('badge#image', function (t) {
-    const badgeRaw = fixtures['3-badge-raw'];
-    const badgeHashed = fixtures['4-badge-hashed'];
+    const badgeImageRaw = fixtures['4-badge-raw-image'];
+    const badgeImageHashed = fixtures['6-badge-hashed-image'];
     const handler = badge.image;
 
     const expect = images.unbaked;
 
     conmock({
       handler: handler,
-      request: { badge: badgeRaw },
+      request: { badgeImage: badgeImageRaw },
     }, function (err, mock) {
       t.same(mock.body, expect);
     });
 
     conmock({
       handler: handler,
-      request: { badge: badgeHashed },
+      request: { badgeImage: badgeImageHashed },
     }, function (err, mock) {
       t.same(mock.body, expect);
     });
