@@ -75,6 +75,23 @@ app.get('/raw.json', function (req, res) {
   });
 });
 
+app.get('/old.json', function (req, res) {
+  return res.json({
+    recipient: req.query.email,
+    badge: {
+      version: '0.5.0',
+      name: 'Badge',
+      description: 'Description',
+      image: makeUrl(req, '/badge.png'),
+      criteria: makeUrl(req, '/criteria'),
+      issuer: {
+        name: 'Issuer',
+        origin: makeUrl(req, '/')
+      }
+    }
+  });
+});
+
 app.get('/hashed.json', function (req, res) {
   var salt = 'yah';
   return res.json({

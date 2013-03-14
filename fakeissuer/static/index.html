@@ -16,6 +16,7 @@
 
     <label>Email or Signature: <input id='email'></label>
     <label>Modaless: <input id='modaless' type='checkbox'></label>
+    <button id="old">Old</button>
     <button id="unhashed">Unhashed</button>
     <button id="hashed">Hashed</button>
     <button id="invalid">Invalid</button>
@@ -28,6 +29,7 @@
       }
       
       
+      var old = document.getElementById('old');
       var unhashed = document.getElementById('unhashed');
       var hashed = document.getElementById('hashed');
       var invalid = document.getElementById('invalid');
@@ -42,6 +44,11 @@
           OpenBadges.issue(assertions);
         }
       }
+      
+      old.addEventListener('click', function(){
+        var url = qualify('/old.json?email=') + encodeURIComponent(getEmail());
+        issue(url)
+      },false)
       
       unhashed.addEventListener('click', function(){
         var url = qualify('/raw.json?email=') + encodeURIComponent(getEmail());
@@ -65,6 +72,6 @@
       },false)
     
     </script>
-    <script src="http://openbadges.mofostaging.net/issuer.js"></script>
+    <script src="http://localhost:8888/issuer.js"></script>
   </body>
 </html>
