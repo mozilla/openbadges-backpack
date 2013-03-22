@@ -1,7 +1,7 @@
 <div class='lightbox' data-id='{{id}}'>
   <div class='contents badge-details'>
     <header>
-      <h2>{{badge.attributes.body.badge.name}}</h2>
+      <h2>{{badge.attributes.body.badge.name|e}}</h2>
       <span class='close'>&times;</span>
     </header>
     <div class='body'>
@@ -9,7 +9,7 @@
       <div class='confirm-disown'>
         <p>
           Do you want to remove this badge? </p>
-          <p> If so, you'd need to reconnect with the issuer (<a href='{{badge.attributes.body.badge.issuer.origin}}'>{{badge.attributes.body.badge.issuer.name}}</a>) to have this badge sent to your Backpack again.
+          <p> If so, you'd need to reconnect with the issuer (<a href='{{badge.attributes.body.badge.issuer.origin}}'>{{badge.attributes.body.badge.issuer.name|e}}</a>) to have this badge sent to your Backpack again.
         </p>
 
         <div class='buttons'>

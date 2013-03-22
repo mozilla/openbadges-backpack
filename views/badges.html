@@ -29,8 +29,8 @@
             <li class="span3 openbadge-container">
               <div class="openbadge" data-id="{{badge.attributes.id}}">
                 <img src="{{ badge.attributes.imageUrl }}" width="64">
-                <p class="title" title="{{ badge.attributes.body.badge.name }}">{{ badge.attributes.body.badge.name }}</p>
-                <p class="issuer">Issuer: {{ badge.attributes.body.badge.issuer.name }}</p>
+                <p class="title" title="{{ badge.attributes.body.badge.name|e }}">{{ badge.attributes.body.badge.name|e }}</p>
+                <p class="issuer">Issuer: {{ badge.attributes.body.badge.issuer.name|e }}</p>
               </div>
             </li>
           {% endfor %}

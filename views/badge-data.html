@@ -28,16 +28,16 @@
     </tr>
     <tr>
       <td class='fieldlabel issuer-name'>Name</td>
-      <td>{{badge.attributes.body.badge.issuer.name}}</td>
+      <td>{{badge.attributes.body.badge.issuer.name|e}}</td>
     </tr>
     <tr>
       <td class='fieldlabel issuer-name'>URL</td>
-      <td><a href="{{badge.attributes.body.badge.issuer.origin}}">{{badge.attributes.body.badge.issuer.origin}}</a></td>
+      <td><a href="{{badge.attributes.body.badge.issuer.origin}}">{{badge.attributes.body.badge.issuer.origin|e}}</a></td>
     </tr>
     {% if badge.attributes.body.badge.issuer.org %}
     <tr>
       <td class='fieldlabel issuer-name'>Organization</td>
-      <td>{{badge.attributes.body.badge.issuer.org}}</td>
+      <td>{{badge.attributes.body.badge.issuer.org|e}}</td>
     </tr>
     {% endif %}
 
@@ -46,21 +46,21 @@
     </tr>
     <tr>
       <td class='fieldlabel'>Name</td>
-      <td>{{badge.attributes.body.badge.name|escape}}</td>
+      <td>{{badge.attributes.body.badge.name|e}}</td>
     </tr>
     <tr>
       <td class='fieldlabel'>Description</td>
-      <td>{{badge.attributes.body.badge.description|escape}}</td>
+      <td>{{badge.attributes.body.badge.description|e}}</td>
     </tr>
     <tr>
       <td class='fieldlabel'>Criteria</td>
-      <td><a href='{{badge.attributes.body.badge.criteria}}'>{{badge.attributes.body.badge.criteria}}</a></td>
+      <td><a href='{{badge.attributes.body.badge.criteria}}'>{{badge.attributes.body.badge.criteria|e}}</a></td>
     </tr>
 
     {% if badge.attributes.body.evidence %}
     <tr>
       <td class='fieldlabel evidence'>Evidence</td>
-      <td><a href='{{badge.attributes.body.evidence}}'>{{badge.attributes.body.evidence}}</a></td>
+      <td><a href='{{badge.attributes.body.evidence}}'>{{badge.attributes.body.evidence|e}}</a></td>
     </tr>
     {% endif %}
 
