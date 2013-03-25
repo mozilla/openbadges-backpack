@@ -15,7 +15,7 @@
       <li>
         <h3>{{badge.attributes.body.badge.name|e}}</h3>
 
-        <textarea name='stories[{{badge.attributes.id}}]' tabindex=1 class='story' placeholder='some information about this badge'>{{badge.attributes._userStory}}</textarea>
+        <textarea name='stories[{{badge.attributes.id}}]' tabindex=1 class='story' placeholder='some information about this badge'>{{badge.attributes._userStory|e}}</textarea>
 
         {% include 'badge-data.html' %}
       </li>

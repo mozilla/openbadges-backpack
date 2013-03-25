@@ -55,7 +55,7 @@
             <strong>{{ issuer.domain|e }}</strong>
             <small>
               <p>The website at 
-                <a href="{{ issuer.origin }}">{{ issuer.domain|e }}</a> has
+                <a href="{{ issuer.origin|e }}">{{ issuer.domain|e }}</a> has
                 permission to:</p>
               {% set permissions = issuer.permissions %}
               {% include 'permissions.html' %}
