@@ -1,22 +1,79 @@
 #!/usr/bin/env node
 
+var optimist = require('optimist');
+var prompt = require('prompt');
+var util = require('util');
 var mysql = require('../lib/mysql');
 var async = require('async');
 var conf = require('../lib/configuration').get('database');
 
-var client = mysql.client;
 var db = conf.database;
 
-async.series([
-  client.query.bind(client, 'DROP DATABASE IF EXISTS `' + db + '`'),
-  client.query.bind(client, 'CREATE DATABASE `' + db + '`')
-], function(err, results) {
-  if (err) {
-    throw err;
+var argv = optimist
+  .usage('Usage: db-nuke [options]')
+  .describe('force', 'Run without prompting for confirmation')
+  .alias('f', 'force')
+  .boolean('force')
+
+  .alias('h', 'help')
+  .alias('h', '?')
+  .boolean('h')
+  .argv;
+
+if (argv.help) {
+  optimist.showHelp();
+  process.exit(1);
+}
+
+function run(cb) {
+  var client = mysql.client;
+
+  async.series([
+    client.query.bind(client, 'DROP DATABASE IF EXISTS `' + db + '`'),
+    client.query.bind(client, 'CREATE DATABASE `' + db + '`')
+  ], function(err, results) {
+    if (err) {
+      throw err;
+    }
+    else {
+      client.end(cb);
+    }
+  });
+}
+
+function warning() {
+  var msg = 'This command will '
+    + 'LOSE ALL DATA'.bold.underline
+    + ' in `' + db + '`!'
+    + ' Proceed?';
+  return msg.red;
+}
+
+prompt.start();
+prompt.message = prompt.delimiter = '';
+
+var property = {
+  name: 'permission',
+  message: warning(),
+  validator: /^(y(es)?|no?)$/i,
+  warning: 'Must respond yes or no',
+  default: 'no'
+};
+
+if (argv.force) {
+  prompt.override = {
+    permission: 'Y'
+  };
+}
+
+prompt.get(property, function(err, result) {
+  if (err) throw err;
+  if (result.permission.match(/^y/i)) {
+    run(function(){
+      console.log('💥  ' + 'Nuked!'.yellow);
+    });
   }
   else {
-    client.end(function(){
-      console.log('💥  Nuked!');
-    });
+    console.log('Aborted'.yellow);
   }
 });
