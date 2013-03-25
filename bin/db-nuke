@@ -1,0 +1,22 @@
+#!/usr/bin/env node
+
+var mysql = require('../lib/mysql');
+var async = require('async');
+var conf = require('../lib/configuration').get('database');
+
+var client = mysql.client;
+var db = conf.database;
+
+async.series([
+  client.query.bind(client, 'DROP DATABASE IF EXISTS `' + db + '`'),
+  client.query.bind(client, 'CREATE DATABASE `' + db + '`')
+], function(err, results) {
+  if (err) {
+    throw err;
+  }
+  else {
+    client.end(function(){
+      console.log('💥  Nuked!');
+    });
+  }
+});
