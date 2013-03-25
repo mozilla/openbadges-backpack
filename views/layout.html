@@ -36,14 +36,18 @@
             <img src="/images/logo.png" alt="Mozilla Backpack logo" />
           </a>
           <a href="http://www.mozilla.org/" id="tabzilla">a mozilla.org joint</a>
-          <ul class="nav pull-right">
           {% if user %}
+          <ul class="nav pull-left">
             <li {% if activeNav == 'badges' %}class="active"{% endif %}>
               <a href="/" class="icon badge-link"><span>Badges</span></a>
             </li>
             <li {% if activeNav == 'collections' %}class="active"{% endif %}>
               <a href="/backpack" class="icon collection-link"><span>Collections</span></a>
             </li>
+          </ul>
+          {% endif %}
+          <ul class="nav pull-right">
+          {% if user %}
             <li class="user navbar-text">{{user.attributes.email}}</li>
             <li class="dropdown">
               <a href="#" class="icon gear-link dropdown-toggle" data-toggle="dropdown">

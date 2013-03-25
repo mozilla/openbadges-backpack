@@ -21,15 +21,10 @@ var app = express();
 app.logger = logger;
 app.config = configuration;
 
-// View helpers. `user` and `badges` are set so we can use them in `if`
-// statements without getting undefined errors and without having to use typeof
-// checks.
+/* Default values for template variables */
 app.locals({
-  login: true,
-  title: 'Backpack',
   error: [],
   success: [],
-  badges: {},
 });
 
 // default view engine
