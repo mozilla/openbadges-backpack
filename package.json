@@ -1,7 +1,7 @@
 {
   "name": "openbadges",
   "description": "http://openbadges.org",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "private": true,
   "scripts": {
     "test": "NODE_ENV=test ./node_modules/.bin/tap test/*.test.js",
