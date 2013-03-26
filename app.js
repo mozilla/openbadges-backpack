@@ -14,7 +14,6 @@ var logger = require('./lib/logging').logger;
 var configuration = require('./lib/configuration');
 var flash = require('connect-flash');
 var nunjucks = require('nunjucks');
-var less = require('less-middleware');
 var _ = require('underscore');
 
 var app = express();
@@ -41,23 +40,7 @@ env.addFilter('formatdate', function (rawDate) {
 
 // Middleware. Also see `middleware.js`
 // ------------------------------------
-var lessConfig = {
-  src: path.join(__dirname, "static/less"),
-  paths: [path.join(__dirname, "static/vendor/bootstrap/less")],
-  dest: path.join(__dirname, "static/css"),
-  prefix: '/css'
-};
-app.configure('development', function() {
-  app.use(less(_.extend(lessConfig, {
-    force: true
-  })));
-});
-app.configure('production', function() {
-  app.use(less(_.extend(lessConfig, {
-    once: true,
-    compress: true
-  })));
-});
+app.use(middleware.less(app.get('env')));
 app.use(express.static(path.join(__dirname, "static")));
 app.use(express.static(path.join(configuration.get('var_dir'), "badges")));
 app.use("/views", express.static(path.join(__dirname, "views")));

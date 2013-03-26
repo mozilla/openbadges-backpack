@@ -4,6 +4,8 @@ var configuration = require('./lib/configuration');
 var logger = require('./lib/logging').logger;
 var crypto = require('crypto');
 var User = require('./models/user');
+var path = require('path');
+var lessMiddleware = require('less-middleware');
 
 // `COOKIE_SECRET` is randomly generated on the first run of the server,
 // then stored to a file and looked up on restart to maintain state.
@@ -157,7 +159,25 @@ exports.notFound = function notFound() {
       res.type('txt').send('Not found');
     }
   }
-}
+};
+
+exports.less = function less(env) {
+  var config = {
+    src: path.join(__dirname, "static/less"),
+    paths: [path.join(__dirname, "static/vendor/bootstrap/less")],
+    dest: path.join(__dirname, "static/css"),
+    prefix: '/css',
+    /* default to production settings */
+    once: true,
+    compress: true
+  };
+  if ('development' === env) {
+    config.once = false;
+    config.compress = "auto";
+    config.force = true;
+  }
+  return lessMiddleware(config);
+};
 
 var utils = exports.utils = {};
 var pseudoRandomBytes = function(num) {
