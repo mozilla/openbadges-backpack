@@ -4,6 +4,7 @@ const test = require('tap').test;
 const backpack = require('../controllers/backpack');
 const conmock = require('./conmock');
 const Badge = require('../models/badge');
+const BadgeImage = require('../models/badge-image');
 const User = require('../models/user');
 
 const ASSERTION_NOT_FOUND = __dirname + '/data/404.png';
@@ -73,9 +74,10 @@ $.prepareDatabase({
       Badge.findAll(function (err, badges) {
         const expectedImageData = fs.readFileSync(VALID_BAKED_IMAGE).toString('base64');
         t.same(badges.length, 1);
-        if (badges.length)
-          t.same(badges[0].get('image_data'), expectedImageData);
-        t.end();
+        BadgeImage.findOne({badge_hash: badges[0].get('body_hash')}, function (err, image) {
+          t.same(image.get('image_data'), expectedImageData);
+          t.end();
+        });
       })
     });
   });

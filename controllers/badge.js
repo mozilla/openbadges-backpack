@@ -1,6 +1,6 @@
+const async = require('async');
 const Badge = require('../models/badge');
 const BadgeImage = require('../models/badge-image');
-
 const logger = require('../lib/logging').logger;
 const utils = require('../lib/utils');
 
@@ -57,7 +57,7 @@ exports.image = function image(req, res, next) {
   const image = req.badgeImage;
   if (!image) return res.send(404);
   res.type('image/png');
-  return res.send(200, Buffer(image.get('image_data'), 'base64'));
+  return res.send(200, image.toBuffer());
 }
 
 exports.share = function share(req, res, next) {
@@ -96,16 +96,13 @@ exports.show = function show(req, res, next) {
 exports.destroy = function destroy(req, res) {
   const badge = req.badge;
   const user = req.user;
-  function failNow() {
-    return res.send(respond('forbidden', "Cannot delete a badge you don't own"), 403);
-  }
   if (!badge)
-    return res.send(respond('missing', "Cannot delete a badge that doesn't exist"), 404);
+    return res.send(404, respond('missing', "Cannot delete a badge that doesn't exist"));
   if (!user || badge.get('user_id') !== user.get('id'))
-    return failNow();
+    return res.send(403, respond('forbidden', "Cannot delete a badge you don't own"));
   async.series([
     function destroyBadgeImage(callback) {
-      const condition = { badge_hash: badge.get('hash') };
+      const condition = { badge_hash: badge.get('body_hash') };
       BadgeImage.findAndDestroy(condition, callback)
     },
     function destroyBadge(callback) {
@@ -115,8 +112,8 @@ exports.destroy = function destroy(req, res) {
     if (err) {
       logger.warn('Failed to delete badge');
       logger.warn(err);
-      return res.send(respond('error', 'Could not delete badge: ' + err), 500);
+      return res.send(500, respond('error', 'Could not delete badge: ' + err));
     }
-    return res.send({ status: 'okay' }, 200);
+    return res.send(200, { status: 'okay' });
   });
 };

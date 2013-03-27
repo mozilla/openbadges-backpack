@@ -3,6 +3,7 @@ const User = require('../models/user');
 const Badge = require('../models/badge');
 const BadgeImage = require('../models/badge-image');
 const test = require('tap').test;
+const images = require('./test-images');
 
 $.prepareDatabase({
   '1-user': new User({
@@ -15,7 +16,7 @@ $.prepareDatabase({
   }),
   '3-existing-badge-image': new BadgeImage({
     badge_hash: Badge.createHash($.makeAssertion()),
-    image_data: 'image1'
+    image_data: images.unbaked.toString('base64')
   }),
 }, function (fixtures) {
 
@@ -27,6 +28,12 @@ $.prepareDatabase({
       t.same(image.attributes, expect.attributes);
       t.end();
     });
+  });
+
+  test('BadgeImage#toBuffer', function (t) {
+    const badgeimage = fixtures['3-existing-badge-image'];
+    t.same(badgeimage.toBuffer(), images.unbaked);
+    t.end();
   });
 
   $.finish(test);

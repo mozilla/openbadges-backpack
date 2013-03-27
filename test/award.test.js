@@ -6,6 +6,7 @@ const path = require('path');
 const awardBadge = require('../lib/award');
 const mysql = require('../lib/mysql');
 const Badge = require('../models/badge');
+const BadgeImage = require('../models/badge-image');
 const normalize = require('../lib/normalize-assertion');
 
 const TEST_ASSERTION = $.makeAssertion();
@@ -98,7 +99,12 @@ $.prepareDatabase(function (done) {
     }, function (err, badge) {
       t.same(signature, badge.get('signature'));
       t.same(normalizedAssertion.uid, badge.getFromAssertion('uid'));
-      t.end();
+
+      // get the badge image
+      BadgeImage.findOne({ badge_hash: badge.get('body_hash') }, function (err, image) {
+        t.same(image.toBuffer(), PNG_DATA);
+        t.end();
+      })
     });
   });
 
