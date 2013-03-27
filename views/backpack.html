@@ -92,7 +92,7 @@
 </script>
 
 <!-- third party -->
-{% if settings.env == "production" %}
+{% if settings.useCompiledTemplates %}
   <script type="text/javascript" src="/js/nunjucks-min.js"></script>
   <script type="text/javascript" src="/js/nunjucks-templates.js"></script>
 {% else %}

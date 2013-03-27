@@ -26,6 +26,8 @@ app.locals({
   success: [],
 });
 
+app.set('useCompiledTemplates', configuration.get('nunjucks_precompiled'));
+
 // default view engine
 var env = new nunjucks.Environment(new nunjucks.FileSystemLoader(__dirname + '/views'));
 env.express(app);
