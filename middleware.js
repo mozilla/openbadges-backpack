@@ -173,6 +173,28 @@ exports.less = function less(env) {
   return lessMiddleware(_.defaults(base, config));
 };
 
+exports.staticViews = function staticViews(env) {
+  return function (req, res, next) {
+    var match;
+    if(match = /^\/(.+\.html)$/.exec(req.path)) {
+      var view = match[1];
+      try { 
+        env.getTemplate(view);
+      }
+      catch (e) {
+        return next();
+      }
+      res.render(view, function(err, html) {
+        if (err) return next(err);
+        else return res.send(html);
+      });
+    }
+    else {
+      next();
+    }
+  };
+};
+
 var utils = exports.utils = {};
 var pseudoRandomBytes = function(num) {
   var a = [];

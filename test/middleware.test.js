@@ -101,5 +101,80 @@ test('middleware#cors', function (t) {
   t.end();
 });
 
+test('middleware#staticViews', function(t) {
+  const nunjucks = require('nunjucks');
+
+  t.test('next called without error on unmatched path', function (t) {
+    var env = new nunjucks.Environment({
+      getSource: function(name) { 
+        return {
+          src: 'TEMPLATE',
+          path: name,
+          upToDate: function() { return true; }
+        };
+      }
+    });
+
+    const handler = middleware.staticViews(env);
+
+    conmock({
+      handler: handler,
+      request: {
+        path: '/some/endpoint'
+      }
+    }, function(err, mock) {
+      t.same(mock.fntype, 'next', 'next called');
+      t.ok(!mock.nextErr, 'without error');
+      t.end();
+    });
+  });
+
+  t.test('next called without error for missing view', function (t) {
+    var env = new nunjucks.Environment({
+      getSource: function(name) { 
+        return null;
+      }
+    });
+
+    const handler = middleware.staticViews(env);
+
+    conmock({
+      handler: handler,
+      request: {
+        path: '/foo.html'
+      }
+    }, function(err, mock) {
+      t.same(mock.fntype, 'next', 'next called');
+      t.ok(!mock.nextErr, 'without error');
+      t.end();
+    });
+  });
+
+  t.test('render called with view', function (t) {
+    var env = new nunjucks.Environment({
+      getSource: function(name) { 
+        return {
+          src: 'TEMPLATE',
+          path: name,
+          upToDate: function() { return true; }
+        };
+      }
+    });
+
+    const handler = middleware.staticViews(env);
+
+    conmock({
+      handler: handler,
+      request: {
+        path: '/tou.html'
+      }
+    }, function(err, mock) {
+      t.same(mock.fntype, 'render', 'render called');
+      t.same(mock.path, 'tou.html', 'with view');
+      t.end();
+    });
+  });
+});
+
 // necessary because middleware requires mysql, which opens a client
 testUtils.finish(test);
