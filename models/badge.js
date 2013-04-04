@@ -23,8 +23,12 @@ Base.apply(Badge, 'badge');
 
 Badge.prototype.presave = function () {
   if (!this.get('id')) {
-    this.set('body_hash', sha256(JSON.stringify(this.get('body'))));
+    this.set('body_hash', Badge.createHash(this.get('body')));
   }
+};
+
+Badge.createHash = function createHash(body) {
+  return sha256(JSON.stringify(body));
 };
 
 Badge.confirmRecipient = function confirmRecipient(assertion, email) {

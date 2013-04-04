@@ -44,6 +44,7 @@ $.prepareDatabase({
     badge.save(function (err, result) {
       const hash = badge.get('body_hash');
       t.same(hash.length, expect, 'should get back correct length for body hash');
+      t.same(hash, Badge.createHash(assertion));
       t.end();
     });
   });
