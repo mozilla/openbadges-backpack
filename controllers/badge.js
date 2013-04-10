@@ -46,7 +46,7 @@ exports.findByHash = function findByHash (req, res, next, hash) {
   BadgeImage.findOne({badge_hash: hash}, function (err, image) {
     if (err)
       return next(err);
-    if (!badge)
+    if (!image)
       return res.render('errors/404.html', {url: req.url});
     req.badgeImage = image;
     return next();
