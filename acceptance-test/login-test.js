@@ -24,6 +24,6 @@ utils.createClient({
   .waitForPageToLoad(8000)
   .click('css=.js-browserid-link')
   .logIntoBrowserID(config.email, config.password)
-  .selectWindow('title=Open Badge Backpack')
+  .selectWindow('title=Mozilla Backpack')
   .waitForElementPresent('css=div.upload')
   .gracefulExit();
