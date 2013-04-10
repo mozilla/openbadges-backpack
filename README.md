@@ -122,13 +122,15 @@ and then back in windows you can fire up your favourite browser and connect to t
           database: 'openbadges'
         },
 
-3. Install local dependencies: `npm install`
+3. Install external tools:
+  * [PhantomJS](http://phantomjs.org): We use PhantomJS for running unit tests. On a debian based Linux system you can run `sudo apt-get install phantomjs` to install and run `phantomjs --version` to check it is installed. For other systems you can try [downloading](http://phantomjs.org/download.html) and installing it or [building it from source](http://phantomjs.org/build.html).
+4. Install local dependencies: `npm install`
 
-4. Install submodules: `git submodule update --init`
+5. Install submodules: `git submodule update --init`
 
-5. Run the test suite: `npm test`
+6. Run the test suite: `npm test`
 
-6. Start your server: `npm start`
+7. Start your server: `npm start`
 
 No matter which way you choose, you should join the
 [Open Badges Google Group](https://groups.google.com/forum/#!forum/openbadges). If
