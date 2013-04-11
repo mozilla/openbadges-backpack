@@ -13,7 +13,8 @@
     "nock": "~0.15.2",
     "prompt": "~0.2.9",
     "jws": "0.2.2",
-    "tap": "~0.3.2"
+    "tap": "~0.3.2",
+    "cheerio": "0.10.8"
   },
   "dependencies": {
     "connect-flash": "0.1.0",
