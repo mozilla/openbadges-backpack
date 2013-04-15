@@ -124,7 +124,7 @@ function replaceModuleFunctionsForTesting(port) {
   var conf = require('../lib/configuration');
   var testConf = {
     protocol: 'http:',
-    host: 'localhost',
+    hostname: 'localhost',
     port: port
   };
   var originalVerify = browserid.verify;
