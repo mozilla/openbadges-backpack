@@ -11,6 +11,7 @@ const configuration = require('../lib/configuration');
 const browserid = require('../lib/browserid');
 const awardBadge = require('../lib/award');
 const analyzeAssertion = require('../lib/analyze-assertion');
+const normalizeAssertion = require('../lib/normalize-assertion');
 const Badge = require('../models/badge');
 const Group = require('../models/group');
 const User = require('../models/user');
@@ -411,7 +412,7 @@ exports.userBadgeUpload = function userBadgeUpload(req, res) {
     },
     function confirmAndAward(info, callback) {
       const recipient = awardOptions.recipient;
-      const assertion = info.structures.assertion;
+      const assertion = normalizeAssertion(info);
       const userOwnsBadge = Badge.confirmRecipient(assertion, recipient);
       if (!userOwnsBadge) {
         const err = new Error('This badge was not issued to you! Contact your issuer.');
