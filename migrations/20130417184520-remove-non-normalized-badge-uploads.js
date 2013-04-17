@@ -2,8 +2,8 @@ var dbm = require('db-migrate');
 var type = dbm.dataType;
 
 exports.up = function(db, callback) {
-  var badPattern = '"badge":{'; // body.badge not an object
-  db.runSql("DELETE FROM `badge` WHERE `body` NOT RLIKE ?", [badPattern], callback);
+  var goodPattern = '"badge":{'; // body.badge is an object
+  db.runSql("DELETE FROM `badge` WHERE `body` NOT RLIKE ?", [goodPattern], callback);
 };
 
 exports.down = function(db, callback) {
