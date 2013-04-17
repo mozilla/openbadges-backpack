@@ -161,7 +161,12 @@ exports.recentBadges = function recent (request, response, next) {
   function startResponse () {
     return user.getLatestBadges(function(err, badges) {
       if (err) return next(err);
-      return badgePage(request, response, badges, 'recentBadges.html');
+      try {
+        return badgePage(request, response, badges, 'recentBadges.html');
+      }
+      catch (ex) {
+        next(ex);
+      }
     });
   }
 
@@ -176,7 +181,12 @@ exports.allBadges = function everything (request, response, next) {
   function startResponse () {
     return user.getAllBadges(function(err, badges) {
       if (err) return next(err);
-      return badgePage(request, response, badges, 'allBadges.html');
+      try {
+        return badgePage(request, response, badges, 'allBadges.html');
+      }
+      catch (ex) {
+        next(ex);
+      }
     });
   }
 
