@@ -201,3 +201,26 @@ testMigration("move-image-data", function(t, id, previousId) {
   ];
 
 });
+
+testMigration("remove-non-normalized-badge-uploads", function(t, id, previousId) {
+  const BAD_DATA = {
+    "badge": "http://someurl.com"
+  };
+  const GOOD_DATA = {
+    "badge": { some: "object" }
+  };
+  return [
+    up({destination: previousId}),
+    sql("INSERT INTO `user` (id, email) VALUES (1,'foo@bar.org');"),
+    sql("INSERT INTO `badge` (id, user_id, image_path, body, body_hash)" +
+        "VALUES (1, 1, 'image.png', '" + JSON.stringify(BAD_DATA) + "', 'hash1')"),
+    sql("INSERT INTO `badge` (id, user_id, image_path, body, body_hash)" +
+        "VALUES (2, 1, 'image.png', '" + JSON.stringify(GOOD_DATA) + "', 'hash2')"),
+    up({count: 1}),
+    sql("SELECT body FROM badge", function(results) {
+      t.same(results.length, 1, 'one badge deleted');
+      var data = JSON.parse(results[0].body);
+      t.same(typeof data.badge, "object", 'normalized badge kept');
+    })
+  ];
+});
