@@ -4,7 +4,10 @@ var validator = require('openbadges-validator');
 var normalizeAssertion = require('../lib/normalize-assertion');
 
 exports.up = function(db, callback) {
-  var goodPattern = '"badge":{'; // body.badge is an object
+  /* goodPattern is intended to match where body.badge is an object.
+     What we really want is to find badges where body.badge is a url.
+   */
+  var goodPattern = '"badge":{'; 
   db.runSql("SELECT id, body FROM `badge` WHERE `body` NOT RLIKE ?", [goodPattern], function(err, results){
     if (err) callback(err);
     if (!results.length) callback();
