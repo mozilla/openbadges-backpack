@@ -101,7 +101,7 @@ test('middleware#cors', function (t) {
   t.end();
 });
 
-test('middleware#staticViews', function(t) {
+test('middleware#staticTemplateViews', function(t) {
   const nunjucks = require('nunjucks');
 
   t.test('next called without error on unmatched path', function (t) {
@@ -115,7 +115,7 @@ test('middleware#staticViews', function(t) {
       }
     });
 
-    const handler = middleware.staticViews(env);
+    const handler = middleware.staticTemplateViews(env);
 
     conmock({
       handler: handler,
@@ -136,7 +136,7 @@ test('middleware#staticViews', function(t) {
       }
     });
 
-    const handler = middleware.staticViews(env);
+    const handler = middleware.staticTemplateViews(env);
 
     conmock({
       handler: handler,
@@ -150,6 +150,30 @@ test('middleware#staticViews', function(t) {
     });
   });
 
+  t.test('non "template not found" exceptions rethrown', function (t) {
+    var env = new nunjucks.Environment({
+      getSource: function(name) { 
+        throw new Error('barf');
+      }
+    });
+
+    const handler = middleware.staticTemplateViews(env);
+
+    t.throws(function(){
+      conmock({
+        handler: handler,
+        request: {
+          path: '/foo.html'
+        }
+      });
+    }, {
+      name: 'Error',
+      message: 'barf'
+    }, 'other exceptions rethrown');
+
+    t.end();
+  });
+
   t.test('render called with view', function (t) {
     var env = new nunjucks.Environment({
       getSource: function(name) { 
@@ -161,7 +185,7 @@ test('middleware#staticViews', function(t) {
       }
     });
 
-    const handler = middleware.staticViews(env);
+    const handler = middleware.staticTemplateViews(env);
 
     conmock({
       handler: handler,

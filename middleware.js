@@ -173,25 +173,31 @@ exports.less = function less(env) {
   return lessMiddleware(_.defaults(base, config));
 };
 
-exports.staticViews = function staticViews(env) {
+exports.staticTemplateViews = function staticTemplateViews(env) {
+  function hasView(env, view) {
+    try { 
+      env.getTemplate(view);
+      return true;
+    }
+    catch (e) {
+      if (e.message && e.message.match(/template not found/)) 
+        return false;
+      throw e;
+    }
+  }
+
   return function (req, res, next) {
     var match;
-    if(match = /^\/(.+\.html)$/.exec(req.path)) {
+    if(match = /^\/([a-zA-Z0-9\/]+\.html)$/.exec(req.path)) {
       var view = match[1];
-      try { 
-        env.getTemplate(view);
+      if (hasView(env, view)) {
+        return res.render(view, function(err, html) {
+          if (err) return next(err);
+          else return res.send(html);
+        });
       }
-      catch (e) {
-        return next();
-      }
-      res.render(view, function(err, html) {
-        if (err) return next(err);
-        else return res.send(html);
-      });
     }
-    else {
-      next();
-    }
+    next();
   };
 };
 
