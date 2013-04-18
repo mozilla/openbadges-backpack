@@ -11,6 +11,7 @@ var fs = require('fs');
 var path = require('path');
 var middleware = require('./middleware');
 var logger = require('./lib/logging').logger;
+var browserid = require('./lib/browserid');
 var configuration = require('./lib/configuration');
 var flash = require('connect-flash');
 var nunjucks = require('nunjucks');
@@ -20,11 +21,13 @@ var app = express();
 app.logger = logger;
 app.config = configuration;
 
+browserid.configure({testUser: process.env['BROWSERID_TEST_USER']});
+
 /* Default values for template variables */
 app.locals({
   error: [],
   success: [],
-  getBrowserIdScriptUrl: require('./lib/browserid').getIncludeScriptUrl
+  getBrowserIdScriptUrl: browserid.getIncludeScriptUrl
 });
 
 app.set('useCompiledTemplates', configuration.get('nunjucks_precompiled'));
