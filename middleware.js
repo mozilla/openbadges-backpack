@@ -173,7 +173,9 @@ exports.less = function less(env) {
   return lessMiddleware(_.defaults(base, config));
 };
 
-exports.staticTemplateViews = function staticTemplateViews(env) {
+exports.staticTemplateViews = function staticTemplateViews(env, viewPrefix) {
+  viewPrefix = viewPrefix || '';
+
   function hasView(env, view) {
     try { 
       env.getTemplate(view);
@@ -189,7 +191,7 @@ exports.staticTemplateViews = function staticTemplateViews(env) {
   return function (req, res, next) {
     var match;
     if(match = /^\/([a-zA-Z0-9\/]+\.html)$/.exec(req.path)) {
-      var view = match[1];
+      var view = viewPrefix + match[1];
       if (hasView(env, view)) {
         return res.render(view, function(err, html) {
           if (err) return next(err);

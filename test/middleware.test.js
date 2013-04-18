@@ -198,6 +198,32 @@ test('middleware#staticTemplateViews', function(t) {
       t.end();
     });
   });
+
+  t.test('limit the view search path', function (t) {
+    var env = new nunjucks.Environment({
+      getSource: function(name) { 
+        return {
+          src: 'TEMPLATE',
+          path: name,
+          upToDate: function() { return true; }
+        };
+      }
+    });
+
+    const handler = middleware.staticTemplateViews(env, 'static/');
+
+    conmock({
+      handler: handler,
+      request: {
+        path: '/tou.html'
+      }
+    }, function(err, mock) {
+      t.same(mock.fntype, 'render', 'render called');
+      t.same(mock.path, 'static/tou.html', 'with view');
+      t.end();
+    });
+  
+  });
 });
 
 // necessary because middleware requires mysql, which opens a client
