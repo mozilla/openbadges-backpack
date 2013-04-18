@@ -1,9 +1,13 @@
 var async = require('async');
 var test = require('tap').test;
+var $ = require('./');
+var _ = require('underscore');
 var constants = require('mysql');
 var mysql = require('../lib/mysql');
 var migrations = require('../lib/migrations');
 var migrationDirFiles = require('fs').readdirSync(migrations.dir).sort();
+var validator = require('openbadges-validator');
+var normalizeAssertion = require('../lib/normalize-assertion');
 
 function up(options) {
   return function(callback) { migrations.up(options, callback); };
@@ -202,25 +206,48 @@ testMigration("move-image-data", function(t, id, previousId) {
 
 });
 
-testMigration("remove-non-normalized-badge-uploads", function(t, id, previousId) {
-  const BAD_DATA = {
-    "badge": "http://someurl.com"
-  };
-  const GOOD_DATA = {
-    "badge": { some: "object" }
-  };
+testMigration("fix-non-normalized-badge-uploads", function(t, id, previousId) {
+  var assertion = $.makeNewAssertion();
+  var mockHttp = $.mockHttp()
+    .get('/assertion').reply(200, JSON.stringify(assertion), { 'content-type': 'application/json' })
+    .get('/assertion').reply(200, JSON.stringify(assertion), { 'content-type': 'application/json' })
+    .get('/assertion-image').reply(200, 'image', { 'content-type': 'image/png' })
+    .get('/badge-image').reply(200, 'image', { 'content-type': 'image/png' })
+    .get('/badge').reply(200, JSON.stringify($.makeBadgeClass()))
+    .get('/issuer').reply(200, JSON.stringify($.makeIssuer()));
+
   return [
     up({destination: previousId}),
     sql("INSERT INTO `user` (id, email) VALUES (1,'foo@bar.org');"),
-    sql("INSERT INTO `badge` (id, user_id, image_path, body, body_hash)" +
-        "VALUES (1, 1, 'image.png', '" + JSON.stringify(BAD_DATA) + "', 'hash1')"),
-    sql("INSERT INTO `badge` (id, user_id, image_path, body, body_hash)" +
-        "VALUES (2, 1, 'image.png', '" + JSON.stringify(GOOD_DATA) + "', 'hash2')"),
+    function insertData(callback) {
+      validator(assertion, function(err, info){
+        if (err) callback(err);
+        var badData = info.structures.assertion;
+        var goodData = normalizeAssertion(info);
+        async.series(
+          [
+            sql("INSERT INTO `badge` (id, user_id, image_path, body, body_hash)" +
+                "VALUES (1, 1, 'image.png', '" + JSON.stringify(badData) + "', 'hash1')"),
+            sql("INSERT INTO `badge` (id, user_id, image_path, body, body_hash)" +
+                "VALUES (2, 1, 'image.png', '" + JSON.stringify(goodData) + "', 'hash2')")
+          ],
+          function(err) {
+            callback(err);
+          }
+        );
+      });
+    },
     up({count: 1}),
     sql("SELECT body FROM badge", function(results) {
-      t.same(results.length, 1, 'one badge deleted');
-      var data = JSON.parse(results[0].body);
-      t.same(typeof data.badge, "object", 'normalized badge kept');
+      t.same(results.length, 2, 'two badges returned');
+      results.forEach(function(result, i) {
+        t.comment('testing badge ' + i);
+        var body = JSON.parse(result['body']);
+        t.ok(body.badge, 'has badge');
+        t.isa(body.badge, 'object', 'badge is an object');
+        t.ok(body.badge.issuer, 'has badge.issuer');
+        t.isa(body.badge.issuer, 'object', 'badge.issuer is an object');
+      });
     })
   ];
 });
