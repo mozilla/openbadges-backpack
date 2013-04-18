@@ -39,7 +39,7 @@ a.logout {
 {% endblock %}
 
 {% block scripts %}
-<script src="https://login.persona.org/include.js"></script>
+<script src="{{ getBrowserIdScriptUrl() }}"></script>
 <script src="/js/jquery.min.js"></script>
 <script>
 $(window).ready(function() {
