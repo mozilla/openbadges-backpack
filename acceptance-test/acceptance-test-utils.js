@@ -2,6 +2,7 @@ var wd = require('wd');
 var url =require('url');
 var app = require('../app');
 var appMysql = require('../lib/mysql');
+var prepareDatabase = require('../test').prepareDatabase;
 
 var APP_PORT = parseInt(process.env['WEBDRIVER_APP_PORT'] || 8888);
 var APP_URL = process.env['WEBDRIVER_APP_URL'] || 'http://localhost:8888';
@@ -10,49 +11,51 @@ var HOST = process.env['WEBDRIVER_HOST'] || 'localhost';
 var PORT = parseInt(process.env['WEBDRIVER_PORT'] || 4444);
 
 exports.test = function test(name, fn) {
-  app.listen(APP_PORT, function() {
-    browser = wd.remote(HOST, PORT);
+  prepareDatabase(function() {
+    app.listen(APP_PORT, function() {
+      browser = wd.remote(HOST, PORT);
 
-    browser.on('status', function(info) {
-      console.log(info.cyan);
-    });
+      browser.on('status', function(info) {
+        console.log(info.cyan);
+      });
 
-    browser.on('command', function(meth, path, data) {
-      console.log(' > ' + meth.yellow, path.grey, data || '');
-    });
+      browser.on('command', function(meth, path, data) {
+        console.log(' > ' + meth.yellow, path.grey, data || '');
+      });
 
-    var t = {
-      browser: browser,
-      resolve: function(path) {
-        return url.resolve(APP_URL, path);
-      },
-      end: function(testErr) {
-        if (testErr)
-          console.error(testErr.toString());
-        browser.quit(function(browserErr) {
-          var exitCode = testErr || browserErr ? 1 : 0;
-          if (browserErr)
-            console.error("browser.quit() failed: " + browserErr);
-          app.close();
-          appMysql.client.destroy();
-          console.log("Test '" + name + "' " +
-                      (exitCode ? "failed." : "succeeded."));
-          process.exit(exitCode);
-        });
-      }
-    };
+      var t = {
+        browser: browser,
+        resolve: function(path) {
+          return url.resolve(APP_URL, path);
+        },
+        end: function(testErr) {
+          if (testErr)
+            console.error(testErr.toString());
+          browser.quit(function(browserErr) {
+            var exitCode = testErr || browserErr ? 1 : 0;
+            if (browserErr)
+              console.error("browser.quit() failed: " + browserErr);
+            app.close();
+            appMysql.client.destroy();
+            console.log("Test '" + name + "' " +
+                        (exitCode ? "failed." : "succeeded."));
+            process.exit(exitCode);
+          });
+        }
+      };
 
-    unboundActions.forEach(function(action) {
-      t[action.name] = bindAction(t, action);
-    });
+      unboundActions.forEach(function(action) {
+        t[action.name] = bindAction(t, action);
+      });
 
-    browser.init({
-      browserName: BROWSER,
-      tags: [],
-      name: name
-    }, function (err) {
-      if (err) throw err;
-      fn(t);
+      browser.init({
+        browserName: BROWSER,
+        tags: [],
+        name: name
+      }, function(err) {
+        if (err) throw err;
+        fn(t);
+      });
     });
   });
 };
