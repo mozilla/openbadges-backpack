@@ -1,5 +1,5 @@
 <div class='group {% if not attributes.id %}isNew{% endif %}'>
-  <input class='groupName' type='text' value='{{name}}'>
+  <input class='groupName' type='text' value='{{name|e}}'>
   <span class='icon delete'>&times;</span>
   <span class='icon share' title='share this group'>5</span>
   

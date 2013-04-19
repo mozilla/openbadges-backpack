@@ -18,30 +18,25 @@
 
   <header>
     {% if portfolio.attributes.title %}
-      <h1>{{portfolio.attributes.title}}</h1>
+      <h1>{{portfolio.attributes.title|e}}</h1>
     {% endif %}
     {% if portfolio.attributes.subtitle %}
-      <h2>{{portfolio.attributes.subtitle}}</h1>
+      <h2>{{portfolio.attributes.subtitle|e}}</h1>
     {% endif %}
   </header>
 
   <ul class='badges'>
     {% for badge in portfolio.badges %}
       <li>
-        <h3>{{badge.attributes.body.badge.name}}</h3>
+        <h3>{{badge.attributes.body.badge.name|e}}</h3>
 
-        <p class='story'>{{badge.attributes._userStory}}</p>
+        <p class='story'>{{badge.attributes._userStory|e}}</p>
 
         {% include 'badge-data.html' %}
       </li>
     {% endfor %}
   </ul>
 
-  {% if postamble %}
-  <section class='postamble'>
-    {{postamble}}
-  </section>
-  {% endif %}
 </div>
 
 {% endblock %}
