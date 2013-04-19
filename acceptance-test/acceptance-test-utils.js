@@ -1,5 +1,4 @@
 var soda = require('soda'),
-    config = require('./local-config').config,
     app = require('../app.js');
 
 soda.prototype.gracefulExit = function() {
@@ -40,7 +39,7 @@ exports.scriptify = function(func, args) {
 
 exports.createClient = function(options) {
   options = options || {};
-  app.listen(8888);
+  app.listen(parseInt(process.env['SELENIUM_APP_PORT'] || 8888));
 
   if (options.extensions)
     for (var name in options.extensions) {
@@ -48,10 +47,10 @@ exports.createClient = function(options) {
     }
 
   var browser = soda.createClient({
-      host: config.host
-    , port: config.port || 4444
-    , url: config.url || 'http://localhost:8888/'
-    , browser: config.browser || 'firefox'
+      host: process.env['SELENIUM_HOST'] || '127.0.0.1'
+    , port: parseInt(process.env['SELENIUM_PORT'] || 4444)
+    , url: process.env['SELENIUM_APP_URL'] || 'http://localhost:8888/'
+    , browser: process.env['SELENIUM_BROWSER'] || 'firefox'
   });
   
   browser.on('command', function(cmd, args){
