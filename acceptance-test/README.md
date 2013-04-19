@@ -28,4 +28,17 @@ browsers at when testing the app. Defaults to `http://localhost:8888/`.
 `WEBDRIVER_BROWSER`: The browser that the selenium server should use. Defaults
 to `firefox`.
 
+`SAUCE_USERNAME`: Your [Sauce Labs][] username (optional).
+
+`SAUCE_ACCESS_KEY`: Your [Sauce Labs][] access key (optional).
+
+## Running on Sauce Labs
+
+Note that if you want to use Sauce Labs to run your tests, you will
+need to set `WEBDRIVER_HOST=ondemand.saucelabs.com` and
+`WEBDRIVER_PORT=80`. You may also need to use [Sauce Connect][] if
+you're behind a firewall.
+
   [WebDriver/Selenium 2 Server]: http://seleniumhq.org/download/
+  [Sauce Labs]: https://saucelabs.com/
+  [Sauce Connect]: https://saucelabs.com/docs/connect
