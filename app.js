@@ -11,6 +11,7 @@ var fs = require('fs');
 var path = require('path');
 var middleware = require('./middleware');
 var logger = require('./lib/logging').logger;
+var browserid = require('./lib/browserid');
 var configuration = require('./lib/configuration');
 var flash = require('connect-flash');
 var nunjucks = require('nunjucks');
@@ -24,6 +25,9 @@ app.config = configuration;
 app.locals({
   error: [],
   success: [],
+  getBrowserIdScriptUrl: function() {
+    return browserid.getIncludeScriptUrl();
+  }
 });
 
 app.set('useCompiledTemplates', configuration.get('nunjucks_precompiled'));
@@ -53,11 +57,6 @@ app.use(express.methodOverride());
 app.use(middleware.logRequests());
 app.use(middleware.cookieSessions());
 app.use(middleware.userFromSession());
-app.configure('development', function () {
-  var testUser = process.env['OPENBADGES_TEST_USER'];
-  if (testUser)
-    app.use(middleware.testUser(testUser));
-});
 app.use(flash());
 app.use(middleware.csrf({
   whitelist: [
@@ -79,6 +78,7 @@ app.configure('development', function () {
   catch (ex) {
     logger.warn(ex.message);
   }
+  browserid.configure({testUser: process.env['BROWSERID_TEST_USER']});
 });
 app.use(express.errorHandler());
 
