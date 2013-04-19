@@ -6,7 +6,7 @@ const test = require('tap').test;
 var rootDir = path.dirname(__dirname);
 var node = process.argv[0];
 var testFiles = fs.readdirSync(__dirname).filter(function(filename) {
-  return filename.match(/-test\.js$/);
+  return filename.match(/\.atest\.js$/);
 });
 
 testFiles.forEach(function(filename) {

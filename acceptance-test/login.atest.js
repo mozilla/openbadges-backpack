@@ -1,9 +1,9 @@
 process.env['BROWSERID_TEST_USER'] = 'foo@bar.org';
 
 var async = require('async');
-var test = require('./acceptance-test-utils.js').test;
+var acceptanceTest = require('./acceptance-test-utils.js').test;
 
-test('Login works', function(t) {
+acceptanceTest('Login works', function(t) {
   async.series([
     t.open('/'),
     t.click('.js-browserid-link'),
