@@ -49,7 +49,7 @@ exports.createClient = function(options) {
   var browser = soda.createClient({
       host: process.env['SELENIUM_HOST'] || '127.0.0.1'
     , port: parseInt(process.env['SELENIUM_PORT'] || 4444)
-    , url: process.env['SELENIUM_APP_URL'] || 'http://localhost:8888/'
+    , url: process.env['SELENIUM_APP_URL'] || 'http://127.0.0.1:8888/'
     , browser: process.env['SELENIUM_BROWSER'] || 'firefox'
   });
   
