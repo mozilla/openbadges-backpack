@@ -60,19 +60,36 @@ exports.test = function test(name, fn) {
   });
 };
 
+// Bind 't' as the first argument to 'fn' and return an action function
+// as the result. An action function, as used in this module, is simply
+// a function whose last argument is unambiguously a callback of the
+// form 'function(err, result)'. If the action function is called without
+// the callback, then a curried version of itself is returned. Otherwise,
+// 'fn' is called with all its bound arguments.
 function bindAction(t, fn) {
   var boundFunction = fn.bind(this, t);
 
   return function() {
+    var result = boundFunction;
+
     if (arguments.length) {
       if (typeof(arguments[arguments.length-1]) == 'function')
-        return boundFunction.apply(this, arguments);
+        // Our last argument was a function, which we'll assume is
+        // an async callback function. Call it!
+        return result.apply(this, arguments);
     }
 
+    // An async callback function wasn't passed to us, so we'll just
+    // return a curried version of ourself that's bound to the arguments.
+    // This can later be passed to utilities like async.series().
     for (var i = 0; i < arguments.length; i++)
-      boundFunction = boundFunction.bind(this, arguments[i]);
-    return boundFunction;
+      result = result.bind(this, arguments[i]);
+    return result;
   };
+}
+
+function collapseWhitespace(text) {
+  return text.replace(/\n/g, ' ').replace(/\s+/g, ' ');
 }
 
 var unboundActions = [
@@ -86,10 +103,6 @@ var unboundActions = [
     });
   },
   function waitForVisibleContent(t, options, cb) {
-    function collapseWhitespace(text) {
-      return text.replace(/\n/g, ' ').replace(/\s+/g, ' ');
-    }
-
     var cssSelector = options.selector;
     t.browser.waitForVisibleByCssSelector(
       cssSelector, t.timeout, function(err) {
@@ -113,3 +126,8 @@ var unboundActions = [
     );
   }
 ];
+
+exports._forTesting = {
+  bindAction: bindAction,
+  collapseWhitespace: collapseWhitespace
+};
