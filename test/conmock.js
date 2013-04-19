@@ -40,7 +40,8 @@ module.exports = function conmock (options, callback) {
       return this.header('Content-Type', mime.lookup(type));
     },
     type: function (type) {
-      return this.header('Content-Type', mime.lookup(type));
+      this.header('Content-Type', mime.lookup(type));
+      return this;
     },
     send: function (data, status) {
       if (typeof data === 'number') {
