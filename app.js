@@ -21,13 +21,13 @@ var app = express();
 app.logger = logger;
 app.config = configuration;
 
-browserid.configure({testUser: process.env['BROWSERID_TEST_USER']});
-
 /* Default values for template variables */
 app.locals({
   error: [],
   success: [],
-  getBrowserIdScriptUrl: browserid.getIncludeScriptUrl
+  getBrowserIdScriptUrl: function() {
+    return browserid.getIncludeScriptUrl();
+  }
 });
 
 app.set('useCompiledTemplates', configuration.get('nunjucks_precompiled'));
@@ -78,6 +78,7 @@ app.configure('development', function () {
   catch (ex) {
     logger.warn(ex.message);
   }
+  browserid.configure({testUser: process.env['BROWSERID_TEST_USER']});
 });
 app.use(express.errorHandler());
 
