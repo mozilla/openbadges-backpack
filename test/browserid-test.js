@@ -1,3 +1,4 @@
+const vm = require('vm');
 const $ = require('./');
 const test = require('tap').test;
 const browserid = require('../lib/browserid');
@@ -86,4 +87,62 @@ test('getVerifierUrl', function (t) {
   });
   t.same(url, 'https://localhost/verify');
   t.end();
+});
+
+test('getIncludeScriptUrl', function(t) {
+  t.same(browserid.getIncludeScriptUrl(),
+         "https://login.persona.org/include.js");
+  t.end();
+});
+
+test('configure defaults work', function(t) {
+  var origVerify = browserid.verify;
+  var origGetIncludeScriptUrl = browserid.getIncludeScriptUrl;
+
+  browserid.configure();
+  t.equal(browserid.verify, origVerify);
+  t.equal(browserid.getIncludeScriptUrl, origGetIncludeScriptUrl);
+
+  browserid.configure({testUser: null});
+  t.equal(browserid.verify, origVerify);
+  t.equal(browserid.getIncludeScriptUrl, origGetIncludeScriptUrl);
+
+  t.end();
+});
+
+test('configure works when testUser="error"', function(t) {
+  browserid.configure({testUser: 'error'});
+  browserid.verify({assertion: 'error'}, function(err) {
+    t.same(err.code, 'invalid-assertion');
+    t.same(err.extra, 'sent from fakeVerify');
+    t.end();
+  });
+});
+
+test('configure works when testUser="prompt" or email addr', function(t) {
+  var FAKE_PROMPT_RESULT = "foo@bar.org";
+  var navigatorIdGet = function(cb) {
+    var url = browserid.getIncludeScriptUrl();
+    var base64 = url.split("data:application/javascript;base64,")[1];
+    var js = new Buffer(base64, 'base64').toString('ascii');
+
+    var sandbox = {
+      navigator: {},
+      prompt: function() { return FAKE_PROMPT_RESULT; },
+      setTimeout: setTimeout
+    };
+
+    vm.runInNewContext(js, sandbox);
+    sandbox.navigator.id.get(cb);
+  };
+
+  browserid.configure({testUser: 'prompt'});
+  navigatorIdGet(function(assertion) {
+    t.same(assertion, FAKE_PROMPT_RESULT);
+    browserid.configure({testUser: 'lol@cat.org'});
+    navigatorIdGet(function(assertion) {
+      t.same(assertion, "lol@cat.org");
+      t.end();
+    });
+  });
 });

@@ -302,6 +302,7 @@ testUtils.prepareDatabase({
     }, function(err, mock) {
       if (err) throw err;
       t.equal(mock.status, 400);
+      t.equal(mock.headers['Content-Type'], 'text/plain');
       t.equal(mock.body, 'invalid scope: invalid permission(s): BAD');
       t.end();
     });

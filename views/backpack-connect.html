@@ -8,7 +8,7 @@ a.logout {
 </style>
 {% endblock %}
 {% block body %}
-<h1><span class="client">{{ clientDomain }}</span> would like permission 
+<h1><span class="client">{{ clientDomain|e }}</span> would like permission
   to:</h1>
 
 {% set permissions = scopes %}
@@ -27,10 +27,10 @@ a.logout {
 
 <form method="POST" action="accept">
   <input name="_csrf" type="hidden" value="{{ csrfToken }}">
-  <input name="callback" type="hidden" value="{{ callback }}">
-  <input name="scope" type="hidden" value="{{ joinedScope }}">
+  <input name="callback" type="hidden" value="{{ callback|e }}">
+  <input name="scope" type="hidden" value="{{ joinedScope|e }}">
   <button class="btn btn-primary" type="submit">Grant permission</button>
-  <a class="btn" href="{{ denyCallback }}">Deny permission</a>
+  <a class="btn" href="{{ denyCallback|e }}">Deny permission</a>
   <a href="/backpack/signout" class="logout">
     I am not <span class="email">{{ user.attributes.email }}</span>.
   </a>
@@ -39,7 +39,7 @@ a.logout {
 {% endblock %}
 
 {% block scripts %}
-<script src="https://login.persona.org/include.js"></script>
+<script src="{{ getBrowserIdScriptUrl() }}"></script>
 <script src="/js/jquery.min.js"></script>
 <script>
 $(window).ready(function() {

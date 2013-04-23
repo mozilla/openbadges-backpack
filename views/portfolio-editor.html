@@ -6,16 +6,16 @@
   <input type='hidden' name='group_id' value='{{group.attributes.id}}'>
   <input type='hidden' name='url' value='{{groups.attributes.url}}'>
   <header>
-    <input tabindex=1 name='title' class='field title' value='{{portfolio.attributes.title}}'>
-    <input tabindex=1 name='subtitle' class='field subtitle' placeholder='Optional subtitle' value='{{portfolio.attributes.subtitle}}'>
+    <input tabindex=1 name='title' class='field title' value='{{portfolio.attributes.title|e}}'>
+    <input tabindex=1 name='subtitle' class='field subtitle' placeholder='Optional subtitle' value='{{portfolio.attributes.subtitle|e}}'>
   </header>
 
   <ul class='badges'>
     {% for badge in portfolio.badges %}
       <li>
-        <h3>{{badge.attributes.body.badge.name}}</h3>
+        <h3>{{badge.attributes.body.badge.name|e}}</h3>
 
-        <textarea name='stories[{{badge.attributes.id}}]' tabindex=1 class='story' placeholder='some information about this badge'>{{badge.attributes._userStory}}</textarea>
+        <textarea name='stories[{{badge.attributes.id}}]' tabindex=1 class='story' placeholder='some information about this badge'>{{badge.attributes._userStory|e}}</textarea>
 
         {% include 'badge-data.html' %}
       </li>

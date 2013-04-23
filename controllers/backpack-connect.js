@@ -28,9 +28,9 @@ function revokeOrigin(req, res, next) {
   if (!req.user)
     return res.send(403);
   if (!req.body)
-    return res.send('body expected', 400);
+    return res.type('text').send('body expected', 400);
   if (!req.body.origin)
-    return res.send('origin URL expected', 400);
+    return res.type('text').send('origin URL expected', 400);
 
   this.Model.revokeOriginForUser({
     origin: req.body.origin,
@@ -47,9 +47,9 @@ function revokeOrigin(req, res, next) {
 
 function refresh(req, res, next) {
   if (!req.body)
-    return res.send('body expected', 400);
+    return res.type('text').send('body expected', 400);
   if (req.body.grant_type != "refresh_token")
-    return res.send('invalid grant_type', 400);
+    return res.type('text').send('invalid grant_type', 400);
   
   var refresh_token = req.body.refresh_token || '';
   
@@ -61,11 +61,11 @@ function refresh(req, res, next) {
       return next(err);
     }
     if (!session)
-      return res.send('invalid refresh_token', 400);
+      return res.type('text').send('invalid refresh_token', 400);
     if (req.headers['origin']) {
       res.set('access-control-allow-origin', session.get('origin'));
       if (session.get('origin') != req.headers['origin'])
-        return res.send("invalid origin", 401);
+        return res.type('text').send("invalid origin", 401);
     }
 
     session.refresh();
@@ -86,9 +86,9 @@ function refresh(req, res, next) {
 
 function requestAccess(req, res) {
   if (!req.query.callback)
-    return res.send('callback expected', 400);
+    return res.type('text').send('callback expected', 400);
   if (!req.query.scope)
-    return res.send('scope expected', 400);
+    return res.type('text').send('scope expected', 400);
 
   var originErr = this.Model.validators.origin(req.query.callback);
   var scopes = req.query.scope.split(',');
@@ -96,9 +96,9 @@ function requestAccess(req, res) {
   var parsed = url.parse(req.query.callback, false, true);
   
   if (originErr)
-    return res.send('invalid callback: ' + originErr, 400);
+    return res.type('text').send('invalid callback: ' + originErr, 400);
   if (scopeErr)
-    return res.send('invalid scope: ' + scopeErr, 400);
+    return res.type('text').send('invalid scope: ' + scopeErr, 400);
   
   return res.render('backpack-connect.html', {
     clientDomain: parsed.hostname,
@@ -114,11 +114,11 @@ function allowAccess(req, res, next) {
   if (!req.user)
     return res.send(403);
   if (!req.body)
-    return res.send('body expected', 400);
+    return res.type('text').send('body expected', 400);
   if (!req.body.callback)
-    return res.send('callback expected', 400);
+    return res.type('text').send('callback expected', 400);
   if (!req.body.scope)
-    return res.send('scope expected', 400);
+    return res.type('text').send('scope expected', 400);
   
   var originErr = this.Model.validators.origin(req.body.callback);
   var scopes = req.body.scope.split(',');
@@ -127,9 +127,9 @@ function allowAccess(req, res, next) {
   var session;
   
   if (originErr)
-    return res.send('invalid callback: ' + originErr, 400);
+    return res.type('text').send('invalid callback: ' + originErr, 400);
   if (scopeErr)
-    return res.send('invalid scope: ' + scopeErr, 400);
+    return res.type('text').send('invalid scope: ' + scopeErr, 400);
 
   session = new this.Model({
     origin: req.body.callback,
@@ -172,13 +172,13 @@ function authorize(permission, req, res, next) {
       'error="' + type + '"',
       'error_description="' + desc + '"'
     ].join(', '));
-    return res.send(type + ": " + desc, 401);
+    return res.type('text').send(type + ": " + desc, 401);
   };
   var invalidTokenError = tokenError.bind(null, "invalid_token");
 
   if (!auth) {
     res.header('WWW-Authenticate', bearerRealmStr);
-    return res.send("access token expected", 401);
+    return res.type('text').send("access token expected", 401);
   }
   
   auth = new Buffer(auth[1], 'base64');
@@ -201,7 +201,7 @@ function authorize(permission, req, res, next) {
     if (req.headers['origin']) {
       res.set('access-control-allow-origin', token.get('origin'));
       if (token.get('origin') != req.headers['origin'])
-        return res.send("invalid origin", 401);
+        return res.type('text').send("invalid origin", 401);
     }
     User.find({id: token.get('user_id')}, function(err, results) {
       if (err || !results.length) {

@@ -52,10 +52,10 @@
       {% for issuer in issuers %}
         <div class="item">
           <span class="title">
-            <strong>{{ issuer.domain }}</strong>
+            <strong>{{ issuer.domain|e }}</strong>
             <small>
               <p>The website at 
-                <a href="{{ issuer.origin }}">{{ issuer.domain }}</a> has
+                <a href="{{ issuer.origin|e }}">{{ issuer.domain|e }}</a> has
                 permission to:</p>
               {% set permissions = issuer.permissions %}
               {% include 'permissions.html' %}
@@ -65,8 +65,8 @@
             <button type="button" class="btn btn-danger js-revoke"
                     autocomplete="off"
                     data-loading-text="Revoking..."
-                    data-revoke="{{ issuer.origin }}">Revoke
-              access for {{ issuer.domain }}</button>
+                    data-revoke="{{ issuer.origin|e }}">Revoke
+              access for {{ issuer.domain|e }}</button>
           </div>
         </div>
       {% endfor %}
