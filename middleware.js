@@ -157,6 +157,36 @@ exports.less = function less(env) {
   return lessMiddleware(_.defaults(base, config));
 };
 
+exports.staticTemplateViews = function staticTemplateViews(env, viewPrefix) {
+  viewPrefix = viewPrefix || '';
+
+  function hasView(env, view) {
+    try { 
+      env.getTemplate(view);
+      return true;
+    }
+    catch (e) {
+      if (e.message && e.message.match(/template not found/)) 
+        return false;
+      throw e;
+    }
+  }
+
+  return function (req, res, next) {
+    var match;
+    if(match = /^\/([a-zA-Z0-9\/]+\.html)$/.exec(req.path)) {
+      var view = viewPrefix + match[1];
+      if (hasView(env, view)) {
+        return res.render(view, function(err, html) {
+          if (err) return next(err);
+          else return res.send(html);
+        });
+      }
+    }
+    next();
+  };
+};
+
 var utils = exports.utils = {};
 var pseudoRandomBytes = function(num) {
   var a = [];
