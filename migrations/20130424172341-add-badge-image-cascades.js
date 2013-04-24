@@ -11,7 +11,7 @@ function getConstraintName(db) {
     const sql = ''
       + 'SELECT constraint_name'
       + ' FROM information_schema.REFERENTIAL_CONSTRAINTS'
-      + ' WHERE constraint_schema = \'openbadges\''
+      + ' WHERE constraint_schema = (select database())'
       + ' AND table_name = \'badge_image\'';
     return db.runSql(sql, wrap(callback));
   };
