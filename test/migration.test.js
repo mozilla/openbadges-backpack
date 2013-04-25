@@ -206,6 +206,27 @@ testMigration("move-image-data", function(t, id, previousId) {
 
 });
 
+testMigration("add-badge-image-cascades", function(t, id, previousId) {
+  return [
+    up({destination: previousId}),
+    sql("INSERT INTO `user` (id, email) VALUES (1,'foo@bar.org');"),
+    sql("INSERT INTO `badge` (id, user_id, image_path, body, body_hash)" +
+        "VALUES (1, 1, 'image.png', 'body', 'hash1')"),
+    sql("INSERT INTO `badge_image` (id, badge_hash, image_data)" +
+        "VALUES (1, 'hash1', 'data')"),
+    sql("INSERT INTO `badge` (id, user_id, image_path, body, body_hash)" +
+        "VALUES (2, 1, 'image.png', 'body', 'hash2')"),
+    sql("INSERT INTO `badge_image` (id, badge_hash, image_data)" +
+        "VALUES (2, 'hash2', 'data')"),
+    up({count: 1}),
+    sql("DELETE FROM `badge` WHERE id = 1", function(results) {
+      t.same(results.affectedRows, 1);
+    }),
+    down({count: 1}),
+    sqlError("DELETE FROM `badge` WHERE id = 2", t, "ERROR_ROW_IS_REFERENCED_2")
+  ];
+});
+
 testMigration("remove-non-normalized-badge-uploads", function(t, id, previousId) {
   var newAssertion = $.makeNewAssertion();
   var mockHttp = $.mockHttp()
@@ -224,9 +245,17 @@ testMigration("remove-non-normalized-badge-uploads", function(t, id, previousId)
       validator(oldAssertion, function(err, info) {
         if (err) callback(err);
         var oldBody = normalizeAssertion(info);
-        var sql = "INSERT INTO `badge` (id, user_id, image_path, body, body_hash)" +
-                  "VALUES (3, 1, 'image.png', '" + JSON.stringify(oldBody) + "', 'hash3')";
-        mysql.client.query(sql, callback);
+        async.series(
+          [
+            sql("INSERT INTO `badge` (id, user_id, image_path, body, body_hash)" +
+                "VALUES (3, 1, 'image.png', '" + JSON.stringify(oldBody) + "', 'hash3')"),
+            sql("INSERT INTO `badge_image` (id, badge_hash, image_data)" +
+                "VALUES (3, 'hash3', 'data')")
+          ],
+          function (err) {
+            callback(err);
+          }
+        );
       });
     },
     function insertNewAssertionData(callback) {
@@ -238,8 +267,12 @@ testMigration("remove-non-normalized-badge-uploads", function(t, id, previousId)
           [
             sql("INSERT INTO `badge` (id, user_id, image_path, body, body_hash)" +
                 "VALUES (1, 1, 'image.png', '" + JSON.stringify(badBody) + "', 'hash1')"),
+            sql("INSERT INTO `badge_image` (id, badge_hash, image_data)" +
+                "VALUES (1, 'hash1', 'data')"),
             sql("INSERT INTO `badge` (id, user_id, image_path, body, body_hash)" +
-                "VALUES (2, 1, 'image.png', '" + JSON.stringify(newBody) + "', 'hash2')")
+                "VALUES (2, 1, 'image.png', '" + JSON.stringify(newBody) + "', 'hash2')"),
+            sql("INSERT INTO `badge_image` (id, badge_hash, image_data)" +
+                "VALUES (2, 'hash2', 'data')"),
           ],
           function(err) {
             callback(err);
