@@ -48,7 +48,6 @@ env.addFilter('formatdate', function (rawDate) {
 // ------------------------------------
 app.use(middleware.less(app.get('env')));
 app.use(express.static(path.join(__dirname, "static")));
-app.use(express.static(path.join(configuration.get('var_path'), "badges")));
 app.use("/views", express.static(path.join(__dirname, "views")));
 app.use(middleware.staticTemplateViews(env, 'static/'));
 app.use(middleware.noFrame({ whitelist: [ '/issuer/frame.*', '/', '/share/.*' ] }));
