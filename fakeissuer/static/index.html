@@ -45,33 +45,41 @@
         }
       }
       
-      old.addEventListener('click', function(){
+      var attach = function(element, eventName, cb) {
+        if (element.addEventListener)
+          element.addEventListener(eventName, cb, false);
+        else
+          element.attachEvent('on' + eventName, cb);
+      };
+
+      attach(old, 'click', function(){
         var url = qualify('/old.json?email=') + encodeURIComponent(getEmail());
         issue(url)
-      },false)
+      });
       
-      unhashed.addEventListener('click', function(){
+      attach(unhashed, 'click', function(){
         var url = qualify('/raw.json?email=') + encodeURIComponent(getEmail());
         issue(url)
-      },false)
+      });
     
-      hashed.addEventListener('click', function(){
+      attach(hashed, 'click', function(){
         var url = qualify('/hashed.json?email=') + encodeURIComponent(getEmail())
         issue([url]);
-      },false)
+      });
 
       // added to test whether proper error message is thrown for invalid assertion 
-      invalid.addEventListener('click', function(){
+      attach(invalid, 'click', function(){
         var url = qualify('/invalid.json?email=') + encodeURIComponent(getEmail());
         issue(url);
-      },false)
+      });
     
-      signature.addEventListener('click', function(){
+      attach(signature, 'click', function(){
         var assertion = getEmail();
         issue(assertion);
-      },false)
+      });
     
+      document.write('<script src="//' + location.hostname +
+                     ':8888/issuer.js"></' + 'script>');
     </script>
-    <script src="http://localhost:8888/issuer.js"></script>
   </body>
 </html>
