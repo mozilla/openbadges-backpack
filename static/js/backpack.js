@@ -587,7 +587,7 @@ Group.fromElement = function (element) {
  */
 Badge.fromElement = function (element) {
   var $el = $(element)
-  var model = new Badge.Model(JSON.parse($el.attr('data-serialization')));
+  var model = new Badge.Model($el.data('serialization'));
   new Badge.View({ model: model }).attachToExisting($el);
   if (!AllBadges.get(model.id)) AllBadges.add(model);
   return model;
