@@ -27,7 +27,7 @@
         {% block badgeItems %}
           {% for badge in badges %}
             <li class="span3 openbadge-container">
-              <div class="openbadge" data-id="{{badge.attributes.id}}">
+              <div class="openbadge" data-id="{{badge.attributes.id}}" data-serialization="{{badge.serializedAttributes|e}}">
                 <img src="{{ badge.attributes.imageUrl }}" width="64">
                 <p class="title" title="{{ badge.attributes.body.badge.name|e }}">{{ badge.attributes.body.badge.name|e }}</p>
                 <p class="issuer">Issuer: {{ badge.attributes.body.badge.issuer.name|e }}</p>
@@ -52,14 +52,6 @@
 {% endblock %}
 
 {% block scripts %}
-
-<!-- bootstrap some data -->
-<script>
-  window.badgeData = {};
-  {% for badge in badges %}
-    window.badgeData[{{badge.attributes.id}}] = {{badge.serializedAttributes}};
-  {% endfor %}
-</script>
 
 <!-- third party -->
 {% if settings.useCompiledTemplates %}
