@@ -47,10 +47,18 @@ exports.baker = function (req, res) {
     function bakeBadge(info, callback) {
       const image = preferedImage(info.resources);
       awardOptions.assertion = info.structures.assertion;
-      bakery.bake({
-        image: image,
-        data: url
-      }, callback)
+      try {
+        bakery.bake({
+          image: image,
+          data: url
+        }, callback)
+      }
+      catch (ex) {
+        callback({
+          error: 'Unable to bake',
+          reason:ex.toString()
+        });
+      }
     },
     function maybeAward(imageData, callback) {
       const shouldAward = query.award && query.award !== 'false';
