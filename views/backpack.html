@@ -34,7 +34,7 @@
             </span>
 
             {% for badge in group.attributes.badgeObjects %}
-            <span draggable="true" class="openbadge" data-id="{{badge.attributes.id}}">
+            <span draggable="true" class="openbadge" data-id="{{badge.attributes.id}}" data-serialization="{{badge.serializedAttributes|e}}">
               <img src="{{ badge.attributes.imageUrl }}" width="64px"/>
             </span>
             {% endfor %}
