@@ -2,7 +2,7 @@ var _ = require('underscore');
 var Group = require('../models/group.js');
 var Portfolio = require('../models/portfolio.js');
 var Badge = require('../models/badge.js');
-var logger = require('../lib/logging').logger;
+const logger = require('../lib/logger');
 
 function makeBadgeObj(attr) { return new Badge(attr) }
 
@@ -48,8 +48,7 @@ exports.create = function (request, response) {
 
   group.save(function (err, group) {
     if (err) {
-      logger.debug('there was some sort of error creating a group:');
-      logger.debug(err);
+      logger.debug(err, 'there was some sort of error creating a group');
       return response.send('there was an error', 500);
     }
     response.contentType('json');
@@ -102,8 +101,7 @@ exports.update = function (request, response) {
 
   group.save(function (err) {
     if (err) {
-      logger.debug('there was an error updating a group:');
-      logger.debug(err);
+      logger.debug(err, 'there was an error updating a group');
       return response.send({
         status: 'error',
         error: 'there was an unknown error. it has been logged.'
@@ -140,8 +138,7 @@ exports.destroy = function (request, response) {
   // find any profile associated with this group and delete it
   Portfolio.findOne({group_id: group.get('id')}, function (err, folio) {
     if (err) {
-      logger.debug('error finding portfolios:');
-      logger.debug(err);
+      logger.debug(err, 'error finding portfolios');
       return response.send({
         status: 'error',
         error: 'there was some sort of error and it has been logged'
@@ -152,8 +149,7 @@ exports.destroy = function (request, response) {
 
     group.destroy(function (err) {
       if (err) {
-        logger.debug('error deleting group');
-        logger.debug(err);
+        logger.debug(err, 'error deleting group');
         return response.send({
           status: 'error',
           error: 'there was some sort of error and it has been logged'

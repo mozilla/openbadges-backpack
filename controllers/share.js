@@ -5,7 +5,7 @@ var Badge = require('../models/badge');
 var Portfolio = require('../models/portfolio');
 var Group = require('../models/group');
 var configuration = require('../lib/configuration');
-var logger = require('../lib/logging').logger;
+const logger = require('../lib/logger');
 
 exports.findGroupByUrl = function findGroupByUrl(req, res, next, url) {
   Group.findOne({url: url}, function (err, group) {

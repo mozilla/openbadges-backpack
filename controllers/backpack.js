@@ -6,7 +6,7 @@ const async = require('async');
 const url = require('url');
 const bakery = require('openbadges-bakery');
 
-const logger = require('../lib/logging').logger;
+const logger = require('../lib/logger');
 const configuration = require('../lib/configuration');
 const browserid = require('../lib/browserid');
 const awardBadge = require('../lib/award');

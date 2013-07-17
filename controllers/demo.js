@@ -5,7 +5,7 @@ var path = require('path');
 var configuration = require('../lib/configuration');
 var request = require('request');
 var awardBadge = require('../lib/award');
-var logger = require('../lib/logging').logger;
+const logger = require('../lib/logger');
 
 var protocol = configuration.get('protocol') || 'http';
 var port = configuration.get('port') || '';
@@ -58,7 +58,7 @@ exports.massAward = function (req, res) {
         recipient: email
       }, function(err) {
         if (err)
-          logger.debug('baller, please:', err.message);
+          logger.debug('baller, please: %s', err.message);
       });
     });
   res.redirect('/', 303);

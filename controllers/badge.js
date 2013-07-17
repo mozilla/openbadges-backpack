@@ -1,7 +1,7 @@
 const async = require('async');
 const Badge = require('../models/badge');
 const BadgeImage = require('../models/badge-image');
-const logger = require('../lib/logging').logger;
+const logger = require('../lib/logger');
 const utils = require('../lib/utils');
 
 function respond(status, message) {
@@ -110,8 +110,7 @@ exports.destroy = function destroy(req, res) {
     }
   ], function (err, results) {
     if (err) {
-      logger.warn('Failed to delete badge');
-      logger.warn(err);
+      logger.warn(err, 'Failed to delete badge');
       return res.send(500, respond('error', 'Could not delete badge: ' + err));
     }
     return res.send(200, { status: 'okay' });

@@ -1,7 +1,7 @@
 var express = require('express');
 var secrets = require('./lib/secrets');
 var configuration = require('./lib/configuration');
-var logger = require('./lib/logging').logger;
+const logger = require('./lib/logger');
 var crypto = require('crypto');
 var User = require('./models/user');
 var path = require('path');
@@ -72,8 +72,7 @@ exports.userFromSession = function userFromSession() {
 
     User.findOrCreate(email, function (err, user) {
       if (err) {
-        logger.error("Problem finding/creating user:");
-        logger.error(err);
+        logger.error(err, "Problem finding/creating user");
         return next(err);
       }
       req.user = res.locals.user = user;
