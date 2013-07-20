@@ -8,7 +8,7 @@ const async = require('async');
 
 // local requirements
 const regex = require('../lib/regex');
-const logger = require('../lib/logging').logger;
+const logger = require('../lib/logger');
 const awardBadge = require('../lib/award');
 const Badge = require('../models/badge');
 const analyzeAssertion = require('../lib/analyze-assertion');
@@ -74,7 +74,7 @@ exports.baker = function (req, res) {
       res.setHeader('Content-Type', 'image/png');
       res.setHeader('Content-Disposition', 'attachment; filename="' + filename + '"');
       if (badge) {
-        logger.warn('badge awarded through baker:', url);
+        logger.warn('badge awarded through baker: %s', url);
         res.setHeader('x-badge-awarded', query.award);
       }
       res.send(imageData);

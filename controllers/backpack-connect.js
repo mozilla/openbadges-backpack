@@ -1,6 +1,6 @@
 var url = require('url');
 var utils = require('../lib/utils');
-var logger = require('../lib/logging').logger;
+const logger = require('../lib/logger');
 
 var BackpackConnect = module.exports = function BackpackConnect(options) {
   this.Model = options.Model ||

@@ -3,7 +3,7 @@ var Group = require('../models/group.js');
 var Badge = require('../models/badge.js');
 var User = require('../models/user.js');
 var conf = require('../lib/configuration');
-var logger = require('../lib/logging').logger;
+const logger = require('../lib/logger');
 var utils = require('../lib/utils');
 
 // Helpers
@@ -42,9 +42,7 @@ function determineFormat(req) {
  */
 
 function logFormatterError(req) {
-  logger.debug('could not find a formatter for api request');
-  logger.debug('  url: ' + req.url);
-  logger.debug('  accept header: ' + req.headers['accept']);
+  logger.debug({ req: req }, 'could not find a formatter for api request');
 }
 
 /**
@@ -144,9 +142,7 @@ exports.emailToUserId = function emailToUserId(req, res, next) {
 
   User.findOne({ email: email }, function (err, user) {
     if (err) {
-      logger.debug('displayer#emailToUserId: there was an error getting the user');
-      logger.debug('email: ' + email);
-      logger.debug('error: ' + JSON.stringify(err));
+      logger.debug(err, 'displayer#emailToUserId: there was an error getting the user %s', email);
       return res.send(400, {
         status: 'error',
         error: 'error trying to pull user `' + email + '` from database'

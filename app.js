@@ -10,7 +10,7 @@ var http = require('http');
 var fs = require('fs');
 var path = require('path');
 var middleware = require('./middleware');
-var logger = require('./lib/logging').logger;
+var logger = require('./lib/logger');
 var browserid = require('./lib/browserid');
 var configuration = require('./lib/configuration');
 var flash = require('connect-flash');
@@ -76,7 +76,7 @@ app.configure('development', function () {
     app.set('sha', sha);
   }
   catch (ex) {
-    logger.warn(ex.message);
+    logger.warn(ex);
   }
   browserid.configure({testUser: process.env['BROWSERID_TEST_USER']});
 });
@@ -174,8 +174,8 @@ if (!module.parent) {
     var pidfile = path.join(app.config.get('var_path'), 'server.pid');
 
     app.listen(port);
-    app.logger.info('environment: ' + process.env['NODE_ENV']);
-    app.logger.info('opening server on port: ' + port);
+    app.logger.info('environment: %s', process.env['NODE_ENV']);
+    app.logger.info('opening server on port: %s', port);
     app.logger.info('READY PLAYER ONE');
 
     fs.unlink(pidfile, function () {

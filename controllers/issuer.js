@@ -3,7 +3,7 @@ const request = require('request');
 const fs = require('fs');
 const url = require('url');
 const validator = require('openbadges-validator');
-const logger = require('../lib/logging').logger;
+const logger = require('../lib/logger');
 const awardBadge = require('../lib/award');
 const Badge = require('../models/badge.js');
 const regex = require('../lib/regex.js');
@@ -178,8 +178,7 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
 
   analyzeAssertion(input, function (err, data) {
     if (err) {
-      logger.debug('there was an error analyzing the assertion');
-      console.dir(err);
+      logger.debug(err, 'there was an error analyzing the assertion');
 
       if (err.code === 'resources')
         err.message = 'Could not get all linked resources';
@@ -222,10 +221,9 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
       return awardBadge(opts, function (err, badge) {
         if (err) {
           const errorMessage = "badge error " + input + err;
-          logger.error(errorMessage);
+          logger.error(err, errorMessage);
           // check if this badge is a duplicate, currently in the
           // error message
-          logger.error(err);
           const dupeRegex = /Duplicate entry/;
           if (dupeRegex.test(err)) {
             return res.json({

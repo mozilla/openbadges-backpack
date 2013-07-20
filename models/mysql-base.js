@@ -1,4 +1,3 @@
-var logger = require('../lib/logging').logger;
 var client = require('../lib/mysql').client;
 
 var Base = function () { };
