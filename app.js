@@ -134,7 +134,7 @@ app.get('/backpack/add', backpack.addBadge);
 app.get('/backpack/login', backpack.login);
 app.get('/backpack/signout', backpack.signout);
 app.post('/backpack/badge', middleware.statsdRequests(), backpack.userBadgeUpload);
-app.post('/backpack/authenticate', middleware.statsdRequests(), backpack.authenticate);
+app.post('/backpack/authenticate', backpack.authenticate);
 app.get('/backpack/settings', backpack.settings());
 app.post('/backpack/settings/revoke-origin', backpackConnect.revokeOrigin());
 app.get('/stats', backpack.stats);
