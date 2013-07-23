@@ -8,6 +8,7 @@ var User = require('./models/user');
 var path = require('path');
 var lessMiddleware = require('less-middleware');
 var _ = require('underscore');
+var statsd = require('./lib/statsd');
 
 // `COOKIE_SECRET` is randomly generated on the first run of the server,
 // then stored to a file and looked up on restart to maintain state.
@@ -63,6 +64,21 @@ exports.logRequests = function logRequests() {
     if (heartbeat || req.url.indexOf(imgPrefix) === 0)
       return next();
     requestLogger(req, res, next);
+  };
+};
+
+exports.statsdRequests = function statsdRequests () {
+  return function (req, res, next) {
+    var sprintf = function (format) {
+      for (var i = 1; i < arguments.length; i++) {
+        format = format.replace(/%s/, arguments[i]);
+      }
+      return format;
+    }
+
+    var bucket = sprintf('obi%s.%s', req.url.replace(/\//g, '.'), req.method.toLowerCase());
+    statsd.increment(bucket);
+    return next();
   };
 };
 
