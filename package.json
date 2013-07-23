@@ -35,7 +35,8 @@
     "async": "~0.2.6",
     "bunyan": "~0.21.4",
     "gelf-stream": "~0.2.2",
-    "request": "~2.27.0"
+    "request": "~2.27.0",
+    "node-statsd": "~0.0.7"
   },
   "engines": {
     "node": ">=0.8"
