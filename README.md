@@ -188,6 +188,6 @@ environment variable `NODE_ENV=production`. These differences include:
 
 ## Related Projects
 * https://github.com/lmorchard/django-badger -- Issuing app for Django
-* https://github.com/ralphbean/tahrir -- A pyramid (python) app for issuing your own Open Badges
+* https://github.com/fedora-infra/tahrir -- A Pyramid (Python) app for issuing your own Open Badges.
 * https://github.com/openmichigan/open_badges -- Drupal module for managing/issuing badges
 * https://github.com/PRX/badges_engine -- Rails Engine for issuing.
