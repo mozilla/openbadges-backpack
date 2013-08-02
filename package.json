@@ -30,7 +30,7 @@
     "up": "~0.2.2",
     "optimist": "~0.3.0",
     "openbadges-validator": "0.0.21",
-    "openbadges-bakery": "0.2.5",
+    "openbadges-bakery": "0.2.6",
     "newrelic": "~0.9.19",
     "async": "~0.2.6",
     "bunyan": "~0.21.4"
