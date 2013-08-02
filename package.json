@@ -33,7 +33,8 @@
     "openbadges-bakery": "0.2.6",
     "newrelic": "~0.9.19",
     "async": "~0.2.6",
-    "bunyan": "~0.21.4"
+    "bunyan": "~0.21.4",
+    "gelf-stream": "~0.2.2"
   },
   "engines": {
     "node": "0.8.x"
