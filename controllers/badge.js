@@ -18,7 +18,7 @@ function respond(status, message) {
 exports.findById = function findById(req, res, next, id) {
   Badge.findById(id, function (err, badge) {
     if (!badge)
-      return res.send(respond('missing', 'could not find badge'), 404);
+      return res.send(404, respond('missing', 'could not find badge'));
 
     req.badge = badge;
     return next();
@@ -35,7 +35,7 @@ exports.findById = function findById(req, res, next, id) {
 exports.findByUrl = function findByUrl(req, res, next, url) {
   Badge.findByUrl(url, function (err, badge) {
     if (!badge)
-      return res.send(respond('missing', 'could not find badge'), 404);
+      return res.send(404, respond('missing', 'could not find badge'));
 
     req.badge = badge;
     return next();
@@ -63,7 +63,7 @@ exports.image = function image(req, res, next) {
 exports.share = function share(req, res, next) {
   req.badge.share(function(err, badge) {
     if (err) throw err;
-    return res.redirect('/share/badge/' + badge.attributes.public_path, 303);
+    return res.redirect(303, '/share/badge/' + badge.attributes.public_path);
   });
 };
 

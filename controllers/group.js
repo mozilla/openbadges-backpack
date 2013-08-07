@@ -10,17 +10,17 @@ exports.findById = function findById(req, res, next, id) {
   Group.findById(id, function (err, group) {
     if (err) {
       logger.error("Error pulling group: " + err);
-      return res.send({
+      return res.send(500, {
         status: 'error',
         error: 'Error pulling group'
-      }, 500);
+      });
     }
 
     if (!group)
-      return res.send({
+      return res.send(404, {
         status: 'missing',
         error: 'Could not find group'
-      }, 404);
+      });
 
     req.group = group;
     return next();
@@ -29,13 +29,13 @@ exports.findById = function findById(req, res, next, id) {
 
 exports.create = function (request, response) {
   if (!request.user)
-    return response.json({error: 'no user'}, 403);
+    return response.json(403, {error: 'no user'});
 
   if (!request.body)
-    return response.json({error: 'no badge body'}, 400);
+    return response.json(400, {error: 'no badge body'});
 
   if (!request.body.badges)
-    return response.json({error: 'no badges'}, 400);
+    return response.json(400, {error: 'no badges'});
 
   var user = request.user;
   var body = request.body;
@@ -49,7 +49,7 @@ exports.create = function (request, response) {
   group.save(function (err, group) {
     if (err) {
       logger.debug(err, 'there was some sort of error creating a group');
-      return response.send('there was an error', 500);
+      return response.send(500, 'there was an error');
     }
     response.contentType('json');
     response.send({id: group.get('id'), url: group.get('url')});
@@ -58,28 +58,28 @@ exports.create = function (request, response) {
 
 exports.update = function (request, response) {
   if (!request.user)
-    return response.send({
+    return response.send(403, {
       status: 'forbidden',
       error: 'user required'
-    }, 403);
+    });
 
   if (!request.group)
-    return response.send({
+    return response.send(404, {
       status: 'missing-required',
       error: 'missing group to update'
-    }, 404);
+    });
 
   if (request.user.get('id') !== request.group.get('user_id'))
-    return response.send({
+    return response.send(403, {
       status: 'forbidden',
       error: 'you cannot modify a group you do not own'
-    }, 403);
+    });
 
   if (!request.body)
-    return response.send({
+    return response.send(400, {
       status: 'missing-required',
       error: 'missing fields to update'
-    }, 400);
+    });
 
   var group = request.group;
   var body = request.body;
@@ -102,10 +102,10 @@ exports.update = function (request, response) {
   group.save(function (err) {
     if (err) {
       logger.debug(err, 'there was an error updating a group');
-      return response.send({
+      return response.send(500, {
         status: 'error',
         error: 'there was an unknown error. it has been logged.'
-      }, 500);
+      });
     }
 
     response.contentType('json');
@@ -118,31 +118,31 @@ exports.destroy = function (request, response) {
   var group = request.group;
 
   if (!user)
-    return response.send({
+    return response.send(403, {
       status: 'forbidden',
       error: 'user required'
-    }, 403);
+    });
 
   if (!group)
-    return response.send({
+    return response.send(404, {
       status: 'missing-required',
       error: 'missing group to update'
-    }, 404);
+    });
 
   if (group.get('user_id') !== user.get('id'))
-    return response.send({
+    return response.send(403, {
       status: 'forbidden',
       error: 'you cannot modify a group you do not own'
-    }, 403);
+    });
 
   // find any profile associated with this group and delete it
   Portfolio.findOne({group_id: group.get('id')}, function (err, folio) {
     if (err) {
       logger.debug(err, 'error finding portfolios');
-      return response.send({
+      return response.send(500, {
         status: 'error',
         error: 'there was some sort of error and it has been logged'
-      }, 500);
+      });
     }
 
     if (folio) folio.destroy();
@@ -150,10 +150,10 @@ exports.destroy = function (request, response) {
     group.destroy(function (err) {
       if (err) {
         logger.debug(err, 'error deleting group');
-        return response.send({
+        return response.send(500, {
           status: 'error',
           error: 'there was some sort of error and it has been logged'
-        }, 500);
+        });
       }
       response.send({status: 'okay'});
     });

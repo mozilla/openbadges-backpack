@@ -103,11 +103,11 @@ exports.stats = function stats(request, response, next) {
   // we make sure the current user is in that list. for posterity, we
   // log everytime a user accesses the stats page.
   if (!user)
-    return response.send('Must be logged in', 403);
+    return response.send(403, 'Must be logged in');
   if (!adminUsers)
     return response.send('Not implemented.')
   if (adminUsers.indexOf(user.get('email')) < 0)
-    return response.send('Must be an admin user', 403);
+    return response.send(403, 'Must be an admin user');
   logger.info(user.get('email') + ' is accessing /stats');
 
   async.parallel({

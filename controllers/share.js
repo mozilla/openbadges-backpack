@@ -11,11 +11,11 @@ exports.findGroupByUrl = function findGroupByUrl(req, res, next, url) {
   Group.findOne({url: url}, function (err, group) {
     if (err) {
       logger.error("Error pulling group: " + err);
-      return res.send('Error pulling group', 500);
+      return res.send(500, 'Error pulling group');
     }
 
     if (!group)
-      return res.send('Could not find group', 404);
+      return res.send(404, 'Could not find group');
 
     Portfolio.findOne({group_id: group.get('id')}, function (err, portfolio) {
       if (err)
@@ -51,10 +51,10 @@ exports.editor = function (request, response) {
   var group = request.group;
 
   if (!user)
-    return response.send('nope', 403);
+    return response.send(403, 'nope');
 
   if (user.get('id') !== group.get('user_id'))
-    return response.send('nope', 403);
+    return response.send(403, 'nope');
 
   var portfolio = group.get('portfolio');
   if (!portfolio)
@@ -104,7 +104,7 @@ exports.show = function (request, response, next) {
   // If there is no portfolio and this is the owner, create and save a new
   // portfolio object. Otherwise, kick the user out.
   if (!portfolio) {
-    if (!owner) return response.send('no portfolio :(', 404);
+    if (!owner) return response.send(404, 'no portfolio :(');
     portfolio = new Portfolio({
       group_id: group.get('id'),
       title: group.get('name'),
@@ -135,10 +135,10 @@ exports.createOrUpdate = function (request, response) {
   var user = request.user;
 
   if (!user)
-    return response.send('Forbidden', 403);
+    return response.send(403, 'Forbidden');
 
   if (group.get('user_id') !== user.get('id'))
-    return response.send('Forbidden', 403);
+    return response.send(403, 'Forbidden');
 
   var stories = {};
   var submitted = request.body;
@@ -156,6 +156,6 @@ exports.createOrUpdate = function (request, response) {
   });
 
   portfolio.save(function (err, p) {
-    return response.redirect(request.url, '303');
+    return response.redirect(303, request.url);
   });
 };
