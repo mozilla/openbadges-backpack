@@ -1,7 +1,8 @@
 var express = require('express');
 var secrets = require('./lib/secrets');
 var configuration = require('./lib/configuration');
-const logger = require('./lib/logger');
+var logger = require('./lib/logger');
+var util = require('util');
 var crypto = require('crypto');
 var User = require('./models/user');
 var path = require('path');
@@ -28,14 +29,31 @@ exports.cookieSessions = function cookieSessions() {
   });
 };
 
-var requestLogger = express.logger({
-  format: 'dev',
-  stream: {
-    write: function (x) {
-      logger.info(typeof x === 'string' ? x.trim() : x);
-    }
-  }
-});
+var requestLogger = function requestLogger(req, res, next) {
+  const startTime = new Date();
+  logger.info({
+    req: req
+  }, util.format(
+    'Incoming Request: %s %s',
+    req.method, req.url));
+
+  // this method of hijacking res.end is inspired by connect.logger()
+  // see connect/lib/middleware/logger.js for details
+  const end = res.end;
+  res.end = function(chunk, encoding) {
+    const responseTime = new Date() - startTime;
+    res.end = end;
+    res.end(chunk, encoding);
+    logger.info({
+      url: req.url,
+      responseTime: responseTime,
+      res: res,
+    }, util.format(
+      'Outgoing Response: HTTP %s %s (%s ms)',
+      res.statusCode, req.url, responseTime));
+  };
+  return next();
+};
 
 const imgPrefix = '/images/badge/';
 exports.logRequests = function logRequests() {
