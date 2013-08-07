@@ -61,7 +61,7 @@ exports.massAward = function (req, res) {
           logger.debug('baller, please: %s', err.message);
       });
     });
-  res.redirect('/', 303);
+  res.redirect(303, '/');
 };
 
 // Create a demo badge. Optionally override default values by providing GET

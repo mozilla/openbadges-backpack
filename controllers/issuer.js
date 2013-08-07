@@ -121,7 +121,7 @@ exports.frameless = function (req, res) {
   for (var i = 0, assertion; assertion = assertions[i]; i++) {
     if (!isValidInput(assertion)) {
       logger.error("malformed assertion " + assertion + " returning 400");
-      return res.send('assertion must be url or signature', 400);
+      return res.send(400, 'assertion must be url or signature');
     }
   }
   res.header('Cache-Control', 'no-cache, must-revalidate');
@@ -152,10 +152,10 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
   const success = req.flash('success');
 
   // is the user logged in? if not, suggest they redirect to the login page
-  if (!user) return res.json({
+  if (!user) return res.json(403, {
     message: "user is not logged in, redirect to /backpack/login",
     redirect_to: '/backpack/login'
-  }, 403);
+  });
 
   const input = req.query.assertion || req.body.assertion || req.body.badge;
   const assertionIsSignature = validator.isSignedBadge(input);
@@ -164,16 +164,16 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
   // no assertion was passed, return error
   if (!input) {
     logger.error("didn't receive an assertion returning 400");
-    return res.json({
+    return res.json(400, {
       message: 'must provide either url or signature'
-    }, 400);
+    });
   }
 
   if (!assertionIsUrl && !assertionIsSignature) {
     logger.error("malformed assertion " + input + " returning 400");
-    return res.json({
+    return res.json(400, {
       message: 'malformed assertion, must be a url or signature'
-    }, 400);
+    });
   }
 
   analyzeAssertion(input, function (err, data) {
@@ -188,7 +188,7 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
         err.message = 'Could not parse the '+err.field+' file at '+err.url+' file';
       if (err.code === 'http-status')
         err.message = 'Tried to get '+err.field+' file at '+err.url+' and got an HTTP '+err.received;
-      return res.json(err, 400);
+      return res.json(400, err);
     }
 
     const assertion = normalizeAssertion(data);
@@ -197,16 +197,16 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
     const origin = assertion.badge.issuer.origin;
 
     if (req.method == 'POST' &&  !userOwnsBadge) {
-      return res.json({
+      return res.json(403, {
         message: "badge assertion is for a different user"
-      }, 403);
+      });
     }
 
     if (req.backpackConnect &&
         req.backpackConnect.get('origin') != origin)
-      return res.json({
+      return res.json(400, {
         message: "issuer origin must be identical to bearer token origin"
-      }, 400);
+      });
 
     // awarding the badge, only done if this is a POST
     if (req.method == 'POST') {
@@ -226,24 +226,24 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
           // error message
           const dupeRegex = /Duplicate entry/;
           if (dupeRegex.test(err)) {
-            return res.json({
+            return res.json(304, {
               badge: assertion,
               exists: true,
               message: "badge already exists"
-            }, 304);
+            });
           }
           // return a general error message
-          return res.json({
+          return res.json(500, {
             badge: assertion,
             exists: false,
             message: errorMessage
-          }, 500);
+          });
         }
         logger.debug("badge added " + input);
-        return res.json({
+        return res.json(201, {
           exists: false,
           badge: assertion
-        }, 201);
+        });
       });
     }
 
@@ -268,7 +268,7 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
     Badge.findOne(conditions, function (err, badge) {
       if (err) {
         logger.error(err);
-        return res.json({message: "internal server error"}, 500);
+        return res.json(500, {message: "internal server error"});
       }
 
       if (badge && badge.get("user_id") == req.user.get("id"))
@@ -277,19 +277,19 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
       if (Badge.confirmRecipient(assertion, req.user.get('email')))
         response.owner = true;
 
-      return res.json(response, 200);
+      return res.json(200, response);
     });
   });
 };
 
 exports.welcome = function(request, response, next) {
   var user = request.user;
-  if (!user) return response.redirect('/backpack/login', 303);
+  if (!user) return response.redirect(303, '/backpack/login');
 
   function makeResponse(err, badges) {
     if (err) return next(err);
     if (badges && badges.length)
-      return response.redirect('/', 303);
+      return response.redirect(303, '/');
     else
       return response.render('issuer-welcome.html');
   }
