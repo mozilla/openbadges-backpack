@@ -5,7 +5,8 @@ var backpack = require('../../');
 
 exports.app = function(options) {
   options = _.defaults(options || {}, {
-    origin: 'http://example.org'
+    origin: 'http://example.org',
+    cookieSecret: 's3cret'
   });
 
   return backpack.app.build(options);
