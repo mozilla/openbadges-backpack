@@ -5,7 +5,7 @@ var testUtil = require('./lib/util');
 var request = testUtil.request;
 
 describe("app", function() {
-  it('should report errors', function(done) {
+  it('reports errors', function(done) {
     sinon.stub(process.stderr, 'write');
 
     request({
@@ -24,7 +24,7 @@ describe("app", function() {
       });
   });
 
-  it('should protect endpoints with CSRF', function(done) {
+  it('protects endpoints with CSRF', function(done) {
     request()
       .post('/blargy')
       .expect('Content-Type', 'text/plain')
