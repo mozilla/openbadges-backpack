@@ -1,10 +1,8 @@
-var request = require('supertest');
-
-var backpack = require('../');
+var testUtil = require('./lib/util');
 
 describe("app", function() {
   it("returns 'HELLO WORLD' at /", function(done) {
-    request(backpack.app.build())
+    testUtil.request()
       .get('/')
       .expect(200)
       .expect('HELLO WORLD')
