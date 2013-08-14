@@ -1,7 +1,8 @@
 var should = require('should');
 var sinon = require('sinon');
 
-var request = require('./lib/util').request;
+var testUtil = require('./lib/util');
+var request = testUtil.request;
 
 describe("app", function() {
   it('should report errors', function(done) {
@@ -29,5 +30,21 @@ describe("app", function() {
       .expect('Content-Type', 'text/plain')
       .expect('Forbidden')
       .expect(403, done);
+  });
+
+  it('auto-escapes template variables', function(done) {
+    request({
+      defineExtraRoutes: function(app) {
+        app.get('/escaping', function(req, res) {
+          return res.render('escaping.html', {foo: '<script>'});
+        });
+      },
+      extraTemplateLoaders: [testUtil.templateLoader({
+        'escaping.html': 'hi {{foo}}'
+      })]
+    })
+      .get('/escaping')
+      .expect('hi &lt;script&gt;')
+      .expect(200, done);
   });
 });

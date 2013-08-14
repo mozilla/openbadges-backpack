@@ -17,3 +17,17 @@ exports.request = function(options) {
 
   return request(app);
 };
+
+exports.templateLoader = function FakeLoader(map) {
+  return {
+    getSource: function(name) {
+      if (name in map) {
+        return {
+          src: map[name],
+          path: name,
+          upToDate: function() { return true; }
+        };
+      }
+    }
+  };
+};
