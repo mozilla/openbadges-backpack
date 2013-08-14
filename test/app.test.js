@@ -4,14 +4,6 @@ var sinon = require('sinon');
 var request = require('./lib/util').request;
 
 describe("app", function() {
-  it("returns 'HELLO WORLD' at /", function(done) {
-    request()
-      .get('/')
-      .expect(200)
-      .expect('HELLO WORLD')
-      .end(done);
-  });
-
   it('should report errors', function(done) {
     sinon.stub(process.stderr, 'write');
 
