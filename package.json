@@ -1,0 +1,19 @@
+{
+  "name": "openbadges-backpack",
+  "description": "A simple Open Badges backpack.",
+  "version": "1.1.0",
+  "private": true,
+  "scripts": {
+    "test": "./node_modules/.bin/mocha test/*.test.js --check-leaks -R spec"
+  },
+  "devDependencies": {
+    "mocha": "1.12.0",
+    "supertest": "0.7.1"
+  },
+  "dependencies": {
+    "express": "3.0.6"
+  },
+  "engines": {
+    "node": "0.10.x"
+  }
+}
