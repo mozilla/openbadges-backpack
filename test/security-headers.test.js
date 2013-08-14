@@ -32,10 +32,22 @@ describe("app security headers", function() {
       .expect('X-Content-Type-Options', 'nosniff', done)
   });
 
-  it('enable content security policy', function(done) {
+  it('enable content security policy on self', function(done) {
     request()
       .get('/')
-      .expect('Content-Security-Policy', /'self'/, function(err, res) {
+      .expect('Content-Security-Policy', /'self'/, done);
+  });
+
+  it('enable content security policy on persona.org', function(done) {
+    request()
+      .get('/')
+      .expect('Content-Security-Policy', /persona\.org/, done);
+  });
+
+  it('do not allow eval() by default', function(done) {
+    request()
+      .get('/')
+      .end(function(err, res) {
         if (err) return done(err);
         res.headers['content-security-policy']
           .should.not.match(/'unsafe-eval'/);

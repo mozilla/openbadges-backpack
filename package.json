@@ -15,6 +15,7 @@
   "dependencies": {
     "express": "3.0.6",
     "client-sessions": "0.3.1",
+    "express-persona": "0.0.9",
     "nunjucks": "0.1.10",
     "underscore": "1.5.1"
   },
