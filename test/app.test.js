@@ -34,14 +34,12 @@ describe("app", function() {
 
   it('auto-escapes template variables', function(done) {
     request({
-      defineExtraRoutes: function(app) {
-        app.get('/escaping', function(req, res) {
+      testRoutes: {
+        'GET /escaping': function(req, res) {
           return res.render('escaping.html', {foo: '<script>'});
-        });
+        }
       },
-      extraTemplateLoaders: [testUtil.templateLoader({
-        'escaping.html': 'hi {{foo}}'
-      })]
+      testTemplates: {'escaping.html': 'hi {{foo}}'}
     })
       .get('/escaping')
       .expect('hi &lt;script&gt;')
@@ -58,6 +56,22 @@ describe("app", function() {
   it('defines PERSONA_JS_URL in app.locals', function() {
     testUtil.app().locals.PERSONA_JS_URL
       .should.match(/persona\.org\/include\.js/);
+  });
+
+  it('defines csrfToken in res.locals', function(done) {
+    request({testRoutes: {
+      'GET /csrf': function(req, res) {
+        res.send(typeof(res.locals.csrfToken) + res.locals.csrfToken.length);
+      }
+    }}).get('/csrf').expect('string24', done);
+  });
+
+  it('defines email in res.locals', function(done) {
+    request({testRoutes: {
+      'GET /email': function(req, res) {
+        res.send(typeof(res.locals.email) + res.locals.email.length);
+      }
+    }}).get('/email').expect('string0', done);
   });
 
   it('defines POST /persona/verify', function() {
