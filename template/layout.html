@@ -8,6 +8,13 @@
   <title>{% block title %}Open Badges Backpack{% endblock %}</title>
 </head>
 <body>
+  {% set flashMessages = fetchAndClearFlashMessages() %}
+  {% for message in flashMessages %}
+    <div class="{{ message.category }}">
+      {{ message.html|safe }}
+    </div>
+  {% endfor %}
+
   <div>
     {% if email %}
       <button class="js-logout" title="Logout {{email}}.">Logout</button>
