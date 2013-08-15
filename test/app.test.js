@@ -1,8 +1,7 @@
 var should = require('should');
 var sinon = require('sinon');
 
-var testUtil = require('./lib/util');
-var request = testUtil.request;
+var request = require('./lib/util').request;
 
 describe("app", function() {
   it('reports errors', function(done) {
@@ -21,30 +20,11 @@ describe("app", function() {
       });
   });
 
-  it('protects endpoints with CSRF', function(done) {
+  it('protects POST endpoints with CSRF', function(done) {
     request()
       .post('/blargy')
       .expect('Content-Type', 'text/plain')
       .expect('Forbidden')
       .expect(403, done);
-  });
-
-  it('defines PERSONA_JS_URL in app.locals', function() {
-    testUtil.app().locals.PERSONA_JS_URL
-      .should.match(/persona\.org\/include\.js/);
-  });
-
-  it('defines POST /persona/verify', function() {
-    testUtil.app()._router.matchRequest({
-      method: 'POST',
-      url: '/persona/verify'
-    }).should.be.a('object');
-  });
-
-  it('defines POST /persona/logout', function() {
-    testUtil.app()._router.matchRequest({
-      method: 'POST',
-      url: '/persona/logout'
-    }).should.be.a('object');
   });
 });
