@@ -48,6 +48,13 @@ describe("app", function() {
       .expect(200, done);
   });
 
+  it('defines DOT_MIN in app.locals', function() {
+    testUtil.app({debug: true}).locals.DOT_MIN
+      .should.equal('');
+    testUtil.app({debug: false}).locals.DOT_MIN
+      .should.equal('.min');
+  });
+
   it('defines PERSONA_JS_URL in app.locals', function() {
     testUtil.app().locals.PERSONA_JS_URL
       .should.match(/persona\.org\/include\.js/);

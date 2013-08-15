@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta name="csrf" content="{{ csrfToken }}">
+  <meta name="email" content="{{ email }}">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  {% block head %}{% endblock %}
+  <title>{% block title %}Open Badges Backpack{% endblock %}</title>
+</head>
+<body>
+  <div>
+    {% if email %}
+      <button class="js-logout" title="Logout {{email}}.">Logout</button>
+    {% else %}
+      <button class="js-login">Login</button>
+    {% endif %}
+  </div>
+
+  {% block content %}{% endblock %}
+
+  <script src="/vendor/jquery{{ DOT_MIN }}.js"></script>
+  <script src="{{ PERSONA_JS_URL }}"></script>
+  <script src="/js/login.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
