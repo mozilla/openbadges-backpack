@@ -6,15 +6,12 @@ var request = testUtil.request;
 
 describe("app", function() {
   it('reports errors', function(done) {
-    sinon.stub(process.stderr, 'write');
-
-    request({
-      defineExtraRoutes: function(app) {
-        app.get('/forced-error', function(req, res, next) {
-          next(new Error('omg kaboom'));
-        });
+    request({testRoutes: {
+      'GET /forced-error': function(req, res, next) {
+        sinon.stub(process.stderr, 'write');
+        next(new Error('omg kaboom'));
       }
-    })
+    }})
       .get('/forced-error')
       .expect('Sorry, something exploded!')
       .expect(500, function(err) {
