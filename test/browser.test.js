@@ -58,9 +58,13 @@ function runQunitTests(path, cb) {
 describe('Browser QUnit Tests (via PhantomJS)', function() {
   this.timeout(15000);
 
-  it('should all pass', function(done) {
-    runQunitTests('/test/', function() {
-      done();
+  if ('DISABLE_PHANTOM_TESTS' in process.env)
+    it.skip('skipped because DISABLE_PHANTOM_TESTS is set - ' +
+            process.env['DISABLE_PHANTOM_TESTS'], function() {});
+  else
+    it('should all pass', function(done) {
+      runQunitTests('/test/', function() {
+        done();
+      });
     });
-  });
 });
