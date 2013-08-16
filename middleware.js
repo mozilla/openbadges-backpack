@@ -30,32 +30,7 @@ exports.cookieSessions = function cookieSessions() {
   });
 };
 
-var requestLogger = function requestLogger(req, res, next) {
-  const startTime = new Date();
-  logger.info({
-    req: req
-  }, util.format(
-    'Incoming Request: %s %s',
-    req.method, req.url));
-
-  // this method of hijacking res.end is inspired by connect.logger()
-  // see connect/lib/middleware/logger.js for details
-  const end = res.end;
-  res.end = function(chunk, encoding) {
-    const responseTime = new Date() - startTime;
-    res.end = end;
-    res.end(chunk, encoding);
-    logger.info({
-      url: req.url,
-      responseTime: responseTime,
-      res: res,
-    }, util.format(
-      'Outgoing Response: HTTP %s %s (%s ms)',
-      res.statusCode, req.url, responseTime));
-  };
-  return next();
-};
-
+const requestLogger = logger.middleware();
 const imgPrefix = '/images/badge/';
 exports.logRequests = function logRequests() {
   return function (req, res, next) {

@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "test": "NODE_ENV=test ./node_modules/.bin/tap-prettify test/*.test.js",
-    "start": "./bin/db-migrate up && ./node_modules/.bin/up -w -n 1 -p 8888 app.js | ./node_modules/.bin/bunyan"
+    "start": "./bin/db-migrate up && ./node_modules/.bin/up -w -n 1 -p 8888 app.js | bunyan"
   },
   "devDependencies": {
     "jshint": "~0.6.2",
@@ -34,7 +34,7 @@
     "openbadges-bakery": "0.2.6",
     "newrelic": "~0.10.3",
     "async": "~0.2.6",
-    "bunyan": "~0.21.4",
+    "messina": "~0.1.0",
     "gelf-stream": "~0.2.2",
     "request": "~2.27.0",
     "node-statsd": "~0.0.7"
