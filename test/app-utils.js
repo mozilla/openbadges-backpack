@@ -122,6 +122,7 @@ function replaceModuleFunctionsForTesting(port) {
   var browserid = require('../lib/browserid');
   var middleware = require('../middleware');
   var conf = require('../lib/configuration');
+  var statsd = require('../lib/statsd');
   var testConf = {
     protocol: 'http:',
     hostname: 'localhost',
@@ -131,6 +132,7 @@ function replaceModuleFunctionsForTesting(port) {
   var originalUid = middleware.utils.uid;
   var originalCreateSecureToken = middleware.utils.createSecureToken;
   var originalConfGet = conf.get;
+  var originalIncrement = statsd.increment;
 
   conf.get = function fakeGet(val, env) {
     if (val in testConf)
@@ -150,11 +152,13 @@ function replaceModuleFunctionsForTesting(port) {
                  message: 'expected ' + JSON.stringify(expected) +
                        ' but got ' + JSON.stringify(opts.assertion)}, null);
   };
+  statsd.increment = function(bucket) {};
 
   return function undo() {
     conf.get = originalConfGet;
     browserid.verify = originalVerify;
     middleware.utils.uid = originalUid;
     middleware.utils.createSecureToken = originalCreateSecureToken;
+    statsd.increment = originalIncrement;
   };
 }
