@@ -46,51 +46,57 @@ These 3rd party tools may be useful in testing the Backpack:
 #### Baker
 
 * Manual baking
+    * **NO SCRIPT**: This functionality may currently be broken.
 * Baking API
+    * Through `curl` issue a `GET` request to `/baker?assertion=http://backpack.openbadges.org/demo/badge.json` on the server you are testing, and redirect output to a `.png` filename.
+        * You can optionally change `http://backpack.openbadges.org/` to be the server under test.
+        * E.g. ```curl http://openbadges.mofostaging.net/baker?assertion=http://openbadges.mofostaging.net/demo/badge.json > badge.png```
+    * Verify the PNG file is a baked badge.
 
 #### Backpack
 
 * Sign up
-    * **NO SCRIPT**: repeatedly testing sign up is incredibly tedious as it requires repeatedly creating/deleting Persona accounts.
-* Log in
+    * **NO SCRIPT**: Repeatedly testing sign up is incredibly tedious as it requires repeatedly creating/deleting Persona accounts.
+* Log in: *user should be able to log in*
     * Navigate to the appropriate Backpack server, e.g. http://openbadges.mofostaging.net.
     * Log out if already logged in.
     * Log in.
-        * *Note*: if logging in returns you to the log in screen with no error, delete old cookies for the site and try again.
-* Badge upload/deletion
+        * *Note*: If logging in returns you to the log in screen with no error, delete old cookies for the site and try again.
+* Badge upload/deletion: *user should be able to upload a baked badge, and delete badges from account*
     * Log in as `someone@mockmyid.com`.
     * Navigate to the badge upload page.
     * Upload a baked badge.
         * A badge baked for `someone@mockmyid.com` should be available [here][baked].
     * Verify that it appears in your badge list.
     * Delete it.
-* Badge views
+    * Refresh the page and ensure the badge remains deleted.
+* Badge views: *user should be able to view their badges*
     * View recent view.
     * Ensure that appropriate badges are shown.
     * View all view.
     * Ensure that appropriate badges are shown.
 * Collections
-    * Creation
+    * Creation: *user should be able to group their badges in collections*
         * Navigate to the collections page.
         * Drag badges, one at a time, into a new collection.
         * Ensure a new collection appears with the dragged badges.
-    * Deletion
+    * Deletion: *user should be able to delete collection*
         * Delete the collection.
         * Refresh the page.
         * Ensure the collection is gone.
 * Share pages
-    * Creation
+    * Creation: *user should be able to share collections*
         * Create a collection.
         * Click the share icon.
         * Ensure you are taken to a share page for the collection.
-    * Editing
+    * Editing: *user should be able to edit details of the share page*
         * Edit the share page title, subtitle, and badge stories.
         * Save the page.
         * Ensure your edits are preserved on the page you are shown.
-    * Logged out view
+    * Logged out view: *share pages should be publicly viewable*
         * Visit the share page url while logged out.
         * Ensure it looks appropriate and is not editable.
-    * Deletion
+    * Deletion: *share pages should go away when the underlying collection does*
         * Navigate to the collections screen. 
         * Delete the collection.
         * Navigate to the share page url and ensure it is not available.
@@ -99,17 +105,17 @@ These 3rd party tools may be useful in testing the Backpack:
 
 #### Displayer API
 
-* Retrieve user ID
+* Retrieve user ID: *user ID should be retreivable from account email*
   * Navigate to `/displayer/convert/email/` for the Backpack server you are testing.
   * Enter your account email address.
   * Run the converter and note the id returned.
-* Retrieve collections
+* Retrieve collections: *public collections should be listed*
   * Ensure you have a collection in your account.
   * Ensure its `public` checkbox is checked.
   * Through `curl` (or [hurl][]) issue a `GET` request to `/displayer/{{ ID }}/groups.json` on the server you are testing.
   * Ensure your public group is listed, with appropriate data.
   * Note the `groupId`.
-* Retrieve badges
+* Retrieve badges: *badges for public collections should be listed*
   * Through `curl` (or [hurl][]) issue a `GET` request to `/displayer/{{ ID }}/group/{{ groupId }}.json` on the server you are testing.
   * Ensure your grouped badges are listed, with appropriate data.
   
