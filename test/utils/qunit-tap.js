@@ -57,3 +57,9 @@ exports.testRunner = function(path) {
     });
   };
 };
+
+exports.details = function() {
+  return {
+    skip: ('DISABLE_PHANTOM_TESTS' in process.env)
+  };
+};
