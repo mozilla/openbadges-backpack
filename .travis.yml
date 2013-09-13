@@ -2,6 +2,7 @@ language: node_js
 node_js:
   - 0.8
   - 0.10
+env: DISABLE_PHANTOM_TESTS="see https://github.com/joyent/libuv/issues/826" 
 notifications:
   irc:
     - "irc.mozilla.org#badges"
