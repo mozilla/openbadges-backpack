@@ -16,9 +16,11 @@ These 3rd party tools may be useful in testing the Backpack:
 
 * [badgetest][]: Issues configurable junk badges for testing
 * [mockmyid][]: Useful for quick persona log-in through a throwaway account
+* [hurl][]: Web-based curl
 
 [badgetest]: http://badgetest.herokuapp.com
 [mockmyid]: http://mockmyid.com
+[hurl]: http://hurl.it
 
 ### Script
 #### Issuer API
@@ -49,20 +51,65 @@ These 3rd party tools may be useful in testing the Backpack:
 #### Backpack
 
 * Sign up
+    * **NO SCRIPT**: repeatedly testing sign up is incredibly tedious as it requires repeatedly creating/deleting Persona accounts.
 * Log in
+    * Navigate to the appropriate Backpack server, e.g. http://openbadges.mofostaging.net.
+    * Log out if already logged in.
+    * Log in.
+        * *Note*: if logging in returns you to the log in screen with no error, delete old cookies for the site and try again.
 * Badge upload/deletion
+    * Log in as `someone@mockmyid.com`.
+    * Navigate to the badge upload page.
+    * Upload a baked badge.
+        * A badge baked for `someone@mockmyid.com` should be available [here][baked].
+    * Verify that it appears in your badge list.
+    * Delete it.
 * Badge views
+    * View recent view.
+    * Ensure that appropriate badges are shown.
+    * View all view.
+    * Ensure that appropriate badges are shown.
 * Collections
     * Creation
+        * Navigate to the collections page.
+        * Drag badges, one at a time, into a new collection.
+        * Ensure a new collection appears with the dragged badges.
     * Deletion
+        * Delete the collection.
+        * Refresh the page.
+        * Ensure the collection is gone.
 * Share pages
     * Creation
+        * Create a collection.
+        * Click the share icon.
+        * Ensure you are taken to a share page for the collection.
     * Editing
-    * Deletion
+        * Edit the share page title, subtitle, and badge stories.
+        * Save the page.
+        * Ensure your edits are preserved on the page you are shown.
     * Logged out view
+        * Visit the share page url while logged out.
+        * Ensure it looks appropriate and is not editable.
+    * Deletion
+        * Navigate to the collections screen. 
+        * Delete the collection.
+        * Navigate to the share page url and ensure it is not available.
+
+[baked]: http://badgetest.herokuapp.com/baked/someone-at-mockmyid-dot-com.png
 
 #### Displayer API
 
 * Retrieve user ID
+  * Navigate to `/displayer/convert/email/` for the Backpack server you are testing.
+  * Enter your account email address.
+  * Run the converter and note the id returned.
 * Retrieve collections
+  * Ensure you have a collection in your account.
+  * Ensure its `public` checkbox is checked.
+  * Through `curl` (or [hurl][]) issue a `GET` request to `/displayer/{{ ID }}/groups.json` on the server you are testing.
+  * Ensure your public group is listed, with appropriate data.
+  * Note the `groupId`.
 * Retrieve badges
+  * Through `curl` (or [hurl][]) issue a `GET` request to `/displayer/{{ ID }}/group/{{ groupId }}.json` on the server you are testing.
+  * Ensure your grouped badges are listed, with appropriate data.
+  
