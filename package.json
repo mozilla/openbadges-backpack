@@ -4,7 +4,7 @@
   "version": "1.0.31",
   "private": true,
   "scripts": {
-    "test": "NODE_ENV=test ./node_modules/.bin/tap test/*.test.js",
+    "test": "NODE_ENV=test ./node_modules/.bin/tap-prettify test/*.test.js",
     "start": "./bin/db-migrate up && ./node_modules/.bin/up -w -n 1 -p 8888 app.js | ./node_modules/.bin/bunyan"
   },
   "devDependencies": {
@@ -15,7 +15,8 @@
     "jws": "0.2.2",
     "tap": "~0.3.2",
     "wd": "0.0.31",
-    "cheerio": "0.10.8"
+    "cheerio": "0.10.8",
+    "tap-prettify": "0.0.1"
   },
   "dependencies": {
     "connect-flash": "0.1.0",
