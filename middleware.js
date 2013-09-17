@@ -69,14 +69,7 @@ exports.logRequests = function logRequests() {
 
 exports.statsdRequests = function statsdRequests () {
   return function (req, res, next) {
-    var sprintf = function (format) {
-      for (var i = 1; i < arguments.length; i++) {
-        format = format.replace(/%s/, arguments[i]);
-      }
-      return format;
-    }
-
-    var bucket = sprintf('obi%s.%s', req.url.replace(/\//g, '.'), req.method.toLowerCase());
+    var bucket = util.format('obi%s.%s', req.url.replace(/\//g, '.'), req.method.toLowerCase());
     statsd.increment(bucket);
     return next();
   };
