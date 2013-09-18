@@ -16,7 +16,8 @@
     "tap": "~0.3.2",
     "wd": "0.0.31",
     "cheerio": "0.10.8",
-    "tap-prettify": "0.0.1"
+    "tap-prettify": "0.0.1",
+    "sinon": "~1.7.3"
   },
   "dependencies": {
     "connect-flash": "0.1.0",
