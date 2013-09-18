@@ -69,7 +69,7 @@ exports.logRequests = function logRequests() {
 
 exports.statsdRequests = function statsdRequests () {
   return function (req, res, next) {
-    var bucket = util.format('obi%s.%s', req.path.replace(/\//g, '.'), req.method.toLowerCase());
+    var bucket = util.format('paths%s.%s', req.path.replace(/\//g, '.'), req.method.toLowerCase());
     statsd.increment(bucket);
     return next();
   };
