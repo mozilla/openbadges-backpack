@@ -1,4 +1,5 @@
 var app = require('../../app'),
+    statsd = require('../../lib/statsd'),
     test = require('tap').test;
     spawn = require('child_process').spawn;
 
@@ -31,6 +32,7 @@ function start(path, cb) {
     log('running browser-based tests at ' + url + ' using phantomjs.');
     phantom.on('exit', function(status) {
       app.close();
+      statsd.socket.close();
       if (status != 0)
         throw new Error('process "' + cmdline + '" exited with status ' +
                         status);
