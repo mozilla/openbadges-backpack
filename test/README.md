@@ -19,6 +19,7 @@ These 3rd party tools may be useful in testing the Backpack:
 * [hurl][]: Web-based curl
 
 [badgetest]: http://badgetest.herokuapp.com
+[badgetest-https]: https://badgetest.herokuapp.com
 [mockmyid]: http://mockmyid.com
 [hurl]: http://hurl.it
 
@@ -42,6 +43,8 @@ These 3rd party tools may be useful in testing the Backpack:
     * Issue a badge to the appropriate server through Backpack Connect.
     * Visit the Backpack and ensure the badge is there.
     * Delete the badge.
+* Repeat for https
+    * Do the same three checks using [badgetest over https][badgetest-https].
 
 #### Baker
 
