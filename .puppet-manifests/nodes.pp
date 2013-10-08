@@ -1,3 +1,10 @@
+import 'aptupdate.pp'
+import 'essentials.pp'
+import 'mysql.pp'
+import 'openbadges.pp'
+import 'nginx.pp'
+import 'nvm.pp'
+
 node lucid32 {
   include aptupdate
   include essentials

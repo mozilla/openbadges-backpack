@@ -31,7 +31,7 @@ class openbadges::app ($node_version) {
   
   npm { "vows": }
   npm { "jshint": }
-  npm { "up": }
+  npm { "up-time": }
   
   file { "package.json":
     path => "/home/vagrant/package.json",
