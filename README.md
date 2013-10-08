@@ -6,8 +6,8 @@ We intend to provide an open set of specifications, tools and services for
 generating verifiable badges that users can take with them wherever they go
 and use however they like.
 
-The latest open standard we released can be found in the new assertion specification: [https://github.com/mozilla/openbadges/wiki/New-Assertion-Specification](https://github.com/mozilla/openbadges/wiki/New-Assertion-Specification). 
-The assertion includes the open standard, the metadata specification, we defined. 
+The latest open standard we released can be found in the new assertion specification: [https://github.com/mozilla/openbadges/wiki/New-Assertion-Specification](https://github.com/mozilla/openbadges/wiki/New-Assertion-Specification).
+The assertion includes the open standard, the metadata specification, we defined.
 
 For more information, check out http://openbadges.org
 
@@ -25,13 +25,13 @@ Usage example:
 1. Generate an assertion (see below) for the user recieving the badge.
 2. Store that assertion at a public-but-secret URL and serve it with
 `content-type: application/json`
-  
+
   * The assertion contains private information about a user, so you want a
     non-predictable URL scheme to prevent automated scraping.
-  
+
   * This URL should be stable - any badge issued from it relies on its
     existence for verification.
-  
+
   * Both of these problems will be solved in the near-term future by
     supporting signed assertions, so you'll only need to expose a URL
     containing your public key.
@@ -139,8 +139,7 @@ you have any problems setting up the environment, feel free to post a message to
 ### Optional: A real hostname
 
 I like to be able to use http://openbadges.local for accessing the
-project. Assuming you used vagrant, you can change the hostname in `local.js`
-and do `sudo echo "33.33.33.11 openbadges.local" >> /etc/hosts` to make it
+project. Assuming you used vagrant, you can `sudo echo "33.33.33.11 openbadges.local" >> /etc/hosts` to make it
 happen. If you're on OS X, you can also use
 [Gas Mask](http://code.google.com/p/gmask/) for temporary hosts file switching
 rather than having to manually edit /etc/hosts
@@ -157,7 +156,7 @@ migration. You can do this as follows:
    file preixed with a timestamp in the `migrations` directory.
    Something like the following should be displayed:
 
-       [INFO] Created migration at  
+       [INFO] Created migration at
        migrations/20130213205310-add-issuer-column.js
 
 3. Edit the new JS file as per the [node-db-migrate][] instructions.
@@ -171,12 +170,12 @@ And finally, note that during development, `npm start` automatically runs
 run this command yourself whenever you deploy changes that involve a
 schema change.
 
-If you want to write tests for your migration, check out 
+If you want to write tests for your migration, check out
 `test/migration.test.js` for inspiration.
 
   [node-db-migrate]: https://github.com/nearinfinity/node-db-migrate#creating-migrations
 
-### Production 
+### Production
 
 The codebase behaves slightly differently when run in an environment where
 environment variable `NODE_ENV=production`. These differences include:
