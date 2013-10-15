@@ -31,7 +31,7 @@
     "up-time": "~0.2.1",
     "optimist": "~0.3.0",
     "openbadges-validator": "0.0.21",
-    "openbadges-bakery": "0.2.6",
+    "openbadges-bakery": "0.2.7",
     "newrelic": "~0.10.3",
     "async": "~0.2.6",
     "messina": "~0.1.0",
