@@ -34,7 +34,7 @@
     "openbadges-bakery": "0.2.7",
     "newrelic": "~0.10.3",
     "async": "~0.2.6",
-    "messina": "~0.1.0",
+    "messina": "~0.1.1",
     "gelf-stream": "~0.2.2",
     "request": "~2.27.0",
     "node-statsd": "~0.0.7"
