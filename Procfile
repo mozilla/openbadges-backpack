@@ -1,0 +1,1 @@
+web: ./node_modules/.bin/up -n 1 -p $PORT app.js
