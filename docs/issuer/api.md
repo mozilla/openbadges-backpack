@@ -34,6 +34,14 @@ Presents the user with a modal dialog that requests their consent to add the iss
         * *reason* is an **Error Constant String** identifying the reason the assertion couldn't be added to the user's backpack.
     * *successes* is a list of badge assertions that were successfully added to the user's backpack.
 
+`OpenBadges.issue_no_modal(assertions)`
+
+Redirects the page to a full-window version of the modal dialog described above. While this does not allow the invocation of a callback with the results of the interaction, it is generally more compatible with older browsers.
+
+* *assertions* is a list of URLs or JSON Web Signatures that represent [badge assertions](https://github.com/mozilla/openbadges-specification/blob/master/Assertion/latest.md).
+
+
+
 ## Error Constant Strings
 
 * `DENIED` means that the user explicitly denied the badge from being added to their backpack.
