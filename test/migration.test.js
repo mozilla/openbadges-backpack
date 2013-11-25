@@ -295,3 +295,26 @@ testMigration("remove-non-normalized-badge-uploads", function(t, id, previousId)
     })
   ];
 });
+
+testMigration("add-baked-flag", function(t, id, previousId) {
+  return [
+    up({destination: previousId}),
+    sql("INSERT INTO `user` (id, email) VALUES (1,'foo@bar.org');"),
+    sql("INSERT INTO `badge` (id, user_id, image_path, body, body_hash)" +
+        "VALUES (1, 1, 'image.png', 'body', 'hash1')"),
+    sql("INSERT INTO `badge_image` (id, badge_hash, image_data)" +
+        "VALUES (1, 'hash1', 'data')"),
+    sql("INSERT INTO `badge` (id, user_id, image_path, body, body_hash)" +
+        "VALUES (2, 1, 'image.png', 'body', 'hash2')"),
+    sql("INSERT INTO `badge_image` (id, badge_hash, image_data)" +
+        "VALUES (2, 'hash2', 'data')"),
+    up({count: 1}),
+    sql("SELECT `baked` FROM `badge_image`", function(results) {
+      results.forEach(function (o) {
+        t.same(o.baked, 0, 'should be unbaked')
+      })
+    }),
+    down({count: 1}),
+    sqlError("SELECT `baked` FROM `badge_image`", t, "ERROR_BAD_FIELD_ERROR"),
+  ];
+});
