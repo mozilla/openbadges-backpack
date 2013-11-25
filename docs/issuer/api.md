@@ -1,3 +1,5 @@
+# Issuer API
+
 Technical Documentation below. Want to take a step back? Check out the [Issuer Onboarding Docs](https://wiki.mozilla.org/Badges/Onboarding-Issuer).
 
 The Issuer API is a script that can be dropped-in to any badge issuer's website to provide a way for users to add an issuer's badges to their backpack. It's a lightweight alternative to the [Backpack Connect API](https://github.com/mozilla/openbadges/wiki/Backpack-Connect:-Issuer-Documentation). 
