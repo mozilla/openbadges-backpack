@@ -24,7 +24,7 @@ The Issuer API provides the following methods.
 
 Presents the user with a modal dialog that requests their consent to add the issuer's badge(s) to their backpack. If the user is not currently logged into the backpack, they will first be asked to log in or create an account if necessary.
 
-* *assertions* is a list of URLs or JSON Web Signatures that represent [[badge assertions|Assertions]].
+* *assertions* is a list of URLs or JSON Web Signatures that represent [badge assertions](https://github.com/mozilla/openbadges-specification/blob/master/Assertion/latest.md).
  * [assertion validator](http://validator.openbadges.org/)
 * *callback* is a function that will be called when the user has completed their interaction with the modal dialog. The function is passed two positional arguments:
     * *errors* is a list of objects that provide information about any assertions that weren't able to be added to the user's backpack. Each object contains the following keys:
