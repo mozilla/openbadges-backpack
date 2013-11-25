@@ -9,6 +9,9 @@ var migrationDirFiles = require('fs').readdirSync(migrations.dir).sort();
 var validator = require('openbadges-validator');
 var normalizeAssertion = require('../lib/normalize-assertion');
 
+var argv = require('optimist').argv
+var specificMigrations = argv._
+
 function up(options) {
   return function(callback) { migrations.up(options, callback); };
 }
@@ -47,7 +50,7 @@ function findMigration(name) {
 
   for (var i = 0; i < migrationDirFiles.length; i++) {
     filename = migrationDirFiles[i];
-    match = filename.match(/^([0-9]+)-(.*)\.js$/);
+    var match = filename.match(/^([0-9]+)-(.*)\.js$/);
     if (match) {
       candidate = match[1] + '-' + match[2];
       if (match[2] == name)
@@ -59,6 +62,11 @@ function findMigration(name) {
 }
 
 function testMigration(name, getSeries) {
+  if (argv.solo && specificMigrations) {
+    if (specificMigrations.indexOf(name) == -1)
+      return console.error('skipping', name, '...')
+  }
+
   var migration = findMigration(name);
   var series = [
     mysql.dropTestDatabase,
