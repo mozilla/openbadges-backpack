@@ -1,4 +1,21 @@
 var OpenBadges = (function() {
+  // Returns the version of Internet Explorer or a -1
+  // (indicating the use of another browser).
+  //
+  // This code was taken from:
+  //
+  //   http://msdn.microsoft.com/en-us/library/ms537509%28v=vs.85%29.aspx
+  var getInternetExplorerVersion = function() {
+    var rv = -1; // Return value assumes failure.
+    if (navigator.appName == 'Microsoft Internet Explorer') {
+      var ua = navigator.userAgent;
+      var re  = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
+      if (re.exec(ua) != null)
+        rv = parseFloat( RegExp.$1 );
+    }
+    return rv;
+  };
+
   var layout = (function(){
     var column = 300;
     var margin = 20;
@@ -75,6 +92,10 @@ var OpenBadges = (function() {
     //   https://github.com/mozilla/openbadges/wiki/Issuer-API
     // The final (undocumented) argument is used for testing.
     issue: function OpenBadges_issue(assertions, callback, hook) {
+      if (getInternetExplorerVersion() != -1)
+        // Workaround for https://github.com/mozilla/openbadges/issues/932
+        return OpenBadges.issue_no_modal(assertions);
+
       // Setup defaults for arguments. I long for the day when javascript
       // supports defining these in the signature.
       assertions = typeof assertions === 'string' ? [assertions] : assertions;
