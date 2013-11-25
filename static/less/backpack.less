@@ -4,7 +4,7 @@
 @import "font-faces";
 @import "devsite";
 @import "persona-buttons";  /* Don't edit directly */
-@import "login";            
+@import "login";
 @import "navbar";
 @import "lightbox";
 
@@ -126,9 +126,9 @@ form.baker #assertion {
   outline: none;
 }
 
-.badge-nav {
+.badge-nav-mixin (@font-size: 1.25em){
   text-align: center;
-  font-size: 1.25em;
+  font-size: @font-size;
   margin-bottom: 2em;
   color: @grayLight;
 
@@ -142,6 +142,15 @@ form.baker #assertion {
     }
   }
 }
+
+.badge-nav {
+  .badge-nav-mixin;
+}
+
+.badge-nav-sub {
+  .badge-nav-mixin(1em);
+}
+
 
 .badge-list {
   list-style: none;
