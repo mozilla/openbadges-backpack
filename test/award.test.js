@@ -12,6 +12,7 @@ const normalize = require('../lib/normalize-assertion');
 const TEST_ASSERTION = $.makeAssertion();
 const BADGE_DIRECTORY = path.basename(require('../lib/configuration').get('badge_path'));
 const PNG_DATA = fs.readFileSync(path.join(__dirname, '/utils/images/no-badge-data.png'));
+const SVG_DATA = fs.readFileSync(path.join(__dirname, '/utils/images/unbaked.svg'));
 
 $.prepareDatabase(function (done) {
   test('awardBadge: old assertion', function (t) {
@@ -22,26 +23,18 @@ $.prepareDatabase(function (done) {
       imagedata: PNG_DATA,
       recipient: TEST_ASSERTION.recipient
     }
-
     t.plan(4)
-
     awardBadge(badgeData, function (err, badge) {
       t.notOk(err, 'should not have an error');
-
       const badgeHash = badge.get('body_hash')
-
       BadgeImage.findOne({ badge_hash: badgeHash }, function (err, image) {
         const bakedImage = image.toBuffer()
-
         bakery.extract(bakedImage, function (err, result) {
           t.notOk(err, 'no error getting baked data')
-
           const debakedAssertion = JSON.parse(result)
           t.same(debakedAssertion.verify.url, endpoint, 'has right endpoint')
         })
       })
-
-
       Badge.findOne({endpoint: endpoint}, function (err, badge) {
         const badgePath = badge.get('image_path');
         t.ok(badgePath.match(BADGE_DIRECTORY), 'should match');
@@ -51,25 +44,20 @@ $.prepareDatabase(function (done) {
 
   test('awardBadge: signed new assertion', function (t) {
     const newAssertion = createNewAssertion()
-
     const signature = jws.sign({
       header: {alg: 'rs256'},
       payload: newAssertion.structures.assertion,
       privateKey: fs.readFileSync(__dirname + '/rsa-private.pem')
     });
-
     const normalizedAssertion = normalize(newAssertion);
-
     awardBadge({
       assertion: normalizedAssertion,
       imagedata: PNG_DATA,
       recipient: 'brian@example.org',
       signature: signature
     }, function (err, badge) {
-
       t.same(signature, badge.get('signature'));
       t.same(normalizedAssertion.uid, badge.getFromAssertion('uid'));
-
       const query = { badge_hash: badge.get('body_hash') }
       BadgeImage.findOne(query, function (err, image) {
         const imageData = image.toBuffer()
@@ -78,6 +66,32 @@ $.prepareDatabase(function (done) {
         bakery.extract(imageData, function (err, result) {
           t.notOk(err, 'no errors')
           t.same(result, signature, 'has right signature')
+          t.end();
+        })
+      })
+    });
+  });
+
+  test('awardBadge: svg badge', function (t) {
+    const endpoint = 'http://example.com/badge';
+    const newAssertion = createNewAssertion()
+    const normalizedAssertion = normalize(newAssertion);
+
+    normalizedAssertion.uid = Date.now()
+
+    awardBadge({
+      url: endpoint,
+      assertion: normalizedAssertion,
+      imagedata: SVG_DATA,
+      recipient: 'brian@example.org',
+    }, function (err, badge) {
+      const query = { badge_hash: badge.get('body_hash') }
+      BadgeImage.findOne(query, function (err, image) {
+        const imageData = image.toBuffer()
+        t.ok(image.get('baked'), 'image should be baked')
+        t.ok(imageData != SVG_DATA, 'badge should be different');
+        bakery.extract(imageData, function (err, result) {
+          t.notOk(err, 'no errors')
           t.end();
         })
       })
