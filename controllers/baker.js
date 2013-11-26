@@ -19,7 +19,7 @@ function quickmd5(data) {
   return md5sum.update(data).digest('hex');
 }
 
-function preferedImage(resources) {
+function preferredImage(resources) {
   return resources['assertion.image'] || resources['badge.image'];
 }
 
@@ -46,7 +46,7 @@ exports.baker = function (req, res) {
       analyzeAssertion(url, callback)
     },
     function bakeBadge(info, callback) {
-      var image = info.resources['badge.image'];
+      var image = preferredImage(info.resources)
       var assertion = info.structures.assertion;
       awardOptions.assertion = info.structures.assertion;
 

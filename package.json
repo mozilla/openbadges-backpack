@@ -10,7 +10,7 @@
   "devDependencies": {
     "jshint": "~0.6.2",
     "mime": "~1.2.5",
-    "nock": "~0.15.2",
+    "nock": "~0.23.0",
     "prompt": "~0.2.9",
     "jws": "0.2.2",
     "tap": "~0.3.2",
@@ -29,7 +29,7 @@
     "nunjucks": "0.1.9",
     "underscore": "~1.3.3",
     "optimist": "~0.3.0",
-    "openbadges-validator": "0.2.1",
+    "openbadges-validator": "0.2.2",
     "openbadges-bakery": "1.0.2",
     "newrelic": "~0.10.3",
     "async": "~0.2.6",

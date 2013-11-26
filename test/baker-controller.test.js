@@ -110,10 +110,12 @@ $.prepareDatabase({
     const badge = $.makeBadgeClass();
     assertion.badge = $.makeUrl('/good-badge-image.json');
     badge.image = $.makeUrl('/badge-image.png');
+    assertion.image = $.makeUrl('/badge-image.png');
     $.mockHttp()
       .get('/assertion').reply(200, assertion)
       .get('/assertion').reply(200, assertion)
       .get('/good-badge-image.json').reply(200, badge)
+      .get('/badge-image.png').reply(200, PNGDATA, {'content-type': 'image/png'})
       .get('/badge-image.png').reply(200, PNGDATA, {'content-type': 'image/png'})
     conmock({
       handler: handler,
@@ -133,10 +135,12 @@ $.prepareDatabase({
     const badge = $.makeBadgeClass();
     assertion.badge = $.makeUrl('/good-badge-image.json');
     badge.image = $.makeUrl('/badge-image.svg');
+    assertion.image = $.makeUrl('/badge-image.svg');
     $.mockHttp()
       .get('/assertion').reply(200, assertion)
       .get('/assertion').reply(200, assertion)
       .get('/good-badge-image.json').reply(200, badge)
+      .get('/badge-image.svg').reply(200, SVGDATA, {'content-type': 'image/svg+xml'})
       .get('/badge-image.svg').reply(200, SVGDATA, {'content-type': 'image/svg+xml'})
     conmock({
       handler: handler,
@@ -155,10 +159,12 @@ $.prepareDatabase({
     const badge = $.makeBadgeClass();
     assertion.badge = $.makeUrl('/good-badge-image.json');
     badge.image = $.makeUrl('/badge-image.png');
+    assertion.image = $.makeUrl('/badge-image.png');
     $.mockHttp()
       .get('/assertion').reply(200, assertion)
       .get('/assertion').reply(200, assertion)
       .get('/good-badge-image.json').reply(200, badge)
+      .get('/badge-image.png').reply(200, PNGDATA, {'content-type': 'image/png'})
       .get('/badge-image.png').reply(200, PNGDATA, {'content-type': 'image/png'})
     conmock({
       handler: handler,
