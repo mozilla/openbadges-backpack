@@ -113,14 +113,18 @@ $.prepareDatabase({
       .get('/assertion').reply(200, assertion)
       .get('/good-badge-image.json').reply(200, badge)
       .get('/badge-image.png').reply(200, IMAGEDATA, {'content-type': 'image/png'})
+
+
     conmock({
       handler: handler,
       request: makeRequestObj('/assertion')
     }, function (err, mock) {
+
       t.same(mock.headers['Content-Type'], 'image/png');
       t.same(mock.status, 200);
+
       bakery.extract(mock.body, function (err, data) {
-        t.same(data, $.makeUrl('/assertion'));
+        t.same(JSON.parse(data), assertion);
         t.end();
       });
     });
@@ -144,7 +148,7 @@ $.prepareDatabase({
       t.same(mock.headers['x-badge-awarded'], $.EMAIL);
       t.same(mock.status, 200);
       bakery.extract(mock.body, function (err, data) {
-        t.same(data, $.makeUrl('/assertion'));
+        t.same(JSON.parse(data), assertion);
         t.end();
       });
     });
@@ -152,4 +156,3 @@ $.prepareDatabase({
 
   $.finish(test);
 });
-

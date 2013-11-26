@@ -73,6 +73,7 @@ $.prepareDatabase(function (done) {
       const query = { badge_hash: badge.get('body_hash') }
       BadgeImage.findOne(query, function (err, image) {
         const imageData = image.toBuffer()
+        t.ok(image.get('baked'), 'image should be baked')
         t.ok(imageData != PNG_DATA, 'badge should be different');
         bakery.extract(imageData, function (err, result) {
           t.notOk(err, 'no errors')

@@ -131,6 +131,41 @@ testUtils.prepareDatabase({
     });
   });
 
+  test('badge#image', function (t) {
+    const badgeImageRaw = fixtures['4-badge-raw-image'];
+    const badgeImageHashed = fixtures['6-badge-hashed-image'];
+    const handler = badge.image;
+
+    t.plan(3)
+
+    badgeImageRaw.bakeAndSave(function (err, image) {
+      const expect = image.toBuffer()
+      conmock({
+        handler: handler,
+        request: { badgeImage: badgeImageRaw },
+      }, function (err, mock) {
+        t.same(mock.body, expect);
+      });
+    })
+
+    badgeImageHashed.bakeAndSave(function (err, image) {
+      const expect = image.toBuffer()
+      conmock({
+        handler: handler,
+        request: { badgeImage: badgeImageHashed },
+      }, function (err, mock) {
+        t.same(mock.body, expect);
+      });
+    })
+
+    conmock({
+      handler: handler,
+      request: { },
+    }, function (err, mock) {
+      t.same(mock.status, 404);
+    });
+  });
+
   test('badge#destroy', function (t) {
     const owner = fixtures['1-real-user'];
     const thief = fixtures['2-false-user'];
@@ -175,36 +210,5 @@ testUtils.prepareDatabase({
     })
   });
 
-  test('badge#image', function (t) {
-    const badgeImageRaw = fixtures['4-badge-raw-image'];
-    const badgeImageHashed = fixtures['6-badge-hashed-image'];
-    const handler = badge.image;
-
-    const expect = images.unbaked;
-
-    conmock({
-      handler: handler,
-      request: { badgeImage: badgeImageRaw },
-    }, function (err, mock) {
-      t.same(mock.body, expect);
-    });
-
-    conmock({
-      handler: handler,
-      request: { badgeImage: badgeImageHashed },
-    }, function (err, mock) {
-      t.same(mock.body, expect);
-    });
-
-    conmock({
-      handler: handler,
-      request: { },
-    }, function (err, mock) {
-      t.same(mock.status, 404);
-      t.end();
-    });
-  });
-
   testUtils.finish(test);
 });
-

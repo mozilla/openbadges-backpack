@@ -57,7 +57,14 @@ exports.image = function image(req, res, next) {
   const image = req.badgeImage;
   if (!image) return res.send(404);
   res.type('image/png');
-  return res.send(200, image.toBuffer());
+
+  if (image.isBaked())
+    return res.send(200, image.toBuffer());
+
+  image.bakeAndSave(function (err, bakedImage) {
+    if (err) return next(err)
+    return res.send(200, bakedImage.toBuffer())
+  })
 }
 
 exports.share = function share(req, res, next) {

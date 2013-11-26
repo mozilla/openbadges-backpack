@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const bakery = require('openbadges-bakery');
 const async = require('async');
+const xtend = require('xtend')
 
 // local requirements
 const regex = require('../lib/regex');
@@ -18,11 +19,11 @@ function quickmd5(data) {
   return md5sum.update(data).digest('hex');
 }
 
-exports.baker = function (req, res) {
-  function preferedImage(resources) {
-    return resources['assertion.image'] || resources['badge.image'];
-  }
+function preferedImage(resources) {
+  return resources['assertion.image'] || resources['badge.image'];
+}
 
+exports.baker = function (req, res) {
   const query = req.query||{};
   const url = query.assertion;
 
@@ -45,20 +46,21 @@ exports.baker = function (req, res) {
       analyzeAssertion(url, callback)
     },
     function bakeBadge(info, callback) {
-      const image = preferedImage(info.resources);
+      var image = info.resources['badge.image'];
+      var assertion = info.structures.assertion;
       awardOptions.assertion = info.structures.assertion;
-      try {
-        bakery.bake({
-          image: image,
-          data: url
-        }, callback)
+
+      if (!assertion.verify) {
+        assertion = xtend(assertion, {
+          verify:{ type: 'hosted', url: url }
+        })
       }
-      catch (ex) {
-        callback({
-          error: 'Unable to bake',
-          reason:ex.toString()
-        });
-      }
+
+      bakery.bake({
+        image: image,
+        assertion: assertion
+      }, callback)
+
     },
     function maybeAward(imageData, callback) {
       const shouldAward = query.award && query.award !== 'false';

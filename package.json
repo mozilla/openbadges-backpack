@@ -37,7 +37,8 @@
     "request": "~2.27.0",
     "node-statsd": "~0.0.7",
     "supervisor": "0.5.6",
-    "bunyan": "~0.22.0"
+    "bunyan": "~0.22.0",
+    "xtend": "~2.1.1"
   },
   "engines": {
     "node": ">=0.8"
