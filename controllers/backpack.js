@@ -390,7 +390,7 @@ exports.userBadgeUpload = function userBadgeUpload(req, res) {
   const MAX_IMAGE_SIZE = 1024*256;
 
   if (!user)
-    return response.redirect(303, '/');
+    return res.redirect(303, '/');
 
   if (!tmpfile.size)
     return redirect(new Error('You must choose a badge to upload.'));
