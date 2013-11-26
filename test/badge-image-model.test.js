@@ -18,7 +18,7 @@ $.prepareDatabase({
   }),
   '3-existing-badge-image': new BadgeImage({
     badge_hash: Badge.createHash($.makeAssertion()),
-    image_data: images.unbaked.toString('base64'),
+    image_data: images.png.unbaked.toString('base64'),
     baked: 0,
   }),
 }, function (fixtures) {
@@ -35,7 +35,7 @@ $.prepareDatabase({
 
   test('BadgeImage#toBuffer', function (t) {
     const badgeimage = fixtures['3-existing-badge-image'];
-    t.same(badgeimage.toBuffer(), images.unbaked);
+    t.same(badgeimage.toBuffer(), images.png.unbaked);
     t.end();
   });
 

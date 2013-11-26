@@ -34,7 +34,7 @@ testUtils.prepareDatabase({
   }),
   '4-badge-raw-image': new BadgeImage({
     badge_hash: Badge.createHash(RAW_ASSERTION),
-    image_data: images.unbaked.toString('base64'),
+    image_data: images.png.unbaked.toString('base64'),
   }),
   '5-badge-hashed': new Badge({
     user_id: 1,
@@ -45,7 +45,7 @@ testUtils.prepareDatabase({
   }),
   '6-badge-hashed-image': new BadgeImage({
     badge_hash: Badge.createHash(HASHED_ASSERTION),
-    image_data: images.unbaked.toString('base64'),
+    image_data: images.png.unbaked.toString('base64'),
   }),
 }, function (fixtures) {
   test('badge#findByUrl sets req.badge when url is valid', function(t) {

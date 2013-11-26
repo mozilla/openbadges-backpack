@@ -8,11 +8,12 @@ const awardBadge = require('../lib/award');
 const Badge = require('../models/badge');
 const BadgeImage = require('../models/badge-image');
 const normalize = require('../lib/normalize-assertion');
+const testImages = require('./test-images')
 
 const TEST_ASSERTION = $.makeAssertion();
 const BADGE_DIRECTORY = path.basename(require('../lib/configuration').get('badge_path'));
-const PNG_DATA = fs.readFileSync(path.join(__dirname, '/utils/images/no-badge-data.png'));
-const SVG_DATA = fs.readFileSync(path.join(__dirname, '/utils/images/unbaked.svg'));
+const PNG_DATA = testImages.png.unbaked
+const SVG_DATA = testImages.png.unbaked
 
 $.prepareDatabase(function (done) {
   test('awardBadge: old assertion', function (t) {

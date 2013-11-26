@@ -8,9 +8,10 @@ const baker = require('../controllers/baker');
 const conmock = require('./conmock');
 const User = require('../models/user');
 
+const images = require('./test-images')
 const makeAssertion = $.makeAssertion;
-const PNGDATA = fs.readFileSync(__dirname + '/utils/images/no-badge-data.png')
-const SVGDATA = fs.readFileSync(__dirname + '/utils/images/unbaked.svg')
+const PNGDATA = images.png.unbaked
+const SVGDATA = images.svg.unbaked
 
 function makeRequestObj(url, award) {
   return {query: { assertion: $.makeUrl(url), award: award }};
