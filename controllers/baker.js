@@ -72,15 +72,26 @@ exports.baker = function (req, res) {
     },
     function probablyDone(badge, callback) {
       const imageData = awardOptions.imagedata;
-      const filename = quickmd5(imageData) + '.png';
-      res.setHeader('Content-Type', 'image/png');
-      res.setHeader('Content-Disposition', 'attachment; filename="' + filename + '"');
-      if (badge) {
-        logger.warn('badge awarded through baker: %s', url);
-        res.setHeader('x-badge-awarded', query.award);
+      const extension = {
+        'image/png': '.png',
+        'image/svg+xml': '.svg',
       }
-      res.send(imageData);
-      return callback();
+
+      bakery.typeCheck(imageData, function (err, type) {
+        const filename = quickmd5(imageData) + extension[type];
+
+        res.setHeader('Content-Type', type);
+        res.setHeader('Content-Disposition', 'attachment; filename="' + filename + '"');
+
+        if (badge) {
+          logger.warn('badge awarded through baker: %s', url);
+          res.setHeader('x-badge-awarded', query.award);
+        }
+
+        res.send(imageData);
+        return callback();
+      })
+
     }
   ], function handleErrors(err) {
     if (err)
