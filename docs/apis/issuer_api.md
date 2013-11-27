@@ -2,7 +2,7 @@
 
 Technical Documentation below. Want to take a step back? Check out the [Issuer Onboarding Docs](https://wiki.mozilla.org/Badges/Onboarding-Issuer).
 
-The Issuer API is a script that can be dropped-in to any badge issuer's website to provide a way for users to add an issuer's badges to their backpack. It's a lightweight alternative to the [Backpack Connect API](https://github.com/mozilla/openbadges/wiki/Backpack-Connect:-Issuer-Documentation). 
+The Issuer API is a script that can be dropped-in to any badge issuer's website to provide a way for users to add an issuer's badges to their backpack. It's a lightweight alternative to the [Backpack Connect API](https://github.com/mozilla/openbadges/wiki/Backpack-Connect:-Issuer-Documentation).
 
 There's no need to bake the badges yourself.  The API takes care of it for you.  The badge creation workflow is simple!
 
@@ -14,8 +14,8 @@ There's no need to bake the badges yourself.  The API takes care of it for you. 
 ![Liz](http://i705.photobucket.com/albums/ww53/essie_bucket/funny-gif-self-high-five-Liz-Lemon.gif)
 
 Check out the following resources:
-* [Badge tutorial](https://badgelab.herokuapp.com/) by Atul Varma 
-* [Earn a Badge Issue a badge](http://weblog.lonelylion.com/2012/03/22/earn-a-badge-issue-a-badge/) by Chris McAvoy to help you get started on issuing badges with the Issuer API 
+* [Badge tutorial](https://badgelab.herokuapp.com/) by Atul Varma
+* [Earn a Badge Issue a badge](http://weblog.lonelylion.com/2012/03/22/earn-a-badge-issue-a-badge/) by Chris McAvoy to help you get started on issuing badges with the Issuer API
 
 
 ## Methods
@@ -51,7 +51,7 @@ Presents the user with a modal dialog that requests their consent to add the iss
 The Mozilla Open Badges hosted issuer API is easy to integrate into your projects, making it possible to easily push badges from your system into the Mozilla hosted Backpack.  Start by including the API Javascript:
 
     <script src="https://backpack.openbadges.org/issuer.js"></script>
- 
+
 either in the head of your application, or before you make any API calls. Once you've included the API, you'll have access to the <code>OpenBadges.issue</code> function.  The function takes two arguments, an array of url's which each represent a hosted assertion, and a callback function that is called on completion of the dialogue with the user.
 
 An example usage of the API:

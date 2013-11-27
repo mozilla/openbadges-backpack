@@ -6,7 +6,7 @@ We intend to provide an open set of specifications, tools and services for
 generating verifiable badges that users can take with them wherever they go
 and use however they like.
 
-The latest open standard we released can be found in the new assertion specification: [https://github.com/mozilla/openbadges/wiki/New-Assertion-Specification](https://github.com/mozilla/openbadges/wiki/New-Assertion-Specification). 
+The latest open standard we released can be found in the latest [assertion specification][assertions-latest].
 The assertion includes the open standard, the metadata specification, we defined. 
 
 For more information, check out http://openbadges.org
@@ -43,12 +43,12 @@ the body being a your `badge.image` with the assertion URL baked into it.
 
 ### The Issuer Javascript API
 
-We have an easy to use API built for Issuers to easily push badges into Users Backpacks, giving the User the ability to approve the push through a lightboxed modal.  The API is written in Javascript, and is includable in your project with just a few lines of JS. Full documentation is in the wiki - https://github.com/mozilla/openbadges/wiki/Issuer-API.
+We have an easy to use API built for Issuers to easily push badges into Users Backpacks, giving the User the ability to approve the push through a lightboxed modal.  The API is written in Javascript, and is includable in your project with just a few lines of JS. Full documentation is [available here][issuer-api].
 
 ## Details
 
-Please [see the page on Assertions](https://github.com/mozilla/openbadges/wiki/Assertions) to
-learn how to format your assertions, and [see the page on Badge Baking](https://github.com/mozilla/openbadges/wiki/Badge-Baking) to
+Please [see the documentation on Assertions][assertions-latest] to
+learn how to format your assertions, and [see the documentation on Badge Baking][baking-latest] to
 learn more about how to use the baking API and what kind of responses to
 expect in case of error.
 
@@ -191,3 +191,7 @@ environment variable `NODE_ENV=production`. These differences include:
 * https://github.com/fedora-infra/tahrir -- A Pyramid (Python) app for issuing your own Open Badges.
 * https://github.com/openmichigan/open_badges -- Drupal module for managing/issuing badges
 * https://github.com/PRX/badges_engine -- Rails Engine for issuing.
+
+[assertions-latest]: https://github.com/mozilla/openbadges-specification/blob/master/Assertion/latest.md
+[baking=latest]: https://github.com/mozilla/openbadges-specification/blob/master/Badge-Baking/latest.md
+[issuer-api]: https://github.com/mozilla/openbadges/blob/development/docs/apis/issuer-api.md
