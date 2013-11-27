@@ -93,8 +93,8 @@ var OpenBadges = (function() {
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
       }).appendTo(document.body);
       var iframe = document.createElement("iframe");
-      // add Date.now() to aggressively cache-bust.
-      var url = root + "issuer/frame?" + Date.now();
+      // add timestamp to aggressively cache-bust.
+      var url = root + "issuer/frame?" + (new Date().getTime());
       iframe.setAttribute("src", url);
       iframe.setAttribute("scrolling", "no");
       var baseStyles = {
@@ -134,11 +134,12 @@ var OpenBadges = (function() {
     issue_no_modal: function OpenBadges_issue_no_modal(assertions) {
       assertions = typeof assertions === 'string' ? [assertions] : assertions;
       var root = this.getRoot();
-      var url = root + "issuer/frameless?" + Date.now();
+      var url = root + "issuer/frameless?" + (new Date().getTime());
       var form = $('<form method="POST"></form>').attr('action', url).appendTo($('body')).hide();
-      assertions.forEach(function(val, i, arr){
+      for (var i = 0; i < assertions.length; i++) {
+        var val = assertions[i];
         $('<input type="text" name="assertions">').val(val).appendTo(form);
-      });
+      }
       form.submit();
     }
   };
