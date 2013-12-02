@@ -363,10 +363,7 @@ exports.addBadge = function addBadge(request, response) {
 
 
 exports.userBadgeUpload = function userBadgeUpload(req, res) {
-  function redirect(err, redirect) {
-    if (!redirect) {
-      redirect = '/backpack/add'
-    }
+  function redirect(err) {
     if (err) {
       logger.warn('There was an error uploading a badge');
       logger.debug(err);
