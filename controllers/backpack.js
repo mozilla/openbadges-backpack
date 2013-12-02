@@ -364,16 +364,18 @@ exports.addBadge = function addBadge(request, response) {
 
 exports.userBadgeUpload = function userBadgeUpload(req, res) {
   function redirect(err) {
+    var url = '/'
     if (err) {
       logger.warn('There was an error uploading a badge');
       logger.debug(err);
       req.flash('error', err.message);
+      url = '/backpack/add'
     }
     // We use store errors in res._error so we can check them in our
     // controller mock tests. This isn't some magic variable, `_error`
     // is just a convenient property name.
     res._error = err;
-    return res.redirect(303, '/');
+    return res.redirect(303, url);
   }
 
   const user = req.user;
