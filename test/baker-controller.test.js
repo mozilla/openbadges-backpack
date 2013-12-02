@@ -2,13 +2,16 @@ const $ = require('./');
 const test = require('tap').test;
 const nock = require('nock');
 const fs = require('fs');
+const path = require('path')
 const bakery = require('openbadges-bakery');
 const baker = require('../controllers/baker');
 const conmock = require('./conmock');
 const User = require('../models/user');
 
+const images = require('./test-images')
 const makeAssertion = $.makeAssertion;
-const IMAGEDATA = fs.readFileSync(__dirname + '/utils/images/no-badge-data.png')
+const PNGDATA = images.png.unbaked
+const SVGDATA = images.svg.unbaked
 
 function makeRequestObj(url, award) {
   return {query: { assertion: $.makeUrl(url), award: award }};
@@ -108,11 +111,13 @@ $.prepareDatabase({
     const badge = $.makeBadgeClass();
     assertion.badge = $.makeUrl('/good-badge-image.json');
     badge.image = $.makeUrl('/badge-image.png');
+    assertion.image = $.makeUrl('/badge-image.png');
     $.mockHttp()
       .get('/assertion').reply(200, assertion)
       .get('/assertion').reply(200, assertion)
       .get('/good-badge-image.json').reply(200, badge)
-      .get('/badge-image.png').reply(200, IMAGEDATA, {'content-type': 'image/png'})
+      .get('/badge-image.png').reply(200, PNGDATA, {'content-type': 'image/png'})
+      .get('/badge-image.png').reply(200, PNGDATA, {'content-type': 'image/png'})
     conmock({
       handler: handler,
       request: makeRequestObj('/assertion')
@@ -120,7 +125,31 @@ $.prepareDatabase({
       t.same(mock.headers['Content-Type'], 'image/png');
       t.same(mock.status, 200);
       bakery.extract(mock.body, function (err, data) {
-        t.same(data, $.makeUrl('/assertion'));
+        t.same(JSON.parse(data), assertion);
+        t.end();
+      });
+    });
+  });
+
+  test('valid assertion, valid svg image', function (t) {
+    const assertion = $.makeNewAssertion();
+    const badge = $.makeBadgeClass();
+    assertion.badge = $.makeUrl('/good-badge-image.json');
+    badge.image = $.makeUrl('/badge-image.svg');
+    assertion.image = $.makeUrl('/badge-image.svg');
+    $.mockHttp()
+      .get('/assertion').reply(200, assertion)
+      .get('/assertion').reply(200, assertion)
+      .get('/good-badge-image.json').reply(200, badge)
+      .get('/badge-image.svg').reply(200, SVGDATA, {'content-type': 'image/svg+xml'})
+      .get('/badge-image.svg').reply(200, SVGDATA, {'content-type': 'image/svg+xml'})
+    conmock({
+      handler: handler,
+      request: makeRequestObj('/assertion')
+    }, function (err, mock) {
+      bakery.extract(mock.body, function (err, data) {
+        console.dir(err)
+        t.same(JSON.parse(data), assertion);
         t.end();
       });
     });
@@ -131,11 +160,13 @@ $.prepareDatabase({
     const badge = $.makeBadgeClass();
     assertion.badge = $.makeUrl('/good-badge-image.json');
     badge.image = $.makeUrl('/badge-image.png');
+    assertion.image = $.makeUrl('/badge-image.png');
     $.mockHttp()
       .get('/assertion').reply(200, assertion)
       .get('/assertion').reply(200, assertion)
       .get('/good-badge-image.json').reply(200, badge)
-      .get('/badge-image.png').reply(200, IMAGEDATA, {'content-type': 'image/png'})
+      .get('/badge-image.png').reply(200, PNGDATA, {'content-type': 'image/png'})
+      .get('/badge-image.png').reply(200, PNGDATA, {'content-type': 'image/png'})
     conmock({
       handler: handler,
       request: makeRequestObj('/assertion', $.EMAIL)
@@ -144,7 +175,7 @@ $.prepareDatabase({
       t.same(mock.headers['x-badge-awarded'], $.EMAIL);
       t.same(mock.status, 200);
       bakery.extract(mock.body, function (err, data) {
-        t.same(data, $.makeUrl('/assertion'));
+        t.same(JSON.parse(data), assertion);
         t.end();
       });
     });
@@ -152,4 +183,3 @@ $.prepareDatabase({
 
   $.finish(test);
 });
-

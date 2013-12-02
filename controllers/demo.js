@@ -53,7 +53,7 @@ exports.massAward = function (req, res) {
       awardBadge({
         assertion: item.assertion,
         url: item.assertionUrl,
-        public_path: [email, item.baseName].join(':'),
+        publicPath: [email, item.baseName].join(':'),
         imagedata: item.imgData,
         recipient: email
       }, function(err) {
@@ -104,4 +104,3 @@ function makeDemoAssertion(email, image, title, description) {
     }
   });
 }
-

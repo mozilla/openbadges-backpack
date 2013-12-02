@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const bakery = require('openbadges-bakery');
 const async = require('async');
+const xtend = require('xtend')
 
 // local requirements
 const regex = require('../lib/regex');
@@ -18,11 +19,11 @@ function quickmd5(data) {
   return md5sum.update(data).digest('hex');
 }
 
-exports.baker = function (req, res) {
-  function preferedImage(resources) {
-    return resources['assertion.image'] || resources['badge.image'];
-  }
+function preferredImage(resources) {
+  return resources['assertion.image'] || resources['badge.image'];
+}
 
+exports.baker = function (req, res) {
   const query = req.query||{};
   const url = query.assertion;
 
@@ -45,20 +46,21 @@ exports.baker = function (req, res) {
       analyzeAssertion(url, callback)
     },
     function bakeBadge(info, callback) {
-      const image = preferedImage(info.resources);
+      var image = preferredImage(info.resources)
+      var assertion = info.structures.assertion;
       awardOptions.assertion = info.structures.assertion;
-      try {
-        bakery.bake({
-          image: image,
-          data: url
-        }, callback)
+
+      if (!assertion.verify) {
+        assertion = xtend(assertion, {
+          verify:{ type: 'hosted', url: url }
+        })
       }
-      catch (ex) {
-        callback({
-          error: 'Unable to bake',
-          reason:ex.toString()
-        });
-      }
+
+      bakery.bake({
+        image: image,
+        assertion: assertion
+      }, callback)
+
     },
     function maybeAward(imageData, callback) {
       const shouldAward = query.award && query.award !== 'false';
@@ -70,15 +72,26 @@ exports.baker = function (req, res) {
     },
     function probablyDone(badge, callback) {
       const imageData = awardOptions.imagedata;
-      const filename = quickmd5(imageData) + '.png';
-      res.setHeader('Content-Type', 'image/png');
-      res.setHeader('Content-Disposition', 'attachment; filename="' + filename + '"');
-      if (badge) {
-        logger.warn('badge awarded through baker: %s', url);
-        res.setHeader('x-badge-awarded', query.award);
+      const extension = {
+        'image/png': '.png',
+        'image/svg+xml': '.svg',
       }
-      res.send(imageData);
-      return callback();
+
+      bakery.typeCheck(imageData, function (err, type) {
+        const filename = quickmd5(imageData) + extension[type];
+
+        res.setHeader('Content-Type', type);
+        res.setHeader('Content-Disposition', 'attachment; filename="' + filename + '"');
+
+        if (badge) {
+          logger.warn('badge awarded through baker: %s', url);
+          res.setHeader('x-badge-awarded', query.award);
+        }
+
+        res.send(imageData);
+        return callback();
+      })
+
     }
   ], function handleErrors(err) {
     if (err)

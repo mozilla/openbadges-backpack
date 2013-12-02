@@ -9,6 +9,9 @@ var migrationDirFiles = require('fs').readdirSync(migrations.dir).sort();
 var validator = require('openbadges-validator');
 var normalizeAssertion = require('../lib/normalize-assertion');
 
+var argv = require('optimist').argv
+var specificMigrations = argv._
+
 function up(options) {
   return function(callback) { migrations.up(options, callback); };
 }
@@ -47,7 +50,7 @@ function findMigration(name) {
 
   for (var i = 0; i < migrationDirFiles.length; i++) {
     filename = migrationDirFiles[i];
-    match = filename.match(/^([0-9]+)-(.*)\.js$/);
+    var match = filename.match(/^([0-9]+)-(.*)\.js$/);
     if (match) {
       candidate = match[1] + '-' + match[2];
       if (match[2] == name)
@@ -59,6 +62,11 @@ function findMigration(name) {
 }
 
 function testMigration(name, getSeries) {
+  if (argv.solo && specificMigrations) {
+    if (specificMigrations.indexOf(name) == -1)
+      return console.error('skipping', name, '...')
+  }
+
   var migration = findMigration(name);
   var series = [
     mysql.dropTestDatabase,
@@ -285,5 +293,28 @@ testMigration("remove-non-normalized-badge-uploads", function(t, id, previousId)
       var ids = results.map(function(result){ return result.id; });
       t.same(ids, ['2', '3'], 'bad badge deleted, good badges kept');
     })
+  ];
+});
+
+testMigration("add-baked-flag", function(t, id, previousId) {
+  return [
+    up({destination: previousId}),
+    sql("INSERT INTO `user` (id, email) VALUES (1,'foo@bar.org');"),
+    sql("INSERT INTO `badge` (id, user_id, image_path, body, body_hash)" +
+        "VALUES (1, 1, 'image.png', 'body', 'hash1')"),
+    sql("INSERT INTO `badge_image` (id, badge_hash, image_data)" +
+        "VALUES (1, 'hash1', 'data')"),
+    sql("INSERT INTO `badge` (id, user_id, image_path, body, body_hash)" +
+        "VALUES (2, 1, 'image.png', 'body', 'hash2')"),
+    sql("INSERT INTO `badge_image` (id, badge_hash, image_data)" +
+        "VALUES (2, 'hash2', 'data')"),
+    up({count: 1}),
+    sql("SELECT `baked` FROM `badge_image`", function(results) {
+      results.forEach(function (o) {
+        t.same(o.baked, 0, 'should be unbaked')
+      })
+    }),
+    down({count: 1}),
+    sqlError("SELECT `baked` FROM `badge_image`", t, "ERROR_BAD_FIELD_ERROR"),
   ];
 });

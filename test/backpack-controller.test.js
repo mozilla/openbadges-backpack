@@ -1,15 +1,16 @@
 const $ = require('./');
 const fs = require('fs');
 const test = require('tap').test;
+const path = require('path')
 const backpack = require('../controllers/backpack');
 const conmock = require('./conmock');
 const Badge = require('../models/badge');
 const BadgeImage = require('../models/badge-image');
 const User = require('../models/user');
 
-const ASSERTION_NOT_FOUND = __dirname + '/data/404.png';
-const VALID_BAKED_IMAGE = __dirname + '/data/valid-baked.png';
-const UNBAKED_IMAGE = __dirname + '/data/unbaked.png';
+const ASSERTION_NOT_FOUND = path.join(__dirname, 'data' ,'404.png');
+const VALID_BAKED_IMAGE = path.join(__dirname, 'data', 'valid-baked.png');
+const UNBAKED_IMAGE = path.join(__dirname, 'data', 'unbaked.png');
 
 function hash(thing, salt) {
   return 'sha256$'+require('crypto').createHash('sha256').update(thing).update(salt).digest('hex');
@@ -150,4 +151,3 @@ $.prepareDatabase({
     $.finish(test);
   });
 });
-

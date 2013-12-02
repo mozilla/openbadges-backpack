@@ -34,7 +34,7 @@ testUtils.prepareDatabase({
   }),
   '4-badge-raw-image': new BadgeImage({
     badge_hash: Badge.createHash(RAW_ASSERTION),
-    image_data: images.unbaked.toString('base64'),
+    image_data: images.png.unbaked.toString('base64'),
   }),
   '5-badge-hashed': new Badge({
     user_id: 1,
@@ -45,7 +45,7 @@ testUtils.prepareDatabase({
   }),
   '6-badge-hashed-image': new BadgeImage({
     badge_hash: Badge.createHash(HASHED_ASSERTION),
-    image_data: images.unbaked.toString('base64'),
+    image_data: images.png.unbaked.toString('base64'),
   }),
 }, function (fixtures) {
   test('badge#findByUrl sets req.badge when url is valid', function(t) {
@@ -131,6 +131,41 @@ testUtils.prepareDatabase({
     });
   });
 
+  test('badge#image', function (t) {
+    const badgeImageRaw = fixtures['4-badge-raw-image'];
+    const badgeImageHashed = fixtures['6-badge-hashed-image'];
+    const handler = badge.image;
+
+    t.plan(3)
+
+    badgeImageRaw.bakeAndSave(function (err, image) {
+      const expect = image.toBuffer()
+      conmock({
+        handler: handler,
+        request: { badgeImage: badgeImageRaw },
+      }, function (err, mock) {
+        t.same(mock.body, expect);
+      });
+    })
+
+    badgeImageHashed.bakeAndSave(function (err, image) {
+      const expect = image.toBuffer()
+      conmock({
+        handler: handler,
+        request: { badgeImage: badgeImageHashed },
+      }, function (err, mock) {
+        t.same(mock.body, expect);
+      });
+    })
+
+    conmock({
+      handler: handler,
+      request: { },
+    }, function (err, mock) {
+      t.same(mock.status, 404);
+    });
+  });
+
   test('badge#destroy', function (t) {
     const owner = fixtures['1-real-user'];
     const thief = fixtures['2-false-user'];
@@ -175,36 +210,5 @@ testUtils.prepareDatabase({
     })
   });
 
-  test('badge#image', function (t) {
-    const badgeImageRaw = fixtures['4-badge-raw-image'];
-    const badgeImageHashed = fixtures['6-badge-hashed-image'];
-    const handler = badge.image;
-
-    const expect = images.unbaked;
-
-    conmock({
-      handler: handler,
-      request: { badgeImage: badgeImageRaw },
-    }, function (err, mock) {
-      t.same(mock.body, expect);
-    });
-
-    conmock({
-      handler: handler,
-      request: { badgeImage: badgeImageHashed },
-    }, function (err, mock) {
-      t.same(mock.body, expect);
-    });
-
-    conmock({
-      handler: handler,
-      request: { },
-    }, function (err, mock) {
-      t.same(mock.status, 404);
-      t.end();
-    });
-  });
-
   testUtils.finish(test);
 });
-
