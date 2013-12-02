@@ -395,6 +395,31 @@ exports.userBadgeUpload = function userBadgeUpload(req, res) {
   if (tmpfile.size > MAX_IMAGE_SIZE)
     return redirect(new Error('Maximum badge size is ' + MAX_IMAGE_SIZE / 1024 + 'KB'));
 
+  function getUrlOrSignature(string) {
+    string = string.trim()
+    try {
+      // let's assume it's an assertion to begin with
+      return {
+        type: 'url',
+        value: JSON.parse(string).verify.url
+      }
+    } catch (e) {
+      // if it's not a json string, we naîvely assume
+      // it's either a url or a signature.
+      if (string.indexOf('http') === 0) {
+        return {
+          type: 'url',
+          value: string,
+        }
+      }
+
+      return {
+        type: 'signature',
+        value: string,
+      }
+    }
+  }
+
   async.waterfall([
     function getBadgeImageData(callback) {
       fs.readFile(tmpfile.path, callback);
@@ -404,8 +429,9 @@ exports.userBadgeUpload = function userBadgeUpload(req, res) {
       bakery.extract(imageData, callback);
     },
     function getAssertionData(url, callback) {
-      awardOptions.url = url;
-      analyzeAssertion(url, callback);
+      const data = getUrlOrSignature(url)
+      awardOptions[data.type] = data.value;
+      analyzeAssertion(data.value, callback);
     },
     function confirmAndAward(info, callback) {
       const recipient = awardOptions.recipient;

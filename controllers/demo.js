@@ -40,7 +40,7 @@ exports.massAward = function (req, res) {
 
   fs.readdirSync(demoBadgeDir)
     .map(function (f) {
-      var imgUrl = ORIGIN + '/static/_demo/' + f;
+      var imgUrl = ORIGIN + '/_demo/' + f;
       var assertion = makeDemoAssertion(recipient, imgUrl);
       return {
         baseName: f,
