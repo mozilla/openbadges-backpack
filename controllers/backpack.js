@@ -404,7 +404,7 @@ exports.userBadgeUpload = function userBadgeUpload(req, res) {
         value: JSON.parse(string).verify.url
       }
     } catch (e) {
-      // if it's not a json string, we naîvely assume
+      // if it's not a json string, we naïvely assume
       // it's either a url or a signature.
       if (string.indexOf('http') === 0) {
         return {
