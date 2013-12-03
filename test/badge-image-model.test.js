@@ -45,6 +45,14 @@ $.prepareDatabase({
     badgeimage.bakeAndSave(function (err, image) {
       t.notOk(err, 'no error')
 
+      const isRawPng =
+        image
+          .get('image_data')
+          .toString('utf8')
+          .slice(1, 4) == 'PNG'
+
+      t.notOk(isRawPng, 'should not be a raw PNG')
+
       const bakedData = image.toBuffer()
       t.ok(image.get('baked'), 'image says its baked')
       t.notOk(bakedData == unbakedData, 'not the same')
