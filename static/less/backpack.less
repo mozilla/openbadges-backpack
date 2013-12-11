@@ -122,6 +122,12 @@ form.baker #assertion {
   cursor: pointer;
 }
 
+.openbadge img {
+  /* fixes IE8 massive img in collection bug: https://github.com/mozilla/openbadges/issues/971 */
+  max-width: none;
+  width: 64px;
+}
+
 .openbadge:active {
   outline: none;
 }
