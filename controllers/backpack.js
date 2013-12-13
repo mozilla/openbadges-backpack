@@ -363,20 +363,19 @@ exports.addBadge = function addBadge(request, response) {
 
 
 exports.userBadgeUpload = function userBadgeUpload(req, res) {
-  function redirect(err, redirect) {
-    if (!redirect) {
-      redirect = '/backpack/add'
-    }
+  function redirect(err) {
+    var url = '/'
     if (err) {
       logger.warn('There was an error uploading a badge');
       logger.debug(err);
       req.flash('error', err.message);
+      url = '/backpack/add'
     }
     // We use store errors in res._error so we can check them in our
     // controller mock tests. This isn't some magic variable, `_error`
     // is just a convenient property name.
     res._error = err;
-    return res.redirect(303, '/');
+    return res.redirect(303, url);
   }
 
   const user = req.user;
@@ -398,6 +397,31 @@ exports.userBadgeUpload = function userBadgeUpload(req, res) {
   if (tmpfile.size > MAX_IMAGE_SIZE)
     return redirect(new Error('Maximum badge size is ' + MAX_IMAGE_SIZE / 1024 + 'KB'));
 
+  function getUrlOrSignature(string) {
+    string = string.trim()
+    try {
+      // let's assume it's an assertion to begin with
+      return {
+        type: 'url',
+        value: JSON.parse(string).verify.url
+      }
+    } catch (e) {
+      // if it's not a json string, we naïvely assume
+      // it's either a url or a signature.
+      if (string.indexOf('http') === 0) {
+        return {
+          type: 'url',
+          value: string,
+        }
+      }
+
+      return {
+        type: 'signature',
+        value: string,
+      }
+    }
+  }
+
   async.waterfall([
     function getBadgeImageData(callback) {
       fs.readFile(tmpfile.path, callback);
@@ -407,8 +431,9 @@ exports.userBadgeUpload = function userBadgeUpload(req, res) {
       bakery.extract(imageData, callback);
     },
     function getAssertionData(url, callback) {
-      awardOptions.url = url;
-      analyzeAssertion(url, callback);
+      const data = getUrlOrSignature(url)
+      awardOptions[data.type] = data.value;
+      analyzeAssertion(data.value, callback);
     },
     function confirmAndAward(info, callback) {
       const recipient = awardOptions.recipient;
