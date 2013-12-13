@@ -30,7 +30,7 @@ BadgeImage.prototype.bakeAndSave = function (globalCallback) {
     const signature = badge.get('signature')
 
     if (signature) {
-      return badge.bake({
+      return bakery.bake({
         signature: signature,
         image: imageData
       }, callback)
