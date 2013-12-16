@@ -46,7 +46,7 @@ exports.massAward = function (req, res) {
         baseName: f,
         imgData: fs.readFileSync(path.join(demoBadgeDir, f)),
         assertion: assertion,
-        assertionUrl: ORIGIN + '/demo/badge.json?' + qs.stringify({title: 'raaad', image: imgUrl, recipient: recipient})
+        assertionUrl: getDemoUrl(assertion)
       };
     })
     .forEach(function (item) {
@@ -85,6 +85,9 @@ exports.badBadge = function (req, res) {
 };
 
 function makeDemoAssertion(email, image, title, description) {
+  title = title || 'Open Badges Demo Badge';
+  if (title.indexOf('DEMO:') !== 0)
+    title = 'DEMO: ' + title;
   return ({
     recipient: email,
     salt: 'ballertime',
@@ -93,7 +96,7 @@ function makeDemoAssertion(email, image, title, description) {
     issued_on: '2011-08-23',
     badge: {
       version: 'v0.5.0',
-      name: 'DEMO: ' + (title || 'Open Badges Demo Badge'),
+      name: title,
       description: description || 'For rocking in the "free world"',
       image: image,
       criteria: '/demo/criteria',
@@ -102,5 +105,13 @@ function makeDemoAssertion(email, image, title, description) {
         origin: ORIGIN
       }
     }
+  });
+}
+
+function getDemoUrl(assertion) {
+  return assertion.badge.issuer.origin + '/demo/badge.json?' + qs.stringify({
+    title: assertion.badge.name, 
+    image: assertion.badge.image, 
+    recipient: assertion.recipient
   });
 }
