@@ -5,11 +5,8 @@ var path = require('path');
 var configuration = require('../lib/configuration');
 var request = require('request');
 var awardBadge = require('../lib/award');
+var utils = require('../lib/utils');
 const logger = require('../lib/logger');
-
-var protocol = configuration.get('protocol') || 'http';
-var port = configuration.get('port') || '';
-var ORIGIN = protocol + '://' + configuration.get('hostname') + (port ? ':' + port : '');
 
 // Render the view for the demo badge issuer.
 exports.issuer = function (req, res) {
@@ -22,8 +19,8 @@ exports.issuer = function (req, res) {
 
 // Bake & award a demo badge. Uses `demoBadge` below to generate a proper assertion.
 exports.award = function (req, res) {
-  var assertionURL = encodeURIComponent([ORIGIN + '/demo/badge.json', qs.stringify(req.body)].join('?'));
-  var bakeURL = ORIGIN + '/baker?award=true&assertion=' + assertionURL;
+  var assertionURL = encodeURIComponent([utils.fullUrl('/demo/badge.json'), qs.stringify(req.body)].join('?'));
+  var bakeURL = utils.fullUrl('/baker?award=true&assertion=' + assertionURL);
 
   request({url: bakeURL, encoding: 'binary'},  function (err, resp, body) {
     res.send(Buffer(body, 'binary'), {'content-type': 'image/png'});
@@ -40,7 +37,7 @@ exports.massAward = function (req, res) {
 
   fs.readdirSync(demoBadgeDir)
     .map(function (f) {
-      var imgUrl = ORIGIN + '/_demo/' + f;
+      var imgUrl = utils.fullUrl('/_demo/' + f);
       var assertion = makeDemoAssertion(recipient, imgUrl);
       return {
         baseName: f,
@@ -102,7 +99,7 @@ function makeDemoAssertion(email, image, title, description) {
       criteria: '/demo/criteria',
       issuer: {
         name: 'Open Badges Demo',
-        origin: ORIGIN
+        origin: utils.fullUrl('')
       }
     }
   });
