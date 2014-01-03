@@ -43,7 +43,7 @@ the body being a your `badge.image` with the assertion URL baked into it.
 
 ### The Issuer Javascript API
 
-We have an easy to use API built for Issuers to easily push badges into Users Backpacks, giving the User the ability to approve the push through a lightboxed modal.  The API is written in Javascript, and is includable in your project with just a few lines of JS. Full documentation is [available here][issuer-api].
+We have an easy to use API built for Issuers to easily push badges into Users Backpacks, giving the User the ability to approve the push through a lightboxed modal.  The API is written in Javascript, and is includable in your project with just a few lines of JS. Full documentation is [available here](docs/apis/issuer_api.md).
 
 ## Details
 
