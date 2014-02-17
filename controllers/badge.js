@@ -55,8 +55,12 @@ exports.findByHash = function findByHash (req, res, next, hash) {
 
 exports.image = function image(req, res, next) {
   const image = req.badgeImage;
+  var header  = "png";
   if (!image) return res.send(404);
-  res.type('image/png');
+  if (req.params.badgeFileType == "png") header = 'image/png';
+  if (req.params.badgeFileType == "svg") header = 'image/svg+xml';
+
+  res.type(header);
 
   if (image.isBaked())
     return res.send(200, image.toBuffer());

@@ -136,7 +136,7 @@ Badge.prepare = {
       return JSON.parse(value);
     },
     imageUrl: function (value, attr) {
-      return utils.fullUrl('/images/badge/' + attr['body_hash'] + '.png');
+      return utils.fullUrl('/images/badge/' + attr['body_hash'] + attr['image_path'].slice(-4));
     },
   }
 };
