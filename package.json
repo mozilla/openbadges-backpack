@@ -1,7 +1,7 @@
 {
   "name": "openbadges",
   "description": "http://openbadges.org",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "private": true,
   "scripts": {
     "test": "NODE_ENV=test ./node_modules/.bin/tap-prettify test/*.test.js",
