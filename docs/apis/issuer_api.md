@@ -39,7 +39,7 @@ You can then access the API methods using the `OpenBadges` object.
 
 ## Methods
 
-The Issuer API provides the following methods: [`issue`](#issue-assertions-callback) and [`issue_no_modal`](#issue-no-modal-assertions).
+The Issuer API provides the following methods: [`issue`](#issueassertions-callback) and [`issue_no_modal`](#issue_no_modalassertions).
 
 ### `issue(assertions, callback)`
 
@@ -58,7 +58,7 @@ If called, the callback function receives the following parameters:
 
 |Parameter| |
 |:---|:---|
-|`errors`|Array of errors - each item includes: `assertion` (_URL or JSON Web Signature not added to Backpack_) and [`reason`](#error-constant-string) (_constant string_)|
+|`errors`|Array of errors - each item includes: `assertion` (_URL or JSON Web Signature not added to Backpack_) and [`reason`](#error-constant-strings) (_constant string_)|
 |`successes`|Array of assertions successfully added to the Backpack (_each represented by URL or JSON Web Signature_).|
 
 #### Example method call
@@ -73,7 +73,7 @@ OpenBadges.issue(assertions, function(errors, successes) {
 }); 
 ```
 
-__The `issue` method will behave like [`issue_no_modal`](#issue-no-modal) for some browsers.__
+__The `issue` method will behave like [`issue_no_modal`](#issue_no_modalassertions) for some browsers.__
 
 #### Error Constant Strings
 
@@ -89,7 +89,7 @@ __The `issue` method will behave like [`issue_no_modal`](#issue-no-modal) for so
 
 ### `issue_no_modal(assertions)`
 
-Redirects the page to a full-window version of the modal dialog described for [`issue`](#issue-assertions-callback). While this does not allow the invocation of a callback with the results of the interaction, it is generally more compatible with older browsers.
+Redirects the page to a full-window version of the modal dialog described for [`issue`](#issueassertions-callback). While this does not allow the invocation of a callback with the results of the interaction, it is generally more compatible with older browsers.
 
 #### Parameters
 
