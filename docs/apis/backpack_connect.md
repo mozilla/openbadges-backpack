@@ -2,14 +2,14 @@
 
 This document regards the Backpack Connect API for pushing earner badges to the Mozilla hosted Backpack. The API allows issuers to manage persistent access to the earner Backpack without requiring their explicit permission each time a new badge is issued. Earners grant permission when issuers first call the `connect` method, and can revoke this permission within their Backpack settings at any time. 
 
-Interaction with the Backpack is implemented using access tokens. Issuers can use the `issue` endpoint to send badges to the Backpack, the `refresh` endpoint to retrieve valid access tokens and the `identity` endpoint to retrieve hashed earner identity information.
+Interaction with the Backpack is implemented using access tokens. Issuers can use the [`issue`](#issue) endpoint to send badges to the Backpack, the [`refresh`](#refresh) endpoint to retrieve valid access tokens and the [`identity`](#identity) endpoint to retrieve hashed earner identity information.
 
 For a detailed guide to using the Backpack Connect API, see [the tutorial](https://github.com/mozilla/openbadges/wiki/Using-the-Backpack-Connect-API).
 
 ## Contents
 
 * [Accessing the API](#accessing-the-api)
-* Methods and Endpoints
+* _Methods and Endpoints_
  * [`connect`](#connect)
  * [`issue`](#issue)
  * [`token`](#token)
@@ -17,7 +17,7 @@ For a detailed guide to using the Backpack Connect API, see [the tutorial](https
 
 ## Accessing the API
 
-To access the Backpack Connect API in your site, you need to include the following script:
+To access the Backpack Connect API in your site, include the following script:
 
 ```
 https://beta.openbadges.org/issuer.js
@@ -65,7 +65,7 @@ When `access_token` expires, you can call [`token`](#token) to retrieve a new on
 
 ## `issue`
 
-Push a badge you have awarded an earner to their Backpack. The endpoint is `/issue` appended to the `api_root` value you received when you called the `connect` method.
+Push a badge you have awarded an earner to their Backpack. The endpoint is `/issue` appended to the `api_root` value you received when you called the [`connect`](#connect) method.
 
 ### Endpoint
 
@@ -164,7 +164,7 @@ The API may return an error if:
 
 ## `token`
 
-Retrieve a new token to replace an expired one. The endpoint is `/token` appended to the `api_root` value you received when you called the `connect` method.
+Retrieve a new token to replace an expired one. The endpoint is `/token` appended to the `api_root` value you received when you called the [`connect`](#connect) method.
 
 ### Endpoint
 
@@ -179,7 +179,7 @@ POST <api-root>/token
 The `token` endpoint expects:
 
 * `grant_type` which should be `refresh_token` to retrieve a replacement for an expired token
-* `refresh_token` which should be your `refresh_token` received when you called `connect` or `token` previously
+* `refresh_token` which should be your `refresh_token` received when you called [`connect`](#connect) or [`token`](#token) previously
 
 _The `Authorization` header is not required for this endpoint._
 
@@ -218,12 +218,12 @@ postRequest.write(claimData);
 }
 ```
 
-* The new `access_token` should be used for any subsequent calls to `issue`. 
-* The new `refresh_token` should be used for any subsequent call to `token`.
+* The new `access_token` should be used for any subsequent calls to [`issue`](#issue). 
+* The new `refresh_token` should be used for any subsequent call to [`token`](#token).
 
 ## `identity`
 
-Retrieve the hashed email for the current Backpack user. _You can use this to issue badges without explicitly storing the earner email address._ The endpoint is `/identity` appended to the `api_root` value you received when you called the `connect` method.
+Retrieve the hashed email for the current Backpack user. _You can use this to issue badges without direct access to the earner email address._ The endpoint is `/identity` appended to the `api_root` value you received when you called the [`connect`](#connect) method.
 
 ### Endpoint
 
