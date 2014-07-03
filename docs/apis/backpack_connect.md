@@ -1,6 +1,6 @@
 # Mozilla Hosted Backpack - Backpack Connect API
 
-This document regards the Backpack Connect API for pushing earner badges to the Mozilla hosted Backpack. The API allows issuers to manage persistent access to the earner Backpack without requiring their explicit permission each time a new badge is issued. Earners grant permission when issuers first call the `connect` method, and can revoke this permission within their Backpack settings at any time. 
+This document regards the Backpack Connect API for pushing earner badges to the Mozilla hosted Backpack. The API allows issuers to manage persistent access to the earner Backpack without requiring their explicit permission each time a new badge is issued. Earners grant permission when issuers first call the [`connect`](#connect) method, and can revoke this permission within their Backpack settings at any time. 
 
 Interaction with the Backpack is implemented using access tokens. Issuers can use the [`issue`](#issue) endpoint to send badges to the Backpack, the [`refresh`](#refresh) endpoint to retrieve valid access tokens and the [`identity`](#identity) endpoint to retrieve hashed earner identity information.
 
