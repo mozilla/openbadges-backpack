@@ -20,7 +20,7 @@ For a detailed guide to using the Backpack Connect API, see [the tutorial](https
 To access the Backpack Connect API in your site, include the following script:
 
 ```
-https://beta.openbadges.org/issuer.js
+https://backpack.openbadges.org/issuer.js
 ```
 
 You can then use the `OpenBadges` object to call the [`connect`](#connect) method to retrieve your access token for pushing earner badges to the Backpack.
