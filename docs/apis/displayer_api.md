@@ -51,7 +51,7 @@ $ curl -i -X POST -d "email=earner@example.org" http://backpack.openbadges.org/d
 The following represents an example call to the `convert` service in a node.js app:
 
 ```js
-var earnerData = querystring.stringify({
+var earnerData = JSON.stringify({
 	email: 'earner@example.org'
 	});
 
@@ -59,7 +59,7 @@ var requestOptions = {
 	host : 'backpack.openbadges.org', 
 	path : '/displayer/convert/email', 
 	method : 'POST', 
-	headers: {'Content-Type': 'application/x-www-form-urlencoded',
+	headers: {'Content-Type': 'application/json',
 		'Content-Length': Buffer.byteLength(earnerData)
 	}
 };
