@@ -11,6 +11,8 @@ To access the earner's badges, you need their unique ID within the Backpack. You
 
 The Displayer API REST queries allow you to [retrieve an earner's public groups](#retrieve-groups) and the [badge data within specific groups](#retrieve-a-specific-group). When you retrieve the data for a specific group, it will include the data for the earner's awarded badges - you can then parse that data and present it within your own display context.
 
+__For a step-by-step guide to displaying Backpack badges, see [Using the Displayer API](https://github.com/mozilla/openbadges/wiki/Using-the-Displayer-API).__
+				
 ## Notes
 
 * Both the email conversion and the badge query requests return `application/json` responses.
