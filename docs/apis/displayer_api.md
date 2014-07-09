@@ -136,13 +136,13 @@ GET <backpack>/displayer/<user-id>/groups
 cURL example:
 
 ```bash
-curl -i -X GET http://backpack.openbadges.org/displayer/71460/groups.json
+curl -i -X GET http://backpack.openbadges.org/displayer/12345/groups.json
 ```
 
 In the Web browser:
 
 ```
-http://backpack.openbadges.org/displayer/71460/groups.json
+http://backpack.openbadges.org/displayer/12345/groups.json
 ```
 
 The following code demonstrates the request in a node.js app:
