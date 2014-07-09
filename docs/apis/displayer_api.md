@@ -74,7 +74,7 @@ convertRequest.write(earnerData);
 
 ### Expected Response
 
-Returns JSON including the `userId` for the request earner email - _you can then use this to query the earner's badges_.
+Returns JSON including the `userId` for the request earner email - _you can then use this to [query the earner's groups and badges](#retrieve-groups)_.
 
 #### Example Response
 
@@ -123,7 +123,7 @@ Content-Type: application/json; charset=utf-8
 
 ## Retrieve Groups
 
-Backpack users can manage groups of badges and make them public. You can use the Displayer API to query for an earner's public groups - __then you can use the returned information to query for the earned badges within a group__.
+Backpack users can manage groups of badges and make them public. You can use the Displayer API to query for an earner's public groups - __then you can use the returned information to query for the earned badges within a group__. Your request for an earner's groups will include their Backpack user ID, which you can [convert from the email address](#convert-earner-email-to-id).
 
 ### Expected Request
 
@@ -141,7 +141,7 @@ curl -i -X GET http://backpack.openbadges.org/displayer/71460/groups.json
 
 In the Web browser:
 
-```http
+```
 http://backpack.openbadges.org/displayer/71460/groups.json
 ```
 
@@ -227,7 +227,7 @@ curl -i -X GET http://backpack.openbadges.org/displayer/12345/group/67890.json
 
 In the Web browser:
 
-```http
+```
 http://backpack.openbadges.org/displayer/12345/group/67890.json
 ```
 
@@ -325,4 +325,4 @@ Content-Type: application/json
 
 ## Security
 
-We send the assertion exactly as we received it, without any escaping or sanitization. You will need to carry out context-relevant escaping of any fields you plan on including in output HTML. [Read more about Cross Site Scripting at the Open Web Application Security Project site](https://www.owasp.org/index.php/Cross-site_Scripting_%28XSS%29).
+We send the assertion exactly as we received it, without any escaping or sanitization. You will need to carry out context-relevant escaping of any fields you plan on including in output HTML. Read more about Cross Site Scripting at the [Open Web Application Security Project site](https://www.owasp.org/index.php/Cross-site_Scripting_%28XSS%29).
