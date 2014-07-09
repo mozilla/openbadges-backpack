@@ -9,7 +9,7 @@ As a displayer, you can query the Mozilla Backpack for the badges an earner has 
 
 To access the earner's badges, you need their unique ID within the Backpack. You can pass an earner email address to the [`convert`](#convert-earner-email-to-id) service to retrieve the earner ID, which you can then use in your calls to the Displayer API.
 
-The Displayer API REST queries allow you to retrieve an earner's public groups and the badge data within specific groups. When you retrieve the data for a specific group, it will include the data for the earner's awarded badges - you can then parse that data and present it within your own display context.
+The Displayer API REST queries allow you to [retrieve an earner's public groups](#retrieve-groups) and the [badge data within specific groups](#retrieve-a-specific-group). When you retrieve the data for a specific group, it will include the data for the earner's awarded badges - you can then parse that data and present it within your own display context.
 
 ## Notes
 
@@ -21,7 +21,6 @@ The Displayer API REST queries allow you to retrieve an earner's public groups a
 * [Convert Earner Email to ID](#convert-earner-email-to-id)
 * [Retrieve Groups](#retrieve-groups)
 * [Retrieve a Specific Group](#retrieve-a-specific-group)
-* [Widgets](#widgets)
 * [Security](#security)
 
 ## Convert Earner Email to ID
@@ -32,8 +31,8 @@ To access the conversion service in your terminal or application code, use the f
 
 ### Expected Request
 
-```
-POST /displayer/convert/email
+```bash
+POST <backpack>/displayer/convert/email
 ```
 
 #### Parameters
@@ -64,13 +63,13 @@ var requestOptions = {
 	}
 };
 
-var postRequest = http.request(requestOptions, function(requestResponse) {
+var convertRequest = http.request(requestOptions, function(requestResponse) {
 //process response
 });
 
 //...
 
-postRequest.write(earnerData);
+convertRequest.write(earnerData);
 ```
 
 ### Expected Response
@@ -86,9 +85,9 @@ Content-Type: application/json; charset=utf-8
 
 ```json
 {
-    "status": "okay",
-    "email": "earner@example.com",
-    "userId": 12345
+	"status": "okay",
+	"email": "earner@example.com",
+	"userId": 12345
 }
 ```
 
@@ -103,8 +102,8 @@ Content-Type: application/json; charset=utf-8
 
 ```json
 {
-    "status": "missing",
-    "error": "Could not find a user by the email address `earner@example.org`"
+	"status": "missing",
+	"error": "Could not find a user by the email address `earner@example.org`"
 }
 ```
 
@@ -117,41 +116,212 @@ Content-Type: application/json; charset=utf-8
 
 ```json
 {
-    "status": "invalid",
-    "error": "missing `email` parameter"
+	"status": "invalid",
+	"error": "missing `email` parameter"
 }
 ```
 
-
-
 ## Retrieve Groups
 
-### GET /displayer/[userid]/groups.json
+Backpack users can manage groups of badges and make them public. You can use the Displayer API to query for an earner's public groups - __then you can use the returned information to query for the earned badges within a group__.
 
-A backpack user can expose groups of badges as public groups.  A users public groups are listed in JSON format at, <code>/displayer/[userid]/groups.json</code>.  An example response,
+### Expected Request
 
-    {
-      'userid' : 123456,
-      'groups': [{ 'groupid': 123456,
-                  'name'   : "My very fancy group",
-                  'badges' : 12
-                }, ...
+```bash
+GET <backpack>/displayer/<user-id>/groups
+```
+
+#### Example Requests
+
+cURL example:
+
+```bash
+curl -i -X GET http://backpack.openbadges.org/displayer/71460/groups.json
+```
+
+In the Web browser:
+
+```http
+http://backpack.openbadges.org/displayer/71460/groups.json
+```
+
+The following code demonstrates the request in a node.js app:
+
+```js
+var earnerId = 12345;//retrieved from the convert service
+var requestOptions = {
+	host : 'backpack.openbadges.org', 
+	path : '/displayer/'+earnerId+'/groups', 
+	method : 'GET'
+};
+
+var displayRequest = http.request(requestOptions, function(reqResponse) {
+	//process the response..
+	
+});
+
+//...
+
+```
+
+### Expected Response
+
+Returns JSON including an array of the earner's public badge groups - __you can parse the returned data to include in a [request for a particular group](#retrieve-a-specific-group)__.
+
+#### Example Response
+
+```bash
+HTTP/1.1 200 OK
+Content-Type: application/json
+```
+
+```json
+{
+	"userId": 12345,
+	"groups": [
+        {
+            "groupId": 67890,
+            "name": "My Badge Group",
+            "badges": 3
+        },
+        ...
+	]
+}
+```
+
+The response includes the user ID and `groups`, an array including group items, each of which includes a `groupId`, `name` and number of `badges`. When you parse the JSON response, you will particularly  want to retrieve the `groupId`, which you can then include in a request to retrieve that group's badges.
+
+### Potential Errors
+
+Not found.
+
+```bash
+HTTP/1.1 404 Not Found
+Content-Type: application/json
+```
+
+```json
+{
+	"httpStatus": 404,
+	"status": "missing"
+}
+```
 
 ## Retrieve a Specific Group
 
-### GET /displayer/[userid]/group/[groupid].json
+To retrieve the data for an earner's awarded badges, you need to make a request to the Displayer API for a particular group the earner has made public. Your request will include the group ID in question, which you can also [retrieve from the API](#retrieve-groups) 
 
-A list of badges in a public group is exposed through the call, <code>/displayer/[userid]/group/[groupid].json</code>. An example response,
+### Expected Request
 
-    {
-      'userid'  : 123456,
-      'groupid' : 123456,
-      'badges'  : [{ 'badge assertion goes here' }]
+```bash
+GET <backpack>/displayer/<user-id>/group/<group-id>
+```
 
+#### Example Requests
 
-## Widgets
+cURL example:
 
-Widgets to display badges on a users' collection of sites should use the JSON feeds above as a data source.
+```bash
+curl -i -X GET http://backpack.openbadges.org/displayer/12345/group/67890.json
+```
+
+In the Web browser:
+
+```http
+http://backpack.openbadges.org/displayer/12345/group/67890.json
+```
+
+The following code demonstrates the request in a node.js app:
+
+```js
+var earnerId = 12345;//retrieved from convert service
+var groupId = 67890;//retrieved from groups query
+var requestOptions = {
+	host : 'backpack.openbadges.org', 
+	path : '/displayer/'+earnerId+'/group/'+groupId, 
+	method : 'GET'
+};
+
+var displayRequest = http.request(requestOptions, function(reqResponse) {
+	//process the response
+
+});
+
+//...
+
+```
+
+### Expected Response
+
+Returns JSON including an array of the earner's badges in the specified group.
+
+#### Example Response
+
+```bash
+HTTP/1.1 200 OK
+Content-Type: application/json
+```
+
+```json
+{
+	"userId": 12345,
+	"groupId": 67890,
+	"badges": [
+	{
+		"lastValidated": "2014-04-28T17:27:22.000Z",
+		"hostedUrl": "http://example.org/badge-assertion.json",
+		"assertion": {
+			"uid": "abcde12345",
+			"recipient": "sha256$abcde1345",
+			"badge": {
+				"name": "Badge Name",
+				"description": "Badge description.",
+				"image": "https://example.org/badge.png",
+				"criteria": "https://example.org/criteria",
+				"issuer": {
+					"name": "Issuer Name",
+					"url": "http://issuersite.org",
+					"_location": "http://example.org/issuer-organization.json",
+					"origin": "http://issuersite.org"
+				},
+			"_location": "http://issuersite.org/badge-class.json"
+			},
+			"verify": {
+				"url": "http://example.org/badge-assertion.json",
+				"type": "hosted"
+			},
+			"issuedOn": 1398705955,
+			"_originalRecipient": {
+				"identity": "sha256$abcde1345",
+				"type": "email",
+				"hashed": true
+			},
+			"issued_on": 1398705955
+		},
+		"imageUrl": "https://backpack.openbadges.org/images/badge/abcde12345.png"
+	},
+	...
+	]
+}
+```
+
+The response includes the user ID, group ID and list of badges. Each badge in the array is represented using its assertion, plus validation and location info. You can parse the returned badge information to include in your widget, site or application to display the earner's public badges.
+
+### Potential Errors
+
+Not found.
+
+```bash
+HTTP/1.1 200 OK
+Content-Type: application/json
+```
+
+```json
+{
+	"httpStatus": 404,
+	"status": "missing"
+}
+```
 
 ## Security
 
