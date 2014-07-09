@@ -5,7 +5,7 @@ This document introduces the Displayer API to query the Backpack for an earner's
 * [Assertion Information for the Uninitiated](https://github.com/mozilla/openbadges/wiki/Assertion-Information-for-the-Uninitiated)
 * [Assertion Specification](https://github.com/mozilla/openbadges-specification/blob/master/Assertion/latest.md)
 
-As a displayer, you can query the Mozilla Backpack for the badges an earner has chosen to make public. The earner can organize their badges into groups, which your REST API calls will query. 
+As a displayer, you can query the Mozilla Backpack for the badges an earner has chosen to make public. The earner can organize their badges into groups (referred to as "collections" within the Backpack), which your REST API calls will query. 
 
 To access the earner's badges, you need their unique ID within the Backpack. You can pass an earner email address to the [`convert`](#convert-earner-email-to-id) service to retrieve the earner ID, which you can then use in your calls to the Displayer API.
 
