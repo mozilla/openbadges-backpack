@@ -4,7 +4,7 @@ This document regards the Backpack Connect API for pushing earner badges to the 
 
 Interaction with the Backpack is implemented using access tokens. Issuers can use the [`issue`](#issue) endpoint to send badges to the Backpack, the [`refresh`](#refresh) endpoint to retrieve valid access tokens and the [`identity`](#identity) endpoint to retrieve hashed earner identity information.
 
-__The Backpack Connect API contrasts with the [Issuer API](issuer-api.md), with which the earner has to grant permission each time you try to push a badge to their Backpack.__
+__The Backpack Connect API contrasts with the [Issuer API](issuer_api.md), with which the earner has to grant permission each time you try to push a badge to their Backpack.__
 
 In order to use the Backpack Connect API, you first need to have your badge assertions(s) prepared. If you're new to badge issuing or assertions, see these pages:
 
