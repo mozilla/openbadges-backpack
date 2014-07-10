@@ -4,6 +4,17 @@ This document regards the Backpack Connect API for pushing earner badges to the 
 
 Interaction with the Backpack is implemented using access tokens. Issuers can use the [`issue`](#issue) endpoint to send badges to the Backpack, the [`refresh`](#refresh) endpoint to retrieve valid access tokens and the [`identity`](#identity) endpoint to retrieve hashed earner identity information.
 
+__The Backpack Connect API contrasts with the [Issuer API](issuer-api.md), with which the earner has to grant permission each time you try to push a badge to their Backpack.__
+
+In order to use the Backpack Connect API, you first need to have your badge assertions(s) prepared. If you're new to badge issuing or assertions, see these pages:
+
+* [Issuer Onboarding Docs](https://wiki.mozilla.org/Badges/Onboarding-Issuer)
+* [Assertion Information for the Uninitiated](https://github.com/mozilla/openbadges/wiki/Assertion-Information-for-the-Uninitiated)
+* [Assertion Specification](https://github.com/mozilla/openbadges-specification/blob/master/Assertion/latest.md)
+* [Badge tutorial](https://badgelab.herokuapp.com/)
+* [Earn a Badge Issue a badge](http://weblog.lonelylion.com/2012/03/22/earn-a-badge-issue-a-badge/)
+* [Assertion Validator](http://validator.openbadges.org/)
+
 For a detailed guide to using the Backpack Connect API, see [the tutorial](https://github.com/mozilla/openbadges/wiki/Using-the-Backpack-Connect-API).
 
 ## Contents
