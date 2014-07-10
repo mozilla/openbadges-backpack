@@ -13,7 +13,7 @@ For a technical overview of the Issuer API, read on. For a step-by-step tutorial
 
 ## Overview
 
-The Issuer API is a script that can be dropped into any badge issuer's website to provide a way for users to add an issuer's badges to their Backpack. It's a lightweight alternative to the [Backpack Connect API](https://github.com/mozilla/openbadges/wiki/Backpack-Connect:-Issuer-Documentation). With the Issuer API, you need the earner's permission each time you push to the Backpack - with the Connect alternative, you can manage user permission on an ongoing basis.
+The Issuer API is a script that can be dropped into any badge issuer's website to provide a way for users to add an issuer's badges to their Backpack. It's a lightweight alternative to the [Backpack Connect API](backpack_connect.md). With the Issuer API, you need the earner's permission each time you push to the Backpack - with the Connect alternative, you can manage user permission on an ongoing basis.
 
 A baked badge is a badge image with the assertion metadata embedded into it. When you use the Issuer API, you do not need to bake your badges, as the API handles this automatically.
 
