@@ -2,13 +2,15 @@
 
 Each awarded badge is represented as an assertion. An assertion is some JSON metadata and a badge image. You can "bake" the assertion data into a badge, meaning that the image has the JSON data embedded into it. See the [baking specification](https://github.com/mozilla/openbadges-specification/blob/master/Badge-Baking/latest.md) for a detailed overview of how baked badges work.
 
-The Backpack offers a REST API for baking data into your badge images. 
+The Mozilla Backpack offers a REST API for baking data into your badge images. 
 
 _You can alternatively bake badges using the Web interface at_: http://backpack.openbadges.org/baker
 
-To use the API, you need to have your assertions prepared. If you don't have assertions built and stored yet, see these pages:
+__You do not need to bake badges when using the [Issuer API](issuer_api.md) as it handles baking automatically.__
 
-* [Issuer Onboarding Docs](https://wiki.mozilla.org/Badges/Onboarding-Issuer)
+To use the baking API, you need to have your assertions prepared. If you don't have assertions built and stored yet, see these pages:
+
+* [Issuer Onboarding](https://github.com/mozilla/openbadges/wiki/Open-Badges-Onboarding:-Issuers)
 * [Assertion Information for the Uninitiated](https://github.com/mozilla/openbadges/wiki/Assertion-Information-for-the-Uninitiated)
 * [Assertion Specification](https://github.com/mozilla/openbadges-specification/blob/master/Assertion/latest.md)
 * [Badge tutorial](https://badgelab.herokuapp.com/)
