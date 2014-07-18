@@ -8,7 +8,7 @@ __The Backpack Connect API contrasts with the [Issuer API](issuer_api.md), with 
 
 In order to use the Backpack Connect API, you first need to have your badge assertions(s) prepared. If you're new to badge issuing or assertions, see these pages:
 
-* [Issuer Onboarding Docs](https://wiki.mozilla.org/Badges/Onboarding-Issuer)
+* [Issuer Onboarding](https://github.com/mozilla/openbadges/wiki/Open-Badges-Onboarding:-Issuers)
 * [Assertion Information for the Uninitiated](https://github.com/mozilla/openbadges/wiki/Assertion-Information-for-the-Uninitiated)
 * [Assertion Specification](https://github.com/mozilla/openbadges-specification/blob/master/Assertion/latest.md)
 * [Badge tutorial](https://badgelab.herokuapp.com/)
