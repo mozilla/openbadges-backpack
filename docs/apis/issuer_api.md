@@ -2,7 +2,7 @@
 
 This document regards the Issuer API for pushing earner badges to the Mozilla Backpack. In order to use the Issuer API, you first need to have your badge assertions(s) prepared. If you're new to badge issuing or assertions, see these pages:
 
-* [Issuer Onboarding Docs](https://wiki.mozilla.org/Badges/Onboarding-Issuer)
+* [Issuer Onboarding](https://github.com/mozilla/openbadges/wiki/Open-Badges-Onboarding:-Issuers)
 * [Assertion Information for the Uninitiated](https://github.com/mozilla/openbadges/wiki/Assertion-Information-for-the-Uninitiated)
 * [Assertion Specification](https://github.com/mozilla/openbadges-specification/blob/master/Assertion/latest.md)
 * [Badge tutorial](https://badgelab.herokuapp.com/)
@@ -116,3 +116,5 @@ Any badges successfully pushed to the earner Backpack can then be managed by the
 The reason we're even presenting the user with a dialog is because we want to prevent badge spamming, whereby third-party issuers spam a user's Backpack with badges that they don't want. Consequently, we need the Backpack to ask for the user's consent. This will be accomplished via an iframe embedded in the issuer's page.
 
 The only sensitive information that a user needs to enter in this flow is login credentials. Since authentication is done via [BrowserID](https://browserid.org/), which opens in a pop-up window, the consequences of spoof attacks are minimal – so long as the user knows to look at domain names in their address bar and BrowserID's UI.
+
+The [Backpack Connect API](backpack_connect.md) provides an alternative way to manage ongoing access to the earner's Mozilla Backpack, without requiring permission every time a badge is pushed.
