@@ -31,10 +31,6 @@ Usage example:
   
   * This URL should be stable - any badge issued from it relies on its
     existence for verification.
-  
-  * Both of these problems will be solved in the near-term future by
-    supporting signed assertions, so you'll only need to expose a URL
-    containing your public key.
 
 3. Make a POST request to the open badge creator with the assertion URL. If
 validation passes, you will receive an HTTP 200 with `content-type: image/png`,
@@ -185,13 +181,3 @@ environment variable `NODE_ENV=production`. These differences include:
 * using precompiled templates for client-side rendering
   * run `bin/template-precompile` to generate
 * "Test Site" banner will not show in the UI
-
-## Related Projects
-* https://github.com/lmorchard/django-badger -- Issuing app for Django
-* https://github.com/fedora-infra/tahrir -- A Pyramid (Python) app for issuing your own Open Badges.
-* https://github.com/openmichigan/open_badges -- Drupal module for managing/issuing badges
-* https://github.com/PRX/badges_engine -- Rails Engine for issuing.
-
-[assertions-latest]: https://github.com/mozilla/openbadges-specification/blob/master/Assertion/latest.md
-[baking=latest]: https://github.com/mozilla/openbadges-specification/blob/master/Badge-Baking/latest.md
-[issuer-api]: https://github.com/mozilla/openbadges/blob/development/docs/apis/issuer-api.md
