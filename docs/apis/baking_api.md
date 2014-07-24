@@ -4,7 +4,7 @@ Each awarded badge is represented as an assertion. An assertion is some JSON met
 
 The Mozilla Backpack offers a REST API for baking data into your badge images. 
 
-_You can alternatively bake badges using the Web interface at_: http://backpack.openbadges.org/baker
+_You can alternatively bake badges using the Web interface at_: http://bakery.openbadges.org/
 
 __You do not need to bake badges when using the [Issuer API](issuer_api.md) as it handles baking automatically.__
 
