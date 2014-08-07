@@ -435,9 +435,9 @@ exports.userBadgeUpload = function userBadgeUpload(req, res) {
       awardOptions[data.type] = data.value;
       analyzeAssertion(data.value, callback);
     },
-    function confirmAndAward(info, callback) {
+    function confirmAndAward(data, callback) {
       const recipient = awardOptions.recipient;
-      const assertion = normalizeAssertion(info);
+      const assertion = normalizeAssertion(data.info);
       const userOwnsBadge = Badge.confirmRecipient(assertion, recipient);
       if (!userOwnsBadge) {
         const err = new Error('This badge was not issued to you! Contact your issuer.');
