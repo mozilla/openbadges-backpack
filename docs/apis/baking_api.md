@@ -13,13 +13,15 @@ To use the baking API, you need to have your assertions prepared. If you don't h
 * [Issuer Onboarding](https://github.com/mozilla/openbadges/wiki/Open-Badges-Onboarding:-Issuers)
 * [Assertion Information for the Uninitiated](https://github.com/mozilla/openbadges/wiki/Assertion-Information-for-the-Uninitiated)
 * [Assertion Specification](https://github.com/mozilla/openbadges-specification/blob/master/Assertion/latest.md)
+* [New Issuers: Give Yourself a Badge](https://github.com/mozilla/openbadges/wiki/New-Issuers:-Give-Yourself-a-Badge)
+* [Issuer Checklist](https://github.com/mozilla/openbadges/wiki/Issuer-Checklist)
 * [Badge tutorial](https://badgelab.herokuapp.com/)
 * [Earn a Badge Issue a badge](http://weblog.lonelylion.com/2012/03/22/earn-a-badge-issue-a-badge/)
 * [Assertion Validator](http://validator.openbadges.org/)
 
 ## Baking
 
-The endpoint for baking a badge is `baker`. You can make a `GET` request to the baking service, passing the URL of your badge assertion. The baker will retrieve the badge image file listed as `image` in the badge class linked to from your assertion JSON. The baker will embed the assertion data into that image and return it to you as a raw data stream. You can then save it as an image file, with the assertion data stored within it.
+The endpoint for baking a badge is `/baker`. You can make a `GET` request to the baking service, passing the URL of your badge assertion. The baker will retrieve the badge image file listed as `image` in the badge class linked to from your assertion JSON. The baker will embed the assertion data into that image and return it to you as a raw data stream. You can then save it as an image file, with the assertion data stored within it.
 
 _Earners who use the Mozilla Backpack can upload baked images to their Backpacks and the embedded data will automatically be extracted._
 
