@@ -5,6 +5,8 @@ This document regards the Issuer API for pushing earner badges to the Mozilla Ba
 * [Issuer Onboarding](https://github.com/mozilla/openbadges/wiki/Open-Badges-Onboarding:-Issuers)
 * [Assertion Information for the Uninitiated](https://github.com/mozilla/openbadges/wiki/Assertion-Information-for-the-Uninitiated)
 * [Assertion Specification](https://github.com/mozilla/openbadges-specification/blob/master/Assertion/latest.md)
+* [New Issuers: Give Yourself a Badge](https://github.com/mozilla/openbadges/wiki/New-Issuers:-Give-Yourself-a-Badge)
+* [Issuer Checklist](https://github.com/mozilla/openbadges/wiki/Issuer-Checklist)
 * [Badge tutorial](https://badgelab.herokuapp.com/)
 * [Earn a Badge Issue a badge](http://weblog.lonelylion.com/2012/03/22/earn-a-badge-issue-a-badge/)
 * [Assertion Validator](http://validator.openbadges.org/)
@@ -25,7 +27,7 @@ The badge creation workflow is as follows:
 
 *A badge assertion represents a single badge awarded to a single earner. Each assertion includes the earner identity and a link to info about the badge itself, which in turn links to information about the issuer. The Issuer API can handle both __hosted__ and __signed__ badge assertions. A _hosted_ assertion requires three JSON files hosted at stable URLs. A _signed_ assertion requires a JSON Web Signature.
 
-__Your assertion URLs should respond using both HTTP GET and HEAD.__
+__Your assertion URLs should respond using both HTTP `GET` and `HEAD`.__
 
 ## Installation
 
@@ -58,7 +60,7 @@ If called, the callback function receives the following parameters:
 
 |Parameter| |
 |:---|:---|
-|`errors`|Array of errors - each item includes: `assertion` (_URL or JSON Web Signature not added to Backpack_) and [`reason`](#error-constant-strings) (_constant string_)|
+|`errors`|Array of errors - each item includes: `assertion` (_URL or JSON Web Signature NOT added to Backpack_) and [`reason`](#error-constant-strings) (_constant string_)|
 |`successes`|Array of assertions successfully added to the Backpack (_each represented by URL or JSON Web Signature_).|
 
 #### Example method call
@@ -109,7 +111,7 @@ OpenBadges.issue_no_modal(assertions);
 
 ## Earner Backpack
 
-Any badges successfully pushed to the earner Backpack can then be managed by the earner along with any other badges they have.
+Any badges successfully pushed to the earner Backpack can subsequently be managed by the earner along with any other badges they have.
 
 ## Threat Model
 
