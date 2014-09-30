@@ -11,6 +11,8 @@ In order to use the Backpack Connect API, you first need to have your badge asse
 * [Issuer Onboarding](https://github.com/mozilla/openbadges/wiki/Open-Badges-Onboarding:-Issuers)
 * [Assertion Information for the Uninitiated](https://github.com/mozilla/openbadges/wiki/Assertion-Information-for-the-Uninitiated)
 * [Assertion Specification](https://github.com/mozilla/openbadges-specification/blob/master/Assertion/latest.md)
+* [New Issuers: Give Yourself a Badge](https://github.com/mozilla/openbadges/wiki/New-Issuers:-Give-Yourself-a-Badge)
+* [Issuer Checklist](https://github.com/mozilla/openbadges/wiki/Issuer-Checklist)
 * [Badge tutorial](https://badgelab.herokuapp.com/)
 * [Earn a Badge Issue a badge](http://weblog.lonelylion.com/2012/03/22/earn-a-badge-issue-a-badge/)
 * [Assertion Validator](http://validator.openbadges.org/)
