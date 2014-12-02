@@ -8,9 +8,9 @@ const analyzeAssertion = require('../lib/analyze-assertion');
 
 test('analyzeAssertion: valid old assertion', function (t) {
   $.mockHttp();
-  analyzeAssertion($.makeOldAssertion(), function (err, info) {
+  analyzeAssertion($.makeOldAssertion(), function (err, data) {
     t.notOk(err, 'no errors');
-    t.same(info.version, '0.5.0');
+    t.same(data.info.version, '0.5.0');
     t.end();
   });
 });
@@ -20,7 +20,7 @@ test('analyzeAssertion: invalid old assertion, bad form', function (t) {
   const assertion = $.makeOldAssertion();
   delete assertion.badge.criteria;
   delete assertion.badge.image;
-  analyzeAssertion(assertion, function (err, info) {
+  analyzeAssertion(assertion, function (err, data) {
     t.same(err.code, 'structure');
     t.ok(err.extra['badge.image'], 'should have image error');
     t.end();
@@ -31,16 +31,16 @@ test('analyzeAssertion: valid old assertion, url', function (t) {
   const assertion = $.makeOldAssertion();
   $.mockHttp()
     .get('/assertion').reply(200, JSON.stringify(assertion), { 'content-type': 'application/json' })
-  analyzeAssertion($.makeUrl('/assertion'), function (err, info) {
+  analyzeAssertion($.makeUrl('/assertion'), function (err, data) {
     t.notOk(err, 'no errors');
-    t.same(info.version, '0.5.0');
-    t.same(info.structures.assertion, assertion);
+    t.same(data.info.version, '0.5.0');
+    t.same(data.info.structures.assertion, assertion);
     t.end();
   });
 });
 
 test('analyzeAssertion: url points to nothing', function (t) {
-  analyzeAssertion('https://not-a-real-domain.fake', function (err, info) {
+  analyzeAssertion('https://not-a-real-domain.fake', function (err, data) {
     t.same(err.code, 'http-unreachable');
     t.end();
   });
@@ -51,18 +51,18 @@ test('analyzeAssertion: bad responses', function (t) {
     .get('/404').reply(404)
     .get('/500').reply(500)
   t.plan(4);
-  analyzeAssertion($.makeUrl('/404'), function (err, info) {
+  analyzeAssertion($.makeUrl('/404'), function (err, data) {
     t.same(err.code, 'http-status');
     t.same(err.extra, 404);
   });
-  analyzeAssertion($.makeUrl('/500'), function (err, info) {
+  analyzeAssertion($.makeUrl('/500'), function (err, data) {
     t.same(err.code, 'http-status');
     t.same(err.extra, 500);
   });
 });
 
 test('analyzeAssertion: malformed url', function (t) {
-  analyzeAssertion('something not a url', function (err, info) {
+  analyzeAssertion('something not a url', function (err, data) {
     t.same(err.name, 'TypeError');
     t.end();
   });
@@ -72,21 +72,21 @@ test('analyzeAssertion: new assertion, hosted', function (t) {
   const assertion = $.makeNewAssertion();
   $.mockHttp()
     .get('/assertion').reply(200, JSON.stringify(assertion))
-  analyzeAssertion(assertion, function (err, info) {
+  analyzeAssertion(assertion, function (err, data) {
     t.notOk(err, 'no errors')
-    t.same(info.version, '1.0.0');
-    t.same(info.structures.assertion, assertion);
+    t.same(data.info.version, '1.0.0');
+    t.same(data.info.structures.assertion, assertion);
     t.end();
   });
 });
 
 test('analyzeAssertion: new assertion, signed', function (t) {
   const signature = $.makeSignature();
-  analyzeAssertion(signature, function (err, info) {
+  analyzeAssertion(signature, function (err, data) {
     t.notOk(err, 'no errors');
-    t.same(info.version, '1.0.0');
-    t.same(signature, info.signature);
-    t.same(info.structures.assertion.uid, 'f2c20');
+    t.same(data.info.version, '1.0.0');
+    t.same(signature, data.info.signature);
+    t.same(data.info.structures.assertion.uid, 'f2c20');
     t.end();
   });
 });

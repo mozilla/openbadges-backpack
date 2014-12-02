@@ -45,10 +45,10 @@ exports.baker = function (req, res) {
       awardOptions.url = url;
       analyzeAssertion(url, callback)
     },
-    function bakeBadge(info, callback) {
-      var image = preferredImage(info.resources)
-      var assertion = info.structures.assertion;
-      awardOptions.assertion = info.structures.assertion;
+    function bakeBadge(data, callback) {
+      var image = preferredImage(data.info.resources)
+      var assertion = data.info.structures.assertion;
+      awardOptions.assertion = data.info.structures.assertion;
 
       if (!assertion.verify) {
         assertion = xtend(assertion, {

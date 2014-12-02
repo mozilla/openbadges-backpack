@@ -191,7 +191,7 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
       return res.json(400, err);
     }
 
-    const assertion = normalizeAssertion(data);
+    const assertion = normalizeAssertion(data.info);
     const recipient = user.get('email');
     const userOwnsBadge = Badge.confirmRecipient(assertion, recipient);
     const origin = assertion.badge.issuer.origin;
@@ -210,8 +210,9 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
 
     // awarding the badge, only done if this is a POST
     if (req.method == 'POST') {
-      const imagedata = data.resources['badge.image'];
+      const imagedata = data.info.resources['badge.image'];
       const opts = {
+        original: data.assertion,
         assertion: assertion,
         imagedata: imagedata,
         recipient: recipient,
