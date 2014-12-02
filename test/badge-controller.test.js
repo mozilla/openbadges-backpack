@@ -23,6 +23,18 @@ const HASHED_ASSERTION = testUtils.makeAssertion({
   salt: 'hashbrowns'
 });
 
+
+const RAW_SVG_ASSERTION = testUtils.makeAssertion({
+  recipient: 'brian@example.org',
+  criteria: '/ohsup.html',
+  issued_on: '2011-08-24'
+});
+
+const HASHED_SVG_ASSERTION = testUtils.makeAssertion({
+  recipient: makeHash('brian@example.org', 'eggs'),
+  salt: 'eggs'
+});
+
 testUtils.prepareDatabase({
   '1-real-user': new User({ email: 'brian@example.org' }),
   '2-false-user': new User({ email: 'thief@example.org' }),
@@ -32,20 +44,37 @@ testUtils.prepareDatabase({
     image_path: 'image_path',
     body: RAW_ASSERTION
   }),
-  '4-badge-raw-image': new BadgeImage({
+
+  '4-badge-raw-png-image': new BadgeImage({
     badge_hash: Badge.createHash(RAW_ASSERTION),
     image_data: images.png.unbaked.toString('base64'),
   }),
-  '5-badge-hashed': new Badge({
+  '5-badge-png-hashed': new Badge({
     user_id: 1,
     endpoint: 'endpoint',
     image_path: 'image_path',
     public_path: '4-badge-hashed-pth',
     body: HASHED_ASSERTION
   }),
-  '6-badge-hashed-image': new BadgeImage({
+  '6-badge-png-hashed-image': new BadgeImage({
     badge_hash: Badge.createHash(HASHED_ASSERTION),
     image_data: images.png.unbaked.toString('base64'),
+  }),
+
+  '7-badge-raw-svg-image': new BadgeImage({
+    badge_hash: Badge.createHash(RAW_ASSERTION),
+    image_data: images.svg.unbaked.toString('base64'),
+  }),
+  '8-badge-svg-hashed': new Badge({
+    user_id: 1,
+    endpoint: 'endpoint',
+    image_path: 'image_path',
+    public_path: '6-badge-hashed-pth',
+    body: HASHED_SVG_ASSERTION
+  }),
+  '9-badge-svg-hashed-image': new BadgeImage({
+    badge_hash: Badge.createHash(HASHED_SVG_ASSERTION),
+    image_data: images.svg.unbaked.toString('base64'),
   }),
 }, function (fixtures) {
   test('badge#findByUrl sets req.badge when url is valid', function(t) {
@@ -99,12 +128,29 @@ testUtils.prepareDatabase({
   });
 
   test('badge#share works when public_path already exists', function(t) {
-    t.same(fixtures['5-badge-hashed'].get('public_path'),
+
+    t.same(fixtures['8-badge-svg-hashed'].get('public_path'),
+           '6-badge-hashed-pth', 'public_path already exists');
+
+    t.same(fixtures['5-badge-png-hashed'].get('public_path'),
            '4-badge-hashed-pth', 'public_path already exists');
+
     conmock({
       handler: badge.share,
       request: {
-        badge: fixtures['5-badge-hashed']
+        badge: fixtures['8-badge-svg-hashed']
+      }
+    }, function(err, mock) {
+      if (err) throw err;
+      t.same(mock.status, 303);
+      t.same(mock.fntype, 'redirect');
+      t.same(mock.path, '/share/badge/6-badge-hashed-pth');
+    });
+
+    conmock({
+      handler: badge.share,
+      request: {
+        badge: fixtures['5-badge-png-hashed']
       }
     }, function(err, mock) {
       if (err) throw err;
@@ -119,7 +165,7 @@ testUtils.prepareDatabase({
     conmock({
       handler: badge.show,
       request: {
-        badge: fixtures['5-badge-hashed']
+        badge: fixtures['5-badge-png-hashed']
       }
     }, function(err, mock) {
       if (err) throw err;
@@ -127,13 +173,26 @@ testUtils.prepareDatabase({
       t.same(mock.fntype, 'render');
       t.same(mock.path, 'badge-shared.html');
       t.same(mock.options.badge.attributes.public_path, '4-badge-hashed-pth');
+    });
+
+    conmock({
+      handler: badge.show,
+      request: {
+        badge: fixtures['8-badge-svg-hashed']
+      }
+    }, function(err, mock) {
+      if (err) throw err;
+      t.same(mock.status, 200, '200 returned');
+      t.same(mock.fntype, 'render');
+      t.same(mock.path, 'badge-shared.html');
+      t.same(mock.options.badge.attributes.public_path, '6-badge-hashed-pth');
       t.end();
     });
   });
 
   test('badge#image', function (t) {
-    const badgeImageRaw = fixtures['4-badge-raw-image'];
-    const badgeImageHashed = fixtures['6-badge-hashed-image'];
+    const badgeImageRaw = fixtures['4-badge-raw-png-image'];
+    const badgeImageHashed = fixtures['6-badge-png-hashed-image'];
     const handler = badge.image;
 
     t.plan(3)
@@ -170,7 +229,7 @@ testUtils.prepareDatabase({
     const owner = fixtures['1-real-user'];
     const thief = fixtures['2-false-user'];
     const badgeRaw = fixtures['3-badge-raw'];
-    const badgeHashed = fixtures['5-badge-hashed'];
+    const badgeHashed = fixtures['5-badge-png-hashed'];
     const handler = badge.destroy;
 
     conmock({

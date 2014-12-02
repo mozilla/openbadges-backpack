@@ -148,7 +148,7 @@ app.post('/group', group.create);
 app.put('/group/:groupId', group.update);
 app.delete('/group/:groupId', group.destroy);
 
-app.get('/images/badge/:badgeHash.png', badge.image);
+app.get('/images/badge/:badgeHash.:badgeFileType', badge.image);
 
 app.post('/share/badge/:badgeId', badge.share);
 app.get('/share/badge/:badgeUrl', badge.show);
