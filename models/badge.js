@@ -49,9 +49,9 @@ Badge.confirmRecipient = function confirmRecipient(assertion, email) {
   if (typeof recipient !== 'string')
     return false
 
-  // if it's an email address, do a straight comparison
+  // if it's an email address, do a straight lower-case comparison mozilla/openbadges#469
   if (/@/.test(recipient))
-    return recipient === email;
+    return recipient.toLowerCase() === email.toLowerCase();
 
   // if it's not an email address, it must have an alg and dollar sign.
   if (!(recipient.match(/\w+(\d+)?\$.+/)))
