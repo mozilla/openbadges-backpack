@@ -1,19 +1,10 @@
 language: node_js
 node_js:
-  - 0.8
-  - 0.10
-env: DISABLE_PHANTOM_TESTS="see https://github.com/joyent/libuv/issues/826" 
-notifications:
-  irc:
-    - "irc.mozilla.org#badges"
-  email:
-    recipients:
-      - openbadges+ci@mozilla.com
+  - "0.10"
+env: DISABLE_PHANTOM_TESTS="see https://github.com/joyent/libuv/issues/826"
 before_script:
   - cp lib/environments/local-dist.js lib/environments/local.js
   - mysql -e 'create database openbadges;'
   - mysql -e 'create database test_openbadges;'
   - mysql -uroot -e "grant all on openbadges.* to 'badgemaker'@'localhost' identified by 'secret'"
   - mysql -uroot -e "grant all on test_openbadges.* to 'badgemaker'@'localhost' identified by 'secret'"
-script:
-  - npm test
