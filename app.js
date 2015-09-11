@@ -46,6 +46,15 @@ env.addFilter('formatdate', function (rawDate) {
 
 // Middleware. Also see `middleware.js`
 // ------------------------------------
+if (configuration.get('force_https')) {
+  var force_ssl = require('express-enforces-ssl');
+  var hsts = require('hsts');
+
+  // trust X-Forwarded-Proto header
+  app.enable('trust proxy');
+  app.use(force_ssl());
+  app.use(hsts({ maxAge: 10886400000 }))
+}
 app.use(middleware.less(app.get('env')));
 app.use(express.static(path.join(__dirname, "static")));
 app.use("/views", express.static(path.join(__dirname, "views")));
