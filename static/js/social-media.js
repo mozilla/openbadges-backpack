@@ -13,8 +13,8 @@ var SocialMedia = function() {};
 
     facebook: {
       id: "facebook-jssdk",
-      src: "//connect.facebook.net/en_US/all.js#xfbml=true",
-      html: "<div class='fb-like' data-href='"+urlPlaceHolder+"' data-send='false' data-layout='button_count' data-width='50' data-show-faces='false' style='position:relative; top:1px'></div>"
+      src: "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.4",
+      html: "<div class='fb-share-button' data-href='"+urlPlaceHolder+"' data-layout='button_count'></div>"
     },
 
     google: {
@@ -27,6 +27,12 @@ var SocialMedia = function() {};
       id: "twitter-wjs",
       src: "//platform.twitter.com/widgets.js",
       html: "<a href='https://twitter.com/share' class='twitter-share-button' data-count='none' data-text='Check out my OpenBadges at ' data-via='OpenBadges' data-dnt='true'>Tweet</a>"
+    },
+
+    linkedin: {
+      id: "linkedin",
+      src: "//platform.linkedin.com/in.js",
+      html: "<script type='IN/Share' data-url='"+urlPlaceHolder+"' data-counter='right'></script>"
     },
 
     /**
