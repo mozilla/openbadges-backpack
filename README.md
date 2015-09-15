@@ -62,11 +62,9 @@ The Backpack includes the [Displayer API](docs/apis/displayer_api.md), via which
   * [PhantomJS](http://phantomjs.org): We use PhantomJS for running unit tests. On a debian based Linux system you can run `sudo apt-get install phantomjs` to install and run `phantomjs --version` to check it is installed. For other systems you can try [downloading](http://phantomjs.org/download.html) and installing it or [building it from source](http://phantomjs.org/build.html).
 4. Install local dependencies: `npm install`
 
-5. Install submodules: `git submodule update --init`
+5. Run the test suite: `npm test`
 
-6. Run the test suite: `npm test`
-
-7. Start your server: `npm start`
+6. Start your server: `npm start`
 
 No matter which way you choose, you should join the
 [Open Badges Google Group](https://groups.google.com/forum/#!forum/openbadges). If
@@ -93,7 +91,7 @@ migration. You can do this as follows:
    file preixed with a timestamp in the `migrations` directory.
    Something like the following should be displayed:
 
-       [INFO] Created migration at  
+       [INFO] Created migration at
        migrations/20130213205310-add-issuer-column.js
 
 3. Edit the new JS file as per the [node-db-migrate][] instructions.
@@ -107,12 +105,12 @@ And finally, note that during development, `npm start` automatically runs
 run this command yourself whenever you deploy changes that involve a
 schema change.
 
-If you want to write tests for your migration, check out 
+If you want to write tests for your migration, check out
 `test/migration.test.js` for inspiration.
 
   [node-db-migrate]: https://github.com/nearinfinity/node-db-migrate#creating-migrations
 
-### Production 
+### Production
 
 The codebase behaves slightly differently when run in an environment where
 environment variable `NODE_ENV=production`. These differences include:
