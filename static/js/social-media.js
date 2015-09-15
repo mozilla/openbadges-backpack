@@ -14,7 +14,7 @@ var SocialMedia = function() {};
     facebook: {
       id: "facebook-jssdk",
       src: "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.4",
-      html: '<div class="fb-share-button" data-href="'+urlPlaceHolder+'" data-layout="button_count"></div>'
+      html: "<div class='fb-share-button' data-href='"+urlPlaceHolder+"' data-layout='button_count'></div>"
     },
 
     google: {
