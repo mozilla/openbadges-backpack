@@ -146,15 +146,24 @@ exports.notFound = function notFound() {
   }
 };
 
-exports.less = function less(env) {
-  var base = {
-    src: path.join(__dirname, "static/less"),
-    paths: [path.join(__dirname, "static/vendor/bootstrap/less")],
-    dest: path.join(__dirname, "static/css"),
-    prefix: '/css',
+exports.less = function less() {
+  var src = path.join(__dirname, 'static/less');
+  var config = {
+    render: {
+      compress: "auto",
+      paths: [path.join(__dirname, "static/vendor/bootstrap/less")],
+    },
+    dest: path.join(__dirname, "static"),
+    debug: true,
+    force: true,
+    preprocess: {
+      path: function(pathname, req) {
+        return pathname.replace(path.sep + 'css' + path.sep, path.sep);
+      }
+    }
   };
-  var config = configuration.get('less') || {};
-  return lessMiddleware(_.defaults(base, config));
+
+  return lessMiddleware(src, config);
 };
 
 exports.staticTemplateViews = function staticTemplateViews(env, viewPrefix) {

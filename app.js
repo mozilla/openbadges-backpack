@@ -17,18 +17,22 @@ var flash = require('connect-flash');
 var nunjucks = require('nunjucks');
 var _ = require('underscore');
 
+var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
+var session = require('express-session');
+
 var app = express();
+
 app.logger = logger;
 app.config = configuration;
 
 /* Default values for template variables */
-app.locals({
-  error: [],
-  success: [],
-  getBrowserIdScriptUrl: function() {
-    return browserid.getIncludeScriptUrl();
-  }
-});
+
+app.locals.error = [];
+app.locals.success = [];
+app.locals.getBrowserIdScriptUrl = function() {
+  return browserid.getIncludeScriptUrl();
+};
 
 app.set('useCompiledTemplates', configuration.get('nunjucks_precompiled'));
 
@@ -55,42 +59,68 @@ if (configuration.get('force_https')) {
   app.use(force_ssl());
   app.use(hsts({ maxAge: 10886400000 }))
 }
-app.use(middleware.less(app.get('env')));
+app.use(middleware.less());
 app.use(express.static(path.join(__dirname, "static")));
 app.use("/views", express.static(path.join(__dirname, "views")));
-app.use(middleware.staticTemplateViews(env, 'static/'));
-app.use(middleware.noFrame({ whitelist: [ '/issuer/frame.*', '/', '/share/.*' ] }));
-app.use(express.bodyParser());
-app.use(express.cookieParser());
-app.use(express.methodOverride());
-app.use(middleware.logRequests());
-app.use(middleware.cookieSessions());
-app.use(middleware.userFromSession());
-app.use(flash());
-app.use(middleware.csrf({
-  whitelist: [
-    '/backpack/authenticate',
-    '/displayer/convert/.+',
-    '/issuer/frameless.*',
-    '/api/.+'
-  ]
+
+
+// prepare session/cookie handling
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(require('connect-multiparty')());
+app.use(cookieParser());
+
+var secret = (process.env.SESSION_SECRET !== undefined) ? process.env.SESSION_SECRET : 'keyboard cat strikes again';
+app.use(session({
+  secret: secret,
+  resave: false,
+  saveUninitialized: false
 }));
-app.use(middleware.cors({ whitelist: ['/_badges.*', '/issuer.*', '/baker', '/displayer/.+/group.*'] }));
-app.use(middleware.statsdRequests());
-app.use(app.router);
-app.use(middleware.notFound());
-app.configure('development', function () {
-  var gitUtil = require('./lib/git-util');
-  try {
-    var sha = gitUtil.findSHA();
-    app.set('sha', sha);
-  }
-  catch (ex) {
-    logger.warn(ex);
-  }
-  browserid.configure({testUser: process.env['BROWSERID_TEST_USER']});
+
+
+nunjucks.configure('views', {
+    autoescape: true,
+    express: app
 });
-app.use(express.errorHandler());
+
+
+
+
+
+
+// app.use(middleware.staticTemplateViews(env, 'static/'));
+// app.use(middleware.noFrame({ whitelist: [ '/issuer/frame.*', '/', '/share/.*' ] }));
+// app.use(express.bodyParser());
+// app.use(express.cookieParser());
+// app.use(express.methodOverride());
+// app.use(middleware.logRequests());
+// app.use(middleware.cookieSessions());
+// app.use(middleware.userFromSession());
+app.use(flash());
+// app.use(middleware.csrf({
+//   whitelist: [
+//     '/backpack/authenticate',
+//     '/displayer/convert/.+',
+//     '/issuer/frameless.*',
+//     '/api/.+'
+//   ]
+// }));
+// app.use(middleware.cors({ whitelist: ['/_badges.*', '/issuer.*', '/baker', '/displayer/.+/group.*'] }));
+// app.use(middleware.statsdRequests());
+// app.use(app.router);
+// app.use(middleware.notFound());
+// app.configure('development', function () {
+//   var gitUtil = require('./lib/git-util');
+//   try {
+//     var sha = gitUtil.findSHA();
+//     app.set('sha', sha);
+//   }
+//   catch (ex) {
+//     logger.warn(ex);
+//   }
+//   browserid.configure({testUser: process.env['BROWSERID_TEST_USER']});
+// });
+// app.use(express.errorHandler());
 
 
 // Routes
@@ -201,5 +231,5 @@ if (!module.parent) {
   };
   start_server(app);
 } else {
-  module.exports = http.createServer(app);
+  app.listen();
 }
