@@ -9,6 +9,7 @@ var path = require('path');
 var lessMiddleware = require('less-middleware');
 var _ = require('underscore');
 var statsd = require('./lib/statsd');
+var cookieSession = require('cookie-session');
 
 // `COOKIE_SECRET` is randomly generated on the first run of the server,
 // then stored to a file and looked up on restart to maintain state.
@@ -19,7 +20,7 @@ var COOKIE_KEY = 'openbadges_state';
 // Store sessions in cookies. The session structure is base64 encoded, a
 // salty hash is created with `COOKIE_SECRET` to prevent clientside tampering.
 exports.cookieSessions = function cookieSessions() {
-  return express.cookieSession({
+  return cookieSession({
     secret: COOKIE_SECRET,
     key: COOKIE_KEY,
     cookie: {

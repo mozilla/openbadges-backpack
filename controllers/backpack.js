@@ -5,6 +5,8 @@ const fs = require('fs');
 const async = require('async');
 const url = require('url');
 const bakery = require('openbadges-bakery');
+const csrf = require('csurf');
+const bodyParser = require('body-parser');
 
 const logger = require('../lib/logger');
 const configuration = require('../lib/configuration');
@@ -17,17 +19,24 @@ const Group = require('../models/group');
 const User = require('../models/user');
 
 /**
+ * Setup route middlewares
+ */
+const csrfProtection = csrf({ cookie: true });
+const parseForm = bodyParser.urlencoded({ extended: false });
+
+/**
  * Render the login page.
  */
 
 exports.login = function login(request, response) {
-  if (request.user)
+  if (request.user) {
     return response.redirect(303, '/');
+  }
   // request.flash returns an array. Pass on the whole thing to the view and
   // decide there if we want to display all of them or just the first one.
   response.render('login.html', {
     error: request.flash('error'),
-    csrfToken: request.session._csrf
+    csrfToken: request.csrfToken()
   });
 };
 
@@ -44,8 +53,9 @@ exports.authenticate = function authenticate(req, res) {
   function formatResponse(to, apiError, humanReadableError) {
     const preferJsonOverHtml = req.accepts('html, json') === 'json';
     if (preferJsonOverHtml) {
-      if (apiError)
+      if (apiError) {
         return res.send(400, {status: 'error', reason: apiError});
+      }
       return res.send(200, {status: 'ok', email: req.session.emails[0]});
     }
     if (humanReadableError)
@@ -57,8 +67,9 @@ exports.authenticate = function authenticate(req, res) {
   const verifierUrl = browserid.getVerifierUrl(configuration);
   const audience = browserid.getAudience(req);
 
-  if (!assertion)
+  if (!assertion) {
     return formatResponse('/backpack/login', "assertion expected");
+  }
 
   browserid.verify({
     url: verifierUrl,
@@ -85,6 +96,7 @@ exports.authenticate = function authenticate(req, res) {
  */
 
 exports.signout = function signout(request, response) {
+  console.log("signout");
   request.session = {};
   response.redirect(303, '/backpack/login');
 };
@@ -155,6 +167,7 @@ function badgePage (request, response, badges, template) {
 }
 
 exports.recentBadges = function recent (request, response, next) {
+  console.log(request, request.user)
   var user = request.user;
   if (!user)
     return response.redirect(303, '/backpack/login');

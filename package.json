@@ -9,16 +9,16 @@
     "postinstall": "nunjucks-precompile views > static/js/nunjucks-templates.js"
   },
   "devDependencies": {
-    "jshint": "~0.6.2",
-    "mime": "~1.2.5",
-    "nock": "~0.23.0",
-    "prompt": "~0.2.9",
-    "jws": "0.2.2",
-    "tap": "~0.3.2",
-    "wd": "0.0.31",
-    "cheerio": "0.10.8",
+    "cheerio": "^0.10.8",
+    "jshint": "^0.6.3",
+    "jws": "^0.2.2",
+    "mime": "^1.2.11",
+    "nock": "^0.23.0",
+    "prompt": "^0.2.14",
+    "sinon": "^1.7.3",
+    "tap": "^0.3.3",
     "tap-prettify": "0.0.1",
-    "sinon": "~1.7.3"
+    "wd": "0.0.31"
   },
   "dependencies": {
     "async": "^2.0.0-rc.5",
@@ -27,6 +27,7 @@
     "connect-flash": "*",
     "connect-multiparty": "*",
     "cookie-parser": "*",
+    "cookie-session": "^2.0.0-alpha.1",
     "csurf": "^1.9.0",
     "db-migrate": "0.3.2",
     "express": "^5.0.0-alpha.2",

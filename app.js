@@ -17,9 +17,16 @@ var flash = require('connect-flash');
 var nunjucks = require('nunjucks');
 var _ = require('underscore');
 
+var csrf = require('csurf');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
-var session = require('express-session');
+
+/**
+ * Setup route middlewares
+ */
+var csrfProtection = csrf({ cookie: true });
+var parseForm = bodyParser.urlencoded({ extended: false });
+
 
 var app = express();
 
@@ -59,6 +66,7 @@ if (configuration.get('force_https')) {
   app.use(force_ssl());
   app.use(hsts({ maxAge: 10886400000 }))
 }
+// compile stylesheets at runtime
 app.use(middleware.less());
 app.use(express.static(path.join(__dirname, "static")));
 app.use("/views", express.static(path.join(__dirname, "views")));
@@ -70,14 +78,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(require('connect-multiparty')());
 app.use(cookieParser());
 
-var secret = (process.env.SESSION_SECRET !== undefined) ? process.env.SESSION_SECRET : 'keyboard cat strikes again';
-app.use(session({
-  secret: secret,
-  resave: false,
-  saveUninitialized: false
-}));
-
-
+// configure views
 nunjucks.configure('views', {
     autoescape: true,
     express: app
@@ -94,8 +95,8 @@ nunjucks.configure('views', {
 // app.use(express.cookieParser());
 // app.use(express.methodOverride());
 // app.use(middleware.logRequests());
-// app.use(middleware.cookieSessions());
-// app.use(middleware.userFromSession());
+app.use(middleware.cookieSessions());
+app.use(middleware.userFromSession());
 app.use(flash());
 // app.use(middleware.csrf({
 //   whitelist: [
@@ -171,10 +172,10 @@ app.get('/', backpack.recentBadges);
 app.get('/backpack', backpack.manage);
 app.get('/backpack/badges', backpack.allBadges);
 app.get('/backpack/add', backpack.addBadge);
-app.get('/backpack/login', backpack.login);
+app.get('/backpack/login', csrfProtection, backpack.login);
 app.get('/backpack/signout', backpack.signout);
 app.post('/backpack/badge', backpack.userBadgeUpload);
-app.post('/backpack/authenticate', backpack.authenticate);
+app.post('/backpack/authenticate', parseForm, csrfProtection, backpack.authenticate);
 app.get('/backpack/settings', backpack.settings());
 app.post('/backpack/settings/revoke-origin', backpackConnect.revokeOrigin());
 app.get('/stats', backpack.stats);
@@ -208,7 +209,7 @@ app.get('/api/identity', backpackConnect.authorize("issue"),
                          backpackConnect.hashIdentity());
 
 if (!module.parent) {
-  var start_server = function start_server(app) {
+  var startServer = function startServer(app) {
     var port = app.config.get('port');
     var pid = process.pid.toString();
     var pidfile = path.join(app.config.get('var_path'), 'server.pid');
@@ -229,7 +230,7 @@ if (!module.parent) {
       process.exit();
     });
   };
-  start_server(app);
+  startServer(app);
 } else {
   app.listen();
 }
