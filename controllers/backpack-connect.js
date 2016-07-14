@@ -142,6 +142,7 @@ function allowAccess(req, res, next) {
       logger.debug(err);
       return next(err);
     }
+    console.log("trigger");
     return res.redirect(303, utils.extendUrl(req.body.callback, {
       access_token: session.get('access_token'),
       refresh_token: session.get('refresh_token'),

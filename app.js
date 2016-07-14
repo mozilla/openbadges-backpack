@@ -24,8 +24,8 @@ var cookieParser = require('cookie-parser');
 /**
  * Setup route middlewares
  */
-var csrfProtection = csrf({ cookie: true });
-var parseForm = bodyParser.urlencoded({ extended: false });
+// var csrfProtection = csrf({ cookie: true });
+// var parseForm = bodyParser.urlencoded({ extended: false });
 
 
 var app = express();
@@ -77,6 +77,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(require('connect-multiparty')());
 app.use(cookieParser());
+app.use(csrf({ cookie: true }));
 
 // configure views
 nunjucks.configure('views', {
@@ -172,10 +173,12 @@ app.get('/', backpack.recentBadges);
 app.get('/backpack', backpack.manage);
 app.get('/backpack/badges', backpack.allBadges);
 app.get('/backpack/add', backpack.addBadge);
-app.get('/backpack/login', csrfProtection, backpack.login);
+// app.get('/backpack/login', csrfProtection, backpack.login);
+app.get('/backpack/login', backpack.login);
 app.get('/backpack/signout', backpack.signout);
 app.post('/backpack/badge', backpack.userBadgeUpload);
-app.post('/backpack/authenticate', parseForm, csrfProtection, backpack.authenticate);
+// app.post('/backpack/authenticate', parseForm, csrfProtection, backpack.authenticate);
+app.post('/backpack/authenticate', backpack.authenticate);
 app.get('/backpack/settings', backpack.settings());
 app.post('/backpack/settings/revoke-origin', backpackConnect.revokeOrigin());
 app.get('/stats', backpack.stats);

@@ -5,8 +5,6 @@ const fs = require('fs');
 const async = require('async');
 const url = require('url');
 const bakery = require('openbadges-bakery');
-const csrf = require('csurf');
-const bodyParser = require('body-parser');
 
 const logger = require('../lib/logger');
 const configuration = require('../lib/configuration');
@@ -18,11 +16,6 @@ const Badge = require('../models/badge');
 const Group = require('../models/group');
 const User = require('../models/user');
 
-/**
- * Setup route middlewares
- */
-const csrfProtection = csrf({ cookie: true });
-const parseForm = bodyParser.urlencoded({ extended: false });
 
 /**
  * Render the login page.
@@ -30,6 +23,7 @@ const parseForm = bodyParser.urlencoded({ extended: false });
 
 exports.login = function login(request, response) {
   if (request.user) {
+    console.log("login 1");
     return response.redirect(303, '/');
   }
   // request.flash returns an array. Pass on the whole thing to the view and
@@ -60,6 +54,7 @@ exports.authenticate = function authenticate(req, res) {
     }
     if (humanReadableError)
       req.flash('error', humanReadableError);
+    console.log("auth 1");
     return res.redirect(303, to);
   }
 
@@ -95,10 +90,12 @@ exports.authenticate = function authenticate(req, res) {
  * @return {HTTP 303} redirect user to login page
  */
 
-exports.signout = function signout(request, response) {
+exports.signout = function signout(req, res) {
   console.log("signout");
-  request.session = {};
-  response.redirect(303, '/backpack/login');
+  req.session = null;
+  console.log("overwritten session", req.session);
+  console.log("signout ============================================================================================");
+  res.redirect(303, '/backpack/login');
 };
 
 /**
@@ -167,7 +164,6 @@ function badgePage (request, response, badges, template) {
 }
 
 exports.recentBadges = function recent (request, response, next) {
-  console.log(request, request.user)
   var user = request.user;
   if (!user)
     return response.redirect(303, '/backpack/login');

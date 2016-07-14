@@ -65,6 +65,7 @@ exports.userFromSession = function userFromSession() {
       return next();
     }
 
+    console.log("session", req.session)
     email = req.session.emails[0];
 
     if (!emailRe.test(email)) {
