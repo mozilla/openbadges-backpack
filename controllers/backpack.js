@@ -23,7 +23,6 @@ const User = require('../models/user');
 
 exports.login = function login(request, response) {
   if (request.user) {
-    console.log("login 1");
     return response.redirect(303, '/');
   }
   // request.flash returns an array. Pass on the whole thing to the view and
@@ -54,7 +53,6 @@ exports.authenticate = function authenticate(req, res) {
     }
     if (humanReadableError)
       req.flash('error', humanReadableError);
-    console.log("auth 1");
     return res.redirect(303, to);
   }
 
@@ -83,6 +81,21 @@ exports.authenticate = function authenticate(req, res) {
   });
 };
 
+/**
+ * Render the signup page.
+ */
+
+exports.signup = function signup(request, response) {
+  if (request.user) {
+    return response.redirect(303, '/');
+  }
+  // request.flash returns an array. Pass on the whole thing to the view and
+  // decide there if we want to display all of them or just the first one.
+  response.render('signup.html', {
+    error: request.flash('error'),
+    csrfToken: request.csrfToken()
+  });
+};
 
 /**
  * Wipe the user's session and send back to the login page.
@@ -91,10 +104,7 @@ exports.authenticate = function authenticate(req, res) {
  */
 
 exports.signout = function signout(req, res) {
-  console.log("signout");
   req.session = null;
-  console.log("overwritten session", req.session);
-  console.log("signout ============================================================================================");
   res.redirect(303, '/backpack/login');
 };
 
@@ -356,7 +366,7 @@ exports.addBadge = function addBadge(request, response) {
   response.render('addBadge.html', {
     error: error,
     success: success,
-    csrfToken: request.session._csrf
+    csrfToken: request.csrfToken()
   });
 }
 

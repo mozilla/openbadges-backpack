@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="shortcut icon" href="/favicon.ico">
     <link rel="icon" type="image/png" href="/favicon.png">
-    <link href="//www.mozilla.org/tabzilla/media/css/tabzilla.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="/css/tabzilla.css" media="screen" />
     <link rel="stylesheet" href="/css/backpack.min.css" type="text/css" media="all" />
     <title dir="ltr">Mozilla Backpack</title>
     <script type="text/javascript" src="/js/es5-shim.min.js"></script>
@@ -37,7 +37,9 @@
           <a class="brand" href="/">
             <img src="/images/logo.png" alt="Mozilla Backpack logo" />
           </a>
-          <a href="http://www.mozilla.org/" id="tabzilla">a mozilla.org joint</a>
+          <div id="tabzilla">
+              <a href="https://www.mozilla.org/">Mozilla</a>
+          </div>
           {% if user %}
           <ul class="nav pull-left">
             <li {% if activeNav == 'badges' %}class="active"{% endif %}>
@@ -61,7 +63,7 @@
               </ul>
             </li>
           {% elif bodyClass == 'login' %}
-            <li><a class="js-browserid-link" href="#">Log In</a></li>
+
           {% endif %}
           </ul>
         </div>
@@ -71,7 +73,7 @@
     <div id="body" class="container">
       <div class='message-container'>
       {% for e in error %}
-        <div class="alert alert-error">
+        <div class="alert alert-danger">
           <a class="close" data-dismiss="alert">×</a>
           {{e}}
         </div>
@@ -99,7 +101,6 @@
       </small></aside>
     </div>
 
-    <script src="//www.mozilla.org/tabzilla/media/js/tabzilla.js"></script>
     <script type="text/javascript" src="/vendor/bootstrap/js/dropdown.js"></script>
     {% block scripts %}{% endblock %}
 

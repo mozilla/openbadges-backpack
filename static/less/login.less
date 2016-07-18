@@ -5,13 +5,6 @@
 .login {
   background: #043D5D;
 
-  #body {
-    background: url(/images/signin-graphic.png) no-repeat left 10px;
-    background-size: contain;
-    padding-top: 410px;
-    text-align: center;
-  }
-
   .title {
     color: whitesmoke;
     margin-bottom: 0.1em;
@@ -19,15 +12,42 @@
   }
 
   .subtitle {
-    color: whitesmoke;
+    color: #00A5E2;
     font-weight: 100;
     font-size: 1.2em;
   }
 
-  .muted {
-    color: whitesmoke;
+  .graphic {
+    width: 100%
   }
-  a.muted:hover {
-    color: darken(whitesmoke, 10%);
+
+  h2 {
+    color: white;
+    margin-top: 50px;
+  }
+
+  form {
+    margin-top: 10px;
+
+    label {
+      color: #FFC000;
+    }
+  }
+
+  button[type=submit] {
+    border: none;
+    background: #5cb85c;
+    transition: background 250ms ease;
+  }
+  button[type=submit]:hover {
+    background: lighten(#5cb85c, 10%);
+  }
+  .go-to-link {
+    margin-left: 20px;
+    color: #0098D8;
+    transition: color 250ms ease;
+  }
+  .go-to-link:hover {
+    color: lighten(#0098D8, 10%);
   }
 }

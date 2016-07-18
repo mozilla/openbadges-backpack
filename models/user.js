@@ -3,15 +3,23 @@ var regex = require('../lib/regex');
 var mysql = require('../lib/mysql');
 var Base = require('./mysql-base');
 var Badge = require('./badge');
+var bcrypt   = require('bcrypt-nodejs');
 
 var User = function (attributes) {
   this.attributes = attributes;
-  this.setLoginDate = function () {
-    this.set('last_login', Math.floor(Date.now() / 1000));
+
+  // checking if password is valid
+  this.validPassword = function(password) {
+    return bcrypt.compareSync(password, this.attributes.password);
   };
 };
 
 Base.apply(User, 'user');
+
+User.prototype.generateHash = function(password) {
+  // generating a hash
+  return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
+};
 
 User.prototype.getAllBadges = function(callback) {
   Badge.find({email: this.get('email')}, function(err, badges) {

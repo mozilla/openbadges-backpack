@@ -51,30 +51,19 @@ exports.statsdRequests = function statsdRequests () {
   };
 };
 
-exports.userFromSession = function userFromSession() {
-  return function (req, res, next) {
-    var email = '';
-    var emailRe = /^.+?\@.+?\.*$/;
 
+exports.findPassportUser = function() {
+  return function (req, res, next) {
     if (!req.session) {
       logger.debug('could not find session');
       return next();
     }
 
-    if (!req.session.emails) {
+    if (!req.session.passport) {
       return next();
     }
 
-    console.log("session", req.session)
-    email = req.session.emails[0];
-
-    if (!emailRe.test(email)) {
-      logger.warn('req.session.emails does not contain valid user: ' + email);
-      req.session = {};
-      return req.next();
-    }
-
-    User.findOrCreate(email, function (err, user) {
+    User.findById(req.session.passport.user, function(err, user) {
       if (err) {
         logger.error(err, "Problem finding/creating user");
         return next(err);
@@ -83,7 +72,41 @@ exports.userFromSession = function userFromSession() {
       return next();
     });
   };
-};
+}
+
+// exports.userFromSession = function userFromSession() {
+//   return function (req, res, next) {
+//     var email = '';
+//     var emailRe = /^.+?\@.+?\.*$/;
+
+//     if (!req.session) {
+//       logger.debug('could not find session');
+//       return next();
+//     }
+
+//     if (!req.session.emails) {
+//       return next();
+//     }
+
+//     console.log("session", req.session)
+//     email = req.session.emails[0];
+
+//     if (!emailRe.test(email)) {
+//       logger.warn('req.session.emails does not contain valid user: ' + email);
+//       req.session = {};
+//       return req.next();
+//     }
+
+//     User.findOrCreate(email, function (err, user) {
+//       if (err) {
+//         logger.error(err, "Problem finding/creating user");
+//         return next(err);
+//       }
+//       req.user = res.locals.user = user;
+//       return next();
+//     });
+//   };
+// };
 
 function whitelisted(list, input) {
   var pattern;
@@ -117,22 +140,22 @@ exports.cors = function cors(options) {
 //         The current version of the csrf middleware checks the token on
 //         HEAD requests and it shouldn't. Until issue #409 is resolved,
 //         we'll have to use this version.
-exports.csrf = function (options) {
-  options = options || {};
-  var value = options.value || defaultValue;
-  var list = options.whitelist;
-  return function (req, res, next) {
+// exports.csrf = function (options) {
+//   options = options || {};
+//   var value = options.value || defaultValue;
+//   var list = options.whitelist;
+//   return function (req, res, next) {
 
-    var token = req.session._csrf || (req.session._csrf = utils.uid(24));
-    if ('GET' == req.method || 'HEAD' == req.method || whitelisted(list, req.url)) return next();
-    var val = value(req);
-    if (val != token) {
-      logger.debug("CSRF token failure");
-      return utils.forbidden(res);
-    }
-    next();
-  };
-};
+//     var token = req.session._csrf || (req.session._csrf = utils.uid(24));
+//     if ('GET' == req.method || 'HEAD' == req.method || whitelisted(list, req.url)) return next();
+//     var val = value(req);
+//     if (val != token) {
+//       logger.debug("CSRF token failure");
+//       return utils.forbidden(res);
+//     }
+//     next();
+//   };
+// };
 
 exports.notFound = function notFound() {
   return function (req, res, next) {
@@ -214,18 +237,18 @@ utils.forbidden = function (res) {
   res.end(body);
 };
 
-utils.createSecureToken = function(numBaseBytes) {
-  var randomBytes;
+// utils.createSecureToken = function(numBaseBytes) {
+//   var randomBytes;
 
-  try {
-    randomBytes = crypto.randomBytes(numBaseBytes);
-  } catch (e) {
-    logger.warn('crypto.randomBytes() failed with ' + e);
-    logger.warn('falling back to pseudo-random bytes.');
-    randomBytes = pseudoRandomBytes(numBaseBytes);
-  }
-  return randomBytes.toString('base64') + '_' + Date.now().toString(32);
-};
+//   try {
+//     randomBytes = crypto.randomBytes(numBaseBytes);
+//   } catch (e) {
+//     logger.warn('crypto.randomBytes() failed with ' + e);
+//     logger.warn('falling back to pseudo-random bytes.');
+//     randomBytes = pseudoRandomBytes(numBaseBytes);
+//   }
+//   return randomBytes.toString('base64') + '_' + Date.now().toString(32);
+// };
 
 utils.uid = function (len) {
   var buf = [];
