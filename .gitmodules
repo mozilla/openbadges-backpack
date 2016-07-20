@@ -1,3 +1,0 @@
-[submodule "static/vendor/bootstrap"]
-	path = static/vendor/bootstrap
-	url = git://github.com/twbs/bootstrap.git
