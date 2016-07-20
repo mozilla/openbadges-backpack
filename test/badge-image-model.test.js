@@ -41,6 +41,7 @@ $.prepareDatabase({
     const badge = fixtures['2-existing-png-badge'];
     const where = { badge_hash: badge.get('body_hash' )};
     BadgeImage.findOne(where, function (err, image) {
+      image.attributes.image_data = image.attributes.image_data.toString();
       t.same(image.attributes, expect.attributes);
       t.end();
     });

@@ -7,8 +7,9 @@ var bcrypt   = require('bcrypt-nodejs');
 
 var User = function (attributes) {
   this.attributes = attributes;
-
-  // checking if password is valid
+  this.setLoginDate = function () {
+    this.set('last_login', new Date().getTime());
+  };
   this.validPassword = function(password) {
     return bcrypt.compareSync(password, this.attributes.password);
   };

@@ -76,7 +76,7 @@ $.prepareDatabase({
         const expectedImageData = fs.readFileSync(VALID_BAKED_IMAGE).toString('base64');
         t.same(badges.length, 1);
         BadgeImage.findOne({badge_hash: badges[0].get('body_hash')}, function (err, image) {
-          t.same(image.get('image_data'), expectedImageData);
+          t.same(image.get('image_data').toString(), expectedImageData);
           t.end();
         });
       })

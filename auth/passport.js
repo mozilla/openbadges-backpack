@@ -61,7 +61,7 @@ module.exports = function(passport) {
 
                 // all is well, return user
                 } else {
-                    user.attributes.last_login = new Date().getTime();
+                    user.setLoginDate();
                     user.save(function(err) {
                         if (err)
                             return done(err);
