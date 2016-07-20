@@ -13,59 +13,57 @@
 {% else %}
 <div class="row" style="position: relative;">
 
-  <div class="span4">
-    <div class="row">
-      <div class="sticky span4">
-        <hgroup class="separator">
-          <h2>My Collections</h2>
-          Organize badges the way you want
-        </hgroup>
-        <div id="groups" class="scroll span4">
-          {% for group in groups %}
-          <div class='group' data-id="{{group.attributes.id}}" data-url="{{group.attributes.url}}">
-            <input class='groupName' type='text' value='{{group.attributes.name|e}}' style='display: block'>
-            <span class='icon delete'>&times;</span>
-            <span class='icon share' {% if not group.attributes.badgeObjects %}style='display: none'{% endif %} title='Share this group'>5</span>
-            <span class='public'>
-              <label>
-                <input type='checkbox' class='js-privacy' {% if group.attributes.public %}checked{% endif %}>
-                <span>public</span>
-              </label>
-            </span>
+  <div class="col-md-4">
+    <div class="sticky row">
+      <hgroup class="separator col-md-12">
+        <h2>My Collections</h2>
+        Organize badges the way you want
+      </hgroup>
+      <div id="groups" class="scroll col-md-12">
+        {% for group in groups %}
+        <div class='group' data-id="{{group.attributes.id}}" data-url="{{group.attributes.url}}">
+          <input class='groupName' type='text' value='{{group.attributes.name|e}}' style='display: block'>
+          <span class='icon delete'>&times;</span>
+          <span class='icon share' {% if not group.attributes.badgeObjects %}style='display: none'{% endif %} title='Share this group'>5</span>
+          <span class='public'>
+            <label>
+              <input type='checkbox' class='js-privacy' {% if group.attributes.public %}checked{% endif %}>
+              <span>public</span>
+            </label>
+          </span>
 
-            {% for badge in group.attributes.badgeObjects %}
-            <span draggable="true" class="openbadge" data-id="{{badge.attributes.id}}" data-serialization="{{badge.serializedAttributes|e}}">
-              <img src="{{ badge.attributes.imageUrl }}" width="64px"/>
-            </span>
-            {% endfor %}
-          </div>
+          {% for badge in group.attributes.badgeObjects %}
+          <span draggable="true" class="openbadge" data-id="{{badge.attributes.id}}" data-serialization="{{badge.serializedAttributes|e}}">
+            <img src="{{ badge.attributes.imageUrl }}" width="64px"/>
+          </span>
           {% endfor %}
+        </div>
+        {% endfor %}
 
-          <div class='group isNew'>
-            <input class='groupName' type='text' value='New Collection'>
-            <span class='icon delete'>&times;</span>
-            <span class='icon share' title='share this group'>5</span>
-            <hgroup class="instructions">
-              <h3>Drag a badge here</h3>
-              to create a Collection.
-            </hgroup>
-            <span class='public'>
-              <label>
-                <input type='checkbox' class='js-privacy'>
-                <span>public</span>
-              </label>
-            </span>
-          </div>
+        <div class='group isNew'>
+          <input class='groupName' type='text' value='New Collection'>
+          <span class='icon delete'>&times;</span>
+          <span class='icon share' title='share this group'>5</span>
+          <hgroup class="instructions">
+            <h3>Drag a badge here</h3>
+            to create a Collection.
+          </hgroup>
+          <span class='public'>
+            <label>
+              <input type='checkbox' class='js-privacy'>
+              <span>public</span>
+            </label>
+          </span>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="span8 badge-area">
+  <div class="col-md-8 badge-area">
     <div class="row">
       <ul id="badges" class="js-badges badge-list small-cards">
         {% for badge in badges %}
-          <li class="span3 openbadge-container">
+          <li class="col-md-3 openbadge-container">
             <div class="openbadge" data-id="{{badge.attributes.id}}" data-serialization="{{badge.serializedAttributes|e}}">
               <img src="{{ badge.attributes.imageUrl }}" width="64">
               <p class="title" title="{{ badge.attributes.body.badge.name|e }}">{{ badge.attributes.body.badge.name|e }}</p>

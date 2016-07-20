@@ -74,8 +74,8 @@ form.baker #assertion {
   border-top: 2px solid #fff;
   background: #00a5e2 url(/images/header.png) no-repeat right;
 }
-.navbar .container {
-  max-width: 940px;
+.navbar .brand {
+  margin-left: -20px;
 }
 .navbar .user {
   padding-right: 0;
@@ -115,6 +115,10 @@ form.baker #assertion {
 }
 #footer aside {
   font-size: 0.85em;
+
+  .muted {
+    color: #999999;
+  }
 }
 
 .openbadge {
@@ -175,7 +179,6 @@ form.baker #assertion {
     border: solid 1px #8D8D8D;
     text-align: center;
     padding: 20px;
-    box-shadow: 1px 1px 2px #999;
 
     img {
       display: block;
@@ -197,8 +200,10 @@ form.baker #assertion {
 
     .issuer {
       margin: 10px -20px -20px;
-      background: #FAB142;
+      background: #333333;
+      color: white;
       font-size: 0.8em;
+      padding: 2px;
     }
   }
 
@@ -614,4 +619,9 @@ form.settings .status {
 .slider input[type="checkbox"]:not(:checked) + span::after {
   margin-left: -1px;
   left: 0;
+}
+
+input[type="file"] {
+  height: 30px;
+  line-height: 30px;
 }

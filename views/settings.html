@@ -46,6 +46,7 @@
   </fieldset>
 
   -->
+  
   <fieldset id="issuer-acceptance">
     <legend>Connected Issuers</legend>
     {% if issuers.length %}
@@ -80,7 +81,7 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="/vendor/bootstrap/js/bootstrap-button.js"></script>
+<script src="/vendor/bootstrap/js/button.js"></script>
 <script>
 var CONFIRM_MSG = "Are you sure you want to prevent the website at " +
                   "ORIGIN from accessing your backpack?";

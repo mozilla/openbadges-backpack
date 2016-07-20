@@ -85,6 +85,10 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
   app.put('/share/:groupUrl', share.createOrUpdate);
   app.get('/share/:groupUrl', share.show);
 
+  app.get('/privacy.html', function(req, res) { return res.render('privacy.html', {}); });
+  app.get('/tou.html', function(req, res) { return res.render('tou.html', {}); });
+  app.get('/vpat.html', function(req, res) { return res.render('vpat.html', {}); });
+
   app.get('/access', backpackConnect.requestAccess());
   app.post('/accept', backpackConnect.allowAccess());
 

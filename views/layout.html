@@ -26,49 +26,13 @@
     </script>
     {% block head %}{% endblock %}
   </head>
-  <body {% if bodyClass %}class="{{bodyClass}}"{% endif %}>
+  <body {% if bodyClass %}class="{{ bodyClass }}"{% endif %}>
     <div id="fb-root"></div>
     {% if settings.env == 'development' %}
       <img src="/images/testribbon.png" class="test-ribbon" title="{{ settings.sha|d('') }}">
     {% endif %}
-    <div class="navbar">
-      <div class="navbar-inner">
-        <div class="container" style="position: relative;">
-          <a class="brand" href="/">
-            <img src="/images/logo.png" alt="Mozilla Backpack logo" />
-          </a>
-          <div id="tabzilla">
-              <a href="https://www.mozilla.org/">Mozilla</a>
-          </div>
-          {% if user %}
-          <ul class="nav pull-left">
-            <li {% if activeNav == 'badges' %}class="active"{% endif %}>
-              <a href="/" class="icon badge-link"><span>Badges</span></a>
-            </li>
-            <li {% if activeNav == 'collections' %}class="active"{% endif %}>
-              <a href="/backpack" class="icon collection-link"><span>Collections</span></a>
-            </li>
-          </ul>
-          {% endif %}
-          <ul class="nav pull-right">
-          {% if user %}
-            <li class="user navbar-text">{{user.attributes.email}}</li>
-            <li class="dropdown">
-              <a href="#" class="icon gear-link dropdown-toggle" data-toggle="dropdown">
-                <span><b class="caret"></b></span>
-              </a>
-              <ul class="dropdown-menu">
-                <li><a href="/backpack/settings">Settings</a></li>
-                <li><a href="/backpack/signout">Sign Out</a></li>
-              </ul>
-            </li>
-          {% elif bodyClass == 'login' %}
 
-          {% endif %}
-          </ul>
-        </div>
-      </div>
-    </div>
+    {% include "header.html" %}
 
     <div id="body" class="container">
       <div class='message-container'>

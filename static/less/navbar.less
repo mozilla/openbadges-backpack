@@ -1,3 +1,56 @@
+.navbar {
+  border-radius: 0;
+
+  .navbar-header {
+    padding: 20px 30px 20px 0;
+  }
+
+  .navbar-text {
+    line-height: 88px;
+    margin: 0 15px;
+  }
+
+  .user {
+    color: #fff;
+  }
+
+  .nav {
+    li {
+      > a.icon span:before {
+        content: '';
+        display: block;
+        width: 45px;
+        height: 45px;
+        position: absolute;
+        left: 12px;
+        top: 22px;
+      }
+      .badge-link span:before {
+        background: url(/images/badges-icon.png);
+      }
+      .collection-link span:before {
+        background: url(/images/collections-icon.png);
+      }
+      .gear-link span:before {
+        background: url(/images/gear-icon.png);
+      }
+      &.active > a.icon,
+      &.open > a.icon,
+      > a.icon:hover {
+        span {
+          color: #333;
+        }
+        span:before {
+          background-position: 0 -45px;
+        }
+      }
+    }
+  }
+
+}
+
+
+
 .navbar .nav > li > a.icon span {
   display: table-cell;
   height: 45px;
@@ -14,16 +67,16 @@
   background-position: 0 -45px;
 }
 
-.navbar .brand img {
-  padding: 20px;
+.nav > li > a {
+  color: #fff;
+  line-height: 88px;
+  padding: 0 15px;
 }
 
-.badge-link span {
-  background: url(/images/badges-icon.png);
+.nav>li>a:hover, .nav>li>a:focus {
+  background: transparent;
 }
-.collection-link span {
-  background: url(/images/collections-icon.png);
-}
-.gear-link span {
-  background: url(/images/gear-icon.png);
+
+.navbar-nav>li>.dropdown-menu {
+  margin-top: 3px;
 }

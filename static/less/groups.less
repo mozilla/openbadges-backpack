@@ -8,7 +8,7 @@
   text-align: center;
   border: 1px dotted #999;
   border-radius: 5px;
-  background: url('/images/texturetastic_gray.png');
+  background: #fff;
   overflow: hidden;
   -webkit-transition: all 0.25s ease;
   -moz-transition: all 0.25s ease;
@@ -158,7 +158,7 @@
   .share {
     font-family: 'EntypoRegular';
     font-size: 3.3em;
-    bottom: 10px;
+    bottom: 32px;
 
     &:hover {
       color: #66f;
@@ -221,7 +221,7 @@
   /* top: height + borders
      TODO: extract variables & use consistently 
    */
-  top: @navbarHeight + 4px + 2px; 
+  top: 100px; 
   bottom: 0;
 
   .scroll {
@@ -229,24 +229,20 @@
     position: fixed;
     top: 0;
     bottom: 0;
-    margin: 160px 0 20px;
+    margin: 200px 0 20px 15px;
     padding: 0 12px;
     .box-sizing(border-box);
     border-radius: 5px;
-    background-color: @gray;
-    border: solid @gray;
+    background-color: #333;
+    border: solid #333;
     border-width: 8px 2px;
+    width: 360px;
   }
 }
 
 hgroup {
-  margin-left: 20px;
-  margin-right: 20px;
+  margin-left: 0px;
   padding-bottom: 0.8em;
-
-  &.separator {
-    border-bottom: 1px dotted @gray;
-  }
 
   h1, h2 {
     margin-bottom: 2px;

@@ -29,7 +29,7 @@
       <ul id="badges" class="js-badges badge-list">
         {% block badgeItems %}
           {% for badge in badges %}
-            <li class="span3 openbadge-container">
+            <li class="col-md-3 openbadge-container">
               <div class="openbadge" data-id="{{badge.attributes.id}}" data-serialization="{{badge.serializedAttributes|e}}">
                 <img src="{{ badge.attributes.imageUrl }}" width="64">
                 <p class="title" title="{{ badge.attributes.body.badge.name|e }}">{{ badge.attributes.body.badge.name|e }}</p>
@@ -39,7 +39,7 @@
           {% endfor %}
         {% endblock %}
         {% block afterBadgeItems %}
-          <li class="span3">
+          <li class="col-md-3">
             <a href="/backpack/add" class="add-openbadge">
               <img src="/images/add-badge.png">
               <p class="title">Upload a badge</p>

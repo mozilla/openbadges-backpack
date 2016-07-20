@@ -11,7 +11,7 @@
 // -----------------------------------------------------
 
 body {
-  background: #F9F9F9 url(../images/bg-stone.png) 50% @navbarHeight repeat-x;
+  background: #FFF;
 }
 
 a:hover,
@@ -32,19 +32,7 @@ a:focus {
   }
 
   .container {
-    max-width: 940px;
-  }
-
-  .brand {
-    padding: @logoTopPadding 20px @logoBottomPadding;
-  }
-
-  .nav > li > a,
-  .navbar-text {
-    @navIconHeight: 45px;
-    @bottom-padding: 0;
-    padding: (@navbarHeight - @navIconHeight - @bottom-padding) 15px @bottom-padding;
-    line-height: @navIconHeight;
+    max-width: 1170px;
   }
 
   .nav > .active > a,
@@ -60,7 +48,9 @@ a:focus {
       .box-sizing(border-box);
       width: @caretWidth;
       margin: 0 auto -@caretHeight;
-      border-top: @caretHeight solid white;
+      position: relative;
+      bottom: 10px;
+      border-bottom: @caretHeight solid #333;
       border-left: @caretWidth/2 dotted transparent;
       border-right: @caretWidth/2 dotted transparent;
     }
