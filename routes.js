@@ -46,7 +46,6 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
   app.get('/backpack', backpack.manage);
   app.get('/backpack/badges', backpack.allBadges);
   app.get('/backpack/add', csrfProtection, backpack.addBadge);
-  // app.get('/backpack/login', csrfProtection, backpack.login);
   app.get('/backpack/login', csrfProtection, backpack.login);
   app.post('/backpack/login', parseForm, csrfProtection, passport.authenticate('local-login', {
       successRedirect : '/', // redirect to the secure profile section

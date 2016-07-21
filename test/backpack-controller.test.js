@@ -43,7 +43,7 @@ $.prepareDatabase({
       }
     }, function (err, mock, req) {
       t.same(mock.path, '/backpack/login', 'should redirect to the login page');
-      t.same(Object.keys(req.session).length, 0, 'should wipe out the session');
+      t.equal(req.session, null, 'should wipe out the session');
       t.end();
     });
   });
