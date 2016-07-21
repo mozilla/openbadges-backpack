@@ -5,7 +5,7 @@ var appMysql = require('../lib/mysql');
 var prepareDatabase = require('../test').prepareDatabase;
 
 var APP_PORT = parseInt(process.env['WEBDRIVER_APP_PORT'] || 8888);
-var APP_URL = process.env['WEBDRIVER_APP_URL'] || 'http://openbadges.local:8888';
+var APP_URL = process.env['WEBDRIVER_APP_URL'] || 'http://localhost:8888';
 var BROWSER = process.env['WEBDRIVER_BROWSER'] || 'firefox';
 var HOST = process.env['WEBDRIVER_HOST'] || 'localhost';
 var PORT = parseInt(process.env['WEBDRIVER_PORT'] || 4444);
@@ -13,9 +13,7 @@ var PORT = parseInt(process.env['WEBDRIVER_PORT'] || 4444);
 exports.test = function test(name, fn) {
   prepareDatabase(function() {
     app.listen(APP_PORT, function() {
-      process.stdout.write("gets here");
       browser = wd.remote(HOST, PORT);
-      process.stdout.write("gets here too", HOST, PORT);
 
       browser.on('status', function(info) {
         console.log(info.cyan);
