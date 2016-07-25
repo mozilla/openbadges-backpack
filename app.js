@@ -75,7 +75,7 @@ app.use(require('connect-multiparty')());
 app.use(cookieParser());
 
 var csrfProtection = csrf({ cookie: false });
-var parseForm = bodyParser.urlencoded({ extended: false })
+var parseForm = bodyParser.urlencoded({ extended: false });
 
 // configure views
 nunjucks.configure('views', {

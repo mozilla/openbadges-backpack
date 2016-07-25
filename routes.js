@@ -60,8 +60,10 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
   }));
   app.get('/backpack/signout', backpack.signout);
   app.post('/backpack/badge', parseForm, csrfProtection, backpack.userBadgeUpload);
+
   // app.post('/backpack/authenticate', parseForm, csrfProtection, backpack.authenticate);
-  app.post('/backpack/authenticate', backpack.authenticate);
+  // app.post('/backpack/authenticate', backpack.authenticate);
+
   app.get('/backpack/settings', backpack.settings());
   app.post('/backpack/settings/revoke-origin', backpackConnect.revokeOrigin());
   app.get('/stats', backpack.stats);
