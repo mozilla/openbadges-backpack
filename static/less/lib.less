@@ -1,0 +1,28 @@
+// THIS FILE SHOULD OUTPUT NOTHING!
+//
+// As this file is included in many places (for variable/mixin access),
+// it must output nothing for performance reasons.
+//
+// IF IT'S NOT A MIXIN OR VARIABLE, IT DOESN'T GO HERE!
+
+// not the most up to date method, but works in IE7
+.image-replaced() {
+    text-indent: 120%; // extra 20% to account for fancy fonts that may overhang
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+// A helper mixin for applying high-resolution background images (http://www.retinajs.com)
+// File-names should follow:
+//  example.png
+//  example-high-res.png
+@highdpi: ~"(-webkit-min-device-pixel-ratio: 1.5), (min--moz-device-pixel-ratio: 1.5), (-o-min-device-pixel-ratio: 3/2), (min-resolution: 1.5dppx)";
+.at2x(@path, @w: auto, @h: auto) {
+    background-image: url(@path);
+    @at2x_path: ~`@{path}.replace(/\.\w+$/, function(match) { return "-high-res" + match; })`;
+    @media @highdpi {
+        background-image: url('@{at2x_path}');
+        -webkit-background-size: @w @h;
+                background-size: @w @h;
+    }
+}
