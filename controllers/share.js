@@ -57,12 +57,13 @@ exports.editor = function (request, response) {
     return response.send(403, 'nope');
 
   var portfolio = group.get('portfolio');
-  if (!portfolio)
+  if (!portfolio) {
     portfolio = new Portfolio({
       group_id: group.get('id'),
       title: group.get('name'),
       stories: {}
     });
+  }
 
   request.group.getBadgeObjects(function (err, badges) {
     var badgesWithStories = _.map(badges, badgeModifierFactory(portfolio));
@@ -70,7 +71,7 @@ exports.editor = function (request, response) {
     portfolio.badges = badgesWithStories;
     portfolio.preamble = prepareText(portfolio.get('preamble'));
     response.render('portfolio-editor.html', {
-      csrfToken: request.session._csrf,
+      csrfToken: request.csrfToken(),
       portfolio: portfolio
     });
   });
@@ -143,17 +144,27 @@ exports.createOrUpdate = function (request, response) {
   var stories = {};
   var submitted = request.body;
 
-  // #TODO: don't assume any stories have been submitted
-  for (var i = 0; i < submitted.stories.length; i++)
-    if (submitted.stories[i]) stories[i] = submitted.stories[i];
+  var i = 1;
+  while (submitted['stories[' + i + ']["id"]'] != undefined) {
+    var id = submitted['stories[' + i + ']["id"]'],
+      story = submitted['stories[' + i + ']["story"]'];
+    stories[id] = story;
+    i++;
+  }
 
-  var portfolio = new Portfolio({
+  var portfolio = group.get('portfolio');
+  var attributes = {
     stories: stories,
     group_id: group.get('id'),
     title: submitted.title,
     subtitle: submitted.subtitle,
     preamble: submitted.preamble
-  });
+  };
+  if (!portfolio) {
+    var portfolio = new Portfolio(attributes);
+  } else {
+    portfolio.attributes = attributes;
+  }
 
   portfolio.save(function (err, p) {
     return response.redirect(303, request.url);

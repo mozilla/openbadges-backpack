@@ -1,21 +1,22 @@
 {% extends 'layout.html' %}
 {% block body %}
-<form class='portfolio' action='/share/{{portfolio.group.attributes.url}}/' method='post'>
-  <input type='hidden' name='_csrf' value='{{csrfToken}}'>
-  <input type='hidden' name='id' value='{{portfolio.attributes.id}}'>
-  <input type='hidden' name='group_id' value='{{group.attributes.id}}'>
-  <input type='hidden' name='url' value='{{groups.attributes.url}}'>
+<form class='portfolio' action='/share/{{ portfolio.group.attributes.url }}/' method='post'>
+  <input type='hidden' name='_csrf' value='{{ csrfToken }}'>
+  <input type='hidden' name='id' value='{{ portfolio.attributes.id }}'>
+  <input type='hidden' name='group_id' value='{{ group.attributes.id }}'>
+  <input type='hidden' name='url' value='{{ groups.attributes.url }}'>
   <header>
-    <input tabindex=1 name='title' class='field title' value='{{portfolio.attributes.title|e}}'>
-    <input tabindex=1 name='subtitle' class='field subtitle' placeholder='Optional subtitle' value='{{portfolio.attributes.subtitle|e}}'>
+    <input tabindex=1 name='title' class='field title' value='{{ portfolio.attributes.title|e }}'>
+    <input tabindex=1 name='subtitle' class='field subtitle' placeholder='Optional subtitle' value='{{ portfolio.attributes.subtitle|e }}'>
   </header>
 
   <ul class='badges'>
     {% for badge in portfolio.badges %}
       <li>
-        <h3>{{badge.attributes.body.badge.name|e}}</h3>
+        <h3>{{ badge.attributes.body.badge.name|e }}</h3>
 
-        <textarea name='stories[{{badge.attributes.id}}]' tabindex=1 class='story' placeholder='some information about this badge'>{{badge.attributes._userStory|e}}</textarea>
+        <textarea name='stories[{{ loop.index }}]["story"]' tabindex='1' class='story' placeholder='some information about this badge'>{{ badge.attributes._userStory|e }}</textarea>
+        <input type="hidden" name='stories[{{ loop.index }}]["id"]' value="{{ badge.attributes.id }}">
 
         {% include 'badge-data.html' %}
       </li>

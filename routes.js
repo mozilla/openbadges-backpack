@@ -81,10 +81,10 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
   app.post('/share/badge/:badgeId', badge.share);
   app.get('/share/badge/:badgeUrl', badge.show);
 
-  app.get('/share/:groupUrl/edit', share.editor);
-  app.post('/share/:groupUrl', share.createOrUpdate);
+  app.get('/share/:groupUrl/edit', csrfProtection, share.editor);
+  app.post('/share/:groupUrl', parseForm, csrfProtection, share.createOrUpdate);
   app.put('/share/:groupUrl', share.createOrUpdate);
-  app.get('/share/:groupUrl', share.show);
+  app.get('/share/:groupUrl', csrfProtection, share.show);
 
   app.get('/privacy.html', function(req, res) { return res.render('privacy.html', {}); });
   app.get('/tou.html', function(req, res) { return res.render('tou.html', {}); });
