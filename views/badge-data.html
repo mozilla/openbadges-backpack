@@ -67,14 +67,14 @@
     {% if badge.attributes.body.issued_on %}
     <tr>
       <td class='fieldlabel'>Issued</td>
-      <td>{{badge.attributes.body.issued_on|formatdate}}</td>
+      <td>{{badge.attributes.body.issued_on}}</td>
     </tr>
     {% endif %}
 
     {% if badge.attributes.body.expires %}
     <tr>
       <td class='fieldlabel'>Expiration</td>
-      <td>{{badge.attributes.body.expires|formatdate}}</td>
+      <td>{{badge.attributes.body.expires}}</td>
     </tr>
     {% endif %}
   </tbody>
