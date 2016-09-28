@@ -1,0 +1,24 @@
+{% extends 'layout.html' %}
+{% set bodyClass = 'login' %}
+{% block body %}
+
+<div class="row">
+  <div class="col-md-6">
+    <img src="/images/signin-graphic.png" alt="signin graphic" class="graphic" />
+  </div>
+  <div class="col-md-6">
+    <h1 class="title">Reset your password</h1>
+
+    <form action="/password/reset" method="post">
+      <input name="_csrf" type="hidden" value="{{ csrfToken }}"></input>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="text" class="form-control" name="email">
+      </div>
+      <button type="submit" class="btn btn-warning btn-lg">Reset</button>
+    </form>
+
+  </div>
+</div>
+
+{% endblock %}

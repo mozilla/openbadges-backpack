@@ -6,6 +6,7 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
   const displayer = require('./controllers/displayer');
   const demo = require('./controllers/demo');
   const backpack = require('./controllers/backpack');
+  const password = require('./controllers/password');
   const group = require('./controllers/group');
   const share = require('./controllers/share');
   const BackpackConnect = require('./controllers/backpack-connect');
@@ -60,6 +61,12 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
   }));
   app.get('/backpack/signout', backpack.signout);
   app.post('/backpack/badge', parseForm, csrfProtection, backpack.userBadgeUpload);
+
+  app.get('/password/reset', csrfProtection, password.reset);
+  app.post('/password/reset', parseForm, csrfProtection, password.resetPost);
+  app.get('/password/reset/:token', csrfProtection, password.change);
+  app.post('/password/update/', parseForm, csrfProtection, password.changePost);
+
 
   // app.post('/backpack/authenticate', parseForm, csrfProtection, backpack.authenticate);
   // app.post('/backpack/authenticate', backpack.authenticate);

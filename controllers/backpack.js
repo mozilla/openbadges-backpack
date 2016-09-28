@@ -29,6 +29,8 @@ exports.login = function login(request, response) {
   // decide there if we want to display all of them or just the first one.
   response.render('login.html', {
     error: request.flash('error'),
+    success: request.flash('success'),
+    info: request.flash('info'),
     csrfToken: request.csrfToken()
   });
 };
