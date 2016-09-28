@@ -3,4 +3,8 @@
 
 ## Important Information
 
-The ng branch is currently undergoing heavy development! Most of the frontend works, but the API layer has yet to be fully tested and migrations are also not yet working. Expect many, many things to be broken! 
+Backpack-ng (pronounced *'backpacking'*) is the next generation of the Backpack.  The ng branch is currently undergoing heavy development!  
+
+We're currently updating the framework and dependencies, as well as removing Persona (which is due to be decommissioned in Nov 2016) and replacing it with Passport.
+
+Most of the frontend works, but the unit tests are still failing. Expect many, many things to be broken!
