@@ -32,15 +32,13 @@ app.config = configuration;
 
 app.locals.error = [];
 app.locals.success = [];
-app.locals.getBrowserIdScriptUrl = function() {
-  return browserid.getIncludeScriptUrl();
-};
 
 app.set('useCompiledTemplates', configuration.get('nunjucks_precompiled'));
 
 // default view engine
 var env = new nunjucks.Environment(new nunjucks.FileSystemLoader(__dirname + '/views'));
 env.express(app);
+app.locals.env = env;
 
 env.addFilter('formatdate', function (rawDate) {
   if (parseInt(rawDate, 10) == rawDate) {
@@ -151,5 +149,5 @@ if (!module.parent) {
   };
   startServer(app);
 } else {
-  app.listen();
+  module.exports = http.createServer(app);
 }
