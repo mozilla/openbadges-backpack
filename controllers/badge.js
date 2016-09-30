@@ -18,7 +18,7 @@ function respond(status, message) {
 exports.findById = function findById(req, res, next, id) {
   Badge.findById(id, function (err, badge) {
     if (!badge)
-      return res.status(404).send(respond('missing', 'could not find badge'));
+      return res.send(404, respond('missing', 'could not find badge'));
 
     req.badge = badge;
     return next();
@@ -34,9 +34,9 @@ exports.findById = function findById(req, res, next, id) {
 
 exports.findByUrl = function findByUrl(req, res, next, url) {
   Badge.findByUrl(url, function (err, badge) {
-    if (!badge)
-      return res.status(404).send(respond('missing', 'could not find badge'));
-
+    if (!badge) {
+      return res.send(404, respond('missing', 'could not find badge'))
+    }
     req.badge = badge;
     return next();
   });
@@ -63,11 +63,11 @@ exports.image = function image(req, res, next) {
   res.type(header);
 
   if (image.isBaked())
-    return res.status(200).send(image.toBuffer());
+    return res.send(200, image.toBuffer());
 
   image.bakeAndSave(function (err, bakedImage) {
     if (err) return next(err)
-    return res.status(200).send(bakedImage.toBuffer());
+    return res.send(200, bakedImage.toBuffer());
   })
 }
 
@@ -108,9 +108,9 @@ exports.destroy = function destroy(req, res) {
   const badge = req.badge;
   const user = req.user;
   if (!badge)
-    return res.status(404).send(respond('missing', "Cannot delete a badge that doesn't exist"));
+    return res.send(404, respond('missing', "Cannot delete a badge that doesn't exist"));
   if (!user || badge.get('user_id') !== user.get('id'))
-    return res.status(403).send(respond('forbidden', "Cannot delete a badge you don't own"));
+    return res.send(403, respond('forbidden', "Cannot delete a badge you don't own"));
   async.series([
     function destroyBadgeImage(callback) {
       const condition = { badge_hash: badge.get('body_hash') };
@@ -122,8 +122,8 @@ exports.destroy = function destroy(req, res) {
   ], function (err, results) {
     if (err) {
       logger.warn(err, 'Failed to delete badge');
-      return res.status(500).send(respond('error', 'Could not delete badge: ' + err));
+      return res.send(500, respond('error', 'Could not delete badge: ' + err));
     }
-    return res.status(200).send({ status: 'okay' });
+    return res.send(200, { status: 'okay' });
   });
 };
