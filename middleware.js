@@ -237,18 +237,20 @@ utils.forbidden = function (res) {
   res.end(body);
 };
 
-// utils.createSecureToken = function(numBaseBytes) {
-//   var randomBytes;
+// given that we've migrated to a newer express that handles csrf tokens slightly differently,
+// we need to ditch this and fix up the areas/tests that rely upon it
+utils.createSecureToken = function(numBaseBytes) {
+  var randomBytes;
 
-//   try {
-//     randomBytes = crypto.randomBytes(numBaseBytes);
-//   } catch (e) {
-//     logger.warn('crypto.randomBytes() failed with ' + e);
-//     logger.warn('falling back to pseudo-random bytes.');
-//     randomBytes = pseudoRandomBytes(numBaseBytes);
-//   }
-//   return randomBytes.toString('base64') + '_' + Date.now().toString(32);
-// };
+  try {
+    randomBytes = crypto.randomBytes(numBaseBytes);
+  } catch (e) {
+    logger.warn('crypto.randomBytes() failed with ' + e);
+    logger.warn('falling back to pseudo-random bytes.');
+    randomBytes = pseudoRandomBytes(numBaseBytes);
+  }
+  return randomBytes.toString('base64') + '_' + Date.now().toString(32);
+};
 
 utils.uid = function (len) {
   var buf = [];

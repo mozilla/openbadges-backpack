@@ -4,7 +4,7 @@
   "version": "3.0.0-alpha.1",
   "private": true,
   "scripts": {
-    "test": "NODE_ENV=test ./node_modules/.bin/tap-prettify test/*.test.js",
+    "test": "NODE_ENV=test TAP_TIMEOUT=60000 ./node_modules/.bin/tap-prettify test/*.test.js",
     "start": "PORT=8888 ./bin/db-migrate up && supervisor app.js | bunyan",
     "postinstall": "nunjucks-precompile views > static/js/nunjucks-templates.js"
   },

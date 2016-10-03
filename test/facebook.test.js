@@ -46,7 +46,7 @@ test("publishBadge() works", withFakeGraphServer(function(t, graph) {
   graph.app.post('/userid/open-badges:award', function(req, res) {
     t.equal(req.query.access_token, 'token');
     t.equal(url.parse(req.query.badge).pathname, '/share/badge/hash');
-    return res.send(body, status);
+    return res.status(status).send(body);
   });
 
   t.test("when fb is nice", function(t) {
@@ -83,7 +83,7 @@ test("publishComment() works", withFakeGraphServer(function(t, graph) {
 
   graph.app.post('/obj_id/comments', function(req, res) {
     t.same(req.query, {access_token: "access_token", message: "hi"});
-    return res.send(body, status);
+    return res.status(status).send(body);
   });
 
   t.test("when fb returns error", function(t) {
@@ -125,7 +125,7 @@ test("extendUserAccessToken() works", withFakeGraphServer(function(t, graph) {
       client_secret: "secret",
       fb_exchange_token: "token"
     });
-    return res.send(body, status);
+    return res.status(status).send(body);
   });
 
   t.test("when fb is nice", function(t) {
@@ -156,7 +156,7 @@ test("checkApplicationAccess() works", withFakeGraphServer(function(t, graph) {
       access_token: 'access',
       app_id: 'appid'
     });
-    return res.send(body, status);
+    return res.status(status).send(body);
   });
 
   t.test("when access is valid", function(t) {
