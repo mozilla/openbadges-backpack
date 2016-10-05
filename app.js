@@ -4,7 +4,7 @@ if ( process.env.NEW_RELIC_HOME ) {
   require( 'newrelic' );
 }
 
-// Configure & start express.
+// load required modules
 var express = require('express');
 var http = require('http');
 var fs = require('fs');
@@ -25,19 +25,20 @@ var cookieParser = require('cookie-parser');
 
 var passport = require('passport');
 
+// let's get this show on the road... fire up express!
 var app = express();
 
 app.logger = logger;
 app.config = configuration;
 
-/* Default values for template variables */
-
+// default values for template variables
 app.locals.error = [];
 app.locals.success = [];
 
+// should we be using pre-compiled templates?
 app.set('useCompiledTemplates', configuration.get('nunjucks_precompiled'));
 
-// default view engine
+// configure nunjucks environment
 var env = new nunjucks.Environment(new nunjucks.FileSystemLoader(__dirname + '/views'));
 // configure views
 nunjucks.configure('views', {
@@ -46,6 +47,7 @@ nunjucks.configure('views', {
 });
 env.express(app);
 
+// formatdate filter
 env.addFilter('formatdate', function (rawDate) {
   if (parseInt(rawDate, 10) == rawDate) {
     var date = new Date(rawDate * 1000);
@@ -54,10 +56,10 @@ env.addFilter('formatdate', function (rawDate) {
   return rawDate;
 });
 
-require('./auth/passport')(passport); // pass passport for configuration
+// pass passport for configuration
+require('./auth/passport')(passport);
 
-// Middleware. Also see `middleware.js`
-// ------------------------------------
+// middleware. also see `middleware.js`
 if (configuration.get('force_https')) {
   var force_ssl = require('express-enforces-ssl');
   var hsts = require('hsts');
@@ -67,8 +69,11 @@ if (configuration.get('force_https')) {
   app.use(force_ssl());
   app.use(hsts({ maxAge: 10886400000 }))
 }
+
 // compile stylesheets at runtime
 app.use(middleware.less());
+
+// set static and views paths
 app.use(express.static(path.join(__dirname, "static")));
 app.use(express.static(path.join(__dirname, "views")));
 
@@ -77,9 +82,11 @@ app.use(bodyParser.json());
 app.use(require('connect-multiparty')());
 app.use(cookieParser());
 
+// init csurf protection (gets passed to router later on)
 var csrfProtection = csrf({ cookie: false });
 var parseForm = bodyParser.urlencoded({ extended: false });
 
+// setup middleware
 // app.use(middleware.staticTemplateViews(env, 'static/'));
 app.use(middleware.noFrame({ whitelist: [ '/issuer/frame.*', '/', '/share/.*' ] }));
 app.use(methodOverride());
@@ -101,7 +108,9 @@ app.use(middleware.cors({ whitelist: ['/_badges.*', '/issuer.*', '/baker', '/dis
 app.use(middleware.statsdRequests());
 // app.use(app.router);
 // app.use(middleware.notFound());
+app.use(errorHandler());
 
+// development-specific app properties
 if (process.env['NODE_ENV'] === 'development') {
   var gitUtil = require('./lib/git-util');
   try {
@@ -113,12 +122,11 @@ if (process.env['NODE_ENV'] === 'development') {
   }
   browserid.configure({testUser: process.env['BROWSERID_TEST_USER']});
 };
-app.use(errorHandler());
 
+// load our routes and pass in our app and fully configured passport
+require('./routes.js')(app, passport, parseForm, csrfProtection);
 
-// Routes
-require('./routes.js')(app, passport, parseForm, csrfProtection); // load our routes and pass in our app and fully configured passport
-
+// let's fire up the server
 if (!module.parent) {
   var startServer = function startServer(app) {
     var port = app.config.get('port');
@@ -143,5 +151,6 @@ if (!module.parent) {
   };
   startServer(app);
 } else {
+  // server to use when running unit tests
   module.exports = http.createServer(app);
 }
