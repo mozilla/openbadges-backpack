@@ -87,7 +87,7 @@ var csrfProtection = csrf({ cookie: false });
 var parseForm = bodyParser.urlencoded({ extended: false });
 
 // setup middleware
-// app.use(middleware.staticTemplateViews(env, 'static/'));
+app.use(middleware.staticTemplateViews(env, 'static/'));
 app.use(middleware.noFrame({ whitelist: [ '/issuer/frame.*', '/', '/share/.*' ] }));
 app.use(methodOverride());
 app.use(middleware.logRequests());
