@@ -65,11 +65,14 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
   app.get('/password/reset', csrfProtection, password.reset);
   app.post('/password/reset', parseForm, csrfProtection, password.resetPost);
   app.get('/password/reset/:token', csrfProtection, password.change);
-  app.post('/password/update/', parseForm, csrfProtection, password.changePost);
+  app.post('/password/update', parseForm, csrfProtection, password.changePost);
+
+  // app.get('/user/profile', csrfProtection, user.profileUpdate);
+  // app.post('/user/profile', parseForm, csrfProtection, user.profileUpdatePost);
 
 
-  // app.post('/backpack/authenticate', parseForm, csrfProtection, backpack.authenticate);
-  // app.post('/backpack/authenticate', backpack.authenticate);
+  app.post('/backpack/authenticate', backpack.authenticate);
+  app.post('/backpack/authenticate', backpack.authenticate);
 
   app.get('/backpack/settings', backpack.settings());
   app.post('/backpack/settings/revoke-origin', backpackConnect.revokeOrigin());
