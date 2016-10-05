@@ -15,7 +15,7 @@ exports.render = function render(view, options, fn) {
 
   options._locals = app.locals;
 
-  app.locals.env.render(view, options, function(err, html) {
+  app.render(view, options, function(err, html) {
     var $ = cheerio.load(html);
     fn(err, $);
   });

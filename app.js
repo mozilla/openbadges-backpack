@@ -16,6 +16,8 @@ var configuration = require('./lib/configuration');
 var flash = require('connect-flash');
 var nunjucks = require('nunjucks');
 var _ = require('underscore');
+var methodOverride = require('method-override');
+var errorHandler = require('errorhandler');
 
 var csrf = require('csurf');
 var bodyParser = require('body-parser');
@@ -37,8 +39,12 @@ app.set('useCompiledTemplates', configuration.get('nunjucks_precompiled'));
 
 // default view engine
 var env = new nunjucks.Environment(new nunjucks.FileSystemLoader(__dirname + '/views'));
+// configure views
+nunjucks.configure('views', {
+  autoescape: true,
+  express: app
+});
 env.express(app);
-app.locals.env = env;
 
 env.addFilter('formatdate', function (rawDate) {
   if (parseInt(rawDate, 10) == rawDate) {
@@ -64,8 +70,7 @@ if (configuration.get('force_https')) {
 // compile stylesheets at runtime
 app.use(middleware.less());
 app.use(express.static(path.join(__dirname, "static")));
-app.use("/views", express.static(path.join(__dirname, "views")));
-
+app.use(express.static(path.join(__dirname, "views")));
 
 // prepare session/cookie handling
 app.use(bodyParser.json());
@@ -75,24 +80,12 @@ app.use(cookieParser());
 var csrfProtection = csrf({ cookie: false });
 var parseForm = bodyParser.urlencoded({ extended: false });
 
-// configure views
-nunjucks.configure('views', {
-  autoescape: true,
-  express: app
-});
-
-
-
-
 // app.use(middleware.staticTemplateViews(env, 'static/'));
-// app.use(middleware.noFrame({ whitelist: [ '/issuer/frame.*', '/', '/share/.*' ] }));
-// app.use(express.bodyParser());
-// app.use(express.cookieParser());
-// app.use(express.methodOverride());
-// app.use(middleware.logRequests());
+app.use(middleware.noFrame({ whitelist: [ '/issuer/frame.*', '/', '/share/.*' ] }));
+app.use(methodOverride());
+app.use(middleware.logRequests());
 app.use(middleware.cookieSessions());
 app.use(middleware.findPassportUser());
-// app.use(middleware.userFromSession());
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash());
@@ -104,22 +97,23 @@ app.use(flash());
 //     '/api/.+'
 //   ]
 // }));
-// app.use(middleware.cors({ whitelist: ['/_badges.*', '/issuer.*', '/baker', '/displayer/.+/group.*'] }));
-// app.use(middleware.statsdRequests());
+app.use(middleware.cors({ whitelist: ['/_badges.*', '/issuer.*', '/baker', '/displayer/.+/group.*'] }));
+app.use(middleware.statsdRequests());
 // app.use(app.router);
 // app.use(middleware.notFound());
-// app.configure('development', function () {
-//   var gitUtil = require('./lib/git-util');
-//   try {
-//     var sha = gitUtil.findSHA();
-//     app.set('sha', sha);
-//   }
-//   catch (ex) {
-//     logger.warn(ex);
-//   }
-//   browserid.configure({testUser: process.env['BROWSERID_TEST_USER']});
-// });
-// app.use(express.errorHandler());
+
+if (process.env['NODE_ENV'] === 'development') {
+  var gitUtil = require('./lib/git-util');
+  try {
+    var sha = gitUtil.findSHA();
+    app.set('sha', sha);
+  }
+  catch (ex) {
+    logger.warn(ex);
+  }
+  browserid.configure({testUser: process.env['BROWSERID_TEST_USER']});
+};
+app.use(errorHandler());
 
 
 // Routes
