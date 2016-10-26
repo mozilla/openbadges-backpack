@@ -130,3 +130,35 @@ environment variable `NODE_ENV=production`. These differences include:
 * using precompiled templates for client-side rendering
   * run `bin/template-precompile` to generate
 * "Test Site" banner will not show in the UI
+
+### Heroku
+
+Heroku relies upon the [habitat](https://github.com/brianloveswords/habitat) environment variables loader library.  The config for this can be found in [lib/environments/heroku.js](lib/environments/heroku.js).
+
+When configuring your environment variables on heroku, they should be prefixed with the string that is passed to the habitat constructor. For example, if we pass the string "openbadges" to our habitat constructor, like so: `new Habitat("openbadges")`, then in heroku our protocol env var would be "OPENBADGES_PROTOCOL" (with, in this case, a value set to either http or https).
+
+Currently, the heroku env var config looks like so...
+
+
+| ENV VAR                         | VALUE EXAMPLE                                     |
+| ------------------------------- | ------------------------------------------------- |
+| NODE_ENV                        | "heroku"                                          |
+| OPENBADGES_ADMINS               | "['admin@somewhere.com','someone@somewhere.com']" |
+| OPENBADGES_BADGE_PATH           | "static/_badges"                                  |
+| OPENBADGES_DATABASE_DATABASE    | "openbadges"                                      |
+| OPENBADGES_DATABASE_DRIVER      | "mysql"                                           |
+| OPENBADGES_DATABASE_HOST        | "eu-cdbr-west-01.cleardb.com"                     |
+| OPENBADGES_DATABASE_PASSWORD    | "pa55w0rd"                                        |
+| OPENBADGES_DATABASE_USER        | "user"                                            |
+| OPENBADGES_FORCE_HTTPS          | true                                              |
+| OPENBADGES_HOSTNAME             | "backpack-ng.herokuapp.com"                       |
+| OPENBADGES_IDENTITY_PATH        | "/verify"                                         |
+| OPENBADGES_IDENTITY_PROTOCOL    | "https"                                           |
+| OPENBADGES_IDENTITY_SERVER      | "verifier.login.persona.org"                      |
+| OPENBADGES_LESS_COMPRESS        | true                                              |
+| OPENBADGES_LESS_ONCE            | true                                              |
+| OPENBADGES_NEW_RELIC            | false                                             |
+| OPENBADGES_NUNJUCKS_PRECOMPILED | true                                              |
+| OPENBADGES_PROTOCOL             | "https"                                           |
+| OPENBADGES_REMOTE_PORT          | "default"                                         |
+| OPENBADGES_VAR_PATH             | "var"                                             |
