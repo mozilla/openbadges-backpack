@@ -239,6 +239,7 @@ utils.forbidden = function (res) {
 
 // given that we've migrated to a newer express that handles csrf tokens slightly differently,
 // we need to ditch this and fix up the areas/tests that rely upon it
+/* @deprecated */
 utils.createSecureToken = function(numBaseBytes) {
   var randomBytes;
 
@@ -273,6 +274,7 @@ function getRandomInt(min, max) {
  * @param {IncomingMessage} req
  * @return {String}
  * @api private
+ * @deprecated
  */
 function defaultValue(req) {
   return (req.body && req.body._csrf)

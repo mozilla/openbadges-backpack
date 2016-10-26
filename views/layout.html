@@ -35,26 +35,38 @@
 
     <div id="body" class="container">
       <div class='message-container'>
-      {% for e in error %}
+      {% if error.length %}
         <div class="alert alert-danger">
           <a class="close" data-dismiss="alert">×</a>
-          {{e}}
+          <ul>
+            {% for e in error %}
+            <li>{{ e }}</li>
+            {% endfor %}
+          </ul>
         </div>
-      {% endfor %}
+      {% endif %}
 
-      {% for s in success %}
+      {% if success.length %}
         <div class="alert alert-success">
           <a class="close" data-dismiss="alert">×</a>
-          {{s}}
+          <ul>
+            {% for s in success %}
+            <li>{{ s }}</li>
+            {% endfor %}
+          </ul>
         </div>
-      {% endfor %}
+      {% endif %}
 
-      {% for i in info %}
+      {% if info.length %}
         <div class="alert alert-info">
           <a class="close" data-dismiss="alert">×</a>
-          {{i}}
+          <ul>
+            {% for i in info %}
+            <li>{{ i }}</li>
+            {% endfor %}
+          </ul>
         </div>
-      {% endfor %}
+      {% endif %}
       </div>
 
       {% block body %}{% endblock %}
@@ -71,6 +83,7 @@
       </small></aside>
     </div>
 
+    <script type="text/javascript" src="/vendor/bootstrap/js/alert.js"></script>
     <script type="text/javascript" src="/vendor/bootstrap/js/dropdown.js"></script>
     {% block scripts %}{% endblock %}
 

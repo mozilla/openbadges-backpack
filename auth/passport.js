@@ -4,9 +4,14 @@ var FacebookStrategy   = require('passport-facebook').Strategy;
 var TwitterStrategy    = require('passport-twitter').Strategy;
 var GoogleStrategy     = require('passport-google-oauth').OAuth2Strategy;
 var DeviantArtStrategy = require('passport-deviantart').Strategy;
+var BearerStrategy     = require('passport-http-bearer').Strategy;
 
 // load up the user model
 var User = require('../models/user');
+var Session = require('../models/backpack-connect').Session;
+
+// load up our trusty password strength checker, courtesy of the sec experts over at owasp
+var owasp = require('owasp-password-strength-test');
 
 // load the auth variables
 var configAuth = require('./auth'); // use this one for testing
@@ -17,7 +22,7 @@ module.exports = function(passport) {
     // passport session setup ==================================================
     // =========================================================================
     // required for persistent login sessions
-    // passport needs ability to serialize and unserialize users out of session
+    // passport needs ability to serialize and unserialize users in/out of session
 
     // used to serialize the user for the session
     passport.serializeUser(function(user, done) {
@@ -30,6 +35,49 @@ module.exports = function(passport) {
             done(err, user);
         });
     });
+
+
+    // =========================================================================
+    // BEARER AUTH =============================================================
+    // =========================================================================
+    // passport.use(new BearerStrategy(
+    //   function(token, done) {
+
+    //     var permission = 'issue';
+
+    //     Session.findOne({access_token: token}, function(err, bpc_session) {
+    //       if (err)
+    //         return done(err);
+
+    //       if (!bpc_session)
+    //         return invalidTokenError("Unknown access token");
+
+    //       if (bpc_session.isExpired())
+    //         return invalidTokenError("The access token expired");
+
+    //       if (permission && !bpc_session.hasPermission(permission))
+    //         return tokenError("insufficient_scope",
+    //                           "Scope '" + permission + "' is required");
+
+    //       req.backpackConnect = bpc_session;
+
+    //       if (req.headers['origin']) {
+    //         res.set('access-control-allow-origin', bpc_session.get('origin'));
+    //         if (bpc_session.get('origin') != req.headers['origin'])
+    //           return res.status(401).send(respond('unauthorized', "invalid origin"));
+    //       }
+
+    //       User.findOne({id: bpc_session.get('user_id')}, function(err, user) {
+    //         if (err || !user) {
+    //           if (!err) err = new Error("user with id not found");
+    //           return done(err);
+    //         }
+    //         // req.user = user;
+    //         return done(null, user, { scope: 'issue' });
+    //       });
+    //     });
+    //   }
+    // ));
 
     // =========================================================================
     // LOCAL LOGIN =============================================================
@@ -61,6 +109,7 @@ module.exports = function(passport) {
 
                 // all is well, return user
                 } else {
+                    req.user = user;
                     user.setLoginDate();
                     user.save(function(err) {
                         if (err)
@@ -99,15 +148,26 @@ module.exports = function(passport) {
                     if (err)
                         return done(err);
 
+                    // check if the password is secure
+                    var result = owasp.test(password);
+
+                    if (result.errors.length > 0) {
+                      return done(null, false, req.flash('error', result.errors));
+                    }
+
                     // check to see if theres already a user with that email
                     if (user) {
                         return done(null, false, req.flash('error', 'That email is already taken.'));
                     } else {
 
+                        var createdAt = new Date().getTime();
+
                         // create the user
                         var newUser = new User({
                             email: email,
                             active: 1,
+                            created_at: createdAt,
+                            updated_at: createdAt,
                         });
 
                         newUser.attributes.password = newUser.generateHash(password);

@@ -341,11 +341,26 @@ testMigration("add-password-reset-token-to-user", function(t, id, previousId) {
     sql("INSERT INTO `user` (id, email, password) VALUES (1,'foo@bar.org', 'letmein');"),
     up({count: 1}),
     sql("SELECT reset_password_token, reset_password_expires FROM user WHERE id=1", function(results) {
-      t.equal(results[0].reset_password_token, null, "'token' defaults to null");
-      t.equal(results[0].reset_password_expires, null, "'token' defaults to null");
+      t.equal(results[0].reset_password_token, null, "'reset_password_token' defaults to null");
+      t.equal(results[0].reset_password_expires, null, "'reset_password_expires' defaults to null");
     }),
     down({count: 1}),
     sqlError("SELECT `reset_password_token` FROM `user` WHERE id=1", t, "ERROR_BAD_FIELD_ERROR"),
     sqlError("SELECT `reset_password_expires` FROM `user` WHERE id=1", t, "ERROR_BAD_FIELD_ERROR"),
+  ];
+});
+
+testMigration("add-created-at-and-updated-at-columns-to-user", function(t, id, previousId) {
+  return [
+    up({destination: previousId}),
+    sql("INSERT INTO `user` (id, email, password) VALUES (1,'foo@bar.org', 'letmein');"),
+    up({count: 1}),
+    sql("SELECT created_at, updated_at FROM user WHERE id=1", function(results) {
+      t.equal(results[0].created_at, null, "'created_at' defaults to null");
+      t.equal(results[0].updated_at, null, "'updated_at' defaults to null");
+    }),
+    down({count: 1}),
+    sqlError("SELECT `created_at` FROM `user` WHERE id=1", t, "ERROR_BAD_FIELD_ERROR"),
+    sqlError("SELECT `updated_at` FROM `user` WHERE id=1", t, "ERROR_BAD_FIELD_ERROR"),
   ];
 });

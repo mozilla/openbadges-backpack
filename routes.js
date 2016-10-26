@@ -6,7 +6,7 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
   const displayer = require('./controllers/displayer');
   const demo = require('./controllers/demo');
   const backpack = require('./controllers/backpack');
-  const password = require('./controllers/password');
+  const user = require('./controllers/user');
   const group = require('./controllers/group');
   const share = require('./controllers/share');
   const BackpackConnect = require('./controllers/backpack-connect');
@@ -43,6 +43,7 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
   app.get('/demo/invalid.json', demo.badBadge);
   app.post('/demo/award', demo.award);
 
+  // app.get('/', passport.authenticate('bearer', { session: false }), backpack.recentBadges);
   app.get('/', backpack.recentBadges);
   app.get('/backpack', backpack.manage);
   app.get('/backpack/badges', backpack.allBadges);
@@ -62,14 +63,12 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
   app.get('/backpack/signout', backpack.signout);
   app.post('/backpack/badge', parseForm, csrfProtection, backpack.userBadgeUpload);
 
-  app.get('/password/reset', csrfProtection, password.reset);
-  app.post('/password/reset', parseForm, csrfProtection, password.resetPost);
-  app.get('/password/reset/:token', csrfProtection, password.change);
-  app.post('/password/update', parseForm, csrfProtection, password.changePost);
-
-  // app.get('/user/profile', csrfProtection, user.profileUpdate);
-  // app.post('/user/profile', parseForm, csrfProtection, user.profileUpdatePost);
-
+  app.get('/user/profile', csrfProtection, user.profile);
+  app.post('/user/profile', parseForm, csrfProtection, user.profilePost);
+  app.get('/password/reset', csrfProtection, user.requestReset);
+  app.post('/password/reset', parseForm, csrfProtection, user.requestResetPost);
+  app.get('/password/reset/:token', csrfProtection, user.reset);
+  app.post('/password/update', parseForm, csrfProtection, user.resetPost);
 
   app.post('/backpack/authenticate', backpack.authenticate);
   app.post('/backpack/authenticate', backpack.authenticate);
@@ -100,8 +99,8 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
   app.get('/tou.html', function(req, res) { return res.render('tou.html', {}); });
   app.get('/vpat.html', function(req, res) { return res.render('vpat.html', {}); });
 
-  app.get('/access', backpackConnect.requestAccess());
-  app.post('/accept', backpackConnect.allowAccess());
+  app.get('/access', csrfProtection, backpackConnect.requestAccess());
+  app.post('/accept', parseForm, csrfProtection, backpackConnect.allowAccess());
 
   app.all('/api/*', backpackConnect.allowCors());
   app.post('/api/token', backpackConnect.refresh());

@@ -9,6 +9,7 @@ const nodemailer = require('nodemailer');
 const smtpTransport = require("nodemailer-smtp-transport");
 const User = require('../models/user');
 const flash = require('connect-flash');
+const owasp = require('owasp-password-strength-test');
 
 var configuration = require('../lib/configuration'),
   mailerConfig = configuration.get('mailer');
@@ -21,16 +22,69 @@ const smtpTrans = nodemailer.createTransport(smtpTransport({
   }
 }));
 
+
+/**
+ * Render the user profile page.
+ */
+
+exports.profile = function profileUpdate(request, response) {
+  if (!request.user) {
+    return response.redirect(303, '/');
+  }
+  // request.flash returns an array. Pass on the whole thing to the view and
+  // decide there if we want to display all of them or just the first one.
+  response.render('user-profile.html', {
+    error: request.flash('error'),
+    csrfToken: request.csrfToken()
+  });
+};
+
+
+/**
+ * Update the user profile.
+ */
+
+exports.profilePost = function profileUpdatePost(request, response) {
+  if (!request.user) {
+    return response.redirect(303, '/');
+  }
+
+  if (request.body.password !== request.body.confirm) {
+    request.flash('error', 'Password field and confirm password field do not match');
+    return response.redirect('back');
+  }
+
+  var result = owasp.test(request.body.password);
+
+  if (result.errors.length > 0) {
+    request.flash('error', result.errors);
+    return response.redirect('back');
+  }
+
+  var user = request.user;
+
+  user.attributes.password = user.generateHash(request.body.password);
+  user.attributes.reset_password_token = null;
+  user.attributes.reset_password_expires = null;
+  user.attributes.updated_at = new Date().getTime();
+
+  user.save(function(err) {
+    request.flash('success', 'User profile has been updated successfully');
+    return response.redirect('/');
+  });
+};
+
+
 /**
  * Render password reset page
  */
-exports.reset = function reset(request, response) {
+exports.requestReset = function reset(request, response) {
   if (request.user) {
     return response.redirect(303, '/');
   }
   // request.flash returns an array. Pass on the whole thing to the view and
   // decide there if we want to display all of them or just the first one.
-  response.render('reset.html', {
+  response.render('request-reset-password.html', {
     error: request.flash('error'),
     csrfToken: request.csrfToken()
   });
@@ -40,7 +94,7 @@ exports.reset = function reset(request, response) {
 /**
  * Handle form submission for password reset page
  */
-exports.resetPost = function resetPost(request, response, next) {
+exports.requestResetPost = function resetPost(request, response, next) {
   if (request.user) {
     return response.redirect(303, '/');
   }
@@ -65,6 +119,7 @@ exports.resetPost = function resetPost(request, response, next) {
 
         user.attributes.reset_password_token = token;
         user.attributes.reset_password_expires = Date.now() + 3600000; // 1 hour
+        user.attributes.updated_at = new Date().getTime();
 
         user.save(function(err) {
           done(err, token, user);
@@ -97,13 +152,13 @@ exports.resetPost = function resetPost(request, response, next) {
 /**
  * Render change password form page
  */
-exports.change = function change(request, response) {
+exports.reset = function change(request, response) {
   User.findOne({ reset_password_token: request.params.token, reset_password_expires: Date.now() }, function(err, user) {
     if (!user) {
       request.flash('error', 'Password reset token is invalid or has expired.');
       return response.redirect('/password/reset');
     }
-    response.render('change-password.html', {
+    response.render('reset-password.html', {
       user: request.user,
       error: request.flash('error'),
       csrfToken: request.csrfToken(),
@@ -116,7 +171,7 @@ exports.change = function change(request, response) {
 /**
  * Handle form submission for password change page
  */
-exports.changePost = function changePost(request, response) {
+exports.resetPost = function changePost(request, response) {
   async.waterfall([
     function(done) {
       User.findOne({ reset_password_token: request.body.token, reset_password_expires: Date.now() }, function(err, user) {
@@ -125,9 +180,22 @@ exports.changePost = function changePost(request, response) {
           return response.redirect('back');
         }
 
+        if (request.body.password !== request.body.confirm) {
+          request.flash('error', 'Password field and confirm password field do not match');
+          return response.redirect('back');
+        }
+
+        var result = owasp.test(request.body.password);
+
+        if (result.errors.length > 0) {
+          request.flash('error', result.errors);
+          return response.redirect('back');
+        }
+
         user.attributes.password = user.generateHash(request.body.password);
         user.attributes.reset_password_token = null;
         user.attributes.reset_password_expires = null;
+        user.attributes.updated_at = new Date().getTime();
 
         user.save(function(err) {
           done(err, user);
