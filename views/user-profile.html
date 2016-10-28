@@ -3,32 +3,28 @@
 {% block body %}
 <section class="page">
     <div class="container">
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="row badge-header">
-                    <div class="col-xs-12 col-sm-3 ">
-                        <h2 class="section-heading">User Profile</h2>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <h1>User Profile</h1>
         <div class="row">
             <div class="col-xs-12 col-lg-6">
                 <form action="/user/profile" method="post">
                     <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-                    <div class="group">
+                    <div class="form-group">
+                          <label>Password</label>
                         <input type="password" class="form-control" name="password" required>
                         <span class="highlight"></span>
                         <span class="bar"></span>
-                        <label>Password</label>
+                      
                     </div>
-                    <div class="group">
+                    <div class="form-group">
+                         <label>Confirm</label>
                         <input type="password" class="form-control" name="confirm" required>
                         <span class="highlight"></span>
                         <span class="bar"></span>
-                        <label>Confirm</label>
+                       
                     </div>
-                    <input class="btn btn-primary btn-outline " type="submit" value="Upload">
+                    <div class="form-group">
+                        <input class="btn btn-primary btn-outline" type="submit" value="Save">
+                    </div>
                 </form>
             </div>
         </div>

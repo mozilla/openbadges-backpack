@@ -19,7 +19,16 @@
                 <li>
                     <a class="share-icon {% if activeNav == 'share' %} active{% endif %}" href="javascript:void(0)">Share</a>
                 </li>
-                <li class="dropdown">
+                 <li class="show-xs">
+                    <a class="share-icon " href="/user/profile">User Profile</a>
+                </li>
+                 <li class="show-xs">
+                    <a class="share-icon " href="/backpack/settings">Backpack Settings</a>
+                </li>
+                 <li class="show-xs">
+                    <a class="share-icon " href="/backpack/signout">Signout</a>
+                </li>
+                <li class="dropdown hidden-xs">
                     <a class="icon gear-icon dropdown-toggle" href="#" data-toggle="dropdown">
                         <span><b class="caret"></b></span>
                     </a>
@@ -29,6 +38,7 @@
                         <li><a href="/backpack/signout">Sign Out</a></li>
                     </ul>
                 </li>
+
             </ul>
         </div>
     </div>

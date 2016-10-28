@@ -1,5 +1,6 @@
 @import "variables.less";
 @import "mixins.less";
+@import "lightbox";
 @media (max-width: 990px) {
     .navbar-header {
         float: none;
@@ -43,12 +44,11 @@ html,
 body {
     height: 100%;
     width: 100%;
-
     // &.signup,
     // &.login,
     // &.reset,
     // &.welcome {
-        background: #222;
+    background: #222;
     // }
 }
 
@@ -113,6 +113,24 @@ p {
     font-size: 18px;
     line-height: 1.5;
     margin-bottom: 20px;
+}
+
+@media (max-width: 1000px) {
+    .navbar-nav>li.show-xs {
+        display: block;
+    }
+    .navbar-nav>li.hide-xs {
+        display: none;
+    }
+}
+
+@media (min-width: 1000px) {
+    .navbar-nav>li.hide-xs {
+        display: block;
+    }
+    .navbar-nav>li.show-xs {
+        display: none;
+    }
 }
 
 @media (min-width: 1400px) {
@@ -351,14 +369,16 @@ p {
 
 // Homepage Header
 header {
-    position: relative;
-    width: 100%;
-    min-height: auto;
-    overflow-y: hidden;
-    background: url("/images/bg-cta.jpg");
-    color: white;
-    background-size: cover;
-    background-position: center right;
+    &.cd-section {
+        position: relative;
+        width: 100%;
+        min-height: auto;
+        overflow-y: hidden;
+        background: url("/images/bg-cta.jpg");
+        color: white;
+        background-size: cover;
+        background-position: center right;
+    }
     .logo {
         margin-top: -20%;
         position: absolute;
@@ -460,6 +480,9 @@ section.download {
     }
     p {
         color: black;
+    }
+    a {
+        color: white;
     }
     .badges {
         .badge-link {
@@ -609,7 +632,6 @@ section.reset {
     .group {
         position: relative;
         margin-bottom: 45px;
-
         &.at {
             &::after {
                 background: url(/images/email-icon.svg);
@@ -622,7 +644,6 @@ section.reset {
                 top: 11px;
             }
         }
-
         &.lock {
             &::after {
                 background: url(/images/lock-icon.svg);
@@ -635,7 +656,6 @@ section.reset {
                 top: 11px;
             }
         }
-        
     }
     input {
         font-size: 14px;
@@ -709,22 +729,18 @@ section.reset {
         display: inline-block;
         margin-top: 20px;
         padding-right: 10%;
-
         li {
             display: inline-block;
             margin-left: 15px;
-
             &:first-of-type {
                 margin-right: 15px;
             }
-
             a {
                 img {
                     width: 20px;
                     opacity: 0.8;
                     transition: opacity 250ms ease;
                 }
-
                 &:hover {
                     img {
                         opacity: 1;
@@ -743,8 +759,12 @@ section.reset {
 }
 
 section.page {
-    margin-top: 180px;
+    margin-top: 50px;
     padding-bottom: 30px;
+    @media only screen and (min-width: 900px) {
+        margin-top: 180px;
+        padding-bottom: 30px;
+    }
 }
 
 section.badges {
@@ -833,14 +853,32 @@ section.upload {
 }
 
 section.collections {
-    margin-top: 180px;
+    margin-top: 70px;
     h2 {
         font-size: 32px;
         padding: 0;
         margin: 0;
     }
     .panel-default {
-        border: white
+        border: white;
+        > .panel-heading {
+            background: black;
+        }
+    }
+    .nav-tabs>li.active>a,
+    .nav-tabs>li.active>a:focus,
+    .nav-tabs>li.active>a:hover {
+        color: #555;
+        cursor: default;
+        background-color: transparent;
+        border: none;
+        border-bottom-color: transparent;
+    }
+    .nav-tabs {
+        border: none;
+    }
+    .container {
+        padding: 0;
     }
     .sticky .scroll {
         overflow-y: scroll;
@@ -852,31 +890,46 @@ section.collections {
     }
     .group {
         background: white;
-        padding: 110px 30px 30px;
+        padding: 85px 30px 30px;
         display: inline-block;
         border: 1px solid #DDD;
-        width:100%;
+        width: 100%;
         position: relative;
         margin-bottom: 30px;
     }
     span.delete {
         position: absolute;
         right: 20px;
-        top: 11px;
+        top: 0px;
         font-size: 40px;
         font-weight: 100;
         font-family: sans-serif;
-        color: #dddddd;
+        opacity: 0.3;
+        transition: opacity 250ms ease;
+        cursor: pointer;
+        &:hover {
+            opacity: 1;
+        }
     }
     span.share {
         position: absolute;
-        right: 20px;
+        right: 10px;
+        width: 20px;
+        bottom: 13px;
+        opacity: 0.3;
+        transition: opacity 250ms ease;
+        cursor: pointer;
+        &:hover {
+            opacity: 1;
+        }
     }
-    .instructions{padding:10px;}
+    .instructions {
+        padding: 10px;
+    }
     input {
         width: 100%;
         border: none;
-        padding: 25px;
+        padding: 15px 25px;
         font-size: 20px;
         position: absolute;
         left: 0;
@@ -884,6 +937,10 @@ section.collections {
         border-bottom: 1px solid #dddddd;
     }
     @media (min-width: 991px) {
+        margin-top: 180px;
+        .container {
+            padding: 0 15px;
+        }
         section.badges h2 {
             margin-left: 70px;
         }
@@ -904,6 +961,36 @@ section.collections {
         }
         .panel {
             background-color: transparent
+        }
+    }
+}
+
+.portfolio {
+    margin: 180px auto;
+    width: 1350px;
+}
+
+@media(min-width: 768px) {
+    .portfolio {
+        margin: 180px auto;
+        width: 1350px;
+    }
+}
+
+ul.badges {
+    padding: 0;
+    margin-bottom: 50px;
+    .information {
+        margin: 20px auto;
+        img {
+            width: 250px;
+            margin-right: 50px;
+        }
+        .fieldlabel {
+            width: 150px;
+        }
+        .section-head {
+            font-size: 18px;
         }
     }
 }
@@ -959,6 +1046,7 @@ footer {
     color: #DD7027;
     background-color: transparent;
     border: 4px solid #DD7027;
+    transition: all 250ms ease;
     &:hover,
     &:focus,
     &:active,

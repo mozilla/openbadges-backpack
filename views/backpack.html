@@ -37,7 +37,9 @@
                                                     <div class='group' data-id="{{group.attributes.id}}" data-url="{{group.attributes.url}}">
                                                         <input class='groupName' type='text' value='{{group.attributes.name|e}}' style='display: block'>
                                                         <span class='icon delete'>&times;</span>
-                                                        <span class='icon share' {% if not group.attributes.badgeObjects %}style='display: none'{% endif %} title='Share this group'>5</span>
+                                                        <span class='icon share' {% if not group.attributes.badgeObjects %}style='display: none'{% endif %} title='Share this group'>
+                                                            <img src="/images/social-share.svg" alt="Social share icon" />
+                                                        </span>
                                                         {#<span class='public'>
                                                             <label>
                                                                 <input type='checkbox' class='js-privacy' {% if group.attributes.public %}checked{% endif %}>
@@ -58,13 +60,6 @@
                                                     <hgroup class="instructions">
                                                         <h3>Drag a badge here</h3> to create a Collection.
                                                     </hgroup>
-                                                    <span class="icon share" title="share this group">share</span>
-                                                    {#<span class="public">
-                                                        <label>
-                                                            <input type="checkbox" class="js-privacy">
-                                                            <span>public</span>
-                                                        </label>
-                                                    </span>#}
                                                 </div>
                                             </div>
                                         </div>
