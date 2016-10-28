@@ -41,7 +41,7 @@ User.prototype.getAllBadges = function(callback) {
 User.prototype.getLatestBadges = function(count, callback) {
   if (typeof count == 'function') {
     callback = count;
-    count = 7; // Yay for magic numbers!
+    count = 11; // Yay for magic numbers!
   }
 
   this.getAllBadges(function(err, badges) {
@@ -49,6 +49,11 @@ User.prototype.getLatestBadges = function(count, callback) {
       // There doesn't appear to be a way to do this at the SQL level :(
       badges = badges.slice(0,count);
     }
+
+    // this sits as a placeholder for the upload badge addition on recent badges page
+    var uploadBadge = { recent: true };
+
+    badges.unshift(uploadBadge);
 
     callback(err, badges);
   });

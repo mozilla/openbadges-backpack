@@ -11,7 +11,7 @@ var fs = require('fs');
 var path = require('path');
 var middleware = require('./middleware');
 var logger = require('./lib/logger');
-var browserid = require('./lib/browserid');
+// var browserid = require('./lib/browserid');
 var configuration = require('./lib/configuration');
 var flash = require('connect-flash');
 var nunjucks = require('nunjucks');
@@ -120,8 +120,11 @@ if (process.env['NODE_ENV'] === 'development') {
   catch (ex) {
     logger.warn(ex);
   }
-  browserid.configure({testUser: process.env['BROWSERID_TEST_USER']});
+  // browserid.configure({testUser: process.env['BROWSERID_TEST_USER']});
 };
+
+var year = new Date().getFullYear();
+app.set('year', year);
 
 // load our routes and pass in our app and fully configured passport
 require('./routes.js')(app, passport, parseForm, csrfProtection);

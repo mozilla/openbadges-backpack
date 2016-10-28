@@ -8,13 +8,20 @@ const bakery = require('openbadges-bakery');
 
 const logger = require('../lib/logger');
 const configuration = require('../lib/configuration');
-const browserid = require('../lib/browserid');
 const awardBadge = require('../lib/award');
 const analyzeAssertion = require('../lib/analyze-assertion');
 const normalizeAssertion = require('../lib/normalize-assertion');
 const Badge = require('../models/badge');
 const Group = require('../models/group');
 const User = require('../models/user');
+
+
+/**
+ * Render welcome page
+ */
+exports.welcome = function welcome(request, response) {
+  response.render('welcome.html');
+}
 
 
 /**
@@ -45,42 +52,42 @@ exports.login = function login(request, response) {
  */
 
 exports.authenticate = function authenticate(req, res) {
-  function formatResponse(to, apiError, humanReadableError) {
-    const preferJsonOverHtml = req.accepts('html, json') === 'json';
-    if (preferJsonOverHtml) {
-      if (apiError) {
-        return res.send(400, {status: 'error', reason: apiError});
-      }
-      return res.send(200, {status: 'ok', email: req.session.emails[0]});
-    }
-    if (humanReadableError)
-      req.flash('error', humanReadableError);
-    return res.redirect(303, to);
-  }
+  // function formatResponse(to, apiError, humanReadableError) {
+  //   const preferJsonOverHtml = req.accepts('html, json') === 'json';
+  //   if (preferJsonOverHtml) {
+  //     if (apiError) {
+  //       return res.send(400, {status: 'error', reason: apiError});
+  //     }
+  //     return res.send(200, {status: 'ok', email: req.session.emails[0]});
+  //   }
+  //   if (humanReadableError)
+  //     req.flash('error', humanReadableError);
+  //   return res.redirect(303, to);
+  // }
 
-  const assertion = req.body && req.body.assertion;
-  const verifierUrl = browserid.getVerifierUrl(configuration);
-  const audience = browserid.getAudience(req);
+  // const assertion = req.body && req.body.assertion;
+  // const verifierUrl = browserid.getVerifierUrl(configuration);
+  // const audience = browserid.getAudience(req);
 
-  if (!assertion) {
-    return formatResponse('/backpack/login', "assertion expected");
-  }
+  // if (!assertion) {
+  //   return formatResponse('/backpack/login', "assertion expected");
+  // }
 
-  browserid.verify({
-    url: verifierUrl,
-    assertion: assertion,
-    audience: audience,
-  }, function (err, email) {
-    if (err) {
-      logger.error('Failed browserID verification: ');
-      logger.debug('Code: ' + err.code + "; Extra: " + err.extra);
-      return formatResponse('back', "browserID verification failed: " + err.message,
-                            "Could not verify with browserID!");
-    }
+  // browserid.verify({
+  //   url: verifierUrl,
+  //   assertion: assertion,
+  //   audience: audience,
+  // }, function (err, email) {
+  //   if (err) {
+  //     logger.error('Failed browserID verification: ');
+  //     logger.debug('Code: ' + err.code + "; Extra: " + err.extra);
+  //     return formatResponse('back', "browserID verification failed: " + err.message,
+  //                           "Could not verify with browserID!");
+  //   }
 
-    req.session.emails = [email];
-    return formatResponse('/');
-  });
+  //   req.session.emails = [email];
+  //   return formatResponse('/');
+  // });
 };
 
 /**
@@ -154,6 +161,7 @@ function badgePage (request, response, badges, template) {
   var success = request.flash('success');
 
   badges.forEach(function (badge) {
+    if (badge.recent) return;
     var body = badge.get('body');
     var origin = body.badge.issuer.origin;
     var criteria = body.badge.criteria;
@@ -178,7 +186,7 @@ function badgePage (request, response, badges, template) {
 exports.recentBadges = function recent (request, response, next) {
   var user = request.user;
   if (!user)
-    return response.redirect(303, '/backpack/login');
+    return response.redirect(303, '/backpack/welcome');
 
   function startResponse () {
     return user.getLatestBadges(function(err, badges) {
@@ -365,7 +373,7 @@ exports.addBadge = function addBadge(request, response) {
   var error = request.flash('error');
   var success = request.flash('success');
 
-  response.render('addBadge.html', {
+  response.render('upload.html', {
     error: error,
     success: success,
     csrfToken: request.csrfToken()

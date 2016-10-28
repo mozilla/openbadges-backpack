@@ -1,0 +1,15 @@
+<div id="subNav">
+    <div class="container">
+        <ul>
+            <li {% if selectedBadgeTab == 'recent' %} class="active"{% endif %}>
+                <a href="/">Recent</a>
+            </li>
+            <li {% if selectedBadgeTab == 'all' %} class="active"{% endif %}>
+                <a href="/backpack/badges">Everything</a>
+            </li>
+            <li {% if selectedBadgeTab == 'upload' %} class="active"{% endif %}>
+                <a href="/backpack/add">Upload</a>
+            </li>
+        </ul>
+    </div>
+</div>

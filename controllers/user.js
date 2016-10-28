@@ -144,7 +144,7 @@ exports.requestResetPost = function resetPost(request, response, next) {
     }
   ], function(err) {
     if (err) return next(err);
-    response.redirect('/');
+    response.redirect('/backpack/login');
   });
 };
 
@@ -216,6 +216,6 @@ exports.resetPost = function changePost(request, response) {
       });
     }
   ], function(err) {
-    response.redirect('/');
+    response.redirect('/backpack/login');
   });
 };

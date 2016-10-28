@@ -3,74 +3,51 @@
 {% set activeNav = 'badges' %}
 
 {% block body %}
-
-{% if not badges.length %}
-  {% block noBadges %}
-    {% include 'no-badges.html' %}
-  {% endblock %}
-{% else %}
-  <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-  {% block badgeNav %}
-    <p class="badge-nav">
-      <span class="hide">Show</span>
-      <a href="/"{% if selectedBadgeTab == 'recent' %} class="selected"{% endif %}>Recent</a>
-      <span class="hide">,</span>
-      <a href="/backpack/badges"{% if selectedBadgeTab == 'all' %} class="selected"{% endif %}>Everything</a>
-      <span class="hide">or</span>
-      <a href="/backpack/add" class="add-openbadge">Upload</a>
-      <span class="hide">a new badge</span>
-    </p>
-    <p class="badge-nav-sub">
-      You can share these badges by creating Collections (above) & choosing to display them on your networks.
-    </p>
-  {% endblock %}
-  <div class="row">
-    {% block badgeList %}
-      <ul id="badges" class="js-badges badge-list">
-        {% block badgeItems %}
-          {% for badge in badges %}
-            <li class="col-md-3 openbadge-container">
-              <div class="openbadge" data-id="{{badge.attributes.id}}" data-serialization="{{badge.serializedAttributes|e}}">
-                <img src="{{ badge.attributes.imageUrl }}" width="64">
-                <p class="title" title="{{ badge.attributes.body.badge.name|e }}">{{ badge.attributes.body.badge.name|e }}</p>
-                <p class="issuer">Issuer: {{ badge.attributes.body.badge.issuer.name|e }}</p>
-              </div>
-            </li>
-          {% endfor %}
+    {% if not badges.length %}
+        {% block noBadges %}
+            {% include 'no-badges.html' %}
         {% endblock %}
-        {% block afterBadgeItems %}
-          <li class="col-md-3">
-            <a href="/backpack/add" class="add-openbadge">
-              <img src="/images/add-badge.png">
-              <p class="title">Upload a badge</p>
-              <p class="issuer">&nbsp;</p>
-            </a>
-          </li>
-        {% endblock %}
-      </ul>
-    {% endblock %}
-  </div>
-{% endif %}
-
+    {% else %}
+        {% include "includes/sub-nav.html" %}
+        <section id="badges" class="badges">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="row badge-header">
+                            <div class="col-xs-12 col-sm-3 ">
+                                <h2 class="section-heading">{{ sectionTitle }}</h2>
+                            </div>
+                            <div class="col-xs-12 col-sm-9 ">
+                                <p>You can share these badges by creating collections and choosing to display them on your networks</p>
+                            </div>
+                        </div>
+                        {% for badge in badges %}
+                            {% if (loop.index - 1) % 6 == 0 %}
+                                <div class="row badge-list {{ badges.length }}">
+                            {% endif %}
+                            {% if badge.recent %}
+                                <a href="/backpack/add">
+                                    <div class="col-xs-6 col-md-4 col-lg-2 openbadge">
+                                        <img src="/images/upload.svg" />
+                                        <h4>Upload a badge</h4>
+                                        <h5></h5>
+                                    </div>
+                                </a>
+                            {% else %}
+                                <div class="col-xs-6 col-md-4 col-lg-2 openbadge" data-id="{{badge.attributes.id}}" data-serialization="{{badge.serializedAttributes|e}}">
+                                    <img src="{{ badge.attributes.imageUrl }}" />
+                                    <h4>{{ badge.attributes.body.badge.name|e }}</h4>
+                                    <h5>{{ badge.attributes.body.badge.issuer.name|e }}</h5>
+                                </div>
+                            {% endif %}
+                            {% if (loop.index) % 6 == 0 %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
 {% endblock %}
 
-{% block scripts %}
-
-<!-- third party -->
-{% if settings.useCompiledTemplates %}
-  <script type="text/javascript" src="/js/nunjucks-min.js"></script>
-  <script type="text/javascript" src="/js/nunjucks-templates.js"></script>
-{% else %}
-  <script type="text/javascript" src="/js/nunjucks-dev.js"></script>
-{% endif %}
-<script type="text/javascript" src="/js/underscore.js"></script>
-<script type="text/javascript" src="/js/backbone.js"></script>
-<script type="text/javascript" src="/vendor/bootstrap/js/alert.js"></script>
-<script type="text/javascript" src="/vendor/bootstrap/js/tooltip.js"></script>
-<script type="text/javascript" src="/vendor/bootstrap/js/popover.js"></script>
-
-<!-- my libraries -->
-<script type="text/javascript" src="/js/jquery.sync.js"></script>
-<script type="text/javascript" src="/js/backpack.js"></script>
-
-{% endblock %}

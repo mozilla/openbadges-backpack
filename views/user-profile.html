@@ -1,21 +1,37 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-<h1>User Profile</h1>
-<form action="/user/profile" method="post">
-  <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-  <fieldset id="issuer-acceptance">
-    <legend>Change Password</legend>
-      <div class="form-group">
-        <label>New Password</label>
-        <input type="password" class="form-control" name="password">
-      </div>
-      <div class="form-group">
-        <label>Confirm Password</label>
-        <input type="password" class="form-control" name="confirm">
-      </div>
-      <button type="submit" class="btn btn-success">Save</button>
-  </fieldset>
-</form>
+<section class="page">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="row badge-header">
+                    <div class="col-xs-12 col-sm-3 ">
+                        <h2 class="section-heading">User Profile</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-lg-6">
+                <form action="/user/profile" method="post">
+                    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                    <div class="group">
+                        <input type="password" class="form-control" name="password" required>
+                        <span class="highlight"></span>
+                        <span class="bar"></span>
+                        <label>Password</label>
+                    </div>
+                    <div class="group">
+                        <input type="password" class="form-control" name="confirm" required>
+                        <span class="highlight"></span>
+                        <span class="bar"></span>
+                        <label>Confirm</label>
+                    </div>
+                    <input class="btn btn-primary btn-outline " type="submit" value="Upload">
+                </form>
+            </div>
+        </div>
+</section>
 {% endblock %}
 

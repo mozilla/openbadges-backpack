@@ -1,0 +1,92 @@
+{% extends 'layout.html' %}
+{% set bodyClass = 'welcome' %}
+{% block body %}
+
+<nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" 
+        data-toggle="collapse" 
+        data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span> Menu <i class="fa fa-bars"></i>
+      </button>
+    </div>
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+          <a class="page-scroll" href="#about">About</a>
+        </li>
+        <li>
+          <a class="page-scroll" href="/backpack/login">Login</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<nav id="cd-vertical-nav">
+  <ul>
+    <li>
+      <a href="#top" data-number="1">
+        <span class="cd-dot"></span>
+        <span class="cd-label">Intro</span>
+      </a>
+    </li>
+    <li>
+      <a href="#about" data-number="2">
+        <span class="cd-dot"></span>
+        <span class="cd-label">About</span>
+      </a>
+    </li>
+    <li>
+      <a href="#developers" data-number="3">
+        <span class="cd-dot"></span>
+        <span class="cd-label">Developers</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+<header id="top" class="cd-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="header-content">
+          <div class="header-content-inner">
+            <div class="logo">
+              <img src="/images/backpack-logo.png" height="80px" />
+            </div>
+            <h1>Store and Share your Badges</h1>
+            <a href="/backpack/login" class="btn btn-outline btn-xl page-scroll">Login</a>
+            <a href="#about" class="btn page-scroll learn-more">Learn more and sign up</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+<section id="about" class="download bg-primary text-center cd-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-12">
+        <h2 class="section-heading">What is the backpack</h2>
+        <p>Store the Open Badges you earn and share them between platforms, anywhere on the web. It gives you total control over your own achievements by allowing you to organise and share your badges with whomever you want, wherever you want.</p>
+        <p>As you earn badges across different platforms and providers, the backpack is a lifelong, central store that means your badges will be safe and accessible, even if you lose access to those issuing platforms and providers.</p>
+        <p>It's simple to use, just setup a free account and upload or push the badges you have earned into it. The backpack is trusted worldwide, with over 1 million badges already stored.</p>
+        <p>Find out more at openbadges.org and join the conversation here (link to twitter?)</p>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="developers" class="developers cd-section">
+  <div class="row double-pane">
+    <div class="col-sm-6 img-part" style="background: url('/images/bg-cta.jpg') no-repeat top right; background-size: cover;"></div>
+    <div class="col-sm-12 text-side">
+      <h3>Developers</h3>
+      <h2>How you can get involved</h2>
+      <h4>Help shape the future</h4>
+      <p>To relaunch their website with Craft CMS, allowing seamless and easy Content Management. A new responsive design created,&nbsp;to&nbsp;allow mobile users to view the site with the best possible browsing experience.</p>
+      <a href="#about" class="btn btn-outline btn-xl page-scroll">Get Involved</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

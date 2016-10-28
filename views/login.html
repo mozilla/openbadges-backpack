@@ -2,30 +2,71 @@
 {% set bodyClass = 'login' %}
 {% block body %}
 
-<div class="row">
-  <div class="col-md-6">
-    <img src="/images/signin-graphic.png" alt="signin graphic" class="graphic" />
-  </div>
-  <div class="col-md-6">
-    <h1 class="title">Welcome to your Backpack</h1>
-    <p class="subtitle">Celebrate your skills &amp; passions</p>
-
-    <form action="/backpack/login" method="post">
-      <input name="_csrf" type="hidden" value="{{ csrfToken }}"></input>
-      <div class="form-group">
-        <label>Email</label>
-        <input type="text" class="form-control" name="email">
+<section id="login" class="login cd-section">
+  <div class="container">
+    <div class="row double-pane">
+      <div class="col-sm-4 img-part">
+        <div class="welcome-message">
+          <h2>Welcome</h2>
+        </div>
+        <div class="backpack-link">
+          <img src="/images/backpack-logo.png" height="60px" />
+          <a href="http://backpack.openbadges.org" target="_blank">backpack.openbadges.org</a>
+        </div>
       </div>
-      <div class="form-group">
-        <label>Password</label>
-        <input type="password" class="form-control" name="password">
+      <div class="col-sm-12 login-part">
+        <h3>Login</h3>
+        <form action="/backpack/login" method="post">
+          <input name="_csrf" type="hidden" value="{{ csrfToken }}"></input>
+          <div class="group at">
+            <input type="text" name="email" required>
+            <span class="highlight"></span>
+            <span class="bar"></span>
+            <label>Email</label>
+          </div>
+          <div class="group lock">
+            <input type="password" name="password" required>
+            <span class="highlight"></span>
+            <span class="bar"></span>
+            <label>Password</label>
+          </div>
+          <input type="submit" value="login" class="btn">
+          <ul class="options">
+            <li>Or sign in with</li>
+            <li>
+              <a href="javascript:void(0)" aria-label="Sign in with Twitter">
+                <img src="/images/twitter-icon.svg" alt="Twitter icon" />
+              </a>
+            </li>
+            <li>
+              <a href="javascript:void(0)" aria-label="Sign in with Google">
+                <img src="/images/google-icon.svg" alt="Google icon" />
+              </a>
+            </li>  
+            <li>
+              <a href="javascript:void(0)" aria-label="Sign in with Facebook">
+                <img src="/images/facebook-icon.svg" alt="Facebook icon" />
+              </a>
+            </li>  
+            <li>
+              <a href="javascript:void(0)" aria-label="Sign in with LinkedIn">
+                <img src="/images/linkedin-icon.svg" alt="LinkedIn icon" />
+              </a>
+            </li>  
+            <li>
+              <a href="javascript:void(0)" aria-label="Sign in with Sharepoint">
+                <img src="/images/sharepoint-icon.svg" alt="Sharepoint icon" />
+              </a>
+            </li>
+          </ul>
+          <div class="links">
+            <a href="/backpack/signup" class="go-to-link">Go to signup page</a>
+            <a href="/password/reset" class="reset-link">Forgotten password?</a>
+          </div>
+        </form>
       </div>
-      <button type="submit" class="btn btn-warning">Login</button>
-      <a href="/backpack/signup" class="go-to-link">Go to signup page</a>
-      <a href="/password/reset" class="reset-link">Forgotten password</a>
-    </form>
-
+    </div>
   </div>
-</div>
+</section>
 
 {% endblock %}
