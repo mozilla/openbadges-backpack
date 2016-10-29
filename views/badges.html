@@ -3,12 +3,10 @@
 {% set activeNav = 'badges' %}
 
 {% block body %}
+    {% include "includes/sub-nav.html" %}
     {% if not badges.length %}
-        {% block noBadges %}
-            {% include 'no-badges.html' %}
-        {% endblock %}
+        {% include 'no-badges.html' %}
     {% else %}
-        {% include "includes/sub-nav.html" %}
         <section id="badges" class="badges">
             <div class="container">
                 <div class="row">
