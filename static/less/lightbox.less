@@ -1,6 +1,5 @@
 .lightbox {
-  position: fixed;
-  background: rgba(0, 0, 0, 0.3);
+  position: absolute;
   z-index: 10000;
   top: 0;
   left: 0;
@@ -8,22 +7,30 @@
   height: 100%;
 }
 
+.lightbox .bg {
+  background: rgba(25,44,58,0.9);
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  z-index: -1;
+}
+
 .lightbox .close {
-  -webkit-transition: opacity 0.5s;
-  -moz-transition: opacity 0.5s;
-  -ms-transition: opacity 0.5s;
-  -o-transition: opacity 0.5s;
-  transition: opacity 0.5s;
-  color: #FFFFFF;
-  display: block;
+  -webkit-transition: opacity .5s;
+  -moz-transition: opacity .5s;
+  -ms-transition: opacity .5s;
+  -o-transition: opacity .5s;
+  transition: opacity .5s;
   position: absolute;
-  font-weight: bold;
-  font-size: 3em;
-  top: 3px;
-  right: 3px;
-  text-shadow: 1px 1px 1px #000;
+  top: 25px;
+  right: 20px;
   cursor: pointer;
-  opacity: 0.4;
+  opacity: .8;
+}
+
+.lightbox .close img {
+  width: 20px;
+  height: 20px;
 }
 
 .lightbox .background {
@@ -44,21 +51,12 @@
   opacity: 1;
 }
 
-.lightbox .close:active {
-  top: 5px;
-  right: 1px;
-  text-shadow: 0 0 1px #000;
-}
-
 .lightbox .contents {
-  width: 700px;
+  width: 90%;
   margin: 88px auto;
-  border-radius: 5px;
-  background: #eee;
-  box-shadow: 1px 1px 5px 5px rgba(0, 0, 0, 0.2);
   overflow: hidden;
-  background: #444;
-  border: 3px solid #444;
+  background: #fff;
+  max-width: 1000px;
 }
 
 .lightbox .contents header {
@@ -68,17 +66,14 @@
 }
 
 .lightbox .contents h2 {
-  color: #fff;
-  text-shadow: 1px 1px 1px #222;
+  color: #333;
+  border-bottom: 1px solid #dddddd;
+  padding-bottom: 15px;
 }
 
 .lightbox .contents .body {
   position: relative;
   min-height: 300px;
-  background: #f4f4f4;
-  border-radius: 3px;
-  text-shadow: 1px 1px 1px #fff;
-  box-shadow: 0px 1px 2px 2px rgba(0, 0, 0, 0.4);
 }
 
 .lightbox .confirm-disown, .lightbox .confirm-facebook-share {
@@ -141,4 +136,58 @@
 
 .lightbox .confirm-facebook-share .auto_push {
   display: block;
+}
+
+.lightbox .left-col {
+  text-align: center;
+  img {
+    width: 80%;
+    margin: 20px auto 40px;
+    display: block;
+  }
+  .date {
+    font-size: 20px;
+    margin-bottom: 25px;
+  }
+  button {
+    background: none;
+    outline: none;
+    border: none;
+    color: #c1272d;
+    margin-bottom: 30px;
+    font-size: 16px;
+    i.fa {
+      margin-left: 5px;
+    }
+  }
+}
+
+.lightbox .right-col {
+  padding-left: 25px;
+  ul {
+    padding: 20px 0 25px;
+    &:first-of-type  {
+      border-bottom: 1px solid #dddddd;
+    }
+    li {
+      margin: 10px 0;
+      font-size: 15px;
+      &.header {
+        font-size: 18px;
+        margin-bottom: 25px;
+      }
+      label {
+        min-width: 140px;
+        font-weight: normal;
+        position: absolute;
+      }
+      span {
+        margin-left: 140px;
+        display: block;
+        a {
+          word-break: break-word;
+        }
+      }
+    }
+  }
 }

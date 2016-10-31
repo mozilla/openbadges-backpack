@@ -1,82 +1,62 @@
-<table class='information'>
-  <colgroup>
-    <col class="imageCol">
-    <col class="fieldLabelCol">
-    <col class="dataCol">
-  </colgroup>
-  <tbody>
-    <tr>
-      <td rowspan="50" class='image'>
-        <img src="{{ badge.attributes.imageUrl }}">
-        {% if disownable %}
-        <button class='btn btn-danger disown'>Remove this Badge</button>
+<div class="col-lg-12">
 
-        <!-- TODO: Re-enable this when sharing actually works well.
-                   We may drop the "Share" button altogether, but it's 
-                   a nice guide for now.
-          <form action="/share/badge/{{ badge.attributes.id }}" method="post">
-            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-            <input class="btn" type="submit" value="Share">
-          </form>
-          <p class="facebook-share">Facebook</p>
-          <p class="twitter-share">Twitter</p>
-        -->
-        {% endif %}
-      </td>
-
-      <td class='section-head' colspan='2'>Issuer Details</td>
-    </tr>
-    <tr>
-      <td class='fieldlabel issuer-name'>Name</td>
-      <td>{{badge.attributes.body.badge.issuer.name|e}}</td>
-    </tr>
-    <tr>
-      <td class='fieldlabel issuer-name'>URL</td>
-      <td><a href="{{badge.attributes.body.badge.issuer.origin|e}}">{{badge.attributes.body.badge.issuer.origin|e}}</a></td>
-    </tr>
-    {% if badge.attributes.body.badge.issuer.org %}
-    <tr>
-      <td class='fieldlabel issuer-name'>Organization</td>
-      <td>{{badge.attributes.body.badge.issuer.org|e}}</td>
-    </tr>
-    {% endif %}
-
-    <tr>
-      <td class='section-head' colspan='2'>Badge Details</td>
-    </tr>
-    <tr>
-      <td class='fieldlabel'>Name</td>
-      <td>{{badge.attributes.body.badge.name|e}}</td>
-    </tr>
-    <tr>
-      <td class='fieldlabel'>Description</td>
-      <td>{{badge.attributes.body.badge.description|e}}</td>
-    </tr>
-    <tr>
-      <td class='fieldlabel'>Criteria</td>
-      <td><a href='{{badge.attributes.body.badge.criteria|e}}'>{{badge.attributes.body.badge.criteria|e}}</a></td>
-    </tr>
-
-    {% if badge.attributes.body.evidence %}
-    <tr>
-      <td class='fieldlabel evidence'>Evidence</td>
-      <td><a href='{{badge.attributes.body.evidence|e}}'>{{badge.attributes.body.evidence|e}}</a></td>
-    </tr>
-    {% endif %}
+  <div class="col-lg-3 col-md-3 col-sm-12 left-col">
+    <img src="{{ badge.attributes.imageUrl }}">
 
     {% if badge.attributes.body.issued_on %}
-    <tr>
-      <td class='fieldlabel'>Issued</td>
-      <td>{{badge.attributes.body.issued_on}}</td>
-    </tr>
+      <div>Issued</div>
+      <div class="date">{{badge.attributes.body.issued_on}}</div>
     {% endif %}
 
     {% if badge.attributes.body.expires %}
-    <tr>
-      <td class='fieldlabel'>Expiration</td>
-      <td>{{badge.attributes.body.expires}}</td>
-    </tr>
+      <div>Expires</div>
+      <div class="date">{{badge.attributes.body.expires}}</div>
     {% endif %}
-  </tbody>
-</table>
 
+    {% if disownable %}
+      <button class='disown'>Remove this Badge <i class="fa fa-trash"></i></button>
+    {% endif %}
+  </div>
+
+  <div class="col-lg-9 col-md-9 col-sm-12 right-col">
+    <ul>
+      <li class="header">Issuer Details</li>
+      <li>
+        <label>Name</label>
+        <span>{{badge.attributes.body.badge.issuer.name|e}}</span>
+      </li>
+      <li>
+        <label>URL</label>
+        <span><a href="{{badge.attributes.body.badge.issuer.origin|e}}">{{badge.attributes.body.badge.issuer.origin|e}}</a></span>
+      </li>
+      {% if badge.attributes.body.badge.issuer.org %}
+        <li>
+          <label>Organization</label>
+          <span>{{badge.attributes.body.badge.issuer.org|e}}</span>
+        </li>
+      {% endif %}
+    </ul>
+    <ul>
+      <li class="header">Badge Details</li>
+      <li>
+        <label>Name</label>
+        <span>{{badge.attributes.body.badge.name|e}}</span>
+      </li>
+      <li>
+        <label>Description</label>
+        <span>{{badge.attributes.body.badge.description|e}}</span>
+      </li>
+      <li>
+        <label>Criteria</label>
+        <span><a href='{{badge.attributes.body.badge.criteria|e}}'>{{badge.attributes.body.badge.criteria|e}}</a></span>
+      </li>
+      {% if badge.attributes.body.evidence %}
+        <li>
+          <label>Evidence</label>
+          <span><a href='{{badge.attributes.body.evidence|e}}'>{{badge.attributes.body.evidence|e}}</a></span>
+        </li>
+      {% endif %}
+    </ul>
+  </div>
+
+</div>
