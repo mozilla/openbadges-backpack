@@ -1,0 +1,27 @@
+{% extends 'layout.html' %}
+{% set bodyClass = 'login' %}
+{% block body %}
+
+<section id="login" class="login cd-section">
+  <div class="container">
+    <div class="row double-pane">
+      <div class="col-sm-4 img-part">
+        <div class="welcome-message">
+          <h2>Migration</h2>
+        </div>
+        <div class="backpack-link">
+          <img src="/images/backpack-logo.png" height="60px" />
+          <a href="http://backpack.openbadges.org" target="_blank">backpack.openbadges.org</a>
+        </div>
+      </div>
+      <div class="col-sm-12 login-part">
+        <h3>You have mail!</h3>
+        <p class="migration-instructions">We have sent you an email with instructions for migrating your account.</p>
+        <p class="migration-instructions">You will need to click the link contained in the email to then set a password for your new (non-Persona) backpack user account.</p>
+        <p class="migration-instructions">After you have completed this step, you will be able to <a href="/backpack/login" aria-label="Login">login</a>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

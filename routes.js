@@ -72,7 +72,15 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
   app.post('/password/update', parseForm, csrfProtection, user.resetPost);
 
   app.post('/backpack/authenticate', backpack.authenticate);
-  app.post('/backpack/authenticate', backpack.authenticate);
+
+  app.post('/auth/browserid', parseForm, csrfProtection, passport.authenticate('persona', {
+    failureRedirect: '/backpack/login' }), function(req, res) {
+    req.session = null;
+    res.redirect('/migration-instructions');
+  });
+  app.get('/migration-instructions', function(req, res) {
+    return res.render('migration-instructions.html', {});
+  });
 
   app.get('/backpack/settings', backpack.settings());
   app.post('/backpack/settings/revoke-origin', backpackConnect.revokeOrigin());

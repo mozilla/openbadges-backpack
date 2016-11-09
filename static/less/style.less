@@ -559,6 +559,11 @@ section.reset {
     p {
         font-size: 12px;
         margin: 40px 0 0;
+
+        &.migration-instructions {
+            font-size: 15px;
+            margin: 30px 0;
+        }
     }
     .container {
         padding: 10% 10%;
@@ -620,6 +625,9 @@ section.reset {
         h3 {
             padding: 0px;
             font-size: 30px;
+            span {
+                font-size: 15px;
+            }
         }
         h2 {
             font-size: 30px;
@@ -1485,6 +1493,24 @@ Main components
     top: 0;
     left: 0;
     z-index: 9999;
+}
+
+.migrate {
+    background: #e36f60;
+    padding: 1px 32px 32px;
+    color: white;
+
+    p {
+        background: white;
+        color: #182733;
+        padding: 10px;
+        border-radius: 4px;
+        font-size: 13px;
+    }
+
+    h4 {
+        font-size: 15px !important;
+    }
 }
 
 @media only screen and (min-width: 768px) {

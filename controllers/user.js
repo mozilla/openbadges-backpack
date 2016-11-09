@@ -128,13 +128,20 @@ exports.requestResetPost = function resetPost(request, response, next) {
     },
     // send password reset email to that user, with tokenised reset link
     function(token, user, done) {
+      var siteUrl = configuration.get('protocol') + '://' + configuration.get('hostname'),
+          port = configuration.get('port');
+
+      if ((port !== 80) && (port !== 443)) {
+        siteUrl = siteUrl + ':' + port;
+      }
+
       var mailOptions = {
         to: user.attributes.email,
         from: 'no-reply@backpack.openbadges.org',
         subject: 'Mozilla Openbadges Backpack Password Reset',
         text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
           'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-          'http://' + request.headers.host + '/password/reset/' + token + '\n\n' +
+          siteUrl + '/password/reset/' + token + '\n\n' +
           'If you did not request this, please ignore this email and your password will remain unchanged.\n'
       };
       smtpTrans.sendMail(mailOptions, function(err) {

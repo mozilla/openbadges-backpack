@@ -11,7 +11,7 @@ var fs = require('fs');
 var path = require('path');
 var middleware = require('./middleware');
 var logger = require('./lib/logger');
-// var browserid = require('./lib/browserid');
+var browserid = require('./lib/browserid');
 var configuration = require('./lib/configuration');
 var flash = require('connect-flash');
 var nunjucks = require('nunjucks');
@@ -57,7 +57,7 @@ env.addFilter('formatdate', function (rawDate) {
 });
 
 // pass passport for configuration
-require('./auth/passport')(passport);
+require('./auth/passport')(passport, configuration);
 
 // middleware. also see `middleware.js`
 if (configuration.get('force_https')) {

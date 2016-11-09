@@ -57,6 +57,7 @@
     "passport-google-oauth": "^1.0.0",
     "passport-http-bearer": "^1.0.1",
     "passport-local": "^1.0.0",
+    "passport-persona": "^0.1.7",
     "passport-twitter": "^1.0.4",
     "request": "^2.72.0",
     "serve-favicon": "^2.3.0",
