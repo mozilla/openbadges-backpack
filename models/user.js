@@ -11,7 +11,10 @@ var User = function (attributes) {
     this.set('last_login', new Date().getTime());
   };
   this.validPassword = function(password) {
-    return bcrypt.compareSync(password, this.attributes.password);
+    if ((this.attributes.password == '') || (this.attributes.password == null))
+      return false;
+
+    return bcrypt.compareSync(password, String(this.attributes.password));
   };
 };
 
