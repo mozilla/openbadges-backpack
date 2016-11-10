@@ -85,6 +85,8 @@ module.exports = function(passport, configuration) {
         siteUrl = siteUrl + ':' + port;
     }
 
+    console.log('AUDIENCE', siteUrl);
+
     passport.use(new PersonaStrategy({
         audience: siteUrl
     },
