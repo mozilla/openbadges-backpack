@@ -130,14 +130,8 @@ module.exports = function(passport, configuration) {
 
                 } else {
                     console.log("ALREADY MIGRATED! LOGIN USING NORMAL MECHANISM, ENSURE THEY HAVE THE MIGRATED FLAG SET");
-                    user.setLoginDate();
-                    user.save(function(err) {
-                        if (err)
-                            return done(err);
-
-                        sendMigrationEmail(mailerConfig, siteUrl, email, user, function() {
-                            return done(null, user.attributes);
-                        });
+                    sendMigrationEmail(mailerConfig, siteUrl, email, user, function() {
+                        return done(null, user.attributes);
                     });
                 }
             });
@@ -470,7 +464,7 @@ module.exports = function(passport, configuration) {
     //                         user.save(function(err) {
     //                             if (err)
     //                                 return done(err);
-                                    
+
     //                             return done(null, user);
     //                         });
     //                     }
