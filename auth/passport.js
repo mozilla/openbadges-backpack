@@ -86,7 +86,7 @@ module.exports = function(passport, configuration) {
     }
 
     passport.use(new PersonaStrategy({
-        audience: 'http://openbadges.local:8888'
+        audience: siteUrl
     },
     function(email, done) {
         if (email)
