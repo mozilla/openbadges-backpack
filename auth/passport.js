@@ -81,7 +81,7 @@ module.exports = function(passport, configuration) {
     var mailerConfig = configuration.get('mailer');
     var siteUrl = configuration.get('protocol') + '://' + configuration.get('hostname');
     var port = configuration.get('port');
-    if ((port !== 80) && (port !== 443)) {
+    if ((process.env.NODE_ENV !== 'heroku') && (port !== 80) && (port !== 443)) {
         siteUrl = siteUrl + ':' + port;
     }
 
