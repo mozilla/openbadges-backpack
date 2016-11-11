@@ -20,7 +20,7 @@ Although we've given the backpack a bit of a facelift, there are still some roug
 
 If you feel you have something to offer and would like to help develop/design the backpack and push things forward, please feel free to grab the codebase and start hacking.  Full setup instructions are below.
 
-We'd be interested to hear your thoughts on the future of Backpack also, mail us at [x@y.com]x@y.com
+We'd be interested to hear your thoughts on the future of Backpack also, mail us at x@y.com
 
 ## What is the Backpack?
 
