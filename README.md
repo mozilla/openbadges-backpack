@@ -20,7 +20,7 @@ Although we've given the backpack a bit of a facelift, there are still some roug
 
 If you feel you have something to offer and would like to help develop/design the backpack and push things forward, please feel free to grab the codebase and start hacking.  Full setup instructions are below.
 
-We'd be interested to hear your thoughts on the future of Backpack also, mail us at x@y.com
+We welcome active collaborators, whether you want to discuss contributions to the code base or explore future developments, connect with us at backpack@digitalme.co.uk
 
 ## What is the Backpack?
 
