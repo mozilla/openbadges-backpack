@@ -1,47 +1,34 @@
 # Open Badges Backpack-ng (Next Generation)
 [![Build Status](https://travis-ci.org/auralon/openbadges-backpack.png?branch=backpack-ng)](https://travis-ci.org/auralon/openbadges-backpack)
 
-## Important Information
+## Welcome to the future of the Backpack
 
-Backpack-ng (pronounced *'backpacking'*) is the next generation of the Backpack.  The ng branch is currently undergoing heavy development!  
+Backpack-ng (pronounced *'backpacking'*) is the next generation of the Backpack.  
 
-We're currently updating the framework and dependencies, as well as removing Persona (which is due to be decommissioned in Nov 2016) and replacing it with Passport.
+Our team has been slugging away behind the scenes to ensure the Backpack stays relevant, maintained and loved.  
 
-Most of the frontend works, but the unit tests are still failing. Expect many, many things to be broken!
+The [ng branch](https://github.com/auralon/openbadges-backpack/tree/backpack-ng) is currently where all the heavy development has been taking place. It's where the following changes have been introduced:
+
+* Updated the framework and most of the dependencies
+* Removed Persona as the main authentication mechanism (which is due to be decommissioned on the 31st Nov 2016)
+* Replaced Persona with [PassportJS](http://passportjs.org/) (which includes a Persona strategy/plugin to allow users to login with Persona until it is finally decommissioned).
+* Added a new responsive theme
+
+Although we've given the backpack a bit of a facelift, there are still some rough edges to smooth out. The front-end functionality is working as expected (that is, to say, we haven't spotted anything that is majorly broken!).  We're currently focusing our attention on the few remaining unit tests that are still failing (these mostly relate to the Backpack API).
+
+## Call to action!
+
+If you feel you have something to offer and would like to help develop/design the backpack and push things forward, please feel free to grab the codebase and start hacking.  Full setup instructions are below.
+
+We'd be interested to hear your thoughts on the future of Backpack also, mail us at [mailto:x@y.com]x@y.com
+
+## What is the Backpack?
+
+The Mozilla Backpack is a placed to store your collections of Open Badges. The Backpack allows earners to import badges and manage them in groups, choosing whether each group is public or not. You can access the Mozilla Backpack Web front-end at: http://backpack.openbadges.org
+
+The Backpack code includes tools for badge issuers and displayers, for pushing awarded badges to an earner's Mozilla Backpack and for retrieving an earner's badges for display.  If you're an issuer or displayer, you will find more information on how to start interacting with the Backpack at the bottom of this guide.
 
 ---
-
-This is the Mozilla Hosted Backpack for earners' Open Badges. The Backpack allows earners to collect and manage their badges in groups, choosing whether each group is public or not. You can access the Mozilla Backpack Web front-end at: http://backpack.openbadges.org
-
-The Backpack code includes tools for badge issuers and displayers, for pushing awarded badges to an earner's Mozilla Backpack and for retrieving an earner's badges for display.
-
-## Open Badges Specifications
-
-To work with the Mozilla Backpack as either an issuer or a displayer, you will be handling Open Badge assertions, structured as JSON data according to the specification. See the [specification](https://github.com/mozilla/openbadges-specification) repo for a detailed overview and [Assertion Information for the Uninitiated](https://github.com/mozilla/openbadges/wiki/Assertion-Information-for-the-Uninitiated) for an introduction.
-
-For more information about Open Badges, check out http://openbadges.org
-
-## I'm an Issuer, how do I use this?
-
-The Backpack includes the following tools for badge issuers:
-
-* [Issuer API](docs/apis/issuer_api.md)
- * For pushing badges you have awarded the earner to their Mozilla Backpack, giving the earner the ability to approve the push through a lightboxed modal. The API is written in Javascript, and is includable in your project with just a few lines of JS.
-* [Backpack Connect API](docs/apis/backpack_connect.md)
- * For pushing to the earner's Mozilla Backpack via persistent access, with permission granted by the earner.
-* [Baker API](docs/apis/baking_api.md)
- * For embedding badge metadata into the badge image (_not required if you use the Issuer API_).
-
-Requirements:
-
-* Webserver capable of serving requests to the general internet.
-* Ability to make a POST request from your server backend and read a JSON response.
-* Email addresses of the users you wish to issue badges.
-* Badge image must be in PNG format.
-
-## I'm a Displayer, how do I use this?
-
-The Backpack includes the [Displayer API](docs/apis/displayer_api.md), via which badge displayers can retrieve earner badges from their Mozilla Backpack. You will only be able to retrieve badges that the earner has chosen to make public. Given the earner email address, you can first use the conversion service to retrieve the earner's Backpack ID, then use that ID to query for public badge groups. Each group contains a list of badges awarded to the earner, inclding the information you need to present the badges within your site, application or other display implementation.
 
 ## I want to play with the code, where do I start?
 
@@ -162,3 +149,33 @@ Currently, the heroku env var config looks like so...
 | OPENBADGES_PROTOCOL             | "https"                                           |
 | OPENBADGES_REMOTE_PORT          | "default"                                         |
 | OPENBADGES_VAR_PATH             | "var"                                             |
+
+---
+
+## Open Badges Specifications
+
+To work with the Mozilla Backpack as either an issuer or a displayer, you will be handling Open Badge assertions, structured as JSON data according to the specification. See the [specification](https://github.com/mozilla/openbadges-specification) repo for a detailed overview and [Assertion Information for the Uninitiated](https://github.com/mozilla/openbadges/wiki/Assertion-Information-for-the-Uninitiated) for an introduction.
+
+For more information about Open Badges, check out http://openbadges.org
+
+## I'm an Issuer, how do I use this?
+
+The Backpack includes the following tools for badge issuers:
+
+* [Issuer API](docs/apis/issuer_api.md)
+ * For pushing badges you have awarded the earner to their Mozilla Backpack, giving the earner the ability to approve the push through a lightboxed modal. The API is written in Javascript, and is includable in your project with just a few lines of JS.
+* [Backpack Connect API](docs/apis/backpack_connect.md)
+ * For pushing to the earner's Mozilla Backpack via persistent access, with permission granted by the earner.
+* [Baker API](docs/apis/baking_api.md)
+ * For embedding badge metadata into the badge image (_not required if you use the Issuer API_).
+
+Requirements:
+
+* Webserver capable of serving requests to the general internet.
+* Ability to make a POST request from your server backend and read a JSON response.
+* Email addresses of the users you wish to issue badges.
+* Badge image must be in PNG format.
+
+## I'm a Displayer, how do I use this?
+
+The Backpack includes the [Displayer API](docs/apis/displayer_api.md), via which badge displayers can retrieve earner badges from their Mozilla Backpack. You will only be able to retrieve badges that the earner has chosen to make public. Given the earner email address, you can first use the conversion service to retrieve the earner's Backpack ID, then use that ID to query for public badge groups. Each group contains a list of badges awarded to the earner, inclding the information you need to present the badges within your site, application or other display implementation.
