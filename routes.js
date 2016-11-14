@@ -75,12 +75,15 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
 
   app.post('/auth/browserid', parseForm, csrfProtection, passport.authenticate('persona', {
     failureRedirect: '/backpack/login' }), function(req, res) {
-    req.session = null;
-    res.redirect('/migration-instructions');
+    res.redirect('/migration-step-1');
   });
-  app.get('/migration-instructions', function(req, res) {
-    return res.render('migration-instructions.html', {});
+  app.get('/migration-step-1', csrfProtection, user.migrate);
+  app.post('/migration-step-1', parseForm, csrfProtection, user.migratePost);
+  app.get('/migration-step-2', function(req, res) {
+    return res.render('migration-step-2.html', {});
   });
+  app.get('/migration/verify/:token', csrfProtection, user.migrateVerify);
+  app.post('/migration-step-3', parseForm, csrfProtection, user.migrateVerifyPost);
 
   app.get('/backpack/settings', backpack.settings());
   app.post('/backpack/settings/revoke-origin', backpackConnect.revokeOrigin());

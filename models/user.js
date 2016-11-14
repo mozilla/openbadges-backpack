@@ -8,7 +8,7 @@ var bcrypt   = require('bcrypt-nodejs');
 var User = function (attributes) {
   this.attributes = attributes;
   this.setLoginDate = function () {
-    this.set('last_login', new Date().getTime());
+    this.set('last_login', (new Date().getTime() / 1000));
   };
   this.validPassword = function(password) {
     if ((this.attributes.password == '') || (this.attributes.password == null))

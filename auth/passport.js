@@ -13,47 +13,7 @@ var Session = require('../models/backpack-connect').Session;
 
 // load up our trusty password strength checker, courtesy of the sec experts over at owasp
 var owasp = require('owasp-password-strength-test');
-var crypto = require('crypto');
-var nodemailer = require('nodemailer');
-var smtpTransport = require("nodemailer-smtp-transport");
 
-// temporary migration mail function
-function sendMigrationEmail(mailerConfig, siteUrl, email, user, callback) {
-
-    var smtpTrans = nodemailer.createTransport(smtpTransport({
-        service: mailerConfig.service,
-        auth: {
-            user: mailerConfig.user,
-            pass: mailerConfig.pass
-        }
-    }));
-
-    // generate token
-    crypto.randomBytes(32, function(err, buf) {
-
-        var token = buf.toString('hex');
-
-        // update user with token
-        user.attributes.reset_password_token = token;
-        user.attributes.reset_password_expires = Date.now() + (3600000 * 8); // 8 hour migration window
-        user.attributes.updated_at = new Date().getTime();
-
-        user.save(function(err) {
-            // send email
-            var mailOptions = {
-                to: email,
-                from: 'no-reply@backpack.openbadges.org',
-                subject: 'Mozilla Openbadges Backpack Migration Instructions',
-                text: 'You are receiving this because you (or someone else) have requested to migrate to the new Backpack account, from Persona (which is to be discontinued November 31st 2016).\n\n' +
-                  'Please click on the following link, or paste this into your browser to complete the migration and set your new backpack account password:\n\n' +
-                  siteUrl + '/password/reset/' + token + '\n\n'
-            };
-            smtpTrans.sendMail(mailOptions, function(err) {
-                callback();
-            });
-        });
-    });
-}
 
 module.exports = function(passport, configuration) {
 
@@ -61,7 +21,7 @@ module.exports = function(passport, configuration) {
     // var configAuth = configuration.get('passportStrategyConfigs');
 
     // =========================================================================
-    // passport session setup ==================================================
+    // PASSPORT SESSION SETUP ==================================================
     // =========================================================================
     // required for persistent login sessions
     // passport needs ability to serialize and unserialize users in/out of session
@@ -78,19 +38,21 @@ module.exports = function(passport, configuration) {
         });
     });
 
-    var mailerConfig = configuration.get('mailer');
+    // prepare siteUrl for Persona audience
     var siteUrl = configuration.get('protocol') + '://' + configuration.get('hostname');
     var port = configuration.get('port');
     if ((process.env.NODE_ENV !== 'heroku') && (port !== 80) && (port !== 443)) {
         siteUrl = siteUrl + ':' + port;
     }
 
-    console.log('AUDIENCE', siteUrl);
-
+    // =========================================================================
+    // PERSONA LOGIN ===========================================================
+    // =========================================================================
     passport.use(new PersonaStrategy({
-        audience: siteUrl
+        audience: siteUrl,
+        passReqToCallback : true
     },
-    function(email, done) {
+    function(request, email, done) {
         if (email)
             email = email.toLowerCase(); // Use lower-case e-mails to avoid case-sensitive e-mail matching
 
@@ -103,38 +65,14 @@ module.exports = function(passport, configuration) {
 
                 // if no user is found, return the message
                 if (!user) {
-                    console.log("MAKE NEW USER ACCOUNT & SEND USER SIGNUP/MIGRATION EMAIL");
-
-                    var createdAt = new Date().getTime();
-
-                    // create the user
-                    var newUser = new User({
-                        email: email,
-                        active: 1,
-                        created_at: createdAt,
-                        updated_at: createdAt,
-                    });
-
-                    crypto.randomBytes(32, function(err, buf) {
-                        var generatedPass = buf.toString('hex');
-
-                        newUser.attributes.password = newUser.generateHash(generatedPass);
-
-                        newUser.save(function(err) {
-                            if (err)
-                                return done(err);
-
-                            sendMigrationEmail(mailerConfig, siteUrl, email, newUser, function() {
-                                return done(null, newUser.attributes);
-                            });
-                        });
-                    });
+                    // USER DIDN'T NEED TO MIGRATE, AS THEY NEVER HAD AN ACCOUNT!
+                    // MAKE NEW USER ACCOUNT & SEND USER SIGNUP/MIGRATION EMAIL ANYWAY
+                    request.flash('error', 'The email address used has no Backpack account.  Please sign up for a new account.');
+                    return done(null);
 
                 } else {
-                    console.log("ALREADY MIGRATED! LOGIN USING NORMAL MECHANISM, ENSURE THEY HAVE THE MIGRATED FLAG SET");
-                    sendMigrationEmail(mailerConfig, siteUrl, email, user, function() {
-                        return done(null, user.attributes);
-                    });
+                    // FOUND USER ACCOUNT... LET'S GET THEM MIGRATED!
+                    return done(null, user.attributes);
                 }
             });
 
