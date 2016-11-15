@@ -901,7 +901,7 @@ section.upload {
 
 section.collections {
     margin-top: 70px;
-    h2 {
+    h1, h2 {
         font-size: 32px;
         padding: 0;
         margin: 0;
@@ -924,9 +924,6 @@ section.collections {
     .nav-tabs {
         border: none;
     }
-    .container {
-        padding: 0;
-    }
     .sticky .scroll {
         overflow-y: scroll;
         height: 400px;
@@ -935,14 +932,34 @@ section.collections {
         position: fixed;
         width: 38%;
     }
+    #groups {
+        margin-top: 35px;
+
+        .openbadge {
+            margin: 5px 4px;
+            display: inline-block;
+        }
+    }
     .group {
         background: white;
-        padding: 85px 30px 30px;
+        padding: 85px 20px 30px;
         display: inline-block;
         border: 1px solid #DDD;
         width: 100%;
         position: relative;
         margin-bottom: 30px;
+    }
+    #badges {
+        padding: 0;
+    }
+    section.badges {
+        margin-top: 0;
+        .badge-header {
+            margin-bottom: 35px
+        }
+        .badge-list {
+            border-bottom: none;
+        }
     }
     span.delete {
         position: absolute;
@@ -986,9 +1003,6 @@ section.collections {
     @media (min-width: 991px) {
         .container {
             padding: 0 15px;
-        }
-        section.badges h2 {
-            margin-left: 70px;
         }
         .panel-heading {
             display: none;

@@ -463,6 +463,7 @@ Badge.View = Backbone.View.extend({
     var isNew = $groupEl.hasClass('isNew')
 
     $groupEl.removeClass('isNew');
+    $groupEl.find('.icon.share').removeClass('hide');
 
     function doIt () {
       $el.sync(
