@@ -3,8 +3,14 @@
 {% block body %}
 <section class="page">
     <div class="container">
-        <h1>User Profile</h1>
         <div class="row">
+            <div class="col-sm-12">
+                <div class="row badge-header">
+                    <div class="col-xs-12 col-sm-12">
+                        <h1 class="section-heading">User Profile</h1>
+                    </div>
+                </div>
+            </div>
             <div class="col-xs-12 col-lg-6">
                 <form action="/user/profile" method="post">
                     <input type="hidden" name="_csrf" value="{{ csrfToken }}">
