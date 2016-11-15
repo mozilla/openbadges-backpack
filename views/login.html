@@ -7,7 +7,7 @@
     <div class="row double-pane">
       <div class="col-sm-4 img-part">
         <div class="welcome-message">
-          <h2>Welcome</h2>
+          <h2>Login</h2>
         </div>
         <div class="backpack-link">
           <img src="/images/backpack-logo.png" height="60px" />
@@ -25,7 +25,8 @@
           </form>
           <img src="https://developer.mozilla.org/files/3969/plain_sign_in_blue.png" id="browserid"/>
         </div>
-        <h3>Login <span>If you have already migrated your account, login below...</span></h3>
+        <h3>Already migrated or just signed up?</h3>
+        <h5>Please use the form below to login...</h5>
         <form action="/backpack/login" method="post">
           <input name="_csrf" type="hidden" value="{{ csrfToken }}"></input>
           <div class="group at">
