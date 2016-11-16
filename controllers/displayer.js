@@ -131,11 +131,12 @@ exports.emailToUserId = function emailToUserId(req, res, next) {
   // don't use formatter here -- we aren't supporting jsonp or CORS for
   // the email to userId API because we want to discourage people including
   // email addresses in cleartext (such as in the source of some javascript)
+  
   var obj = req.body || {};
   var email = obj['email'];
 
   if (!email)
-    return res.send(400, {
+    return res.status(400).send({
       status: 'invalid',
       error: 'missing `email` parameter'
     });
@@ -143,20 +144,20 @@ exports.emailToUserId = function emailToUserId(req, res, next) {
   User.findOne({ email: email }, function (err, user) {
     if (err) {
       logger.debug(err, 'displayer#emailToUserId: there was an error getting the user %s', email);
-      return res.send(400, {
+      return res.status(400).send({
         status: 'error',
         error: 'error trying to pull user `' + email + '` from database'
       });
     }
 
     if (!user) {
-      return res.send(404, {
+      return res.status(404).send({
         status: 'missing',
         error: 'Could not find a user by the email address `' + email + '`'
       });
     }
 
-    return res.send(200, {
+    return res.status(200).send({
       status: 'okay',
       email: email,
       userId: user.get('id')
