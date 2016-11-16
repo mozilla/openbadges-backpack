@@ -45,9 +45,10 @@
     resultSection.animate({opacity: 1.0});
   }
   
-  $('#submit').ajaxStart(function(){
-    var self = $(this);
-    self.fadeOut(200),
+  $(document).ajaxStart(function(){
+    var self = $('#submit');
+    self.fadeOut(200);
+    self.val("test");
     self.queue(function(){
       self.removeClass('primary')
           .addClass('disabled')
@@ -58,11 +59,11 @@
     })
   });
   
-  $('#submit').ajaxComplete(function(){
-    var self = $(this);
-    self.fadeOut(200)
+  $(document).ajaxComplete(function(){
+    var self = $('#submit');
+    self.fadeOut(200);
     self.queue(function(){
-      self.val('Build this badge')
+      self.val('Build')
           .attr('disabled', false)
           .addClass('primary')
           .removeClass('disabled')

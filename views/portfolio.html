@@ -2,64 +2,100 @@
 {% block body %}
 <link rel="stylesheet" href="/css/socialmedia.css">
 
-<div class='portfolio'>
 {% if owner %}
-  <div class="alert alert-info">
-    <div class="socialshare" style="float: left;" tabindex="0" onclick="injectSocialMedia(this)">
-      <span class="msg">Share this on Twitter, Google+, Facebook and LinkedIn</span>
-      <div class="social-medium twitter"></div>
-      <div class="social-medium google"></div>
-      <div class="social-medium facebook"></div>
-      <div class="social-medium linkedin"></div>
-    </div>
-    <a href="edit" class='edit btn btn-primary'>Edit this page</a>
-    <strong class="shareMessage">This is how your portfolio page will look to the public.</strong>
-  </div>
+	<div id="subNav">
+		<div class="container">
+			<div class="socialshare" style="float: left;" tabindex="0" onclick="injectSocialMedia(this)">
+				<span class="msg">Share this on Twitter, Google+, Facebook and LinkedIn</span>
+				<div class="social-sites">
+					<div class="social-medium twitter"></div>
+					<div class="social-medium google"></div>
+					<div class="social-medium facebook"></div>
+					<div class="social-medium linkedin"></div>
+				</div>
+			</div>
+			<a href="edit" class='edit btn btn-primary'>Edit this page</a>
+			<span class="shareMessage">This is how your portfolio page will look to the public.</span>
+		</div>
+	</div>
 {% endif %}
 
-  <header>
-    {% if portfolio.attributes.title %}
-      <h1>{{portfolio.attributes.title|e}}</h1>
-    {% endif %}
-    {% if portfolio.attributes.subtitle %}
-      <h2>{{portfolio.attributes.subtitle|e}}</h1>
-    {% endif %}
-  </header>
+<section id="badges" class="badges portfolio">
+	<div class="container">
+		<div class="row">
+			<div class="col-xs-12">
+				<div class="row badge-header">
+					<div class="col-xs-12">
+						<h1 class="section-heading">{{portfolio.attributes.title|e}}</h1>
+						<h4>{{portfolio.attributes.subtitle|e}}</h4>
+					</div>
+				</div>
+				{% for badge in portfolio.badges %}
+					{% if (loop.index - 1) % 4 == 0 %}
+						<div class="col-xs-12 badge-row">
+					{% endif %}
+					<div class="col-xs-12 col-md-3 openbadge" data-id="{{badge.attributes.id}}" data-serialization="{{badge.serializedAttributes|e}}">
+						<div class="col-xs-12">
+							<img src="{{ badge.attributes.imageUrl }}" class="col-xs-12">
 
-  <ul class='badges'>
-    {% for badge in portfolio.badges %}
-      <li>
-        <h3>{{badge.attributes.body.badge.name|e}}</h3>
+							<div class="clearfix"></div>
 
-        <p class='story'>{{badge.attributes._userStory|e}}</p>
+							<h4>{{ badge.attributes.body.badge.name|e }}</h4>
+							<h5>{{ badge.attributes.body.badge.issuer.name|e }}</h5>
 
-        {% include 'badge-data.html' %}
-      </li>
-    {% endfor %}
-  </ul>
+							<a href="javascript:void(0)" class="expand">Toggle more information</a>
+						</div>
 
-</div>
-
+						<div class="col-xs-12 expander" data-id="{{badge.attributes.id}}">
+							{% if badge.attributes._userStory %}
+								<p class='story col-xs-12'>"{{badge.attributes._userStory|e}}"</p>
+							{% endif %}
+							{% include 'badge-data-portfolio.html' %}
+						</div>
+					</div>
+					{% if (loop.index) % 4 == 0 %}
+						</div>
+					{% endif %}
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+</section>
 {% endblock %}
+
+
+
 {% block scripts %}
 <script type="text/javascript" src="/js/social-media.js"></script>
-
 <script>
 function injectSocialMedia(container) {
-  // prevent this element from injecting social media again
-  container.onclick = function() { return false; }
-  var socialMedia = new SocialMedia();
-  var url = window.location.toString();
+	// prevent this element from injecting social media again
+	container.onclick = function() { return false; }
+	var socialMedia = new SocialMedia();
+	var url = window.location.toString();
 
-  // inject twitter, g+ and facebook
-  socialMedia.hotLoad(container.querySelector(".twitter"),  socialMedia.twitter,  url);
-  socialMedia.hotLoad(container.querySelector(".google"),   socialMedia.google,   url);
-  socialMedia.hotLoad(container.querySelector(".facebook"), socialMedia.facebook, url);
-  socialMedia.hotLoad(container.querySelector(".linkedin"), socialMedia.linkedin, url);
+	// inject twitter, g+ and facebook
+	socialMedia.hotLoad(container.querySelector(".twitter"),  socialMedia.twitter,  url);
+	socialMedia.hotLoad(container.querySelector(".google"),   socialMedia.google,   url);
+	socialMedia.hotLoad(container.querySelector(".facebook"), socialMedia.facebook, url);
+	socialMedia.hotLoad(container.querySelector(".linkedin"), socialMedia.linkedin, url);
 
-  // kill off the text label
-  var label = container.querySelector("span");
-  $(label).remove();
+	// kill off the text label
+	var label = container.querySelector("span");
+	$(label).remove();
+	$('.social-sites').show().css('display', 'inline-block');
 }
+$(function() {
+	$('.expand').click(function(e) {
+		e.preventDefault();
+		var badgeId = $(this).closest('.openbadge').data('id'),
+			dropdown = $('.expander[data-id="' + badgeId + '"]').is(':hidden');
+		$('.expander').slideUp().promise().done(function(){
+			if (dropdown) {
+				$('.expander[data-id="' + badgeId + '"]').slideDown();
+			}
+		});
+	});
+});
 </script>
 {% endblock %}

@@ -1,15 +1,33 @@
 {% extends 'layout.html' %}
 {% block body %}
-<form id="bake-form" class="baker form-stacked" action="/baker" method="GET">
-  <fieldset>
-    <label for="assertion">URL for your badge assertion</label>
-    <input id="assertion" class="xlarge" type="text" value="http://badgehub.org/test/badge.json" placeholder="http://your-site.com/path-to-assertion.json" name="assertion"></input>
-  </fieldset>
-  <fieldset>
-    <input id="submit" class="large btn btn-primary" type="submit" value="Build this badge"></input>
-  </fieldset>
-</form>
-<div id="result"></div>
+<div class="pushdown">
+	<section class="page">
+		<div class="container">
+			<div class="row">
+				<div class="col-sm-12">
+					<div class="row badge-header">
+						<div class="col-xs-12 col-sm-12">
+							<h1 class="section-heading">Build a badge</h1>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-12 col-lg-6">
+					<form id="bake-form" class="baker form-stacked" action="/baker" method="GET">
+						<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+						<div class="form-group">
+							<label for="assertion">URL for your badge assertion</label>
+							<input id="assertion" class="form-control" type="text" value="http://badgehub.org/test/badge.json" placeholder="http://your-site.com/path-to-assertion.json" name="assertion"></input>
+						</div>
+						<div class="form-group">
+							<input id="submit" class="large btn btn-primary" type="submit" value="Build"></input>
+						</div>
+					</form>
+					<div id="result"></div>
+				</div>
+			</div>
+		</div>
+	</section>
+</div>
 {% endblock %}
 {% block scripts %}
 <script type="text/javascript" src="/js/formatter.js"></script>
