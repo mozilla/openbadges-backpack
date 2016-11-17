@@ -1,0 +1,146 @@
+@import "style";
+
+body {
+  max-width: 660px;
+  margin: 0 auto;
+  background: white;
+  top: 0;
+  padding-top: 110px;
+}
+
+.narrow {
+  width: 90%;
+  margin: 0px auto;
+}
+
+button,
+.btn {
+  display: block;
+  font-size: 14px;
+  padding: 15px 20px;
+  width: auto;
+  color: black;
+  background-color: transparent;
+  border-color: #F57521;
+  border: 4px solid black;
+  border-radius: 300px;
+  transition: .2s ease all;
+  -moz-transition: .2s ease all;
+  -webkit-transition: .2s ease all;
+
+  &:hover {
+    color: white;
+    background-color: #DD7027;
+    border-color: #DD7027;
+  }
+}
+
+div#badge-ask.span8 {
+  overflow-y: auto;
+  margin-left: 0;
+}
+
+.framed #body {
+  overflow-y: auto;
+}
+
+.frameless .closeFrame {
+  display: none;
+}
+
+#body {
+  height: 100%;
+
+  p, a,
+  button, .btn,
+  h1, h2, h3 {
+    margin: 0 0 30px;
+  }
+
+  a.close {
+    margin: 0;
+  }
+}
+
+#badge-ask {
+  .header {
+    h2,
+    button {
+      float: left;
+    }
+
+    button {
+      margin-top: 6px;
+      margin-left: 30px;
+    }
+  }
+
+  dl {
+    margin-top: 0;
+
+    dt, dd {
+      padding: 2px 0;
+    }
+    dt {
+      float: left;
+      clear: left;
+      min-width: 100px;
+    }
+    dd {
+      max-width: 280px; /* = span5 - dt */
+      overflow: hidden;
+      text-overflow: ellipsis;
+      /* set word-wrap: normal if long urls should get truncated with ellipsis */
+      word-wrap: break-word; 
+      /* set white-space: nowrap if all metadata should be a single line */
+      white-space: normal;
+    }
+  }
+}
+
+.logged-in, .logged-out {
+  display: none;
+}
+
+.navbar {
+  border-top: none;
+
+  .closeFrame {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    font-size: 20px;
+    color: #333;
+    opacity: 0.6;
+    text-shadow: none;
+    margin-top: 0;
+
+    &:hover {
+      opacity: 0.8;
+      text-decoration: none;
+    }
+  }
+}
+
+.navbar-fixed-top {
+  position: fixed;
+}
+
+#ajax-loader {
+  padding-top: 7px;
+  display: none;
+}
+
+.badge-image {
+  width: 220px;
+  margin: 0;
+}
+
+.navbar-inner {
+  background: #1A2C39;
+  padding: 15px;
+}
+
+.brand {
+  height: 56px;
+}

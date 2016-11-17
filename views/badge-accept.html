@@ -2,24 +2,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-CSRF-Token" content="{{ csrfToken }}">
 <meta http-equiv="X-Current-User" content="{{ email }}">
-{% if framed %}
-<script>
-  /* Requesting the framed badge acceptance screen from outside
-   * an iframe probably means we're coming from Persona's redirect
-   * on account creation. Let's kick over to the welcome screen instead.
-   */
-   if (window.top === window.self) {
-    window.location = "/issuer/welcome";
-  }
-</script>
-{% endif %}
+<link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css" media="all">
 <link rel="stylesheet" href="/css/badge-accept.css" type="text/css" media="all" />
 <title>Accept Your Badges</title>
 <body class="{% if framed %}framed{% else %}frameless{% endif %}">
 <div class="navbar navbar-fixed-top">
   <div class="navbar-inner">
     <div class="container-fluid" style="position: relative;">
-      <img class="brand" src="/images/logo.png" alt="Mozilla Backpack logo" />
+      <img class="brand" src="/images/backpack-logo.png" alt="Backpack logo" />
       <img src="/images/ajax-loader.gif" id="ajax-loader">
       <a class="close closeFrame" href="#">&times;</a>
     </div>
@@ -28,35 +18,42 @@
 
 <div id="body" class="container-fluid">
   <div id="messages"></div>
+
+  <!-- welcome -->
   <div id="welcome" class="narrow" style="display: none">
+    <!-- logged out -->
     <div class="logged-out">
-      <h2>Hoorah!</h2>
+      <h2>Send</h2>
       <p class="lead">
         You are about to send <strong class="badge-count">a badge</strong>
-        to your Mozilla Backpack at <strong class="host"></strong>.
+        to your Backpack at <strong class="host"></strong>.
       </p>
       <p class="lead">Log in to do so.</p>
-      <a class="persona-button dark js-browserid-link" href="#">
+      <a href="/backpack/login">
         <span>Log in or Sign up</span>
       </a>
     </div>
+
+    <!-- logged in -->
     <div class="logged-in">
       <p class="lead">You are about to send <strong class="badge-count">a badge</strong>
-      to your Mozilla Backpack at <strong class="host"></strong>.</p>
-      <button class="next btn btn-primary">Hoorah!</button>
-      <a href="#" class="logout">
+      to your Backpack at <strong class="host"></strong>.</p>
+      <button class="next btn btn-primary">Send</button>
+      <a href="/backpack/signout">
         I am not <span class="email"></span>.
       </a>
     </div>
   </div>
+
+  <!-- farewell -->
   <div id="farewell" class="narrow" style="display: none">
     <p class="badges-0 lead" style="display: none">You didn't add any open badges to your backpack.</p>
     <p class="badges-1 lead" style="display: none">
-      You've sent <strong>1 badge</strong> to your Mozilla Backpack.
+      You've sent <strong>1 badge</strong> to your Backpack.
     </p>
     <p class="badges-many lead" style="display: none">
       You've sent <strong class="badges-added"></strong> badges to your
-      Mozilla Backpack.
+      Backpack.
     </p>
     <p class="lead">
       Visit your <a href="/" target="_blank">Backpack</a> to manage
@@ -64,8 +61,12 @@
     </p>
     <button class="next btn btn-primary">Thanks</button>
   </div>
-  <div id="badge-ask" class="span8" style="display: none">
+
+  <!-- ask -->
+  <div id="badge-ask" class="col-md-12 column" style="display: none">
   </div>
+
+  <!-- test info -->
   <div id="test-info" style="display: none">
     <hr>
     <p style="font-size: smaller"><strong>This page is operating in test mode.</strong> All data and network operations
@@ -76,6 +77,8 @@
     <div class="log"></div>
   </div>
 </div>
+
+<!-- templates -->
 <div id="templates" style="display: none">
   <div id="accept-failure-template">
     <div class="alert alert-error">
@@ -111,7 +114,7 @@
   </div>
   <div id="badge-ask-template" style="display: none">
     <div class="row">
-      <div class="header span8">
+      <div class="header col-md-12 column">
         <h2>Accept this badge?</h2>
         <button class="accept btn btn-primary">Yes</button>
         <button class="reject btn btn-danger">No</button>
@@ -140,8 +143,11 @@
     </div>
   </div>
 </div>
+
+<!-- scripts -->
 <script src="/js/es5-shim.min.js"></script>
 <script src="/js/jquery.min.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
 <script src="/js/jschannel.js"></script>
 <script src="/js/underscore.js"></script>
 <script src="/js/backbone.js"></script>

@@ -102,11 +102,12 @@ exports.generateScript = function (req, res) {
 
 exports.frame = function (req, res) {
   res.header('Cache-Control', 'no-cache, must-revalidate');
+
   res.render('badge-accept.html', {
     layout: null,
     framed: true,
-    csrfToken: req.session._csrf,
-    email: req.session.emails && req.session.emails[0]
+    csrfToken: req.csrfToken(),
+    email: (req.user ? req.user.attributes.email : null)
   });
 };
 
@@ -129,8 +130,8 @@ exports.frameless = function (req, res) {
     layout: null,
     framed: false,
     assertions: JSON.stringify(assertions),
-    csrfToken: req.session._csrf,
-    email: req.session.emails && req.session.emails[0]
+    csrfToken: req.csrfToken(),
+    email: (req.user ? req.user.attributes.email : null)
   });
 };
 

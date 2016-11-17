@@ -27,15 +27,15 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
   // Badge baking and issuer
   app.get('/baker', baker.baker);
   app.get('/issuer.js', issuer.generateScript);
-  app.get('/issuer/frame', issuer.frame);
-  app.post('/issuer/frameless', issuer.frameless);
+  app.get('/issuer/frame', csrfProtection, issuer.frame);
+  app.post('/issuer/frameless', parseForm, csrfProtection, issuer.frameless);
   app.get('/issuer/assertion', issuer.issuerBadgeAddFromAssertion);
-  app.post('/issuer/assertion', issuer.issuerBadgeAddFromAssertion);
+  app.post('/issuer/assertion', parseForm, issuer.issuerBadgeAddFromAssertion);
   app.get('/issuer/welcome', issuer.welcome);
 
   // Displayer
   app.get('/displayer/convert/email', displayer.emailToUserIdView);
-  app.post('/displayer/convert/email', displayer.emailToUserId);
+  app.post('/displayer/convert/email', parseForm, displayer.emailToUserId);
   app.get('/displayer/:apiUserId/groups.:format?', displayer.userGroups);
   app.get('/displayer/:apiUserId/group/:apiGroupId.:format?', displayer.userGroupBadges);
 
@@ -44,7 +44,7 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
   app.get('/demo/ballertime', demo.massAward);
   app.get('/demo/badge.json', demo.demoBadge);
   app.get('/demo/invalid.json', demo.badBadge);
-  app.post('/demo/award', demo.award);
+  app.post('/demo/award', parseForm, demo.award);
 
   // Backpack
   // app.get('/', passport.authenticate('bearer', { session: false }), backpack.recentBadges);
@@ -94,7 +94,7 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
 
   // Backpack settings
   app.get('/backpack/settings', backpack.settings());
-  app.post('/backpack/settings/revoke-origin', backpackConnect.revokeOrigin());
+  app.post('/backpack/settings/revoke-origin', parseForm, backpackConnect.revokeOrigin());
 
   // Statistics
   app.get('/stats', backpack.stats);
@@ -105,14 +105,14 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
   app.delete('/badge/:badgeId', badge.destroy);
 
   // Badge groups
-  app.post('/group', group.create);
+  app.post('/group', parseForm, group.create);
   app.put('/group/:groupId', group.update);
   app.delete('/group/:groupId', group.destroy);
 
   app.get('/images/badge/:badgeHash.:badgeFileType', badge.image);
 
   // Badge and group sharing
-  app.post('/share/badge/:badgeId', badge.share);
+  app.post('/share/badge/:badgeId', parseForm, badge.share);
   app.get('/share/badge/:badgeUrl', badge.show);
   app.get('/share/:groupUrl/edit', csrfProtection, share.editor);
   app.post('/share/:groupUrl', parseForm, csrfProtection, share.createOrUpdate);
@@ -130,8 +130,8 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
 
   // Backpack Connect API
   app.all('/api/*', backpackConnect.allowCors());
-  app.post('/api/token', backpackConnect.refresh());
-  app.post('/api/issue', backpackConnect.authorize("issue"),
+  app.post('/api/token', parseForm, backpackConnect.refresh());
+  app.post('/api/issue', parseForm, backpackConnect.authorize("issue"),
                          issuer.issuerBadgeAddFromAssertion);
   app.get('/api/identity', backpackConnect.authorize("issue"),
                            backpackConnect.hashIdentity());

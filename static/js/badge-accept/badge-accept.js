@@ -1,7 +1,7 @@
 
 jQuery.extend({
-  meta: function(name, value) {
-    return $("meta[http-equiv='" + name + "']").attr("content", value);
+  meta: function(name) {
+    return $("meta[http-equiv='" + name + "']").attr("content");
   }
 });
 
