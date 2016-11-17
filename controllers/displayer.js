@@ -136,7 +136,7 @@ exports.emailToUserId = function emailToUserId(req, res, next) {
   var email = obj['email'];
 
   if (!email)
-    return res.status(400).send({
+    return res.send(400, {
       status: 'invalid',
       error: 'missing `email` parameter'
     });
@@ -144,20 +144,20 @@ exports.emailToUserId = function emailToUserId(req, res, next) {
   User.findOne({ email: email }, function (err, user) {
     if (err) {
       logger.debug(err, 'displayer#emailToUserId: there was an error getting the user %s', email);
-      return res.status(400).send({
+      return res.send(400, {
         status: 'error',
         error: 'error trying to pull user `' + email + '` from database'
       });
     }
 
     if (!user) {
-      return res.status(404).send({
+      return res.send(404, {
         status: 'missing',
         error: 'Could not find a user by the email address `' + email + '`'
       });
     }
 
-    return res.status(200).send({
+    return res.send(200, {
       status: 'okay',
       email: email,
       userId: user.get('id')

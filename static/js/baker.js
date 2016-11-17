@@ -14,6 +14,7 @@
     resultSection.empty().append(header1, badgeData, header2, link, hint);
     resultSection.animate({opacity: 1.0});
   }
+
   var process_reason = function(reason) {
     var html = '';
     if (reason && typeof reason === "object") {
@@ -86,10 +87,17 @@
       url: badgeURL,
       dataType: 'json',
       error: function(jqXHR, status, error){
-        var data = jQuery.parseJSON(jqXHR.responseText);
-        resultSection.queue('fx', function(next){
-          showErrors(data); next();
-        });
+        if ((jqXHR.status == 200) && 
+              (jqXHR.getResponseHeader('Content-Type') == 'image/png')) {
+          resultSection.queue('fx', function(next){
+            showBadge(badgeURL, assertionURL); next();
+          });
+        } else {
+          var data = jQuery.parseJSON(jqXHR.responseText);
+          resultSection.queue('fx', function(next){
+            showErrors(data); next();
+          });
+        }
       },
       success: function(data, status) {
         if (data.status === 'success') {

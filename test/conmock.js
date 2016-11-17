@@ -43,9 +43,14 @@ module.exports = function conmock (options, callback) {
       this.header('Content-Type', mime.lookup(type));
       return this;
     },
-    send: function (data) {
+    send: function (data, status) {
+      if (typeof data === 'number') {
+        var tmp = data;
+        data = status, status = tmp;
+      }
       this.fntype = 'send';
       this.body = data;
+      this.status = status || 200;
       callback(null, this, request);
     },
     json: function (data, status) {
@@ -76,14 +81,6 @@ module.exports = function conmock (options, callback) {
       this.status = status || 301;
       callback(null, this, request);
     },
-    status: function(status) {
-      this.fntype = 'status';
-      this.status = status || 200;
-      return this;
-    },
-    getStatus: function() {
-      return this.status;
-    }
   };
   mock.request = request;
   function next (err) {
