@@ -38,46 +38,51 @@ module.exports = function(passport, configuration) {
         });
     });
 
-    // prepare siteUrl for Persona audience
-    var siteUrl = configuration.get('protocol') + '://' + configuration.get('hostname');
-    var port = configuration.get('port');
-    if ((process.env.NODE_ENV !== 'heroku') && (port !== 80) && (port !== 443)) {
-        siteUrl = siteUrl + ':' + port;
-    }
+    // We only really need Persona for migration purposes, so other parts of the app
+    // that require passport may not pass the config in, in which case skip this code
+    if (configuration) {
 
-    // =========================================================================
-    // PERSONA LOGIN ===========================================================
-    // =========================================================================
-    passport.use(new PersonaStrategy({
-        audience: siteUrl,
-        passReqToCallback : true
-    },
-    function(request, email, done) {
-        if (email)
-            email = email.toLowerCase(); // Use lower-case e-mails to avoid case-sensitive e-mail matching
+        // prepare siteUrl for Persona audience
+        var siteUrl = configuration.get('protocol') + '://' + configuration.get('hostname');
+        var port = configuration.get('port');
+        if ((process.env.NODE_ENV !== 'heroku') && (port !== 80) && (port !== 443)) {
+            siteUrl = siteUrl + ':' + port;
+        }
 
-        // asynchronous
-        process.nextTick(function() {
-            User.findOne({ email :  email }, function(err, user) {
-                // if there are any errors, return the error
-                if (err)
-                    return done(err);
+        // =========================================================================
+        // PERSONA LOGIN ===========================================================
+        // =========================================================================
+        passport.use(new PersonaStrategy({
+            audience: siteUrl,
+            passReqToCallback : true
+        },
+        function(request, email, done) {
+            if (email)
+                email = email.toLowerCase(); // Use lower-case e-mails to avoid case-sensitive e-mail matching
 
-                // if no user is found, return the message
-                if (!user) {
-                    // USER DIDN'T NEED TO MIGRATE, AS THEY NEVER HAD AN ACCOUNT!
-                    // MAKE NEW USER ACCOUNT & SEND USER SIGNUP/MIGRATION EMAIL ANYWAY
-                    request.flash('error', 'The email address used has no Backpack account.  Please sign up for a new account.');
-                    return done(null);
+            // asynchronous
+            process.nextTick(function() {
+                User.findOne({ email :  email }, function(err, user) {
+                    // if there are any errors, return the error
+                    if (err)
+                        return done(err);
 
-                } else {
-                    // FOUND USER ACCOUNT... LET'S GET THEM MIGRATED!
-                    return done(null, user.attributes);
-                }
+                    // if no user is found, return the message
+                    if (!user) {
+                        // USER DIDN'T NEED TO MIGRATE, AS THEY NEVER HAD AN ACCOUNT!
+                        // MAKE NEW USER ACCOUNT & SEND USER SIGNUP/MIGRATION EMAIL ANYWAY
+                        request.flash('error', 'The email address used has no Backpack account.  Please sign up for a new account.');
+                        return done(null);
+
+                    } else {
+                        // FOUND USER ACCOUNT... LET'S GET THEM MIGRATED!
+                        return done(null, user.attributes);
+                    }
+                });
+
             });
-
-        });
-    }));
+        }));
+    }
 
     // =========================================================================
     // LOCAL LOGIN =============================================================
