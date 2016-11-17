@@ -214,7 +214,7 @@ testUtils.prepareDatabase({
       }
     }, function(err, mock) {
       t.equal(mock.status, 400);
-      t.same(mock.body, "invalid grant_type");
+      t.same(mock.body.message, "invalid grant_type");
       t.end();
     });
   });
@@ -316,7 +316,9 @@ testUtils.prepareDatabase({
           callback: 'http://foo.org',
           scope: 'foo_perm,bar_perm'
         },
-        session: {_csrf: 'a_csrf'}
+        csrfToken: function(){
+          return 'a_csrf';
+        },
       }
     }, function(err, mock) {
       if (err) throw err;
