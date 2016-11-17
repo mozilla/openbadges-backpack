@@ -1,72 +1,80 @@
 {% extends "layout.html" %}
-{% block head %}
-<style>
-a.logout {
-  display: block;
-  padding-top: 20px;
-}
-</style>
-{% endblock %}
+
 {% block body %}
-<h1><span class="client">{{ clientDomain|e }}</span> would like permission
-  to:</h1>
 
-{% set permissions = scopes %}
-{% include 'permissions.html' %}
+<div class="pushdown">
+	<section class="page">
+		<div class="container">
+			<div class="row">
+			    <div class="col-sm-12">
+			        <div class="row badge-header">
+			            <div class="col-xs-12 col-sm-12">
+			                <h1 class="section-heading">
+			                	<span class="client">{{ clientDomain|e }}</span>
+			                	would like permission to:
+			                </h1>
+			            </div>
+			        </div>
+			    </div>
+			    <div class="col-xs-12 col-lg-6">
+					{% set permissions = scopes %}
+					{% include 'permissions.html' %}
 
-{% if not user %}
+					{% if not user %}
 
-<p>Want to create a Backpack?  
-  <a class="js-browserid-link" href="#">Sign up</a> to share your skills and interests, create badge collections, and more!</p>
+						<p>Want to create a Backpack?  
+							<a href="/backpack/signup">Sign up</a> to share your skills and interests, create badge collections, and more!</p>
 
-<a class="js-browserid-link" href="#">
-  <img src="https://browserid.org/i/sign_in_green.png"/>
-</a>
+						<a href="/backpack/login">Login</a>
 
-{% else %}
+					{% else %}
 
-<form method="POST" action="accept">
-  <input name="_csrf" type="hidden" value="{{ csrfToken }}">
-  <input name="callback" type="hidden" value="{{ callback|e }}">
-  <input name="scope" type="hidden" value="{{ joinedScope|e }}">
-  <button class="btn btn-primary" type="submit">Grant permission</button>
-  <a class="btn" href="{{ denyCallback|e }}">Deny permission</a>
-  <a href="/backpack/signout" class="logout">
-    I am not <span class="email">{{ user.attributes.email }}</span>.
-  </a>
-</form>
-{% endif %}
+						<form method="POST" action="accept">
+							<input name="_csrf" type="hidden" value="{{ csrfToken }}">
+							<input name="callback" type="hidden" value="{{ callback|e }}">
+							<input name="scope" type="hidden" value="{{ joinedScope|e }}">
+							<button class="btn btn-primary" type="submit">Grant permission</button>
+							<a class="btn" href="{{ denyCallback|e }}">Deny permission</a>
+							<a href="/backpack/signout" class="logout access">
+								I am not <span class="email">{{ user.attributes.email }}</span>.
+							</a>
+						</form>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</section>
+</div>
 {% endblock %}
 
 {% block scripts %}
-<script src="/js/jquery.min.js"></script>
 <script>
 $(window).ready(function() {
-  var reloadPage = function() { window.location.reload(); };
+	var reloadPage = function() { window.location.reload(); };
 
-  $(document).ajaxError(function() {
-    alert("Sorry, an error occurred. Please try again later.");
-  });
-  
-  $('a[href="/backpack/signout"]').click(function() {
-    $.get($(this).attr("href"), reloadPage);
-    return false;
-  });
+	$(document).ajaxError(function() {
+		alert("Sorry, an error occurred. Please try again later.");
+	});
+	
+	$('a[href="/backpack/signout"]').click(function() {
+		$.get($(this).attr("href"), reloadPage);
+		return false;
+	});
 
-  $(".js-browserid-link").click(function() {
-    navigator.id.get(function(assertion) {
-      if (!assertion) return;
-      $.ajax({
-        url: '/backpack/authenticate',
-        type: 'POST',
-        dataType: 'json',
-        data: {assertion: assertion},
-        headers: {'X-CSRF-Token': '{{ csrfToken }}'},
-        success: reloadPage
-      });
-    });
-    return false;
-  });
+	$(".js-browserid-link").click(function() {
+		navigator.id.get(function(assertion) {
+			if (!assertion) return;
+			$.ajax({
+				url: '/backpack/authenticate',
+				type: 'POST',
+				dataType: 'json',
+				data: {assertion: assertion},
+				headers: {'X-CSRF-Token': '{{ csrfToken }}'},
+				success: reloadPage
+			});
+		});
+		return false;
+	});
 });
 </script>
 {% endblock %}

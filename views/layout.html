@@ -53,6 +53,8 @@
       <script type="text/javascript" src="/js/nunjucks-dev.js"></script>
     {% endif %}
     {% block scripts %}{% endblock %}
+    {% if error.length or success.length or info.length %}
     {% include "includes/flash-messages.html" %}
+    {% endif %}
   </body>
 </html>
