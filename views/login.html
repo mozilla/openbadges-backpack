@@ -92,7 +92,6 @@
     navigator.id.get(function(assertion) {
       console.log(assertion)
       if (assertion) {
-        console.log("setting")
         $("#persona-form-assertion").val(assertion);
         $("#persona-form").submit();
       } else {

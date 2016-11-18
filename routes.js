@@ -59,6 +59,23 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
       failureRedirect : '/backpack/login', // redirect back to the signup page if there is an error
       failureFlash : true // allow flash messages
   }));
+  app.post('/backpack/login/issuer', parseForm, csrfProtection, function(req, res, next) {
+    passport.authenticate('local-login', function(err, user, info) {
+      if (err) { return res.json(400, err); }
+      if (!user) {
+        return res.json(200, {
+          message: "Login failed, please try again"
+        });
+      }
+      req.logIn(user, function(err) {
+        if (err) { return res.json(400, err); }
+        return res.json(200, {
+          message: 'You have successfully logged in',
+          email: user.email
+        });
+      });
+    })(req, res, next);
+  });
   app.get('/backpack/signup', csrfProtection, backpack.signup);
   app.post('/backpack/signup', parseForm, csrfProtection, passport.authenticate('local-signup', {
       successRedirect : '/', // redirect to the secure profile section
