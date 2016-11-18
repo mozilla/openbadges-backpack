@@ -7,7 +7,7 @@ Backpack-ng (pronounced *'backpacking'*) is the next generation of the Backpack.
 
 Our team has been slugging away behind the scenes to ensure the Backpack stays relevant, maintained and loved.  
 
-The [ng branch](https://github.com/auralon/openbadges-backpack/tree/backpack-ng) is currently where all the heavy development has been taking place. It's where the following changes have been introduced:
+The [ng branch](https://github.com/mozilla/openbadges-backpack/tree/backpack-ng) is currently where all the heavy development has been taking place. It's where the following changes have been introduced:
 
 * Updated the framework and most of the dependencies
 * Removed Persona as the main authentication mechanism (which is due to be decommissioned on the 31st Nov 2016)
