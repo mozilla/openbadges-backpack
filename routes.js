@@ -47,19 +47,18 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
   app.post('/demo/award', parseForm, demo.award);
 
   // Backpack
-  // app.get('/', passport.authenticate('bearer', { session: false }), backpack.recentBadges);
   app.get('/', backpack.recentBadges);
   app.get('/backpack', backpack.manage);
   app.get('/backpack/badges', backpack.allBadges);
   app.get('/backpack/add', csrfProtection, backpack.addBadge);
   app.get('/backpack/welcome', csrfProtection, backpack.welcome);
-  app.get('/backpack/login', csrfProtection, backpack.login);
+  app.get('/backpack/login', csrfProtection, backpack.login); // normal login
   app.post('/backpack/login', parseForm, csrfProtection, passport.authenticate('local-login', {
       successRedirect : '/', // redirect to the secure profile section
       failureRedirect : '/backpack/login', // redirect back to the signup page if there is an error
       failureFlash : true // allow flash messages
   }));
-  app.post('/backpack/login/issuer', parseForm, csrfProtection, function(req, res, next) {
+  app.post('/backpack/login/ajax', parseForm, csrfProtection, function(req, res, next) { // ajax login
     passport.authenticate('local-login', function(err, user, info) {
       if (err) { return res.json(400, err); }
       if (!user) {

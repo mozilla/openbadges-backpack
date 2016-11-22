@@ -30,7 +30,7 @@
       <!-- logged out -->
       <div class="logged-out">
         <p class="lead">Log in to proceed.</p>
-        <form action="/backpack/login/issuer" id="login" method="post">
+        <form action="/backpack/login/ajax" id="login" method="post">
           <input name="_csrf" type="hidden" value="{{ csrfToken }}"></input>
           <div class="group at">
             <input type="text" name="email" required>

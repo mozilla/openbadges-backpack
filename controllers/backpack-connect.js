@@ -112,7 +112,8 @@ function requestAccess(req, res) {
     joinedScope: req.query.scope,
     scopes: scopes,
     callback: req.query.callback,
-    denyCallback: utils.extendUrl(req.query.callback, {error: 'access_denied'})
+    denyCallback: utils.extendUrl(req.query.callback, {error: 'access_denied'}),
+    connectNav: true
   });
 }
 

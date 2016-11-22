@@ -567,7 +567,18 @@ section.developers {
 section.login,
 section.signup,
 section.reset {
-    background-color: #182733;
+    &:not(.connect) {
+        background-color: #182733;
+    }
+    &.connect {
+        .go-to-link {
+            display: inline-block;
+            margin-left: 20px;
+        }
+        input[type="submit"] {
+            display: inline-block;
+        }
+    }
     p {
         font-size: 12px;
         margin: 40px 0 0;
@@ -1695,10 +1706,9 @@ textarea.story {
     span.client {
         display: block;
         font-weight: bold;
-        color: #55C2E2;
+        color: #222222;
     }
 }
-
 
 ul.permissions {
     list-style-type: square;
@@ -1707,4 +1717,19 @@ ul.permissions {
 a.logout.access {
     display: block;
     margin-top: 20px;
+}
+
+.permissions-container {
+    margin-bottom: 25px;
+    h5 {
+        font-style: italic;
+    }
+}
+
+#issuer-acceptance {
+    .item {
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e5e5e5;
+        margin-bottom: 17px;
+    }
 }
