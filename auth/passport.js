@@ -85,6 +85,27 @@ module.exports = function(passport, configuration) {
     }
 
     // =========================================================================
+    // HTTP BEARER TOKEN LOGIN =================================================
+    // =========================================================================
+    passport.use('bearer', new BearerStrategy({
+            passReqToCallback : true
+        },
+        function(req, token, done) {
+            Session.findOne({ access_token: token }, function (err, session) {
+                if (err) { return done(err); }
+                if (!session) { return done(null, false); }
+
+                User.findById(session.attributes.user_id, function(err, user) {
+                    if (err) { return done(err); }
+                    if (!user) { return done(null, false); }
+                    req.bpc_session = session;
+                    return done(null, user, { scope: 'all' });
+                });
+            });
+        }
+    ));
+
+    // =========================================================================
     // LOCAL LOGIN =============================================================
     // =========================================================================
     passport.use('local-login', new LocalStrategy({
