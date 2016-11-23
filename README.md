@@ -1,6 +1,11 @@
 # Mozilla Open Badges Backpack
 [![Build Status](https://secure.travis-ci.org/mozilla/openbadges.png?branch=development)](http://travis-ci.org/mozilla/openbadges)
 
+## Update
+
+We have a new [Readme.md](https://github.com/mozilla/openbadges-backpack/blob/backpack-ng/README.md) file on the [NG branch](https://github.com/mozilla/openbadges-backpack/tree/backpack-ng) of the Backpack Repository. If you have any further questions please contact backpack@digitalme.co.uk
+
+## Mozilla Open Badges Backpack
 This is the Mozilla Hosted Backpack for earners' Open Badges. The Backpack allows earners to collect and manage their badges in groups, choosing whether each group is public or not. You can access the Mozilla Backpack Web front-end at: http://backpack.openbadges.org
 
 The Backpack code includes tools for badge issuers and displayers, for pushing awarded badges to an earner's Mozilla Backpack and for retrieving an earner's badges for display.
