@@ -88,6 +88,8 @@ exports.authenticate = function authenticate(req, res) {
   //   req.session.emails = [email];
   //   return formatResponse('/');
   // });
+
+  return res.send(400, {status: 'error', reason: 'Persona has been decommissioned'});
 };
 
 /**
