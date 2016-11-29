@@ -399,7 +399,7 @@ exports.userBadgeUpload = function userBadgeUpload(req, res) {
     if (err) {
       logger.warn('There was an error uploading a badge');
       logger.debug(err);
-      req.flash('error', err.message);
+      req.flash('error', 'There was an error uploading a badge');
       url = '/backpack/add'
     }
     // We use store errors in res._error so we can check them in our
