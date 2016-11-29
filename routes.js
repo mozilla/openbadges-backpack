@@ -145,8 +145,8 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
   app.post('/accept', parseForm, csrfProtection, backpackConnect.allowAccess());
 
   // Backpack Connect API
+  app.post('/api/token', parseForm, backpackConnect.refresh()); // excluded from bearer auth
   app.all('/api/*', passport.authenticate('bearer', { session: false }), backpackConnect.allowCors());
-  app.post('/api/token', passport.authenticate('bearer', { session: false }), parseForm, backpackConnect.refresh());
   app.post('/api/issue', passport.authenticate('bearer', { session: false }), parseForm, backpackConnect.authorize("issue"),
                          issuer.issuerBadgeAddFromAssertion);
   app.get('/api/identity', passport.authenticate('bearer', { session: false }), backpackConnect.authorize("issue"),
