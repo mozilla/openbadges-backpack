@@ -103,7 +103,7 @@ exports.show = function (request, response, next) {
   portfolio = group.get('portfolio');
   owner = user && group.get('user_id') === user.get('id');
 
-  if (!group.public && !owner) return response.send(404, 'This page is unavailable');
+  if (!group.attributes.public && !owner) return response.send(404, 'This page is unavailable');
 
   // If there is no portfolio and this is the owner, create and save a new
   // portfolio object. Otherwise, kick the user out.
