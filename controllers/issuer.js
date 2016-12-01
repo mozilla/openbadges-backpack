@@ -158,7 +158,7 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
     redirect_to: '/backpack/login'
   });
 
-  const input = req.query.assertion || req.body.assertion || req.body.badge;
+  const input = req.query.assertion || req.body.assertion || req.body.badge || req.query.badge;
   const assertionIsSignature = validator.isSignedBadge(input);
   const assertionIsUrl = validUrl(input);
 
@@ -228,7 +228,7 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
           // error message
           const dupeRegex = /Duplicate entry/;
           if (dupeRegex.test(err)) {
-            return res.json(304, {
+            return res.status(304).json({
               badge: assertion,
               exists: true,
               message: "badge already exists"

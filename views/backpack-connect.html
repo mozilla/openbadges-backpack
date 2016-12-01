@@ -6,40 +6,54 @@
 	<section class="page">
 		<div class="container">
 			<div class="row">
-			    <div class="col-sm-12">
-			        <div class="row badge-header">
-			            <div class="col-xs-12 col-sm-12">
-			                <h1 class="section-heading">
-			                	<span class="client">{{ clientDomain|e }}</span>
-			                	would like permission to:
-			                </h1>
-			            </div>
-			        </div>
-			    </div>
-			    <div class="col-xs-12 col-lg-6">
-					{% set permissions = scopes %}
-					{% include 'permissions.html' %}
+				<div class="col-sm-12">
+					<div class="row badge-header">
+						<div class="col-xs-12 col-sm-12">
+							<h1 class="section-heading">
+								<span class="client">{{ clientDomain|e }}</span>
+							</h1>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-12 col-lg-6">
+					<div class="permissions-container">
+						<h5>would like permission to:</h5>
+						{% set permissions = scopes %}
+						{% include 'permissions.html' %}
+					</div>
 
-					{% if not user %}
-
-						<p>Want to create a Backpack?  
-							<a href="/backpack/signup">Sign up</a> to share your skills and interests, create badge collections, and more!</p>
-
-						<a href="/backpack/login">Login</a>
-
-					{% else %}
-
-						<form method="POST" action="accept">
-							<input name="_csrf" type="hidden" value="{{ csrfToken }}">
-							<input name="callback" type="hidden" value="{{ callback|e }}">
-							<input name="scope" type="hidden" value="{{ joinedScope|e }}">
-							<button class="btn btn-primary" type="submit">Grant permission</button>
-							<a class="btn" href="{{ denyCallback|e }}">Deny permission</a>
-							<a href="/backpack/signout" class="logout access">
-								I am not <span class="email">{{ user.attributes.email }}</span>.
-							</a>
+					<section class="login connect" id="logged-out" style="display: {% if not user %} block {% else %} none {% endif %}">
+						<h3>Log in to proceed.</h3>
+						<form action="/backpack/login/ajax" id="login" method="post">
+							<input name="_csrf" type="hidden" value="{{ csrfToken }}"></input>
+							<div class="group at">
+								<input type="text" name="email" required>
+								<span class="highlight"></span>
+								<span class="bar"></span>
+								<label>Email</label>
+							</div>
+							<div class="group lock">
+								<input type="password" name="password" required>
+								<span class="highlight"></span>
+								<span class="bar"></span>
+								<label>Password</label>
+							</div>
+							<input type="submit" value="login" class="btn">
+							<a href="/backpack/signup" class="go-to-link">Go to signup page</a>
+							<span class="msg error"></span>
 						</form>
-					{% endif %}
+					</section>
+
+					<form method="POST" id="logged-in" action="accept" style="display: {% if not user %} none {% else %} block {% endif %}">
+						<input name="_csrf" type="hidden" value="{{ csrfToken }}">
+						<input name="callback" type="hidden" value="{{ callback|e }}">
+						<input name="scope" type="hidden" value="{{ joinedScope|e }}">
+						<button class="btn btn-primary" type="submit">Grant permission</button>
+						<a class="btn" href="{{ denyCallback|e }}">Deny permission</a>
+						<a href="/backpack/signout" class="logout access">
+							I am not <span class="email">{{ user.attributes.email }}</span>.
+						</a>
+					</form>
 				</div>
 			</div>
 		</div>
@@ -61,19 +75,45 @@ $(window).ready(function() {
 		return false;
 	});
 
-	$(".js-browserid-link").click(function() {
-		navigator.id.get(function(assertion) {
-			if (!assertion) return;
-			$.ajax({
-				url: '/backpack/authenticate',
-				type: 'POST',
-				dataType: 'json',
-				data: {assertion: assertion},
-				headers: {'X-CSRF-Token': '{{ csrfToken }}'},
-				success: reloadPage
-			});
+	$('#login').submit(function(e) {
+		e.preventDefault();
+		$form = $(this);
+		$.post($form.attr('action'), $form.serialize(), function(res, status, jqXHR) {
+			if (jqXHR.status == 200) {
+				if (res.email) {
+					$('#logged-out').fadeOut(function() {
+						$('span.email').text(res.email);
+						$('#logged-in').fadeIn();
+					});
+				}  else {
+					// show message
+					$('.msg.error').text(res.message).animate({
+						opacity: 1
+					}, 250).promise().done(function(){
+						setTimeout(function() {
+							$('.msg.error').animate({
+								opacity: 0
+							}, 250).promise().done(function(){ 
+								$('.msg.error').text('');
+							});
+						}, 2500);
+					});
+				}
+			} else {
+				// problem
+				$('.msg.error').text('There was a problem submitting your request, please try again').animate({
+					opacity: 1
+				}, 250).promise().done(function(){
+					setTimeout(function() {
+						$('.msg.error').animate({
+							opacity: 0
+						}, 250).promise().done(function(){ 
+							$('.msg.error').text('');
+						});
+					}, 2500);
+				});
+			}
 		});
-		return false;
 	});
 });
 </script>

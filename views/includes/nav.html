@@ -43,4 +43,15 @@
         </div>
     </div>
 </nav>
+{% elseif connectNav or shareNav %}
+<nav id="mainNav" class="navbar navbar-application navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <a href="/"><img src="/images/backpack-logo.png" class="menu-logo" /></a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <a href="/"><img src="/images/backpack-logo.png" class="app-logo" /></a>
+        </div>
+    </div>
+</nav>
 {% endif %}

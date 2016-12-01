@@ -246,6 +246,9 @@ p {
     text-align: center;
     font-size: 1.6rem;
     color: white;
+    &.shareNav {
+        margin-top: 0px;
+    }
     ul {
         margin: 0;
         padding: 0;
@@ -567,7 +570,18 @@ section.developers {
 section.login,
 section.signup,
 section.reset {
-    background-color: #182733;
+    &:not(.connect) {
+        background-color: #182733;
+    }
+    &.connect {
+        .go-to-link {
+            display: inline-block;
+            margin-left: 20px;
+        }
+        input[type="submit"] {
+            display: inline-block;
+        }
+    }
     p {
         font-size: 12px;
         margin: 40px 0 0;
@@ -991,7 +1005,7 @@ section.collections {
     }
     .group {
         background: white;
-        padding: 85px 20px 30px;
+        padding: 85px 20px 40px;
         display: inline-block;
         border: 1px solid #DDD;
         width: 100%;
@@ -1045,7 +1059,7 @@ section.collections {
     .instructions {
         padding: 10px;
     }
-    input {
+    input:not([type="checkbox"]) {
         width: 100%;
         border: none;
         padding: 15px 25px;
@@ -1695,10 +1709,9 @@ textarea.story {
     span.client {
         display: block;
         font-weight: bold;
-        color: #55C2E2;
+        color: #222222;
     }
 }
-
 
 ul.permissions {
     list-style-type: square;
@@ -1707,4 +1720,34 @@ ul.permissions {
 a.logout.access {
     display: block;
     margin-top: 20px;
+}
+
+.permissions-container {
+    margin-bottom: 25px;
+    h5 {
+        font-style: italic;
+    }
+}
+
+#issuer-acceptance {
+    .item {
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e5e5e5;
+        margin-bottom: 17px;
+    }
+}
+
+.public {
+    position: absolute;
+    bottom: 0;
+
+    input[type="checkbox"] {
+        vertical-align: sub;
+    }
+
+    span {
+        font-family: 'Catamaran','Helvetica','Arial','sans-serif';
+        font-weight: 200;
+        letter-spacing: 1px;
+    }
 }

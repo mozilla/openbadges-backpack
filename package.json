@@ -1,7 +1,7 @@
 {
   "name": "openbadges",
   "description": "http://openbadges.org",
-  "version": "3.0.0-alpha.1",
+  "version": "3.0.0-beta.1",
   "private": true,
   "scripts": {
     "test": "NODE_ENV=test TAP_TIMEOUT=60000 ./node_modules/.bin/tap-prettify test/*.test.js",
@@ -55,7 +55,7 @@
     "passport-deviantart": "0.0.5",
     "passport-facebook": "^2.1.1",
     "passport-google-oauth": "^1.0.0",
-    "passport-http-bearer": "^1.0.1",
+    "passport-http-bearer-base64": "^1.0.3",
     "passport-local": "^1.0.0",
     "passport-persona": "^0.1.7",
     "passport-twitter": "^1.0.4",

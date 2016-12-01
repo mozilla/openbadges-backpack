@@ -1,66 +1,69 @@
 {% extends 'layout.html' %}
 {% block body %}
-<link rel="stylesheet" href="/css/socialmedia.css">
+<div class="pushdown">
 
-{% if owner %}
-	<div id="subNav">
+	<link rel="stylesheet" href="/css/socialmedia.css">
+
+	{% if owner %}
+		<div id="subNav" class="shareNav">
+			<div class="container">
+				<div class="socialshare" style="float: left;" tabindex="0" onclick="injectSocialMedia(this)">
+					<span class="msg">Share this on Twitter, Google+, Facebook and LinkedIn</span>
+					<div class="social-sites">
+						<div class="social-medium twitter"></div>
+						<div class="social-medium google"></div>
+						<div class="social-medium facebook"></div>
+						<div class="social-medium linkedin"></div>
+					</div>
+				</div>
+				<a href="edit" class='edit btn btn-primary'>Edit this page</a>
+				<span class="shareMessage">This is how your portfolio page will look to the public.</span>
+			</div>
+		</div>
+	{% endif %}
+
+	<section id="badges" class="badges portfolio">
 		<div class="container">
-			<div class="socialshare" style="float: left;" tabindex="0" onclick="injectSocialMedia(this)">
-				<span class="msg">Share this on Twitter, Google+, Facebook and LinkedIn</span>
-				<div class="social-sites">
-					<div class="social-medium twitter"></div>
-					<div class="social-medium google"></div>
-					<div class="social-medium facebook"></div>
-					<div class="social-medium linkedin"></div>
-				</div>
-			</div>
-			<a href="edit" class='edit btn btn-primary'>Edit this page</a>
-			<span class="shareMessage">This is how your portfolio page will look to the public.</span>
-		</div>
-	</div>
-{% endif %}
-
-<section id="badges" class="badges portfolio">
-	<div class="container">
-		<div class="row">
-			<div class="col-xs-12">
-				<div class="row badge-header">
-					<div class="col-xs-12">
-						<h1 class="section-heading">{{portfolio.attributes.title|e}}</h1>
-						<h4>{{portfolio.attributes.subtitle|e}}</h4>
-					</div>
-				</div>
-				{% for badge in portfolio.badges %}
-					{% if (loop.index - 1) % 4 == 0 %}
-						<div class="col-xs-12 badge-row">
-					{% endif %}
-					<div class="col-xs-12 col-md-3 openbadge" data-id="{{badge.attributes.id}}" data-serialization="{{badge.serializedAttributes|e}}">
+			<div class="row">
+				<div class="col-xs-12">
+					<div class="row badge-header">
 						<div class="col-xs-12">
-							<img src="{{ badge.attributes.imageUrl }}" class="col-xs-12">
-
-							<div class="clearfix"></div>
-
-							<h4>{{ badge.attributes.body.badge.name|e }}</h4>
-							<h5>{{ badge.attributes.body.badge.issuer.name|e }}</h5>
-
-							<a href="javascript:void(0)" class="expand">Toggle more information</a>
-						</div>
-
-						<div class="col-xs-12 expander" data-id="{{badge.attributes.id}}">
-							{% if badge.attributes._userStory %}
-								<p class='story col-xs-12'>"{{badge.attributes._userStory|e}}"</p>
-							{% endif %}
-							{% include 'badge-data-portfolio.html' %}
+							<h1 class="section-heading">{{portfolio.attributes.title|e}}</h1>
+							<h4>{{portfolio.attributes.subtitle|e}}</h4>
 						</div>
 					</div>
-					{% if (loop.index) % 4 == 0 %}
+					{% for badge in portfolio.badges %}
+						{% if (loop.index - 1) % 4 == 0 %}
+							<div class="col-xs-12 badge-row">
+						{% endif %}
+						<div class="col-xs-12 col-md-3 openbadge" data-id="{{badge.attributes.id}}" data-serialization="{{badge.serializedAttributes|e}}">
+							<div class="col-xs-12">
+								<img src="{{ badge.attributes.imageUrl }}" class="col-xs-12">
+
+								<div class="clearfix"></div>
+
+								<h4>{{ badge.attributes.body.badge.name|e }}</h4>
+								<h5>{{ badge.attributes.body.badge.issuer.name|e }}</h5>
+
+								<a href="javascript:void(0)" class="expand">Toggle more information</a>
+							</div>
+
+							<div class="col-xs-12 expander" data-id="{{badge.attributes.id}}">
+								{% if badge.attributes._userStory %}
+									<p class='story col-xs-12'>"{{badge.attributes._userStory|e}}"</p>
+								{% endif %}
+								{% include 'badge-data-portfolio.html' %}
+							</div>
 						</div>
-					{% endif %}
-				{% endfor %}
+						{% if (loop.index) % 4 == 0 %}
+							</div>
+						{% endif %}
+					{% endfor %}
+				</div>
 			</div>
 		</div>
-	</div>
-</section>
+	</section>
+</div>
 {% endblock %}
 
 

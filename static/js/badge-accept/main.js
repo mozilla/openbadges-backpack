@@ -190,9 +190,10 @@ function issue(assertions, cb){
       showError('#inaccessible-template', { error: error });
     }
     else if (error.reason !== 'DENIED') {
+      var assertion = badge.data ? badge.data.badge : badge.assertion;
       var templateData = {
         error: error,
-        assertion: badge.data.badge, // data.badge is really the assertion
+        assertion: assertion,
         user: Session.currentUser
       };
       if (error.reason === 'INVALID') {
@@ -202,8 +203,7 @@ function issue(assertions, cb){
         else {
           showError('#owner-mismatch-template', templateData);
         }
-      }
-      else if (error.reason === 'EXISTS') {
+      } else if (error.reason === 'EXISTS') {
 	      showError('#already-exists-template', templateData);
       }
     }

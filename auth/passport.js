@@ -4,7 +4,7 @@ var FacebookStrategy   = require('passport-facebook').Strategy;
 var TwitterStrategy    = require('passport-twitter').Strategy;
 var GoogleStrategy     = require('passport-google-oauth').OAuth2Strategy;
 var DeviantArtStrategy = require('passport-deviantart').Strategy;
-var BearerStrategy     = require('passport-http-bearer').Strategy;
+var BearerStrategy     = require('passport-http-bearer-base64').Strategy;
 var PersonaStrategy    = require('passport-persona').Strategy;
 
 // load up the user model
@@ -83,6 +83,28 @@ module.exports = function(passport, configuration) {
             });
         }));
     }
+
+    // =========================================================================
+    // HTTP BEARER TOKEN LOGIN =================================================
+    // =========================================================================
+    passport.use('bearer', new BearerStrategy({
+            passReqToCallback  : true,
+            base64EncodedToken : true
+        },
+        function(req, token, done) {
+            Session.findOne({ access_token: token }, function (err, session) {
+                if (err) { return done(err); }
+                if (!session) { return done(null, false); }
+
+                User.findById(session.attributes.user_id, function(err, user) {
+                    if (err) { return done(err); }
+                    if (!user) { return done(null, false); }
+                    req.bpc_session = session;
+                    return done(null, user, { scope: 'all' });
+                });
+            });
+        }
+    ));
 
     // =========================================================================
     // LOCAL LOGIN =============================================================

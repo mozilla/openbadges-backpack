@@ -108,11 +108,12 @@ function requestAccess(req, res) {
   
   return res.render('backpack-connect.html', {
     clientDomain: parsed.hostname,
-    csrfToken: req.session._csrf,
+    csrfToken: req.csrfToken(),
     joinedScope: req.query.scope,
     scopes: scopes,
     callback: req.query.callback,
-    denyCallback: utils.extendUrl(req.query.callback, {error: 'access_denied'})
+    denyCallback: utils.extendUrl(req.query.callback, {error: 'access_denied'}),
+    connectNav: true
   });
 }
 
@@ -188,16 +189,8 @@ function authorize(permission, req, res, next) {
   }
   
   auth = new Buffer(auth[1], 'base64');
-  
-  this.Model.find({access_token: auth}, function(err, results) {
-    if (err) {
-      logger.warn('There was an error retrieving an access token');
-      logger.debug(err);
-      return next(err);
-    }
-    if (!results.length)
-      return invalidTokenError("Unknown access token");
-    const token = results[0];
+
+  function processToken(token) {
     if (token.isExpired())
       return invalidTokenError("The access token expired");
     if (permission && !token.hasPermission(permission))
@@ -219,5 +212,23 @@ function authorize(permission, req, res, next) {
       req.user = results[0];
       return next();
     });
-  });
+  }
+
+  if (!req.bpc_session) {
+
+    this.Model.find({access_token: auth}, function(err, results) {
+      if (err) {
+        logger.warn('There was an error retrieving an access token');
+        logger.debug(err);
+        return next(err);
+      }
+      if (!results.length)
+        return invalidTokenError("Unknown access token");
+      const token = results[0];
+      return processToken(token);
+    });
+
+  } else {
+    processToken(req.bpc_session);
+  }
 }

@@ -28,13 +28,12 @@
                                     <span class='icon share' {% if not group.attributes.badgeObjects %}style='display: none'{% endif %} title='Share this group'>
                                         <img src="/images/social-share.svg" alt="Social share icon" />
                                     </span>
-                                    <!-- public/private feature is currently broken -->
-                                    <!--<span class='public'>
+                                    <span class='public'>
                                         <label>
                                             <input type='checkbox' class='js-privacy' {% if group.attributes.public %}checked{% endif %}>
                                             <span>public</span>
                                         </label>
-                                    </span>-->
+                                    </span>
                                     {% for badge in group.attributes.badgeObjects %}
                                         <span draggable="true" class="openbadge" data-id="{{badge.attributes.id}}" data-serialization="{{badge.serializedAttributes|e}}">
                                             <img src="{{ badge.attributes.imageUrl }}" width="64px"/>
