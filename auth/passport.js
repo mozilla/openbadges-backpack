@@ -4,7 +4,7 @@ var FacebookStrategy   = require('passport-facebook').Strategy;
 var TwitterStrategy    = require('passport-twitter').Strategy;
 var GoogleStrategy     = require('passport-google-oauth').OAuth2Strategy;
 var DeviantArtStrategy = require('passport-deviantart').Strategy;
-var BearerStrategy     = require('passport-http-bearer').Strategy;
+var BearerStrategy     = require('passport-http-bearer-base64').Strategy;
 var PersonaStrategy    = require('passport-persona').Strategy;
 
 // load up the user model
@@ -88,7 +88,8 @@ module.exports = function(passport, configuration) {
     // HTTP BEARER TOKEN LOGIN =================================================
     // =========================================================================
     passport.use('bearer', new BearerStrategy({
-            passReqToCallback : true
+            passReqToCallback  : true,
+            base64EncodedToken : true
         },
         function(req, token, done) {
             Session.findOne({ access_token: token }, function (err, session) {
