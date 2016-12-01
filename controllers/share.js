@@ -99,8 +99,11 @@ exports.show = function (request, response, next) {
 
   user = request.user;
   group = request.group;
+
   portfolio = group.get('portfolio');
   owner = user && group.get('user_id') === user.get('id');
+
+  if (!group.public && !owner) return response.send(404, 'This page is unavailable');
 
   // If there is no portfolio and this is the owner, create and save a new
   // portfolio object. Otherwise, kick the user out.
@@ -126,7 +129,8 @@ exports.show = function (request, response, next) {
         { property: 'url', content: makeLinkUrl(request.url, configuration) }
       ],
       portfolio: portfolio,
-      owner: owner
+      owner: owner,
+      shareNav: true
     });
   });
 };

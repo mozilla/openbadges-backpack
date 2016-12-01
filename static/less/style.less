@@ -246,6 +246,9 @@ p {
     text-align: center;
     font-size: 1.6rem;
     color: white;
+    &.shareNav {
+        margin-top: 0px;
+    }
     ul {
         margin: 0;
         padding: 0;
@@ -1002,7 +1005,7 @@ section.collections {
     }
     .group {
         background: white;
-        padding: 85px 20px 30px;
+        padding: 85px 20px 40px;
         display: inline-block;
         border: 1px solid #DDD;
         width: 100%;
@@ -1056,7 +1059,7 @@ section.collections {
     .instructions {
         padding: 10px;
     }
-    input {
+    input:not([type="checkbox"]) {
         width: 100%;
         border: none;
         padding: 15px 25px;
@@ -1731,5 +1734,20 @@ a.logout.access {
         padding-bottom: 20px;
         border-bottom: 1px solid #e5e5e5;
         margin-bottom: 17px;
+    }
+}
+
+.public {
+    position: absolute;
+    bottom: 0;
+
+    input[type="checkbox"] {
+        vertical-align: sub;
+    }
+
+    span {
+        font-family: 'Catamaran','Helvetica','Arial','sans-serif';
+        font-weight: 200;
+        letter-spacing: 1px;
     }
 }
