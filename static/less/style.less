@@ -313,8 +313,10 @@ p {
     .nav {
         > li {
             > a {
+                font-size: 12px;
+                font-weight: bold;
+                font-family: 'Catamaran','Helvetica','Arial','sans-serif' !important;
                 .alt-font;
-                font-size: 11px;
             }
             > a,
             > a:focus {
@@ -421,6 +423,10 @@ header {
         .learn-more {
             width: 100%;
             margin-top: 20px;
+            font-weight: bold;
+            &:hover {
+                color: white;
+            }
         }
         .list-badges {
             margin-bottom: 25px;
@@ -465,8 +471,6 @@ header {
         .logo {
             margin-top: -15%;
             position: absolute;
-            left: 0;
-            margin-left: 0px;
         }
         .header-content .header-content-inner h1 {
             font-size: 50px;
@@ -489,6 +493,7 @@ section.download {
         font-size: 50px;
         color: black;
         margin: 40px 0;
+        font-weight: 400;
     }
     .container {
         padding: 10%;
@@ -517,7 +522,7 @@ section.download {
     }
     @media(min-width: 768px) {
         h2 {
-            font-size: 70px;
+            font-size: 60px;
         }
         .container {
             padding: 5%;
@@ -527,7 +532,10 @@ section.download {
 
 section.developers {
     p {
-        margin: 50px 0 80px;
+        margin: 0 0 30px;
+        &:last-of-type {
+            margin-bottom: 50px;
+        }
     }
     .double-pane {
         overflow: auto;
@@ -571,7 +579,9 @@ section.login,
 section.signup,
 section.reset {
     &:not(.connect) {
-        background-color: #182733;
+        background: url(/images/bg-cta.jpg);
+        background-size: cover;
+        background-position: center right;
     }
     &.connect {
         .go-to-link {
@@ -584,7 +594,7 @@ section.reset {
     }
     p {
         font-size: 12px;
-        margin: 40px 0 0;
+        margin: 25px 0 0;
 
         &.migration-instructions {
             font-size: 15px;
@@ -619,7 +629,7 @@ section.reset {
         top: 35px;
         left: 30px;
         h2 {
-            color: white;
+            color: #182733;
         }
     }
     .backpack-link {
@@ -634,7 +644,7 @@ section.reset {
         display: table;
         margin: 0;
         .img-part {
-            background: #DD7027;
+            background: #B1CF34;
             background-position: center center;
             background-size: cover !important;
             -webkit-background-size: cover;
@@ -653,22 +663,24 @@ section.reset {
         }
         h3 {
             padding: 0px;
-            font-size: 30px;
+            font-size: 28px;
+            margin-top: 15px;
             span {
                 font-size: 15px;
             }
         }
         h2 {
             font-size: 30px;
+            text-transform: uppercase;
         }
         h4 {
-            padding: 0px 0 20px;
+            padding: 0px 0 10px;
             font-size: 30px;
         }
     }
     .group {
         position: relative;
-        margin-bottom: 45px;
+        margin-bottom: 40px;
         &.at {
             &::after {
                 background: url(/images/email-icon.svg);
@@ -703,14 +715,11 @@ section.reset {
         border-bottom: 1px solid #757575;
     }
     input[type="submit"] {
-        font-size: 14px;
-        padding: 15px 20px;
         display: inline-block;
         width: auto;
-        color: black;
+        color: #182733;
         background-color: white;
-        border-color: #F57521;
-        border: 4px solid black;
+        border: 3px solid #182733;
         border-radius: 300px;
         transition: 0.2s ease all;
         -moz-transition: 0.2s ease all;
@@ -718,13 +727,14 @@ section.reset {
         z-index: 2;
         position: relative;
         outline: none;
+        padding: 13px 20px;
+        font-size: 11px;
         &:hover,
         &:focus,
         &:active,
         &.active {
-            color: white;
-            background-color: #DD7027;
-            border-color: #DD7027;
+            background-color: #B2CE36;
+            border-color: #B2CE36;
         }
     }
     input:focus {
@@ -807,27 +817,30 @@ section.page {
     }
 
     input[type="submit"] {
-        font-size: 14px;
-        padding: 15px 20px;
-        display: block;
+        display: inline-block;
         width: auto;
-        color: black;
-        background-color: transparent;
-        border-color: #F57521;
-        border: 4px solid black;
+        color: #182733;
+        background-color: white;
+        border: 3px solid #182733;
         border-radius: 300px;
         transition: 0.2s ease all;
         -moz-transition: 0.2s ease all;
         -webkit-transition: 0.2s ease all;
+        z-index: 2;
+        position: relative;
         outline: none;
+        padding: 13px 20px;
+        font-size: 11px;
         &:hover,
         &:focus,
         &:active,
         &.active {
-            color: white;
-            background-color: #DD7027;
-            border-color: #DD7027;
+            background-color: #B2CE36;
+            border-color: #B2CE36;
         }
+    }
+    input:focus {
+        outline: none;
     }
 
 }
@@ -906,6 +919,10 @@ section.badges {
                 text-align: left;
                 margin-top: 20px;
             }
+            &.strap {
+                text-align: left;
+                padding-top: 0px;
+            }
         }
     }
 
@@ -938,27 +955,30 @@ section.upload {
         margin: 30px 0 40px;
     }
     input[type="submit"] {
-        font-size: 14px;
-        padding: 15px 20px;
-        display: block;
-        width: 140px;
-        color: black;
-        background-color: transparent;
-        border-color: #F57521;
-        border: 4px solid black;
+        display: inline-block;
+        width: auto;
+        color: #182733;
+        background-color: white;
+        border: 3px solid #182733;
         border-radius: 300px;
         transition: 0.2s ease all;
         -moz-transition: 0.2s ease all;
         -webkit-transition: 0.2s ease all;
+        z-index: 2;
+        position: relative;
         outline: none;
+        padding: 13px 20px;
+        font-size: 11px;
         &:hover,
         &:focus,
         &:active,
         &.active {
-            color: white;
-            background-color: #DD7027;
-            border-color: #DD7027;
+            background-color: #B2CE36;
+            border-color: #B2CE36;
         }
+    }
+    input:focus {
+        outline: none;
     }
 }
 
@@ -1224,17 +1244,17 @@ footer {
 
 // Button Styles
 .btn-outline {
-    color: #DD7027;
+    color: #B1CF34;
     background-color: transparent;
-    border: 4px solid #DD7027;
+    border: 3px solid #B1CF34;
     transition: all 250ms ease;
     &:hover,
     &:focus,
     &:active,
     &.active {
         color: white;
-        background-color: #DD7027;
-        border-color: #DD7027;
+        background-color: #B1CF34;
+        border-color: #B1CF34;
     }
 }
 
@@ -1245,6 +1265,11 @@ footer {
 
 .btn-xl {
     padding: 15px 45px;
+    font-size: 11px;
+}
+
+.btn-md {
+    padding: 10px 20px;
     font-size: 11px;
 }
 
@@ -1472,7 +1497,7 @@ Main components
     height: 12px;
     width: 12px;
     border-radius: 50%;
-    background-color: #d88683;
+    background-color: #000000;
     -webkit-transition: -webkit-transform 0.2s, background-color 0.5s;
     -moz-transition: -moz-transform 0.2s, background-color 0.5s;
     transition: transform 0.2s, background-color 0.5s;
@@ -1593,7 +1618,7 @@ Main components
 }
 
 .touch #cd-vertical-nav a.is-selected span:last-child {
-    color: #d88683;
+    color: #000000;
 }
 
 .touch #cd-vertical-nav.open {
@@ -1652,7 +1677,7 @@ Main components
 
 .migrate {
     background: #e36f60;
-    padding: 1px 32px 32px;
+    padding: 1px 25px 25px;
     color: white;
 
     p {
