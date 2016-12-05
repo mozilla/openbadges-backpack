@@ -817,27 +817,30 @@ section.page {
     }
 
     input[type="submit"] {
-        font-size: 14px;
-        padding: 15px 20px;
-        display: block;
+        display: inline-block;
         width: auto;
-        color: black;
-        background-color: transparent;
-        border-color: #F57521;
-        border: 4px solid black;
+        color: #182733;
+        background-color: white;
+        border: 3px solid #182733;
         border-radius: 300px;
         transition: 0.2s ease all;
         -moz-transition: 0.2s ease all;
         -webkit-transition: 0.2s ease all;
+        z-index: 2;
+        position: relative;
         outline: none;
+        padding: 13px 20px;
+        font-size: 11px;
         &:hover,
         &:focus,
         &:active,
         &.active {
-            color: white;
-            background-color: #DD7027;
-            border-color: #DD7027;
+            background-color: #B2CE36;
+            border-color: #B2CE36;
         }
+    }
+    input:focus {
+        outline: none;
     }
 
 }
@@ -952,27 +955,30 @@ section.upload {
         margin: 30px 0 40px;
     }
     input[type="submit"] {
-        font-size: 14px;
-        padding: 15px 20px;
-        display: block;
-        width: 140px;
-        color: black;
-        background-color: transparent;
-        border-color: #F57521;
-        border: 4px solid black;
+        display: inline-block;
+        width: auto;
+        color: #182733;
+        background-color: white;
+        border: 3px solid #182733;
         border-radius: 300px;
         transition: 0.2s ease all;
         -moz-transition: 0.2s ease all;
         -webkit-transition: 0.2s ease all;
+        z-index: 2;
+        position: relative;
         outline: none;
+        padding: 13px 20px;
+        font-size: 11px;
         &:hover,
         &:focus,
         &:active,
         &.active {
-            color: white;
-            background-color: #DD7027;
-            border-color: #DD7027;
+            background-color: #B2CE36;
+            border-color: #B2CE36;
         }
+    }
+    input:focus {
+        outline: none;
     }
 }
 
