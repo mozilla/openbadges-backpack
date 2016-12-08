@@ -1,0 +1,41 @@
+{% extends 'layout.html' %}
+{% set bodyClass = 'reset' %}
+{% block body %}
+
+<section id="login" class="login cd-section">
+  <div class="container">
+    <div class="row double-pane">
+      <div class="col-sm-4 img-part">
+        <div class="welcome-message">
+          <h2>Migration - Step 1</h2>
+        </div>
+        <div class="backpack-link">
+          <img src="/images/backpack-logo.png" height="60px" />
+          <a href="http://backpack.openbadges.org" target="_blank">backpack.openbadges.org</a>
+        </div>
+      </div>
+      <div class="col-sm-12 login-part">
+        <h3>Email Address</h3>
+        <h5>Please choose the email address you would like to use with your new Backpack account.</h5>
+        <form action="/migration-step-1" method="post">
+          <input name="_csrf" type="hidden" value="{{ csrfToken }}"></input>
+          <div class="group lock">
+            <input type="email" name="email" required>
+            <span class="highlight"></span>
+            <span class="bar"></span>
+            <label>Email</label>
+          </div>
+          <div class="group lock">
+            <input type="text" name="confirm" required>
+            <span class="highlight"></span>
+            <span class="bar"></span>
+            <label>Confirm Email</label>
+          </div>
+          <input type="submit" value="submit" class="btn">
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

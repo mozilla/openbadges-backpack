@@ -1,86 +1,92 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-<h1>Backpack Settings</h1>
-<form method="post" class="settings">
-  <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+<div class="pushdown">
+  <section class="page">
+    <div class="container">
+      <h1>Backpack Settings</h1>
+      <form method="post" class="settings">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
-  <!-- TODO: Re-enable this when sharing actually works well.
+        <!-- TODO: Re-enable this when sharing actually works well.
 
-  <fieldset id="accounts">
-    <legend>Connected Accounts</legend>
-    <div class="item">
-      <span class="title"><strong>Twitter</strong>
-        {% if services.twitter %} <span class="hide">is</span> <span class="status">connected</span>{% endif %}
-      </span>
-      <div class="content">
-        Please note that badges you share on Twitter will be public
-        {% if services.twitter %}
-          <input type="button" class="btn btn-danger" value="Disconnect">
-        {% else %}
-          <input type="button" class="btn btn-primary" value="Connect">
-        {% endif %}
-      </div>
-    </div>
-    <div class="item">
-      <span class="title"><strong>Facebook</strong>
-        {% if services.facebook %} <span class="hide">is</span> <span class="status">connected</span>{% endif %}
-      </span>
-      {% if services.facebook %}
-        <div class="content">
-          <input type="button" class="btn btn-danger" value="Disconnect">
-        </div>
-        <div class="secondary">
-          <label class="slider full">
-            Automatically post to my wall when I earn new badges
-            <input type="checkbox" id="services-facebook-auto" name="services[facebook][auto]" value="true"{% if services.facebook.auto %} checked="checked"{% endif %}>
-            <span data-on="On" data-off="Off"></span>
-          </label>
-        </div>
-      {% else %}
-        <div class="content">
-          <input type="button" class="btn btn-primary" value="Connect">
-        </div>
-      {% endif %}
-    </div>
-  </fieldset>
-
-  -->
-  <fieldset id="issuer-acceptance">
-    <legend>Connected Issuers</legend>
-    {% if issuers.length %}
-      {% for issuer in issuers %}
-        <div class="item">
-          <span class="title">
-            <strong>{{ issuer.domain|e }}</strong>
-            <small>
-              <p>The website at 
-                <a href="{{ issuer.origin|e }}">{{ issuer.domain|e }}</a> has
-                permission to:</p>
-              {% set permissions = issuer.permissions %}
-              {% include 'permissions.html' %}
-            </small>
-          </span>
-          <div class="content">
-            <button type="button" class="btn btn-danger js-revoke"
-                    autocomplete="off"
-                    data-loading-text="Revoking..."
-                    data-revoke="{{ issuer.origin|e }}">Revoke
-              access for {{ issuer.domain|e }}</button>
+        <fieldset id="accounts">
+          <legend>Connected Accounts</legend>
+          <div class="item">
+            <span class="title"><strong>Twitter</strong>
+              {% if services.twitter %} <span class="hide">is</span> <span class="status">connected</span>{% endif %}
+            </span>
+            <div class="content">
+              Please note that badges you share on Twitter will be public
+              {% if services.twitter %}
+                <input type="button" class="btn btn-danger" value="Disconnect">
+              {% else %}
+                <input type="button" class="btn btn-primary" value="Connect">
+              {% endif %}
+            </div>
           </div>
-        </div>
-      {% endfor %}
-    {% else %}
-      <div class="item">
-        No issuers of open badges are currently connected
-      </div>
-    {% endif %}
-  </fieldset>
-</form>
+          <div class="item">
+            <span class="title"><strong>Facebook</strong>
+              {% if services.facebook %} <span class="hide">is</span> <span class="status">connected</span>{% endif %}
+            </span>
+            {% if services.facebook %}
+              <div class="content">
+                <input type="button" class="btn btn-danger" value="Disconnect">
+              </div>
+              <div class="secondary">
+                <label class="slider full">
+                  Automatically post to my wall when I earn new badges
+                  <input type="checkbox" id="services-facebook-auto" name="services[facebook][auto]" value="true"{% if services.facebook.auto %} checked="checked"{% endif %}>
+                  <span data-on="On" data-off="Off"></span>
+                </label>
+              </div>
+            {% else %}
+              <div class="content">
+                <input type="button" class="btn btn-primary" value="Connect">
+              </div>
+            {% endif %}
+          </div>
+        </fieldset>
+
+        -->
+        
+        <fieldset id="issuer-acceptance">
+          <legend>Connected Issuers</legend>
+          {% if issuers.length %}
+            {% for issuer in issuers %}
+              <div class="item">
+                <span class="title">
+                  <strong>{{ issuer.domain|e }}</strong>
+                  <small>
+                    <p>The website at 
+                      <a href="{{ issuer.origin|e }}">{{ issuer.domain|e }}</a> has
+                      permission to:</p>
+                    {% set permissions = issuer.permissions %}
+                    {% include 'permissions.html' %}
+                  </small>
+                </span>
+                <div class="content">
+                  <button type="button" class="btn btn-danger js-revoke"
+                          autocomplete="off"
+                          data-loading-text="Revoking..."
+                          data-revoke="{{ issuer.origin|e }}">Revoke
+                    access for {{ issuer.domain|e }}</button>
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="item">
+              No issuers of open badges are currently connected
+            </div>
+          {% endif %}
+        </fieldset>
+      </form>
+    </div>
+  </section>
+</div>
 {% endblock %}
 
 {% block scripts %}
-<script src="/vendor/bootstrap/js/bootstrap-button.js"></script>
 <script>
 var CONFIRM_MSG = "Are you sure you want to prevent the website at " +
                   "ORIGIN from accessing your backpack?";

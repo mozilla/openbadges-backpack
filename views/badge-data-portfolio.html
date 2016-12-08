@@ -1,0 +1,35 @@
+<ul class="details">
+	<li class="header col-xs-12">Issuer Details</li>
+	{% if badge.attributes.body.issued_on %}
+		<li><label>Issued</label></li>
+		<li><span>{{badge.attributes.body.issued_on}}</span></li>
+	{% endif %}
+	{% if badge.attributes.body.expires %}
+		<li><label>Expires</label></li>
+		<li><span>{{badge.attributes.body.expires}}</span></li>
+	{% endif %}
+		<li><label>Name</label></li>
+		<li><span>{{badge.attributes.body.badge.issuer.name|e}}</span></li>
+		<li><label>URL</label></li>
+		<li><span><a href="{{badge.attributes.body.badge.issuer.origin|e}}">{{badge.attributes.body.badge.issuer.origin|e}}</a></span></li>
+	{% if badge.attributes.body.badge.issuer.org %}
+		<li><label>Organization</label></li>
+		<li><span>{{badge.attributes.body.badge.issuer.org|e}}</span></li>
+	{% endif %}
+</ul>
+<ul class="details">
+	<li class="header">Badge Details</li>
+	
+	<li><label>Name</label></li>
+	<li><span>{{badge.attributes.body.badge.name|e}}</span></li>
+	
+	<li><label>Description</label></li>
+	<li><span>{{badge.attributes.body.badge.description|e}}</span></li>
+	
+	<li><label>Criteria</label></li>
+	<li><span><a href='{{badge.attributes.body.badge.criteria|e}}' aria-label="{{badge.attributes.body.badge.criteria|e}}">View</a></span></li>
+	{% if badge.attributes.body.evidence %}
+		<li><label>Evidence</label></li>
+		<li><span><a href='{{badge.attributes.body.evidence|e}}' aria-label="{{badge.attributes.body.evidence|e}}">View</a></span></li>
+	{% endif %}
+</ul>

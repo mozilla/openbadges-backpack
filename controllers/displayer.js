@@ -131,6 +131,7 @@ exports.emailToUserId = function emailToUserId(req, res, next) {
   // don't use formatter here -- we aren't supporting jsonp or CORS for
   // the email to userId API because we want to discourage people including
   // email addresses in cleartext (such as in the source of some javascript)
+  
   var obj = req.body || {};
   var email = obj['email'];
 

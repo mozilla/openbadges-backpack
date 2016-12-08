@@ -1,30 +1,85 @@
 {% extends 'layout.html' %}
 {% block body %}
-<form class='portfolio' action='/share/{{portfolio.group.attributes.url}}/' method='post'>
-  <input type='hidden' name='_csrf' value='{{csrfToken}}'>
-  <input type='hidden' name='id' value='{{portfolio.attributes.id}}'>
-  <input type='hidden' name='group_id' value='{{group.attributes.id}}'>
-  <input type='hidden' name='url' value='{{groups.attributes.url}}'>
-  <header>
-    <input tabindex=1 name='title' class='field title' value='{{portfolio.attributes.title|e}}'>
-    <input tabindex=1 name='subtitle' class='field subtitle' placeholder='Optional subtitle' value='{{portfolio.attributes.subtitle|e}}'>
-  </header>
 
-  <ul class='badges'>
-    {% for badge in portfolio.badges %}
-      <li>
-        <h3>{{badge.attributes.body.badge.name|e}}</h3>
+{#
+    <form class='portfolio' action='/share/{{ portfolio.group.attributes.url }}/' method='post'>
+      <input type='hidden' name='_csrf' value='{{ csrfToken }}'>
+      <input type='hidden' name='id' value='{{ portfolio.attributes.id }}'>
+      <input type='hidden' name='group_id' value='{{ group.attributes.id }}'>
+      <input type='hidden' name='url' value='{{ groups.attributes.url }}'>
+      <header>
+        <input tabindex=1 name='title' class='field title' value='{{ portfolio.attributes.title|e }}'>
+        <input tabindex=1 name='subtitle' class='field subtitle' placeholder='Optional subtitle' value='{{ portfolio.attributes.subtitle|e }}'>
+      </header>
 
-        <textarea name='stories[{{badge.attributes.id}}]' tabindex=1 class='story' placeholder='some information about this badge'>{{badge.attributes._userStory|e}}</textarea>
+      <ul class='badges'>
+        {% for badge in portfolio.badges %}
+          <li>
+            <h3>{{ badge.attributes.body.badge.name|e }}</h3>
 
-        {% include 'badge-data.html' %}
-      </li>
-    {% endfor %}
-  </ul>
-  
-  <div class='save actions'>
-    <input tabindex=1 class='btn btn-primary btn-large save' type='submit' value='Save this page'>
-  </div>
+            <textarea name='stories[{{ loop.index }}]["story"]' tabindex='1' class='story' placeholder='some information about this badge'>{{ badge.attributes._userStory|e }}</textarea>
+            <input type="hidden" name='stories[{{ loop.index }}]["id"]' value="{{ badge.attributes.id }}">
+
+            {% include 'badge-data-portfolio.html' %}
+          </li>
+        {% endfor %}
+      </ul>
+
+      <div class='save actions'>
+        <input tabindex=1 class='btn btn-primary btn-large save' type='submit' value='Save this page'>
+      </div>
+    </form> #}
+
+  <section id="badges" class="badges portfolio">
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-12">
+          <form class='portfolio' action='/share/{{ portfolio.group.attributes.url }}/' method='post'>
+            <input type='hidden' name='_csrf' value='{{ csrfToken }}'>
+            <input type='hidden' name='id' value='{{ portfolio.attributes.id }}'>
+            <input type='hidden' name='group_id' value='{{ group.attributes.id }}'>
+            <input type='hidden' name='url' value='{{ groups.attributes.url }}'>
+
+            <div class="row badge-header">
+              <div class="col-xs-12">
+                <input tabindex=1 name='title' class='field title h1' value='{{ portfolio.attributes.title|e }}'>
+                <input tabindex=1 name='subtitle' class='field subtitle h4' placeholder='Optional subtitle' value='{{ portfolio.attributes.subtitle|e }}'>
+              </div>
+            </div>
+            {% for badge in portfolio.badges %}
+              {% if (loop.index - 1) % 4 == 0 %}
+                <div class="col-xs-12 badge-row">
+              {% endif %}
+              <div class="col-xs-12 col-md-3 openbadge" data-id="{{badge.attributes.id}}" data-serialization="{{badge.serializedAttributes|e}}">
+                <div class="col-xs-12">
+                  <img src="{{ badge.attributes.imageUrl }}" class="col-xs-12">
+
+                  <div class="clearfix"></div>
+
+                  <h4>{{ badge.attributes.body.badge.name|e }}</h4>
+                  <h5>{{ badge.attributes.body.badge.issuer.name|e }}</h5>
+
+                  <a href="javascript:void(0)" class="expand">Toggle more information</a>
+                </div>
+
+                <div class="col-xs-12 expander" data-id="{{badge.attributes.id}}">
+                  <textarea name='stories[{{ loop.index }}]["story"]' tabindex='1' class='story' placeholder='Some information about this badge...'>{{ badge.attributes._userStory|e }}</textarea>
+                  <input type="hidden" name='stories[{{ loop.index }}]["id"]' value="{{ badge.attributes.id }}">
+                  {% include 'badge-data-portfolio.html' %}
+                </div>
+              </div>
+              {% if (loop.index) % 4 == 0 %}
+                </div>
+              {% endif %}
+            {% endfor %}
+            <div class='save actions col-xs-12'>
+              <input tabindex=1 class='btn btn-primary btn-large save' type='submit' value='Save this page'>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
 
 {% endblock %}
 {% block scripts %}
@@ -36,8 +91,19 @@
     });
     $('input.save').on('click', function(e){
       $('form.portfolio')[0].submit();
-    })
+    });
+    $(function() {
+      $('.expand').click(function(e) {
+        e.preventDefault();
+        var badgeId = $(this).closest('.openbadge').data('id'),
+          dropdown = $('.expander[data-id="' + badgeId + '"]').is(':hidden');
+        $('.expander').slideUp().promise().done(function(){
+          if (dropdown) {
+            $('.expander[data-id="' + badgeId + '"]').slideDown();
+          }
+        });
+      });
+    });
   </script>
-</form>
 
 {% endblock %}

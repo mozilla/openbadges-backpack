@@ -8,7 +8,6 @@ const bakery = require('openbadges-bakery');
 
 const logger = require('../lib/logger');
 const configuration = require('../lib/configuration');
-const browserid = require('../lib/browserid');
 const awardBadge = require('../lib/award');
 const analyzeAssertion = require('../lib/analyze-assertion');
 const normalizeAssertion = require('../lib/normalize-assertion');
@@ -16,18 +15,30 @@ const Badge = require('../models/badge');
 const Group = require('../models/group');
 const User = require('../models/user');
 
+
+/**
+ * Render welcome page
+ */
+exports.welcome = function welcome(request, response) {
+  response.render('welcome.html');
+}
+
+
 /**
  * Render the login page.
  */
 
 exports.login = function login(request, response) {
-  if (request.user)
+  if (request.user) {
     return response.redirect(303, '/');
+  }
   // request.flash returns an array. Pass on the whole thing to the view and
   // decide there if we want to display all of them or just the first one.
   response.render('login.html', {
     error: request.flash('error'),
-    csrfToken: request.session._csrf
+    success: request.flash('success'),
+    info: request.flash('info'),
+    csrfToken: request.csrfToken()
   });
 };
 
@@ -41,42 +52,61 @@ exports.login = function login(request, response) {
  */
 
 exports.authenticate = function authenticate(req, res) {
-  function formatResponse(to, apiError, humanReadableError) {
-    const preferJsonOverHtml = req.accepts('html, json') === 'json';
-    if (preferJsonOverHtml) {
-      if (apiError)
-        return res.send(400, {status: 'error', reason: apiError});
-      return res.send(200, {status: 'ok', email: req.session.emails[0]});
-    }
-    if (humanReadableError)
-      req.flash('error', humanReadableError);
-    return res.redirect(303, to);
-  }
+  // function formatResponse(to, apiError, humanReadableError) {
+  //   const preferJsonOverHtml = req.accepts('html, json') === 'json';
+  //   if (preferJsonOverHtml) {
+  //     if (apiError) {
+  //       return res.send(400, {status: 'error', reason: apiError});
+  //     }
+  //     return res.send(200, {status: 'ok', email: req.session.emails[0]});
+  //   }
+  //   if (humanReadableError)
+  //     req.flash('error', humanReadableError);
+  //   return res.redirect(303, to);
+  // }
 
-  const assertion = req.body && req.body.assertion;
-  const verifierUrl = browserid.getVerifierUrl(configuration);
-  const audience = browserid.getAudience(req);
+  // const assertion = req.body && req.body.assertion;
+  // const verifierUrl = browserid.getVerifierUrl(configuration);
+  // const audience = browserid.getAudience(req);
 
-  if (!assertion)
-    return formatResponse('/backpack/login', "assertion expected");
+  // if (!assertion) {
+  //   return formatResponse('/backpack/login', "assertion expected");
+  // }
 
-  browserid.verify({
-    url: verifierUrl,
-    assertion: assertion,
-    audience: audience,
-  }, function (err, email) {
-    if (err) {
-      logger.error('Failed browserID verification: ');
-      logger.debug('Code: ' + err.code + "; Extra: " + err.extra);
-      return formatResponse('back', "browserID verification failed: " + err.message,
-                            "Could not verify with browserID!");
-    }
+  // browserid.verify({
+  //   url: verifierUrl,
+  //   assertion: assertion,
+  //   audience: audience,
+  // }, function (err, email) {
+  //   if (err) {
+  //     logger.error('Failed browserID verification: ');
+  //     logger.debug('Code: ' + err.code + "; Extra: " + err.extra);
+  //     return formatResponse('back', "browserID verification failed: " + err.message,
+  //                           "Could not verify with browserID!");
+  //   }
 
-    req.session.emails = [email];
-    return formatResponse('/');
-  });
+  //   req.session.emails = [email];
+  //   return formatResponse('/');
+  // });
+
+  return res.send(400, {status: 'error', reason: 'Persona has been decommissioned'});
 };
 
+/**
+ * Render the signup page.
+ */
+
+exports.signup = function signup(request, response) {
+  if (request.user) {
+    return response.redirect(303, '/');
+  }
+  // request.flash returns an array. Pass on the whole thing to the view and
+  // decide there if we want to display all of them or just the first one.
+  response.render('signup.html', {
+    error: request.flash('error'),
+    csrfToken: request.csrfToken()
+  });
+};
 
 /**
  * Wipe the user's session and send back to the login page.
@@ -84,9 +114,9 @@ exports.authenticate = function authenticate(req, res) {
  * @return {HTTP 303} redirect user to login page
  */
 
-exports.signout = function signout(request, response) {
-  request.session = {};
-  response.redirect(303, '/backpack/login');
+exports.signout = function signout(req, res) {
+  req.session = null;
+  res.redirect(303, '/backpack/login');
 };
 
 /**
@@ -133,6 +163,7 @@ function badgePage (request, response, badges, template) {
   var success = request.flash('success');
 
   badges.forEach(function (badge) {
+    if (badge.recent) return;
     var body = badge.get('body');
     var origin = body.badge.issuer.origin;
     var criteria = body.badge.criteria;
@@ -157,7 +188,7 @@ function badgePage (request, response, badges, template) {
 exports.recentBadges = function recent (request, response, next) {
   var user = request.user;
   if (!user)
-    return response.redirect(303, '/backpack/login');
+    return response.redirect(303, '/backpack/welcome');
 
   function startResponse () {
     return user.getLatestBadges(function(err, badges) {
@@ -344,10 +375,10 @@ exports.addBadge = function addBadge(request, response) {
   var error = request.flash('error');
   var success = request.flash('success');
 
-  response.render('addBadge.html', {
+  response.render('upload.html', {
     error: error,
     success: success,
-    csrfToken: request.session._csrf
+    csrfToken: request.csrfToken()
   });
 }
 
@@ -368,7 +399,7 @@ exports.userBadgeUpload = function userBadgeUpload(req, res) {
     if (err) {
       logger.warn('There was an error uploading a badge');
       logger.debug(err);
-      req.flash('error', err.message);
+      req.flash('error', 'There was an error uploading a badge');
       url = '/backpack/add'
     }
     // We use store errors in res._error so we can check them in our

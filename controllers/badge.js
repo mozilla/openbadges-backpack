@@ -34,9 +34,9 @@ exports.findById = function findById(req, res, next, id) {
 
 exports.findByUrl = function findByUrl(req, res, next, url) {
   Badge.findByUrl(url, function (err, badge) {
-    if (!badge)
-      return res.send(404, respond('missing', 'could not find badge'));
-
+    if (!badge) {
+      return res.send(404, respond('missing', 'could not find badge'))
+    }
     req.badge = badge;
     return next();
   });
@@ -67,7 +67,7 @@ exports.image = function image(req, res, next) {
 
   image.bakeAndSave(function (err, bakedImage) {
     if (err) return next(err)
-    return res.send(200, bakedImage.toBuffer())
+    return res.send(200, bakedImage.toBuffer());
   })
 }
 

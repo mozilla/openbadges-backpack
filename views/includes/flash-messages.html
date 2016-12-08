@@ -1,0 +1,37 @@
+<script type="text/javascript" data-context="flash-messages">
+  $(function(){
+    {% if error.length %}
+      {% for msg in error %}
+        var d1 = 100 * parseInt({{ loop.index }});
+        setTimeout(function() {
+          $.bootstrapGrowl("{{ msg }}", {
+            type: 'danger',
+            delay: 99999999
+          });
+        }, d1); 
+      {% endfor %}
+    {% endif %}
+    {% if success.length %}
+      {% for msg in success %}
+        var d2 = 100 * parseInt({{ loop.index }});
+        setTimeout(function() {
+          $.bootstrapGrowl("{{ msg }}", {
+            type: 'success',
+            delay: 99999999
+          });
+        }, d2); 
+      {% endfor %}
+    {% endif %}
+    {% if info.length %}
+      {% for msg in info %}
+        var d3 = 100 * parseInt({{ loop.index }});
+        setTimeout(function() {
+          $.bootstrapGrowl("{{ msg }}", {
+            type: 'info',
+            delay: 99999999
+          });
+        }, d3); 
+      {% endfor %}
+    {% endif %}
+  });
+</script>

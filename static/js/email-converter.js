@@ -25,33 +25,28 @@
     }
   }
 
-  function showError (msg) {
-    $userid.val(':(')
-    clearTimeout($error.data('timer'))
-    $error.data('timer', setTimeout(function () { $error.slideUp() }, 3000))
-    $error.stop().html(msg).slideDown()
-  }
-  
-  function showSuccess (msg) {
-    clearTimeout($success.data('timer'))
-    $success.data('timer', setTimeout(function () { $success.slideUp() }, 5000))
-    $success.stop().html(msg).slideDown()
+  function showMessage (msg, type) {
+    $.bootstrapGrowl(msg, {
+      type: (type == 'success' ? 'success' : 'danger'),
+      delay: 99999999
+    });
   }
 
   function successHandler (data, status) {
     $userid.val(data.userId)
-    showSuccess('<strong>Success!</strong> The email address <em>' + data.email + '</em> maps to user id <strong>'+ data.userId + '</strong>');
+    showMessage('<strong>Success!</strong> The email address <em>' + data.email + '</em> maps to user id <strong>'+ data.userId + '</strong>', 'success');
   }
   
   function missingHandler (email) {
+    $userid.val(':(');
     var msg = '<strong>Bummer,</strong> we could not find a user by the email <em>' + email + '</em>'    
-    return function () { showError(msg) }
+    return function () { showMessage(msg, 'error') }
   }
   
   function query () {
     var email = $email.val()
     if (!email.match(emailre)) {
-      showError('<strong>Hey,</strong> that does not look like a real email address to me.');
+      showMessage('<strong>Hey,</strong> that does not look like a real email address to me.', 'error');
       return;
     }
     
@@ -61,7 +56,7 @@
       url: window.location,
       data: { email: email },
       success: successHandler,
-      statusCode: { 404: missingHandler(email) }
+      error: missingHandler
     })
   }
 

@@ -1,0 +1,57 @@
+{% if user and not hideNav %}
+<nav id="mainNav" class="navbar navbar-application navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <a href="/"><img src="/images/backpack-logo.svg" class="menu-logo" /></a>
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span> Menu <i class="fa fa-bars"></i>
+            </button>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <a href="/"><img src="/images/backpack-logo.svg" class="app-logo" /></a>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a class="badge-icon {% if activeNav == 'badges' %} active{% endif %}" href="/">Badges</a>
+                </li>
+                <li>
+                    <a class="collection-icon {% if activeNav == 'collections' %} active{% endif %}" href="/backpack">Collections</a>
+                </li>
+                <!--<li>
+                    <a class="share-icon {% if activeNav == 'share' %} active{% endif %}" href="javascript:void(0)">Share</a>
+                </li>-->
+                 <li class="show-xs">
+                    <a class="gear-icon " href="/user/profile">User Profile</a>
+                </li>
+                 <li class="show-xs">
+                    <a class="gear-icon " href="/backpack/settings">Backpack Settings</a>
+                </li>
+                 <li class="show-xs">
+                    <a class="gear-icon " href="/backpack/signout">Signout</a>
+                </li>
+                <li class="dropdown hidden-xs">
+                    <a class="icon gear-icon dropdown-toggle" href="#" data-toggle="dropdown">
+                        <span><b class="caret"></b></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/user/profile">User Profile</a></li>
+                        <li><a href="/backpack/settings">Backpack Settings</a></li>
+                        <li><a href="/backpack/signout">Sign Out</a></li>
+                    </ul>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+</nav>
+{% elseif connectNav or shareNav %}
+<nav id="mainNav" class="navbar navbar-application navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <a href="/"><img src="/images/backpack-logo.svg" class="menu-logo" /></a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <a href="/"><img src="/images/backpack-logo.svg" class="app-logo" /></a>
+        </div>
+    </div>
+</nav>
+{% endif %}

@@ -102,11 +102,12 @@ exports.generateScript = function (req, res) {
 
 exports.frame = function (req, res) {
   res.header('Cache-Control', 'no-cache, must-revalidate');
+
   res.render('badge-accept.html', {
     layout: null,
     framed: true,
-    csrfToken: req.session._csrf,
-    email: req.session.emails && req.session.emails[0]
+    csrfToken: req.csrfToken(),
+    email: (req.user ? req.user.attributes.email : null)
   });
 };
 
@@ -129,8 +130,8 @@ exports.frameless = function (req, res) {
     layout: null,
     framed: false,
     assertions: JSON.stringify(assertions),
-    csrfToken: req.session._csrf,
-    email: req.session.emails && req.session.emails[0]
+    csrfToken: req.csrfToken(),
+    email: (req.user ? req.user.attributes.email : null)
   });
 };
 
@@ -157,7 +158,7 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
     redirect_to: '/backpack/login'
   });
 
-  const input = req.query.assertion || req.body.assertion || req.body.badge;
+  const input = req.query.assertion || req.body.assertion || req.body.badge || req.query.badge;
   const assertionIsSignature = validator.isSignedBadge(input);
   const assertionIsUrl = validUrl(input);
 
@@ -227,7 +228,7 @@ exports.issuerBadgeAddFromAssertion = function (req, res, next) {
           // error message
           const dupeRegex = /Duplicate entry/;
           if (dupeRegex.test(err)) {
-            return res.json(304, {
+            return res.status(304).json({
               badge: assertion,
               exists: true,
               message: "badge already exists"

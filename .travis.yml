@@ -5,6 +5,6 @@ env: DISABLE_PHANTOM_TESTS="see https://github.com/joyent/libuv/issues/826"
 before_script:
   - cp lib/environments/local-dist.js lib/environments/local.js
   - mysql -e 'create database openbadges;'
-  - mysql -e 'create database test_openbadges;'
+  - mysql -e 'create database openbadges_test;'
   - mysql -uroot -e "grant all on openbadges.* to 'badgemaker'@'localhost' identified by 'secret'"
-  - mysql -uroot -e "grant all on test_openbadges.* to 'badgemaker'@'localhost' identified by 'secret'"
+  - mysql -uroot -e "grant all on openbadges_test.* to 'badgemaker'@'localhost' identified by 'secret'"

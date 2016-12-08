@@ -1,0 +1,108 @@
+{% extends 'layout.html' %}
+{% set bodyClass = 'welcome' %}
+{% block body %}
+
+<nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" 
+        data-toggle="collapse" 
+        data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span> Menu <i class="fa fa-bars"></i>
+      </button>
+    </div>
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+          <a class="page-scroll" href="#about">About</a>
+        </li>
+        <li>
+          <a href="/backpack/login">Login</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<nav id="cd-vertical-nav">
+  <ul>
+    <li>
+      <a href="#top" data-number="1">
+        <span class="cd-dot"></span>
+        <span class="cd-label">Intro</span>
+      </a>
+    </li>
+    <li>
+      <a href="#about" data-number="2">
+        <span class="cd-dot"></span>
+        <span class="cd-label">About</span>
+      </a>
+    </li>
+    <li>
+      <a href="#developers" data-number="3">
+        <span class="cd-dot"></span>
+        <span class="cd-label">Services</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+<header id="top" class="cd-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="header-content">
+          <div class="header-content-inner">
+            <div class="logo">
+              <img src="/images/backpack-logo.svg" height="80px" />
+            </div>
+            <h1>Store and Share your Open Badges</h1>
+            <a href="/backpack/login" class="btn btn-outline btn-xl">Login</a>
+            <a href="/backpack/signup" class="btn learn-more">Sign up</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+<section id="about" class="download bg-primary text-center cd-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-12">
+        <img src="/images/backpack-logo-mono.png" alt="Logo" />
+        <h2 class="section-heading">What is the Backpack</h2>
+        <p>Open Badges communicate skills and achievements by providing a 
+          visual representation of your accomplishments packed with verifiable data and evidence. 
+          Open Badges enable you to take your learning with you, wherever you go, building a rich picture of your 
+          lifelong learning journey.</p>
+        <p>The Backpack lets you store the Open Badges you earn, and share them between platforms, anywhere on the web. 
+          It gives you complete control over your own achievements by allowing you to organise and display your badges 
+          in the places that matter to you.</p>
+        <p>It's simple to use, just <a href="/backpack/signup" aria-label="Sign up to the Backpack">setup a free account</a> 
+        and upload or push the badges you have earned in other platforms into it. </p>
+        <p>The Backpack is trusted worldwide, with over 1 million badges already stored.<br/>
+          Find out more at <a href="https://openbadges.org/" aria-label="Visit OpenBadges.org">openbadges.org</a> 
+        and join the <a href="https://twitter.com/OpenBadges" aria-label="Join the conversation on Twitter">conversation</a>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="developers" class="developers cd-section">
+  <div class="row double-pane">
+    <div class="col-sm-6 img-part" style="background: #000000 url('/images/collaborate.jpg') no-repeat top right; background-position: center center; background-size: cover;"></div>
+    <div class="col-sm-12 text-side">
+      <h2>Open Badge Services</h2>
+      <p>The Open Badges standard is growing fast thanks to the open values and
+        trust that Mozilla built in, the hard work and innovation of developers, 
+        and the badge platforms around the world that have come together and connected.</p>
+      <p>The Backpack supports this standard by providing a safe independent 
+        locker, sitting in the background, giving individuals the confidence 
+        that their badges can always be accessed.</p>
+      <p>The Backpack will also help earners connect out to your platforms and 
+        services, where they can discover, earn and share their badges.<br/>
+       Find out more at <a href="https://openbadges.org/" aria-label="Visit OpenBadges.org">openbadges.org</a> 
+       and join the <a href="https://twitter.com/OpenBadges" aria-label="Join the conversation on Twitter">conversation</a>.</p>
+      <a href="https://github.com/mozilla/openbadges-backpack/blob/backpack-ng/README.md" class="btn btn-outline btn-md">Get Involved</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

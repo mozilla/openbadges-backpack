@@ -14,6 +14,7 @@
     resultSection.empty().append(header1, badgeData, header2, link, hint);
     resultSection.animate({opacity: 1.0});
   }
+
   var process_reason = function(reason) {
     var html = '';
     if (reason && typeof reason === "object") {
@@ -45,9 +46,10 @@
     resultSection.animate({opacity: 1.0});
   }
   
-  $('#submit').ajaxStart(function(){
-    var self = $(this);
-    self.fadeOut(200),
+  $(document).ajaxStart(function(){
+    var self = $('#submit');
+    self.fadeOut(200);
+    self.val("test");
     self.queue(function(){
       self.removeClass('primary')
           .addClass('disabled')
@@ -58,11 +60,11 @@
     })
   });
   
-  $('#submit').ajaxComplete(function(){
-    var self = $(this);
-    self.fadeOut(200)
+  $(document).ajaxComplete(function(){
+    var self = $('#submit');
+    self.fadeOut(200);
     self.queue(function(){
-      self.val('Build this badge')
+      self.val('Build')
           .attr('disabled', false)
           .addClass('primary')
           .removeClass('disabled')
@@ -85,10 +87,17 @@
       url: badgeURL,
       dataType: 'json',
       error: function(jqXHR, status, error){
-        var data = jQuery.parseJSON(jqXHR.responseText);
-        resultSection.queue('fx', function(next){
-          showErrors(data); next();
-        });
+        if ((jqXHR.status == 200) && 
+              (jqXHR.getResponseHeader('Content-Type') == 'image/png')) {
+          resultSection.queue('fx', function(next){
+            showBadge(badgeURL, assertionURL); next();
+          });
+        } else {
+          var data = jQuery.parseJSON(jqXHR.responseText);
+          resultSection.queue('fx', function(next){
+            showErrors(data); next();
+          });
+        }
       },
       success: function(data, status) {
         if (data.status === 'success') {

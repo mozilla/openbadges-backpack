@@ -1,5 +1,15 @@
 !!function setup () {
 
+if ($('head').data('precompiled-templates') == 0) {
+  console.log('You can safely ignore the "Synchronous XMLHttpRequest" warning \
+    that follows this log message. The warning applies to development \
+    environments where the useCompiledTemplates is set to false. The builtin \
+    loaders that load from the filesystem and over HTTP are synchronous, \
+    which is not a performance problem because they are cached from the \
+    filesystem and you should   precompile your templates and never use \
+    HTTP in production.');
+}
+
 var CSRF = $("input[name='_csrf']").val();
 $.ajaxSetup({
   beforeSend: function (xhr, settings) {
@@ -11,7 +21,7 @@ $.ajaxSetup({
   }
 })
 if(!nunjucks.env) {
-    nunjucks.env = new nunjucks.Environment(new nunjucks.HttpLoader('/views'));
+    nunjucks.env = new nunjucks.Environment(new nunjucks.WebLoader('/views'));
 }
 if (!nunjucks.env.globals)
   nunjucks.env.globals = {};
@@ -58,7 +68,7 @@ var errHandler = function (model, xhr) {
  * Nunjucks template helper
  */
 var template = function template(name, data) {
-    return $(nunjucks.env.render(name, $.extend(data, nunjucks.env.globals)));
+  return $(nunjucks.env.render(name, $.extend(data, nunjucks.env.globals)));
 }
 
 // Model Definitions
@@ -453,6 +463,7 @@ Badge.View = Backbone.View.extend({
     var isNew = $groupEl.hasClass('isNew')
 
     $groupEl.removeClass('isNew');
+    $groupEl.find('.icon.share').removeClass('hide');
 
     function doIt () {
       $el.sync(

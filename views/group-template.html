@@ -1,7 +1,9 @@
 <div class='group {% if not attributes.id %}isNew{% endif %}'>
   <input class='groupName' type='text' value='{{name|e}}'>
   <span class='icon delete'>&times;</span>
-  <span class='icon share' title='share this group'>5</span>
+  <span class='icon share hide' title='share this group'>
+    <img src="/images/social-share.svg" alt="Social share icon" />
+  </span>
   
   {% if not attributes.id %}
     <hgroup class="instructions">
@@ -11,9 +13,9 @@
   {% endif %}
 
   <span class='public'>
-    <label>
-      <input type='checkbox' class='js-privacy' {% if attributes.public %}checked{% endif %}>
-      <span>public</span>
-    </label>
+      <label>
+          <input type='checkbox' class='js-privacy' {% if group.attributes.public %}checked{% endif %}>
+          <span>public</span>
+      </label>
   </span>
 </div>

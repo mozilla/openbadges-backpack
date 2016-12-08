@@ -1,17 +1,32 @@
 {% extends 'layout.html' %}
 {% block body %}
-<div id='converter'>
-  <div class="alert alert-error"></div>
-  <div class="alert alert-success"></div>
 
-  <div class='input'>
-    <input tabindex=1 class='email' type='email' placeholder='something@example.com'>
-    <span class='arrow'>&rarr;</span>
-    <input tabindex=3 class='userid disabled' placeholder="12345">
-  </div>
-  <div class='submit'>
-    <input tabindex=2 type="submit" class="btn btn-primary btn-large" value="Let's do this">
-  </div>
+<div class="pushdown">
+	<section class="page">
+		<div class="container">
+			<div class="row">
+				<div class="col-sm-12">
+					<div class="row badge-header">
+						<div class="col-xs-12 col-sm-12">
+							<h1 class="section-heading">User ID Lookup</h1>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-12 col-lg-6">
+					<div id='converter'>
+						<div class='input form-group converter'>
+							<input tabindex=1 class='email form-control' type='email' placeholder='something@example.com'>
+							<span class='arrow'>&darr;</span>
+							<input tabindex=3 class='userid disabled form-control' placeholder="12345">
+						</div>
+						<div class='submit form-group'>
+							<input tabindex=2 type="submit" class="btn btn-primary btn-large" value="Let's do this">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
 </div>
 {% endblock %}
 {% block scripts %}

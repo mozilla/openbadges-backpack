@@ -8,96 +8,93 @@
   <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 </form>
 
-{% if not badges.length %}
-  {% include 'no-badges.html' %}
-{% else %}
-<div class="row" style="position: relative;">
+<div class="pushdown">
+    {% if not badges.length %}
+      {% include 'no-badges.html' %}
+    {% else %}
 
-  <div class="span4">
-    <div class="row">
-      <div class="sticky span4">
-        <hgroup class="separator">
-          <h2>My Collections</h2>
-          Organize badges the way you want
-        </hgroup>
-        <div id="groups" class="scroll span4">
-          {% for group in groups %}
-          <div class='group' data-id="{{group.attributes.id}}" data-url="{{group.attributes.url}}">
-            <input class='groupName' type='text' value='{{group.attributes.name|e}}' style='display: block'>
-            <span class='icon delete'>&times;</span>
-            <span class='icon share' {% if not group.attributes.badgeObjects %}style='display: none'{% endif %} title='Share this group'>5</span>
-            <span class='public'>
-              <label>
-                <input type='checkbox' class='js-privacy' {% if group.attributes.public %}checked{% endif %}>
-                <span>public</span>
-              </label>
-            </span>
-
-            {% for badge in group.attributes.badgeObjects %}
-            <span draggable="true" class="openbadge" data-id="{{badge.attributes.id}}" data-serialization="{{badge.serializedAttributes|e}}">
-              <img src="{{ badge.attributes.imageUrl }}" width="64px"/>
-            </span>
-            {% endfor %}
-          </div>
-          {% endfor %}
-
-          <div class='group isNew'>
-            <input class='groupName' type='text' value='New Collection'>
-            <span class='icon delete'>&times;</span>
-            <span class='icon share' title='share this group'>5</span>
-            <hgroup class="instructions">
-              <h3>Drag a badge here</h3>
-              to create a Collection.
-            </hgroup>
-            <span class='public'>
-              <label>
-                <input type='checkbox' class='js-privacy'>
-                <span>public</span>
-              </label>
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="span8 badge-area">
-    <div class="row">
-      <ul id="badges" class="js-badges badge-list small-cards">
-        {% for badge in badges %}
-          <li class="span3 openbadge-container">
-            <div class="openbadge" data-id="{{badge.attributes.id}}" data-serialization="{{badge.serializedAttributes|e}}">
-              <img src="{{ badge.attributes.imageUrl }}" width="64">
-              <p class="title" title="{{ badge.attributes.body.badge.name|e }}">{{ badge.attributes.body.badge.name|e }}</p>
-              <p class="issuer">Issuer: {{ badge.attributes.body.badge.issuer.name|e }}</p>
+        <section id="collections" class="collections">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6 col-sm-12">
+                        <h1>My Collections</h1>
+                        <span class="hidden-xs hidden-sm">Organise your badges into Collections</span>
+                        <span class="hidden visible-xs visible-sm">You cannot currently add badges to collections on mobile, but you can still share them.</span>
+                        <div id="groups" class="scroll span4">
+                            {% for group in groups %}
+                                <div class='group' data-id="{{group.attributes.id}}" data-url="{{group.attributes.url}}">
+                                    <input class='groupName' type='text' value='{{group.attributes.name|e}}' style='display: block'>
+                                    <span class='icon delete'>&times;</span>
+                                    <span class='icon share' {% if not group.attributes.badgeObjects %}style='display: none'{% endif %} title='Share this group'>
+                                        <img src="/images/social-share.svg" alt="Social share icon" />
+                                    </span>
+                                    <span class='public'>
+                                        <label>
+                                            <input type='checkbox' class='js-privacy' {% if group.attributes.public %}checked{% endif %}>
+                                            <span>public</span>
+                                        </label>
+                                    </span>
+                                    {% for badge in group.attributes.badgeObjects %}
+                                        <span draggable="true" class="openbadge" data-id="{{badge.attributes.id}}" data-serialization="{{badge.serializedAttributes|e}}">
+                                            <img src="{{ badge.attributes.imageUrl }}" width="64px"/>
+                                        </span>
+                                    {% endfor %}
+                                </div>
+                            {% endfor %}
+                            <div class="group isNew hidden-xs hidden-sm">
+                                <input class="groupName" type="text" value="New Collection">
+                                <span class="icon delete">×</span>
+                                <span class='icon share hide' title='share this group'>
+                                  <img src="/images/social-share.svg" alt="Social share icon" />
+                                </span>
+                                <hgroup class="instructions">
+                                    <h3>Drag a badge here</h3> to create a Collection.
+                                </hgroup>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 hidden-xs hidden-sm">
+                        <section id="badges" class="badges">
+                            <div>
+                                <div class="row">
+                                    <div class="col-sm-12 badge-area">
+                                        <div class="row badge-header">
+                                            <div class="col-xs-12">
+                                                <h2 class="section-heading">My Badges</h2>
+                                            </div>
+                                        </div>
+                                        <ul id="badges" class="js-badges small-cards">
+                                            {% for badge in badges %}
+                                                {% if (loop.index - 1) % 2 == 0 %}
+                                                    <li class="col-xs-12 badge-list">
+                                                {% endif %}
+                                                <div class="col-xs-6 openbadge-container">
+                                                    <div class="openbadge" data-id="{{badge.attributes.id}}" data-serialization="{{badge.serializedAttributes|e}}">
+                                                        <img src="{{ badge.attributes.imageUrl }}" />
+                                                        <h4 aria-label="{{ badge.attributes.body.badge.name|e }}">{{ badge.attributes.body.badge.name|e }}</h4>
+                                                        <h5>{{ badge.attributes.body.badge.issuer.name|e }}</h5>
+                                                    </div>
+                                                </div>
+                                                {% if loop.index % 2 == 0 %}
+                                                    </li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
             </div>
-          </li>
-        {% endfor %}
-      </ul>
-    </div>
-  </div>
-
+        </section>
+    {% endif %}
 </div>
-{% endif %}
-
 {% endblock %}
-{% block scripts %}
 
-<!-- third party -->
-{% if settings.useCompiledTemplates %}
-  <script type="text/javascript" src="/js/nunjucks-min.js"></script>
-  <script type="text/javascript" src="/js/nunjucks-templates.js"></script>
-{% else %}
-  <script type="text/javascript" src="/js/nunjucks-dev.js"></script>
-{% endif %}
+{% block scripts %}
 <script type="text/javascript" src="/js/underscore.js"></script>
 <script type="text/javascript" src="/js/backbone.js"></script>
-<script type="text/javascript" src="/vendor/bootstrap/js/bootstrap-alert.js"></script>
-<script type="text/javascript" src="/vendor/bootstrap/js/bootstrap-tooltip.js"></script>
-<script type="text/javascript" src="/vendor/bootstrap/js/bootstrap-popover.js"></script>
-
-<!-- my libraries -->
 <script type="text/javascript" src="/js/jquery.sync.js"></script>
 <script type="text/javascript" src="/js/backpack.js"></script>
-
 {% endblock %}

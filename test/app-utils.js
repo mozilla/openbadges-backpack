@@ -69,8 +69,8 @@ AppTestHarness.prototype = {
 exports.prepareApp = function prepareApp(cb) {
   test("preparing database and app", function(t) {
     testUtils.prepareDatabase(function () {
-      app.listen(0, function() {
-        var a = new AppTestHarness(t, app.address().port);
+      var server = app.listen(0, function() {
+        var a = new AppTestHarness(t, server.address().port);
         cb(a);
       });
     });

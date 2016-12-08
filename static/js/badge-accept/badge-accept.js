@@ -1,7 +1,7 @@
 
 jQuery.extend({
-  meta: function(name, value) {
-    return $("meta[http-equiv='" + name + "']").attr("content", value);
+  meta: function(name) {
+    return $("meta[http-equiv='" + name + "']").attr("content");
   }
 });
 
@@ -69,6 +69,9 @@ var Session = function Session(spec) {
         Session.trigger('login-started');
         startLogin(login);
       }
+    },
+    loggedIn: function() {
+      Session.trigger("login-complete");
     }
   };
 
@@ -167,8 +170,10 @@ var Badge = function Badge(assertion, spec) {
     this.result = function result() {
       if (this.inState('issued', 'complete'))
 	      return this.assertion;
-      else if (this.inState('failed'))
+      else if (this.inState('failed') && this.error)
 	      return { assertion: this.error.assertion, reason: this.error.reason };
+      else if (this.inState('failed'))
+        return this.assertion;
       else
 	      throw new Error("Can't return result for state " + this.state);
     };

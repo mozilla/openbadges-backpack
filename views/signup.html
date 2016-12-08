@@ -1,0 +1,43 @@
+{% extends 'layout.html' %}
+{% set bodyClass = 'signup' %}
+{% block body %}
+
+<section id="signup" class="signup cd-section">
+  <div class="container">
+    <div class="row double-pane">
+      <div class="col-sm-4 img-part">
+        <div class="welcome-message">
+          <h2>Sign up</h2>
+        </div>
+        <div class="backpack-link">
+          <img src="/images/backpack-logo.png" height="60px" />
+          <a href="http://backpack.openbadges.org" target="_blank">backpack.openbadges.org</a>
+        </div>
+      </div>
+      <div class="col-sm-12 signup-part">
+        <h3>Create a Backpack account</h3>
+        <form action="/backpack/signup" method="post">
+          <input name="_csrf" type="hidden" value="{{ csrfToken }}"></input>
+          <div class="group at">
+            <input type="text" name="email" required>
+            <span class="highlight"></span>
+            <span class="bar"></span>
+            <label>Email</label>
+          </div>
+          <div class="group lock">
+            <input type="password" name="password" required>
+            <span class="highlight"></span>
+            <span class="bar"></span>
+            <label>Password</label>
+          </div>
+          <input type="submit" value="signup" class="btn">
+          <div class="links">
+            <a href="/backpack/login" class="go-to-link">Go to login page</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

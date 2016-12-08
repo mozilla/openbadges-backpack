@@ -3,6 +3,7 @@
   width: 100%;
   text-align: center;
   line-height: 30px;
+  color: #777;
 }
 .btn.edit {
   float: right;
@@ -14,6 +15,7 @@
   text-shadow: 2px 2px 4px rgba(0, 200, 160, 0.2);
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
   line-height: 30px;
+  padding: 0 60px 20px 0;
 }
 
 .socialshare:focus {
@@ -23,7 +25,10 @@
 .socialshare span.msg {
   cursor: pointer;
   display: table-cell;
-  border-bottom: 1px dotted #00A5DA;
+  transition: color 250ms ease;
+  &:hover {
+    color: #55C2E2;
+  }
 }
 
 .social-medium {
@@ -66,5 +71,36 @@
 .fb_iframe_widget {
   span {
     display: block
+  }
+}
+
+.btn-primary {
+  background-color: #1a2c39;
+  border-color: #1a2c39;
+  font-size: 12px;
+}
+
+@media only screen and (max-width: 991px) {
+  .socialshare {
+    float: none !important;
+    padding: 0;
+    width: 100%;
+    display: inline-block;
+
+    span.msg {
+      display: inline-block;
+    }
+
+    .social-sites {
+      display: none;
+    }
+  }
+  a.edit {
+    display: inline-block;
+    float: none !important;
+    margin-top: 10px;
+  }
+  .shareMessage {
+    margin: 10px 0;
   }
 }

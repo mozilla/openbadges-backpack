@@ -1,0 +1,42 @@
+{% extends 'layout.html' %}
+
+{% set activeNav = 'badges' %}
+{% set selectedBadgeTab = 'upload' %}
+
+{% block body %}
+    {% include "includes/sub-nav.html" %}
+    <section id="badges" class="badges">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="row badge-header">
+                        <div class="col-xs-12 col-sm-3 ">
+                            <h1 class="section-heading">Upload a Badge</h1>
+                        </div>
+                        <div class="col-xs-12 col-sm-12">
+                            <p class="left">If you have badges you've been awarded, you can upload them manually</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </section>
+    <section id="upload" class="upload">
+        <div class="container">
+            <div class="row upload-file">
+                <div class="col-xs-12">
+                    <form action="/backpack/badge" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                        <fieldset>
+                            <div class="clearfix">
+                                <input id="userBadge" type="file" name="userBadge" accept="image/png,image/svg+xml">
+                            </div>
+                        </fieldset>
+                        <div class="clearfix">
+                            <input class="btn btn-primary btn-outline " type="submit" value="Upload">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

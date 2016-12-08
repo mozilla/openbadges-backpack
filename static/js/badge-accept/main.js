@@ -31,9 +31,42 @@ $(window).ready(function() {
 
   if (!Session.currentUser) {
     $(".logged-out").show();
-    $(".logged-out .js-browserid-link").click(function() {
-      Session.login();
-      return false;
+    $('#login').submit(function(e) {
+      e.preventDefault();
+      $form = $(this);
+      $.post($form.attr('action'), $form.serialize(), function(res, status, jqXHR) {
+        if (jqXHR.status == 200) {
+          if (res.email) {
+            Session.loggedIn();
+          }  else {
+            // show message
+            $('.msg.error').text(res.message).animate({
+              opacity: 1
+            }, 250).promise().done(function(){
+              setTimeout(function() {
+                $('.msg.error').animate({
+                  opacity: 0
+                }, 250).promise().done(function(){ 
+                  $('.msg.error').text('');
+                });
+              }, 2500);
+            });
+          }
+        } else {
+          // problem
+          $('.msg.error').text('There was a problem submitting your request, please try again').animate({
+            opacity: 1
+          }, 250).promise().done(function(){
+            setTimeout(function() {
+              $('.msg.error').animate({
+                opacity: 0
+              }, 250).promise().done(function(){ 
+                $('.msg.error').text('');
+              });
+            }, 2500);
+          });
+        }
+      });
     });
   } else {
     $(".logged-in").show();
@@ -157,9 +190,10 @@ function issue(assertions, cb){
       showError('#inaccessible-template', { error: error });
     }
     else if (error.reason !== 'DENIED') {
+      var assertion = badge.data ? badge.data.badge : badge.assertion;
       var templateData = {
         error: error,
-        assertion: badge.data.badge, // data.badge is really the assertion
+        assertion: assertion,
         user: Session.currentUser
       };
       if (error.reason === 'INVALID') {
@@ -169,8 +203,7 @@ function issue(assertions, cb){
         else {
           showError('#owner-mismatch-template', templateData);
         }
-      }
-      else if (error.reason === 'EXISTS') {
+      } else if (error.reason === 'EXISTS') {
 	      showError('#already-exists-template', templateData);
       }
     }

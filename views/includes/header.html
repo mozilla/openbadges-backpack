@@ -1,0 +1,36 @@
+{#
+<div class="navbar">
+  <div class="container">
+    <a class="navbar-header" href="/">
+      <img src="/images/logo.png" alt="Backpack logo" />
+    </a>
+    {% if user %}
+    <ul class="nav navbar-nav">
+      <li {% if activeNav == 'badges' %}class="active"{% endif %}>
+        <a href="/" class="icon badge-link"><span>Badges</span></a>
+      </li>
+      <li {% if activeNav == 'collections' %}class="active"{% endif %}>
+        <a href="/backpack" class="icon collection-link"><span>Collections</span></a>
+      </li>
+    </ul>
+    {% endif %}
+    <ul class="nav navbar-nav navbar-right">
+    {% if user %}
+      <li class="user navbar-text">{{user.attributes.email}}</li>
+      <li class="dropdown">
+        <a href="#" class="icon gear-link dropdown-toggle" data-toggle="dropdown">
+          <span><b class="caret"></b></span>
+        </a>
+        <ul class="dropdown-menu">
+          <li><a href="/user/profile">User Profile</a></li>
+          <li><a href="/backpack/settings">Backpack Settings</a></li>
+          <li><a href="/backpack/signout">Sign Out</a></li>
+        </ul>
+      </li>
+    {% elif bodyClass == 'login' %}
+
+    {% endif %}
+    </ul>
+  </div>
+</div>
+#}

@@ -9,8 +9,8 @@ var migrationDirFiles = require('fs').readdirSync(migrations.dir).sort();
 var validator = require('openbadges-validator');
 var normalizeAssertion = require('../lib/normalize-assertion');
 
-var argv = require('optimist').argv
-var specificMigrations = argv._
+var argv = require('optimist').argv;
+var specificMigrations = argv._;
 
 function up(options) {
   return function(callback) { migrations.up(options, callback); };
@@ -64,7 +64,7 @@ function findMigration(name) {
 function testMigration(name, getSeries) {
   if (argv.solo && specificMigrations) {
     if (specificMigrations.indexOf(name) == -1)
-      return console.error('skipping', name, '...')
+      return console.error('skipping', name, '...');
   }
 
   var migration = findMigration(name);
@@ -81,9 +81,10 @@ function testMigration(name, getSeries) {
        migration.id + " and back works", function(t) {
     series = series.concat(getSeries(t, migration.id, migration.previous));
     async.series(series, function(err) {
-      if (err) throw err;
-      mysql.client.destroy();
+      if (err)
+        throw err;
       t.end();
+      $.finish(test);
     });
   });
 }
@@ -181,12 +182,12 @@ testMigration("add-image-data-column", function(t, id, previousId) {
   return [
     up({destination: previousId}),
     sql("INSERT INTO `user` (id, email) VALUES (1,'foo@bar.org');"),
-    sql("INSERT INTO `badge` (id, user_id, image_path, body, body_hash) VALUES (1,1, '/_badges/image1.png','body','hsh1')"),
-    sql("INSERT INTO `badge` (id, user_id, image_path, body, body_hash) VALUES (2,1, '/_badges/image2.png','body','hsh2')"),
+    sql("INSERT INTO `badge` (id, user_id, image_path, body, body_hash) VALUES (1,1, '/_badges/image1.png','" + Buffer(image1).toString('base64') + "','hsh1')"),
+    sql("INSERT INTO `badge` (id, user_id, image_path, body, body_hash) VALUES (2,1, '/_badges/image2.png','" + Buffer(image2).toString('base64') + "','hsh2')"),
     up({count: 1}),
-    sql("SELECT image_data FROM badge ORDER BY `id` ASC", function(results) {
-      t.same(Buffer(results[0].image_data, 'base64'), image1);
-      t.same(Buffer(results[1].image_data, 'base64'), image2);
+    sql("SELECT body FROM badge ORDER BY `id` ASC", function(results) {
+      t.same(results[0].body.toString(), Buffer(image1).toString('base64'));
+      t.same(results[1].body.toString(), Buffer(image2).toString('base64'));
     }),
     down({count: 1}),
     sqlError("SELECT image_data FROM badge", t, "ERROR_BAD_FIELD_ERROR"),
@@ -201,14 +202,14 @@ testMigration("move-image-data", function(t, id, previousId) {
     sql("INSERT INTO `badge` (id, user_id, image_path, body, body_hash, image_data) VALUES (2,1, '/_badges/image2.png','body','hsh2', 'image2')"),
     up({count: 1}),
     sql("SELECT image_data, badge_hash FROM badge_image ORDER BY `id` ASC", function(results) {
-      t.same(results[0], {image_data: 'image1', badge_hash: 'hsh1'});
-      t.same(results[1], {image_data: 'image2', badge_hash: 'hsh2'});
+      t.same({image_data: results[0].image_data.toString(), badge_hash: results[0].badge_hash}, {image_data: 'image1', badge_hash: 'hsh1'});
+      t.same({image_data: results[1].image_data.toString(), badge_hash: results[1].badge_hash}, {image_data: 'image2', badge_hash: 'hsh2'});
     }),
     sqlError("SELECT image_data FROM badge", t, "ERROR_BAD_FIELD_ERROR"),
     down({count: 1}),
     sql("SELECT id, image_data FROM badge ORDER BY `id` ASC", function(results) {
-      t.same(results[0], {image_data: 'image1', id: 1});
-      t.same(results[1], {image_data: 'image2', id: 2});
+      t.same({image_data: results[0].image_data.toString(), id: 1}, {image_data: 'image1', id: 1});
+      t.same({image_data: results[1].image_data.toString(), id: 2}, {image_data: 'image2', id: 2});
     })
   ];
 
@@ -311,10 +312,55 @@ testMigration("add-baked-flag", function(t, id, previousId) {
     up({count: 1}),
     sql("SELECT `baked` FROM `badge_image`", function(results) {
       results.forEach(function (o) {
-        t.same(o.baked, 0, 'should be unbaked')
+        t.same(o.baked, 0, 'should be unbaked');
       })
     }),
     down({count: 1}),
     sqlError("SELECT `baked` FROM `badge_image`", t, "ERROR_BAD_FIELD_ERROR"),
+  ];
+});
+
+testMigration("rename-passwd-to-password", function(t, id, previousId) {
+  return [
+    up({destination: previousId}),
+    sql("INSERT INTO `user` (id, email, passwd) VALUES (1,'foo@bar.org', 'letmein');"),
+    up({count: 1}),
+    sql("SELECT password FROM user WHERE id=1", function(results) {
+      t.equal(results[0].password, 'letmein', "'passwd' should have been renamed");
+    }),
+    down({count: 1}),
+    sql("SELECT passwd FROM user WHERE id=1", function(results) {
+      t.equal(results[0].passwd, 'letmein', "'passwd' should have been reverted");
+    }),
+  ];
+});
+
+testMigration("add-password-reset-token-to-user", function(t, id, previousId) {
+  return [
+    up({destination: previousId}),
+    sql("INSERT INTO `user` (id, email, password) VALUES (1,'foo@bar.org', 'letmein');"),
+    up({count: 1}),
+    sql("SELECT reset_password_token, reset_password_expires FROM user WHERE id=1", function(results) {
+      t.equal(results[0].reset_password_token, null, "'reset_password_token' defaults to null");
+      t.equal(results[0].reset_password_expires, null, "'reset_password_expires' defaults to null");
+    }),
+    down({count: 1}),
+    sqlError("SELECT `reset_password_token` FROM `user` WHERE id=1", t, "ERROR_BAD_FIELD_ERROR"),
+    sqlError("SELECT `reset_password_expires` FROM `user` WHERE id=1", t, "ERROR_BAD_FIELD_ERROR"),
+  ];
+});
+
+testMigration("add-created-at-and-updated-at-columns-to-user", function(t, id, previousId) {
+  return [
+    up({destination: previousId}),
+    sql("INSERT INTO `user` (id, email, password) VALUES (1,'foo@bar.org', 'letmein');"),
+    up({count: 1}),
+    sql("SELECT created_at, updated_at FROM user WHERE id=1", function(results) {
+      t.equal(results[0].created_at, null, "'created_at' defaults to null");
+      t.equal(results[0].updated_at, null, "'updated_at' defaults to null");
+    }),
+    down({count: 1}),
+    sqlError("SELECT `created_at` FROM `user` WHERE id=1", t, "ERROR_BAD_FIELD_ERROR"),
+    sqlError("SELECT `updated_at` FROM `user` WHERE id=1", t, "ERROR_BAD_FIELD_ERROR"),
   ];
 });
