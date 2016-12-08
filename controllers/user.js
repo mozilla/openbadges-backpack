@@ -80,7 +80,7 @@ exports.migratePost = function migratePost(request, response) {
               to: request.body.email,
               from: 'no-reply@backpack.openbadges.org',
               subject: 'Mozilla Openbadges Backpack Migration Instructions',
-              text: 'You are receiving this because you (or someone else) have requested to migrate to the new Backpack account, from Persona (which is to be discontinued November 31st 2016).\n\n' +
+              text: 'You are receiving this because you (or someone else) have requested to migrate to the new Backpack account, from Persona (which is to be discontinued December 15th 2016).\n\n' +
                 'Please click on the following link, or paste this into your browser to complete the migration and set your new backpack account password:\n\n' +
                 siteUrl + '/migration/verify/' + token + '\n\n'
           };
