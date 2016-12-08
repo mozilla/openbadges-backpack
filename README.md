@@ -1,5 +1,6 @@
 # Open Badges Backpack-ng (Next Generation)
-[![Build Status](https://travis-ci.org/mozilla/openbadges-backpack.png?branch=backpack-ng)](https://travis-ci.org/mozilla/openbadges-backpack)
+[![Build Status](https://travis-ci.org/mozilla/openbadges-backpack.png?branch=master)](https://travis-ci.org/mozilla/openbadges-backpack)
+[![Dependencies](https://david-dm.org/mozilla/openbadges-backpack.svg)](https://david-dm.org/mozilla/openbadges-backpack)
 
 ## Welcome to the future of the Backpack
 
