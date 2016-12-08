@@ -1776,3 +1776,34 @@ a.logout.access {
         letter-spacing: 1px;
     }
 }
+
+.password-requirements {
+    font-weight: bold;
+    ul {
+        font-weight: normal;
+        padding-left: 0;
+        margin-bottom: 30px;
+        margin-top: 5px;
+        li {
+            color: #F38021;
+            i.fa-check-square-o {
+                display: none;
+            }
+            i.fa-square-o {
+                display: inline-block;
+                margin-right: 10px;
+            }
+            &.met {
+                color: #B1CF34;
+                i.fa-check-square-o {
+                    display: inline-block;
+                    margin-right: 10px;
+                }
+                i.fa-square-o {
+                    display: none;
+                }
+            }
+        }
+
+    }
+}
