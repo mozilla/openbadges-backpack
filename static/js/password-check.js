@@ -6,18 +6,22 @@ $(function() {
     },
     {
       'selector': 'req-2',
-      'rule': 'The password must contain at least one uppercase letter.'
+      'rule': 'The password must contain at least one lowercase letter.'
     },
     {
       'selector': 'req-3',
-      'rule': 'The password must contain at least one number.'
+      'rule': 'The password must contain at least one uppercase letter.'
     },
     {
       'selector': 'req-4',
-      'rule': 'The password must contain at least one special character.'
+      'rule': 'The password must contain at least one number.'
     },
     {
       'selector': 'req-5',
+      'rule': 'The password must contain at least one special character.'
+    },
+    {
+      'selector': 'req-6',
       'rule': 'The password may not contain sequences of three or more repeated characters.'
     },
   ];
