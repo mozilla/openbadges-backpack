@@ -31,16 +31,7 @@
             <span class="bar"></span>
             <label>Confirm</label>
           </div>
-          <div class="password-requirements">
-            Password requirements:
-            <ul>
-              <li class="req-1"><i class="fa fa-square-o"></i><i class="fa fa-check-square-o"></i>must be at least 10 characters long</li>
-              <li class="req-2"><i class="fa fa-square-o"></i><i class="fa fa-check-square-o"></i>must contain at least one uppercase letter</li>
-              <li class="req-3"><i class="fa fa-square-o"></i><i class="fa fa-check-square-o"></i>must contain at least one number</li>
-              <li class="req-4"><i class="fa fa-square-o"></i><i class="fa fa-check-square-o"></i>must contain at least one special character</li>
-              <li class="req-5 met"><i class="fa fa-square-o"></i><i class="fa fa-check-square-o"></i>may not contain sequences of three or more repeated characters</li>
-            </ul>
-          </div>
+          {% include "includes/password-requirements.html" %}
           <input type="submit" value="set new password" class="btn" disabled="true">
         </form>
       </div>
