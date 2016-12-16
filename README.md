@@ -1,6 +1,6 @@
 # Open Badges Backpack-ng (Next Generation)
 [![Build Status](https://travis-ci.org/mozilla/openbadges-backpack.png?branch=master)](https://travis-ci.org/mozilla/openbadges-backpack)
-<!---[![Dependencies](https://david-dm.org/mozilla/openbadges-backpack.svg)](https://david-dm.org/mozilla/openbadges-backpack)--->
+[![Dependencies](https://david-dm.org/mozilla/openbadges-backpack.svg)](https://david-dm.org/mozilla/openbadges-backpack)
 
 ## Welcome to the future of the Backpack
 
@@ -150,6 +150,11 @@ Currently, the heroku env var config looks like so...
 | OPENBADGES_PROTOCOL             | "https"                                           |
 | OPENBADGES_REMOTE_PORT          | "default"                                         |
 | OPENBADGES_VAR_PATH             | "var"                                             |
+| OPENBADGES_MAILER_SERVICE       | "mailgun"                                         |
+| OPENBADGES_MAILER_USER          | "mailUser"                                        |
+| OPENBADGES_MAILER_PASS          | "mailPa55word"                                    |
+
+* NOTE: The mailer supports this [list of well-known services](https://github.com/nodemailer/nodemailer-wellknown#supported-services)
 
 ---
 
