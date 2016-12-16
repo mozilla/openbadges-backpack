@@ -15,20 +15,7 @@
         </div>
       </div>
       <div class="col-sm-12 login-part">
-        <div class="migrate">
-          <p>The way you login to your Open Badges Backpack is changing.  
-          You need to take some simple steps to maintain access to your account by 15th December, 2016<br/> 
-            More information <a href="https://medium.com/openbadges/an-open-email-to-all-users-of-the-backpack-8536628e553d#.mxsjzarcw">here</a>.</p>
-          <h3>Not migrated from Persona?</h3>
-          <h4>Please sign in to update your account now.</h4>
-          <form id="persona-form" action="/auth/browserid" method="post" style="display:none;">
-            <input type="text" name="assertion" id="persona-form-assertion" type="hidden" value=""></input>
-            <input name="_csrf" type="hidden" value="{{ csrfToken }}"></input>
-          </form>
-          <img src="https://developer.mozilla.org/files/3969/plain_sign_in_blue.png" id="browserid"/>
-        </div>
-        <h3>Already updated your account or just signed up?</h3>
-        <h5>Please use the form below to login...</h5>
+        <h3>Login to your Backpack account</h3>
         <form action="/backpack/login" method="post">
           <input name="_csrf" type="hidden" value="{{ csrfToken }}"></input>
           <div class="group at">
