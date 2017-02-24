@@ -136,9 +136,9 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
   app.get('/share/:groupUrl', csrfProtection, share.show);
 
   // Legal pages
-  app.get('/privacy.html', function(req, res) { return res.render('privacy.html', {}); });
-  app.get('/tou.html', function(req, res) { return res.render('tou.html', {}); });
-  app.get('/vpat.html', function(req, res) { return res.render('vpat.html', {}); });
+  app.get('/privacy.html', function(req, res) { return res.render('privacy.html', {legalNav: true}); });
+  app.get('/tou.html', function(req, res) { return res.render('tou.html', {legalNav: true}); });
+  app.get('/vpat.html', function(req, res) { return res.render('vpat.html', {legalNav: true}); });
 
   // Backpack Connect request access
   app.get('/access', csrfProtection, backpackConnect.requestAccess());
