@@ -32,7 +32,7 @@
     "csurf": "^1.9.0",
     "db-migrate": "0.3.2",
     "errorhandler": "^1.4.3",
-    "express": "^5.0.0-alpha.2",
+    "express": "4.0.0",
     "express-enforces-ssl": "*",
     "express-session": "*",
     "habitat": "*",
