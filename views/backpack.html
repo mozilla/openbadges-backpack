@@ -2,6 +2,10 @@
 
 {% set activeNav = 'collections' %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="/css/jquery.mCustomScrollbar.css" media="all">
+{% endblock %}
+
 {% block body %}
 
 <form style="display: none" action=''>
@@ -16,7 +20,7 @@
         <section id="collections" class="collections">
             <div class="container">
                 <div class="row">
-                    <div class="col-md-6 col-sm-12">
+                    <div class="col-md-6 col-sm-12 scroll-pane">
                         <h1>My Collections</h1>
                         <span class="hidden-xs hidden-sm">Organise your badges into Collections</span>
                         <span class="hidden visible-xs visible-sm">You cannot currently add badges to collections on mobile, but you can still share them.</span>
@@ -53,7 +57,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 hidden-xs hidden-sm">
+                    <div class="col-md-6 hidden-xs hidden-sm scroll-pane">
                         <section id="badges" class="badges">
                             <div>
                                 <div class="row">
@@ -97,4 +101,17 @@
 <script type="text/javascript" src="/js/backbone.js"></script>
 <script type="text/javascript" src="/js/jquery.sync.js"></script>
 <script type="text/javascript" src="/js/backpack.js"></script>
+<script type="text/javascript" src="/js/jquery.mCustomScrollbar.js"></script>
+<script type="text/javascript">
+    (function($){
+        $(window).on("load",function(){
+            console.log("firing");
+            $(".scroll-pane").mCustomScrollbar({
+                theme: 'minimal-dark',
+                scrollInertia: 200,
+            });
+            $(".scroll-pane").animate({'opacity': 1}, 500);
+        });
+    })($);
+</script>
 {% endblock %}
