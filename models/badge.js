@@ -1,5 +1,6 @@
 var mysql = require('../lib/mysql');
 var regex = require('../lib/regex');
+var emailCaser = require('../lib/email-caser');
 var crypto = require('crypto');
 var Base = require('./mysql-base');
 const utils = require('../lib/utils');
@@ -51,7 +52,7 @@ Badge.confirmRecipient = function confirmRecipient(assertion, email) {
 
   // if it's an email address, do a straight comparison
   if (/@/.test(recipient))
-    return recipient === email;
+    return recipient.toLowerCase() === email.toLowerCase();
 
   // if it's not an email address, it must have an alg and dollar sign.
   if (!(recipient.match(/\w+(\d+)?\$.+/)))
@@ -60,13 +61,6 @@ Badge.confirmRecipient = function confirmRecipient(assertion, email) {
   const parts = recipient.split('$');
   const algorithm = parts[0];
   const expect = parts[1];
-  var hasher;
-  try {
-    hasher = crypto.createHash(algorithm);
-  } catch(e) {
-    // #TODO: should probably actually throw an error here.
-    return false;
-  }
 
   // if there are more than 2 parts, it's an algorithm with options
   // #TODO: support algorithms with options, throw instead of just
@@ -74,8 +68,25 @@ Badge.confirmRecipient = function confirmRecipient(assertion, email) {
   if (parts.length !== 2)
     return false;
 
-  const value = hasher.update(email + salt).digest('hex');
-  return value.toLowerCase() === expect.toLowerCase();
+  var potentialEmailVariations = emailCaser.variations(email);
+  var potentialHashedEmailVariations = [];
+
+  for (var i = potentialEmailVariations.length - 1; i >= 0; i--) {
+
+    // crypto objects are not re-usable, so we must do this on every iteration
+    var hasher;
+    try {
+      hasher = crypto.createHash(algorithm);
+    } catch(e) {
+      // #TODO: should probably actually throw an error here.
+      return false;
+    }
+
+    var hashedEmailVariation = hasher.update(potentialEmailVariations[i] + salt).digest('hex');
+    potentialHashedEmailVariations.push(hashedEmailVariation);
+  }
+
+  return potentialHashedEmailVariations.indexOf(expect.toLowerCase()) !== -1;
 };
 
 Badge.prototype.share = function share(callback) {

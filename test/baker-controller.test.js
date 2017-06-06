@@ -155,31 +155,5 @@ $.prepareDatabase({
     });
   });
 
-  test('valid assertion, awarding', function (t) {
-    const assertion = $.makeNewAssertion();
-    const badge = $.makeBadgeClass();
-    assertion.badge = $.makeUrl('/good-badge-image.json');
-    badge.image = $.makeUrl('/badge-image.png');
-    assertion.image = $.makeUrl('/badge-image.png');
-    $.mockHttp()
-      .get('/assertion').reply(200, assertion)
-      .get('/assertion').reply(200, assertion)
-      .get('/good-badge-image.json').reply(200, badge)
-      .get('/badge-image.png').reply(200, PNGDATA, {'content-type': 'image/png'})
-      .get('/badge-image.png').reply(200, PNGDATA, {'content-type': 'image/png'})
-    conmock({
-      handler: handler,
-      request: makeRequestObj('/assertion', $.EMAIL)
-    }, function (err, mock) {
-      t.same(mock.headers['Content-Type'], 'image/png');
-      t.same(mock.headers['x-badge-awarded'], $.EMAIL);
-      t.same(mock.status, 200);
-      bakery.extract(mock.body, function (err, data) {
-        t.same(JSON.parse(data), assertion);
-        t.end();
-      });
-    });
-  });
-
   $.finish(test);
 });

@@ -66,8 +66,10 @@ exports.baker = function (req, res) {
       const shouldAward = query.award && query.award !== 'false';
       awardOptions.recipient = query.award;
       awardOptions.imagedata = imageData;
-      if (shouldAward)
-        return awardBadge(awardOptions, callback)
+      // disabling the award functionality (for now) in bakery api as it allows 
+      // pushing a badge to any backpack, which should not be allowed
+      // if (shouldAward)
+      //   return awardBadge(awardOptions, callback)
       return callback(null, null);
     },
     function probablyDone(badge, callback) {
@@ -85,7 +87,7 @@ exports.baker = function (req, res) {
 
         if (badge) {
           logger.warn('badge awarded through baker: %s', url);
-          res.setHeader('x-badge-awarded', query.award);
+          // res.setHeader('x-badge-awarded', query.award);
         }
 
         res.send(imageData);
