@@ -73,22 +73,3 @@
 </section>
 
 {% endblock %}
-
-{% block scripts %}
-
-<script src="https://login.persona.org/include.js" type="text/javascript"></script>
-<script>
-  $("#browserid").click(function(){
-    navigator.id.get(function(assertion) {
-      console.log(assertion)
-      if (assertion) {
-        $("#persona-form-assertion").val(assertion);
-        $("#persona-form").submit();
-      } else {
-        location.reload();
-      }
-    });
-  });
-</script>
-
-{% endblock %}
