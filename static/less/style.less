@@ -1047,8 +1047,17 @@ section.collections {
     }
     .scroll-pane {
         height: 580px;
-        padding-right: 30px;
+        padding: 30px 50px 30px 30px;
         opacity: 0;
+        background: #f7f7f7;
+        border-radius: 8px;
+        width: 49%;
+        margin-bottom: 60px;
+        border: solid 1px #bdbdbd;
+
+        &:first-of-type {
+            margin-right: 2%;
+        }
     }
     section.badges {
         margin-top: 0;
@@ -1815,4 +1824,16 @@ a.logout.access {
         }
 
     }
+}
+
+.mCS-autoHide > .mCustomScrollBox > .mCSB_scrollTools, .mCS-autoHide > .mCustomScrollBox ~ .mCSB_scrollTools {
+    opacity: 1 !important;
+}
+
+.mCSB_outside + .mCS-minimal.mCSB_scrollTools_vertical, .mCSB_outside + .mCS-minimal-dark.mCSB_scrollTools_vertical {
+    margin: 12px 15px !important;
+}
+
+.mCS-minimal.mCSB_scrollTools .mCSB_draggerRail, .mCS-minimal-dark.mCSB_scrollTools .mCSB_draggerRail {
+    background-color: rgb(236, 236, 236) !important;
 }
