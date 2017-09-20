@@ -12,30 +12,149 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-xs-12 col-lg-6">
-                    <form action="/user/profile" method="post">
+                <div class="col-xs-12 col-lg-6 change-password">
+                    <legend>Change Password</legend>
+                    <form action="/user/profile/change-password" method="post">
                         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
                         <div class="form-group">
-                              <label>Password</label>
+                            <label>Password</label>
                             <input type="password" class="form-control" name="password" required>
-                            <span class="highlight"></span>
                             <span class="bar"></span>
-                          
                         </div>
                         <div class="form-group">
-                             <label>Confirm</label>
+                            <label>Confirm</label>
                             <input type="password" class="form-control" name="confirm" required>
-                            <span class="highlight"></span>
                             <span class="bar"></span>
-                           
                         </div>
+                        {% include "includes/password-requirements.html" %}
                         <div class="form-group">
-                            <input class="btn btn-primary btn-outline" type="submit" value="Save">
+                            <input class="btn btn-primary btn-outline password-check" type="submit" value="Change" disabled="true">
                         </div>
                     </form>
                 </div>
+                <div class="col-xs-12 col-lg-6">
+                    <legend>Associated Email Addresses</legend>
+                    <div>
+                        <table class="associated-emails">
+                            <thead>
+                                <tr>
+                                    <th>Email Address</th>
+                                    <th>Verified</th>
+                                    <th>Remove</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{{ user.attributes.email }} <span class="primary">Primary</span></td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                </tr>
+                                {% for n in [1,2] %}
+                                    {% if user.attributes['additional_email_' ~ n] %}
+                                        <tr>
+                                            <td>
+                                                {{ user.attributes['additional_email_' ~ n] }}
+
+                                                {% if not user.attributes['additional_email_' ~ n ~ '_is_verified'] %}
+                                                    <p class="warn">
+                                                        You have not yet verified ownership of this email address.  You can not receive badges meant for this email address, nor can you login with this email address, until you <a href="#" class="verify-email" data-toggle="modal" data-target="#verify-{{ n }}" aria-label="Verify now">verify ownership</a>. 
+                                                    </p>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if user.attributes['additional_email_' ~ n ~ '_is_verified'] %}
+                                                    <i class="fa fa-check verified"></i>
+                                                {% else %}
+                                                    <i class="fa fa-times not-verified"></i>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <form action="/user/profile/remove-additional-email" method="post">
+                                                    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                                                    <input type="hidden" name="additional_email_{{ n }}" value="1">
+                                                    <input class="btn btn-primary btn-outline" type="submit" value="Remove">
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        <div id="verify-{{ n }}" class="modal fade" role="dialog">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <button type="button" class="close" data-dismiss="modal"><img src="/images/cross.svg" alt="Close modal"></button>
+                                                        <h4 class="modal-title">Email Address Ownership Verification</h4>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p>You should have received an email with a code in it.  Paste the code in the field below and then click the 'VERIFY' button.</p>
+                                                        <form action="/user/profile/verify-email" method="post">
+                                                            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                                                            <input type="hidden" name="additional_email_{{ n }}" value="1">
+                                                            <div class="form-group">
+                                                                <label>Code</label>
+                                                                <input type="text" class="form-control" name="additional_email_{{ n }}_verification_code" required>
+                                                                <span class="bar"></span>
+                                                            </div>
+                                                            <input class="btn btn-primary btn-outline" type="submit" value="Verify">
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {% if not user.attributes.additional_email_1 or not user.attributes.additional_email_2 %}
+                        <legend>Associate an Email Address</legend>
+                        <div>
+                            <table class="associate-email">
+                                <tbody>
+                                    {% if not user.attributes.additional_email_1 %}
+                                        <tr>
+                                            <form action="/user/profile/add-additional-email" method="post">
+                                                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                                                <td>
+                                                    <div>
+                                                        <input type="text" class="form-control" name="additional_email_1" required>
+                                                        <span class="bar"></span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <input class="btn btn-primary btn-outline" type="submit" value="Add">
+                                                </td>
+                                            </form>
+                                        </tr>
+                                    {% elif not user.attributes.additional_email_2 %}
+                                        <tr>
+                                            <form action="/user/profile/add-additional-email" method="post">
+                                                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                                                <td>
+                                                    <div>
+                                                        <input type="text" class="form-control" name="additional_email_2" required>
+                                                        <span class="bar"></span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <input class="btn btn-primary btn-outline" type="submit" value="Add">
+                                                </td>
+                                            </form>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="info">No further additional emails may be added to this account.</p>
+                    {% endif %}
+                </div>
             </div>
+        </div>
     </section>
 </div>
 {% endblock %}
 
+{% block scripts %}
+    <script src="/js/owasp-password-strength-test.js"></script>
+    <script src="/js/password-check.js"></script>
+{% endblock %}

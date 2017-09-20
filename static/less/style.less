@@ -1742,9 +1742,21 @@ textarea.story {
     margin-top: 15px;
 }
 
-.form-group.converter {
-    text-align: center;
-    font-size: 30px;
+.form-group {
+    &.converter {
+        text-align: center;
+        font-size: 30px;
+    }
+    &.additional-email {
+        width: 85%;
+        display: inline-block;
+        margin: 0;
+    }
+    &.additional-email-btn {
+        width: 15%;
+        display: inline-block;
+        margin: 0 -4px 0 0;
+    }
 }
 
 
@@ -1758,6 +1770,83 @@ textarea.story {
 
 ul.permissions {
     list-style-type: square;
+}
+
+table.associated-emails {
+    width: 100%;
+    margin-bottom: 75px;
+
+    thead {
+        tr {
+            border-bottom: 1px solid #e5e5e5;
+            th {
+                &:nth-of-type(2) {
+                    text-align: center;
+                    width: 110px;
+                }
+                &:last-of-type {
+                    text-align: center;
+                    width: 110px;
+                }
+            }
+        }
+    }
+
+    tbody {
+        tr {
+            border-bottom: 1px solid #efefef;
+            td {
+                padding: 12px 0;
+                &:nth-of-type(2) {
+                    text-align: center;
+                    width: 110px;
+                }
+                &:last-of-type {
+                    text-align: center;
+                    width: 110px;
+                }
+                span.primary {
+                    background: #5cc8e4;
+                    color: white;
+                    border-radius: 4px;
+                    padding: 4px 8px;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    font-weight: bold;
+                    margin-left: 10px;
+                }
+                p.warn {
+                    font-size: 13px;
+                    color: #888;
+                }
+            }
+        }
+    }
+}
+
+table.associate-email {
+    width: 100%;
+
+    tbody {
+        tr {
+            td {
+                &:last-of-type {
+                    text-align: right;
+                    width: 110px;
+                }
+            }
+        }
+    }
+}
+
+.fa.verified {
+    color: #B1CF34;
+    display: block;
+}
+
+.fa.not-verified {
+    color: #f32121;
+    display: block;
 }
 
 a.logout.access {
@@ -1836,4 +1925,68 @@ a.logout.access {
 
 .mCS-minimal.mCSB_scrollTools .mCSB_draggerRail, .mCS-minimal-dark.mCSB_scrollTools .mCSB_draggerRail {
     background-color: rgb(236, 236, 236) !important;
+}
+
+.modal-backdrop.in {
+    background: rgba(25,44,58,0.9);
+    opacity: 1;
+}
+
+.modal-header {
+    padding: 0;
+}
+
+.modal-title {
+    font-family: 'Catamaran','Helvetica','Arial','sans-serif';
+    font-weight: 200;
+    letter-spacing: 1px;
+    font-size: 30px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.modal-content {
+    padding: 2px 20px;
+    border: none;
+    border-radius: 0;
+}
+
+.modal-body {
+    p {
+        font-size: 15px;
+    }
+}
+
+.modal-dialog {
+    width: 90%;
+    margin: 52px auto;
+    overflow: hidden;
+    background: #fff;
+    max-width: 1000px;
+}
+
+.modal-header .close {
+    transition: opacity .5s;
+    position: absolute;
+    top: 25px;
+    right: 20px;
+    cursor: pointer;
+    opacity: .8;
+    outline: none;
+
+    img {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+p.info {
+    font-size: 15px;
+    color: #bbbbbb;
+}
+
+.change-password {
+    input[type=submit].password-check {
+        margin-bottom: 40px;
+    }
 }

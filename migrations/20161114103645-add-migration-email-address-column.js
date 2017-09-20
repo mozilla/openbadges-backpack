@@ -6,5 +6,5 @@ exports.up = function(db, callback) {
 };
 
 exports.down = function(db, callback) {
-  db.runSql('ALTER TABLE `user`  DROP `created_at`,  DROP `updated_at`', callback);
+  db.runSql('ALTER TABLE `user`  DROP `migration_email`', callback);
 };

@@ -86,7 +86,10 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
 
   // User profile and password functionality
   app.get('/user/profile', csrfProtection, user.profile);
-  app.post('/user/profile', parseForm, csrfProtection, user.profilePost);
+  app.post('/user/profile/change-password', parseForm, csrfProtection, user.profileChangePasswordPost);
+  app.post('/user/profile/add-additional-email', parseForm, csrfProtection, user.profileAddAdditionalEmailPost);
+  app.post('/user/profile/remove-additional-email', parseForm, csrfProtection, user.profileRemoveAdditionalEmailPost);
+  app.post('/user/profile/verify-email', parseForm, csrfProtection, user.verifyEmailPost);
   app.get('/password/reset', csrfProtection, user.requestReset);
   app.post('/password/reset', parseForm, csrfProtection, user.requestResetPost);
   app.get('/password/reset/:token', csrfProtection, user.reset);

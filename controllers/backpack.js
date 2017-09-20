@@ -413,6 +413,16 @@ exports.userBadgeUpload = function userBadgeUpload(req, res) {
   const tmpfile = req.files.userBadge;
   const awardOptions = {recipient: user.get('email')};
 
+  var potentialRecipients = [user.get('email')];
+
+  if (user.attributes.additional_email_1 && user.attributes.additional_email_1_is_verified) {
+    potentialRecipients.push(user.attributes.additional_email_1);
+  }
+
+  if (user.attributes.additional_email_2 && user.attributes.additional_email_2_is_verified) {
+    potentialRecipients.push(user.attributes.additional_email_2);
+  }
+
   // While the openbadges assertion specification doesn't specify a size
   // limit, our backpack does. We don't want to store lots of huge images,
   // and badges really shouldn't be larger than 256k so that's what we're
@@ -467,9 +477,8 @@ exports.userBadgeUpload = function userBadgeUpload(req, res) {
       analyzeAssertion(data.value, callback);
     },
     function confirmAndAward(data, callback) {
-      const recipient = awardOptions.recipient;
       const assertion = normalizeAssertion(data.info);
-      const userOwnsBadge = Badge.confirmRecipient(assertion, recipient);
+      const userOwnsBadge = Badge.confirmRecipient(assertion, potentialRecipients);
       if (!userOwnsBadge) {
         const err = new Error('This badge was not issued to you! Contact your issuer.');
         err.name = 'InvalidRecipient';
@@ -477,6 +486,7 @@ exports.userBadgeUpload = function userBadgeUpload(req, res) {
         return callback(err);
       }
       awardOptions.assertion = assertion;
+      awardOptions.awardedTo = userOwnsBadge;
       awardBadge(awardOptions, callback);
     }
   ], redirect);

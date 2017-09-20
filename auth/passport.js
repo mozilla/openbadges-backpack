@@ -123,12 +123,67 @@ module.exports = function(passport, configuration) {
         process.nextTick(function() {
             User.findOne({ email :  email }, function(err, user) {
                 // if there are any errors, return the error
-                if (err)
+                if (err) {
                     return done(err);
+                }
 
-                // if no user is found, return the message
+                // if no user is found, check additional emails (some serious nesting going on here), if ultimately no user is found there then return an error message
                 if (!user) {
-                    return done(null, false, req.flash('error', 'No user found.'));
+
+                    // additional email #1
+                    return User.findOne({ additional_email_1 :  email, additional_email_1_is_verified: true }, function(err, user) {
+                        // if there are any errors, return the error
+                        if (err) {
+                            return done(err);
+                        }
+
+                        // if no user is found, check additional_email_1, if no user is found there then return error message
+                        if (!user) {
+
+                            // additional email #2
+                            return User.findOne({ additional_email_2 :  email, additional_email_2_is_verified: true }, function(err, user) {
+                                // if there are any errors, return the error
+                                if (err) {
+                                    return done(err);
+                                }
+
+                                // if no user is found, check additional_email_1, if no user is found there then return error message
+                                if (!user) {
+                                    return done(null, false, req.flash('error', 'No user found.'));
+                                }
+
+                                if (!user.validPassword(password)) {
+                                    return done(null, false, req.flash('error', 'Oops! Wrong password.'));
+
+                                // all is well, return user
+                                } else {
+                                    req.user = user;
+                                    user.setLoginDate();
+                                    user.save(function(err) {
+                                        if (err)
+                                            return done(err);
+
+                                        return done(null, user.attributes);
+                                    });
+                                }
+                            });
+                        }
+
+                        if (!user.validPassword(password)) {
+                            return done(null, false, req.flash('error', 'Oops! Wrong password.'));
+
+                        // all is well, return user
+                        } else {
+                            req.user = user;
+                            user.setLoginDate();
+                            user.save(function(err) {
+                                if (err)
+                                    return done(err);
+
+                                return done(null, user.attributes);
+                            });
+                        }
+                    });
                 }
 
                 if (!user.validPassword(password)) {
@@ -144,14 +199,13 @@ module.exports = function(passport, configuration) {
 
                         return done(null, user.attributes);
                     });
-
-                    
                 }
             });
 
         });
 
     }));
+
 
     // =========================================================================
     // LOCAL SIGNUP ============================================================

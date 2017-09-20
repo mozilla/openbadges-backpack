@@ -87,8 +87,9 @@
       url: badgeURL,
       dataType: 'json',
       error: function(jqXHR, status, error){
+        var acceptedContentTypes = ['image/svg+xml','image/png'];
         if ((jqXHR.status == 200) && 
-              (jqXHR.getResponseHeader('Content-Type') == 'image/png')) {
+            (acceptedContentTypes.indexOf(jqXHR.getResponseHeader('Content-Type')) !== -1)) {
           resultSection.queue('fx', function(next){
             showBadge(badgeURL, assertionURL); next();
           });

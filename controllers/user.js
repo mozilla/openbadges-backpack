@@ -10,6 +10,7 @@ const smtpTransport = require("nodemailer-smtp-transport");
 const User = require('../models/user');
 const flash = require('connect-flash');
 const owasp = require('owasp-password-strength-test');
+const shortid = require('shortid');
 
 var configuration = require('../lib/configuration'),
     mailerConfig = configuration.get('mailer'),
@@ -175,38 +176,40 @@ exports.migrateVerifyPost = function migrateVerifyPost(request, response) {
  * Render the user profile page.
  */
 
-exports.profile = function profileUpdate(request, response) {
+exports.profile = function profile(request, response) {
   if (!request.user) {
     return response.redirect(303, '/');
   }
+
   // request.flash returns an array. Pass on the whole thing to the view and
   // decide there if we want to display all of them or just the first one.
   response.render('user-profile.html', {
     error: request.flash('error'),
-    csrfToken: request.csrfToken()
+    csrfToken: request.csrfToken(),
+    user: request.user,
   });
 };
 
 
 /**
- * Update the user profile.
+ * Change password from the the user profile page.
  */
 
-exports.profilePost = function profileUpdatePost(request, response) {
+exports.profileChangePasswordPost = function profileChangePasswordPost(request, response) {
   if (!request.user) {
     return response.redirect(303, '/');
   }
 
   if (request.body.password !== request.body.confirm) {
     request.flash('error', 'Password field and confirm password field do not match');
-    return response.redirect('back');
+    return response.redirect('/user/profile');
   }
 
   var result = owasp.test(request.body.password);
 
   if (result.errors.length > 0) {
     request.flash('error', result.errors);
-    return response.redirect('back');
+    return response.redirect('/user/profile');
   }
 
   var user = request.user;
@@ -217,9 +220,169 @@ exports.profilePost = function profileUpdatePost(request, response) {
   user.attributes.updated_at = new Date().getTime();
 
   user.save(function(err) {
-    request.flash('success', 'User profile has been updated successfully');
-    return response.redirect('/');
+    response.render('user-profile.html', {
+      success: ['Password has been updated successfully'],
+      csrfToken: request.csrfToken(),
+      user: request.user,
+    });
   });
+};
+
+
+/**
+ * Add additional email from the the user profile page.
+ */
+
+exports.profileAddAdditionalEmailPost = function profileAddAdditionalEmailPost(request, response) {
+  if (!request.user) {
+    return response.redirect(303, '/');
+  }
+
+  if (request.body.additional_email_1) {
+    var additionalEmailAddress = request.body.additional_email_1;
+  } else if (request.body.additional_email_2) {
+    var additionalEmailAddress = request.body.additional_email_2;
+  }
+
+  // check to see that we don't already have this email in the system
+  User.findOne({ email : additionalEmailAddress }, function(err, user) {
+      if (err) return done(err);
+
+      // if a user has been found, then someone already has this email address, let's bail
+      if (user) {
+        request.flash('error', 'Email already exists in the system');
+        return response.redirect('/user/profile');
+      }
+
+      User.findOne({ additional_email_1 : additionalEmailAddress, additional_email_1_is_verified: true }, function(err, user) {
+          if (err) return done(err);
+
+          // if a user has been found, then someone already has this email address, let's bail
+          if (user) {
+            request.flash('error', 'Email already exists in the system');
+            return response.redirect('/user/profile');
+          }
+
+          User.findOne({ additional_email_2 : additionalEmailAddress, additional_email_2_is_verified: true }, function(err, user) {
+              if (err) return done(err);
+
+              // if a user has been found, then someone already has this email address, let's bail
+              if (user) {
+                request.flash('error', 'Email already exists in the system');
+                return response.redirect('/user/profile');
+              }
+
+              // yay!  We're good to go ahead and save this!
+              shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$@');
+
+              var user = request.user,
+                  token = shortid.generate();
+
+              if (request.body.additional_email_1) {
+                var additionalEmailAddress = request.body.additional_email_1;
+                user.attributes.additional_email_1 = request.body.additional_email_1;
+                user.attributes.additional_email_1_is_verified = false;
+                user.attributes.additional_email_1_verification_code = token;
+              } else if (request.body.additional_email_2) {
+                var additionalEmailAddress = request.body.additional_email_2;
+                user.attributes.additional_email_2 = request.body.additional_email_2;
+                user.attributes.additional_email_2_is_verified = false;
+                user.attributes.additional_email_2_verification_code = token;
+              }
+
+              user.attributes.updated_at = new Date().getTime();
+
+              user.save(function(err) {
+                // send email
+                var mailOptions = {
+                    to: additionalEmailAddress,
+                    from: 'no-reply@backpack.openbadges.org',
+                    subject: 'Mozilla Openbadges Backpack Email Verification',
+                    text: 'You are receiving this because you (or someone else) has added this email address to a Backpack account.\n\n' +
+                      'If you didn\'t add an additional email to your Backpack account, you can safely ignore this email.\n\n' +
+                      'If you did, then please copy the following code and paste it into the verification form on your Backpack User Profile page.  ' + 
+                      ' Once you have taken this step, you will then be able to use this email address to login to the Backpack.\n\n' +
+                      'CODE:  ' + token + '\n\n'
+                };
+                smtpTrans.sendMail(mailOptions, function(err) {
+                    response.render('user-profile.html', {
+                      success: ['Additional email has been added successfully, please complete the verification process'],
+                      csrfToken: request.csrfToken(),
+                      user: request.user,
+                    });
+                });
+              });
+
+
+          });
+      });
+  });
+
+};
+
+
+/**
+ * Remove additional email from the the user profile page.
+ */
+
+exports.profileRemoveAdditionalEmailPost = function profileRemoveAdditionalEmailPost(request, response) {
+  if (!request.user) {
+    return response.redirect(303, '/');
+  }
+
+  var user = request.user;
+
+  if (request.body.additional_email_1) {
+    user.attributes.additional_email_1 = null;
+    user.attributes.additional_email_1_is_verified = false;
+    user.attributes.additional_email_1_verification_code = null;
+  } else if (request.body.additional_email_2) {
+    user.attributes.additional_email_2 = null;
+    user.attributes.additional_email_2_is_verified = false;
+    user.attributes.additional_email_2_verification_code = null;
+  }
+
+  user.attributes.updated_at = new Date().getTime();
+
+  user.save(function(err) {
+    response.render('user-profile.html', {
+      success: ['Additional email has been remove successfully'],
+      csrfToken: request.csrfToken(),
+      user: request.user,
+    });
+  });
+
+};
+
+
+/**
+ * Verify email address.
+ */
+
+exports.verifyEmailPost = function verifyEmailPost(request, response) {
+  if (!request.user) {
+    return response.redirect(303, '/');
+  }
+
+  var user = request.user,
+      additionalEmailToVerify = (request.body.additional_email_1 ? 1 : 2);
+
+  if (request.body['additional_email_' + additionalEmailToVerify + '_verification_code'] == user.attributes['additional_email_' + additionalEmailToVerify + '_verification_code']) {
+    user.attributes['additional_email_' + additionalEmailToVerify + '_is_verified'] = true;
+    user.attributes.updated_at = new Date().getTime();
+
+    user.save(function(err) {
+      response.render('user-profile.html', {
+        success: ['Email verification was successful'],
+        csrfToken: request.csrfToken(),
+        user: request.user,
+      });
+    });
+  } else {
+    request.flash('error', 'Email verification failed.  Incorrect code provided.');
+    return response.redirect('/user/profile');
+  }
+
 };
 
 

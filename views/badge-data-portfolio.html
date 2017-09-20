@@ -25,6 +25,12 @@
 	
 	<li><label>Description</label></li>
 	<li><span>{{badge.attributes.body.badge.description|e}}</span></li>
+
+	<li><label>Awardee</label></li>
+	<li><span>{{badge.attributes.awarded_to_email_address|e}}</span></li>
+
+	<li><label>Assertion</label></li>
+	<li><span><a href="{{badge.attributes.endpoint|e}}" aria-label="View">View</a></span></li>
 	
 	<li><label>Criteria</label></li>
 	<li><span><a href='{{badge.attributes.body.badge.criteria|e}}' aria-label="{{badge.attributes.body.badge.criteria|e}}">View</a></span></li>
