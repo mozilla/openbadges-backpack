@@ -47,16 +47,16 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
   app.post('/demo/award', parseForm, demo.award);
 
   // Backpack
-  app.get('/', backpack.recentBadges);
+  app.get('/', csrfProtection, backpack.recentBadges);
   app.get('/backpack', backpack.manage);
   app.get('/backpack/badges', backpack.allBadges);
   app.get('/backpack/add', csrfProtection, backpack.addBadge);
   app.get('/backpack/welcome', csrfProtection, backpack.welcome);
   app.get('/backpack/login', csrfProtection, backpack.login); // normal login
   app.post('/backpack/login', parseForm, csrfProtection, passport.authenticate('local-login', {
-      successRedirect : '/', // redirect to the secure profile section
-      failureRedirect : '/backpack/login', // redirect back to the signup page if there is an error
-      failureFlash : true // allow flash messages
+    successRedirect : '/', // redirect to the secure profile section
+    failureRedirect : '/backpack/login', // redirect back to the signup page if there is an error
+    failureFlash : true // allow flash messages
   }));
   app.post('/backpack/login/ajax', parseForm, csrfProtection, function(req, res, next) { // ajax login
     passport.authenticate('local-login', function(err, user, info) {
@@ -77,9 +77,9 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
   });
   app.get('/backpack/signup', csrfProtection, backpack.signup);
   app.post('/backpack/signup', parseForm, csrfProtection, passport.authenticate('local-signup', {
-      successRedirect : '/', // redirect to the secure profile section
-      failureRedirect : '/backpack/signup', // redirect back to the signup page if there is an error
-      failureFlash : true // allow flash messages
+    successRedirect : '/', // redirect to the secure profile section
+    failureRedirect : '/backpack/signup', // redirect back to the signup page if there is an error
+    failureFlash : true // allow flash messages
   }));
   app.get('/backpack/signout', backpack.signout);
   app.post('/backpack/badge', parseForm, csrfProtection, backpack.userBadgeUpload);
@@ -87,9 +87,13 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
   // User profile and password functionality
   app.get('/user/profile', csrfProtection, user.profile);
   app.post('/user/profile/change-password', parseForm, csrfProtection, user.profileChangePasswordPost);
+  app.post('/user/profile/update-name', parseForm, csrfProtection, user.profileUpdateNamePost);
   app.post('/user/profile/add-additional-email', parseForm, csrfProtection, user.profileAddAdditionalEmailPost);
   app.post('/user/profile/remove-additional-email', parseForm, csrfProtection, user.profileRemoveAdditionalEmailPost);
+  app.post('/user/profile/send-email-address-verification-email', parseForm, csrfProtection, user.sendEmailAddressVerificationEmailPost);
   app.post('/user/profile/verify-email', parseForm, csrfProtection, user.verifyEmailPost);
+  app.post('/user/profile/request-account-deletion-code', parseForm, csrfProtection, user.requestAccountDeletionCodePost);
+  app.post('/user/profile/delete-account', parseForm, csrfProtection, user.deleteAccountPost);
   app.get('/password/reset', csrfProtection, user.requestReset);
   app.post('/password/reset', parseForm, csrfProtection, user.requestResetPost);
   app.get('/password/reset/:token', csrfProtection, user.reset);
@@ -112,8 +116,8 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
   app.post('/migration-step-3', parseForm, csrfProtection, user.migrateVerifyPost);
 
   // Backpack settings
-  app.get('/backpack/settings', backpack.settings());
-  app.post('/backpack/settings/revoke-origin', parseForm, backpackConnect.revokeOrigin());
+  app.get('/backpack/settings', csrfProtection, backpack.settings());
+  app.post('/backpack/settings/revoke-origin', parseForm, csrfProtection, backpackConnect.revokeOrigin());
 
   // Statistics
   app.get('/stats', backpack.stats);

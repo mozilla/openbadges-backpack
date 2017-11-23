@@ -12,28 +12,26 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-xs-12 col-lg-6 change-password">
-                    <legend>Change Password</legend>
-                    <form action="/user/profile/change-password" method="post">
+                <div class="col-xs-12 col-lg-6">
+                    <legend>Name</legend>
+                    <form action="/user/profile/update-name" method="post">
                         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
                         <div class="form-group">
-                            <label>Password</label>
-                            <input type="password" class="form-control" name="password" required>
+                            <label>First Name</label>
+                            <input type="text" class="form-control" name="first_name" value="{{ user.attributes.first_name }}">
                             <span class="bar"></span>
                         </div>
                         <div class="form-group">
-                            <label>Confirm</label>
-                            <input type="password" class="form-control" name="confirm" required>
+                            <label>Last Name</label>
+                            <input type="text" class="form-control" name="last_name" value="{{ user.attributes.last_name }}">
                             <span class="bar"></span>
                         </div>
-                        {% include "includes/password-requirements.html" %}
                         <div class="form-group">
-                            <input class="btn btn-primary btn-outline password-check" type="submit" value="Change" disabled="true">
+                            <input class="btn btn-primary btn-outline" type="submit" value="Update Name">
                         </div>
                     </form>
-                </div>
-                <div class="col-xs-12 col-lg-6">
-                    <legend>Associated Email Addresses</legend>
+
+                    <legend class="push">Associated Email Addresses</legend>
                     <div>
                         <table class="associated-emails">
                             <thead>
@@ -45,8 +43,22 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>{{ user.attributes.email }} <span class="primary">Primary</span></td>
-                                    <td>-</td>
+                                    <td>
+                                        {{ user.attributes.email }} <span class="primary">Primary</span>
+
+                                        {% if not user.attributes.email_is_verified %}
+                                            <p class="warn">
+                                                You have not yet verified ownership of this email address.  Please <a href="#" class="verify-email" data-toggle="modal" data-target="#verify-primary-email" aria-label="Verify now">verify ownership</a>. 
+                                            </p>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if user.attributes.email_is_verified %}
+                                            <i class="fa fa-check verified"></i>
+                                        {% else %}
+                                            <i class="fa fa-times not-verified"></i>
+                                        {% endif %}
+                                    </td>
                                     <td>-</td>
                                 </tr>
                                 {% for n in [1,2] %}
@@ -84,10 +96,13 @@
                                                         <h4 class="modal-title">Email Address Ownership Verification</h4>
                                                     </div>
                                                     <div class="modal-body">
-                                                        <p>You should have received an email with a code in it.  Paste the code in the field below and then click the 'VERIFY' button.</p>
+                                                        <p>You should have received an email with a code in it, if you haven't 
+                                                            <a href="#" class="send-email-address-verification-email" data-email-col="{% if n == 1 %}additional_email_1{% else %}additional_email_2{% endif %}" aria-label="Click here to verify your email address">click here</a>.  
+                                                            Then, paste the code you receive in the field below and then click the 'VERIFY' button.
+                                                        </p>
                                                         <form action="/user/profile/verify-email" method="post">
                                                             <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-                                                            <input type="hidden" name="additional_email_{{ n }}" value="1">
+                                                            <input type="hidden" name="additional_email_{{ n }}" value="{{ user.attributes['additional_email_' ~ n] }}">
                                                             <div class="form-group">
                                                                 <label>Code</label>
                                                                 <input type="text" class="form-control" name="additional_email_{{ n }}_verification_code" required>
@@ -147,6 +162,50 @@
                     {% else %}
                         <p class="info">No further additional emails may be added to this account.</p>
                     {% endif %}
+                </div>
+                <div class="col-xs-12 col-lg-6 change-password">
+                    <legend>Change Password</legend>
+                    <form action="/user/profile/change-password" method="post">
+                        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" class="form-control" name="password" required>
+                            <span class="bar"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Confirm</label>
+                            <input type="password" class="form-control" name="confirm" required>
+                            <span class="bar"></span>
+                        </div>
+                        {% include "includes/password-requirements.html" %}
+                        <div class="form-group">
+                            <input class="btn btn-primary btn-outline password-check" type="submit" value="Update Password" disabled="true">
+                        </div>
+                    </form>
+
+                    <div class="delete-account push">
+                        <legend>Delete Account</legend>
+                        <p>If you wish to delete your account permanently, click the button below and we will send you a code in 
+                        an email to your primary email address. You can then enter the code in the field that subsequently appears 
+                        below to delete the account.</p>
+                        <p>Please note: If you delete your account, all associated data will be removed from the database, 
+                        including badges, badge collections and Backpack Connect sessions.</p>
+                        <form action="/user/profile/request-account-deletion-code" method="post">
+                            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                            <div class="form-group">
+                                <input class="btn btn-danger btn-outline" type="submit" value="Request {% if user.attributes.delete_account_code_requested %}Another {% endif %}Account Deletion Code">
+                            </div>
+                        </form>
+                        {% if user.attributes.delete_account_code_requested %}
+                            <form action="/user/profile/delete-account" method="post">
+                                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" name="delete_account_code" placeholder="Paste your deletion code here" required>
+                                    <input class="btn btn-danger btn-outline" type="submit" value="Delete Account">
+                                </div>
+                            </form>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>

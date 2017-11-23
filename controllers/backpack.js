@@ -52,43 +52,6 @@ exports.login = function login(request, response) {
  */
 
 exports.authenticate = function authenticate(req, res) {
-  // function formatResponse(to, apiError, humanReadableError) {
-  //   const preferJsonOverHtml = req.accepts('html, json') === 'json';
-  //   if (preferJsonOverHtml) {
-  //     if (apiError) {
-  //       return res.send(400, {status: 'error', reason: apiError});
-  //     }
-  //     return res.send(200, {status: 'ok', email: req.session.emails[0]});
-  //   }
-  //   if (humanReadableError)
-  //     req.flash('error', humanReadableError);
-  //   return res.redirect(303, to);
-  // }
-
-  // const assertion = req.body && req.body.assertion;
-  // const verifierUrl = browserid.getVerifierUrl(configuration);
-  // const audience = browserid.getAudience(req);
-
-  // if (!assertion) {
-  //   return formatResponse('/backpack/login', "assertion expected");
-  // }
-
-  // browserid.verify({
-  //   url: verifierUrl,
-  //   assertion: assertion,
-  //   audience: audience,
-  // }, function (err, email) {
-  //   if (err) {
-  //     logger.error('Failed browserID verification: ');
-  //     logger.debug('Code: ' + err.code + "; Extra: " + err.extra);
-  //     return formatResponse('back', "browserID verification failed: " + err.message,
-  //                           "Could not verify with browserID!");
-  //   }
-
-  //   req.session.emails = [email];
-  //   return formatResponse('/');
-  // });
-
   return res.send(400, {status: 'error', reason: 'Persona has been decommissioned'});
 };
 
@@ -181,7 +144,7 @@ function badgePage (request, response, badges, template) {
     error: error,
     success: success,
     badges: badges,
-    csrfToken: request.session._csrf
+    csrfToken: request.csrfToken()
   });
 }
 
@@ -303,7 +266,7 @@ exports.manage = function manage(request, response, next) {
       error: error,
       success: success,
       badges: badges,
-      csrfToken: request.session._csrf,
+      csrfToken: request.csrfToken(),
       groups: groups
     });
   }
@@ -359,7 +322,7 @@ exports.settings = function(options) {
       response.render('settings.html', {
         error: error,
         success: success,
-        csrfToken: request.session._csrf,
+        csrfToken: request.csrfToken(),
         services: getServices(),
         issuers: issuers
       });

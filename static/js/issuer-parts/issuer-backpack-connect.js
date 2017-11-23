@@ -18,7 +18,7 @@ OpenBadges.connect = (function() {
     var location = options.location || window.location;
     var redirect = OpenBadges.getRoot() + ACCESS_ENDPOINT + '?' + $.param({
       callback: absoluteClientUrl(options.callback),
-      scope: options.scope.join(',')
+      scope: options.scope.join(','),
     });
 
     location.replace(redirect);

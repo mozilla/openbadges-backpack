@@ -1,0 +1,35 @@
+<div id="verify-primary-email" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><img src="/images/cross.svg" alt="Close modal"></button>
+                <h4 class="modal-title">Email Address Ownership Verification</h4>
+            </div>
+            <div class="modal-body">
+                <p>When you <a href="#" class="send-email-address-verification-email" data-email-col="email" aria-label="Click here to verify your email address">click this link</a> we will email you a code.
+                    Please paste the code you receive in the field below and then click the 'VERIFY' button.
+                </p>
+                <form action="/user/profile/verify-email" method="post">
+                    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                    <input type="hidden" name="email" value="{{ user.attributes.email }}">
+                    <div class="form-group">
+                        <label>Code</label>
+                        <input type="text" class="form-control" name="email_verification_code" required>
+                        <span class="bar"></span>
+                    </div>
+                    <input class="btn btn-primary btn-outline" type="submit" value="Verify">
+                </form>
+                <form action="/user/profile/send-email-address-verification-email" id="send-email-address-verification-email-form" class="hidden" method="post">
+                    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                    <input type="hidden" name="email_column" value="">
+                    <input class="btn btn-primary btn-outline" type="submit" value="Send">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% if user and not user.attributes.email_is_verified %}
+    <div id="verification-bar">
+        You haven't verified your email address yet, <a href="#" class="verify-email" data-toggle="modal" data-target="#verify-primary-email" aria-label="Verify now">click here</a> to do so!
+    </div>
+{% endif %}

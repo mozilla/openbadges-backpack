@@ -46,6 +46,7 @@
 						<input name="_csrf" type="hidden" value="{{ csrfToken }}">
 						<input name="callback" type="hidden" value="{{ callback|e }}">
 						<input name="scope" type="hidden" value="{{ joinedScope|e }}">
+						<input name="email" type="hidden" value="{{ email|e }}">
 						<button class="btn btn-primary" type="submit">Grant permission</button>
 						<a class="btn" href="{{ denyCallback|e }}">Deny permission</a>
 						<a href="/backpack/signout" class="logout access">

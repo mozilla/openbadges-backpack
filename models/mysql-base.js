@@ -68,6 +68,13 @@ Base.apply = function apply(Model, table) {
     client.query(qstring, values, function(err) { callback(err); });
   };
 
+  Model.findAndDestroyIn = function(criteria, callback) {
+    // this is safe for now, as we're not dealing with user supplied data, when using prepared statements 
+    // this has been causing issues, so this is a temp solution
+    var qstring = 'DELETE FROM `' + table + '` WHERE `' + criteria.key + '` IN (' + criteria.values.join(',') + ')';
+    client.query(qstring, [], function(err) { callback(err); });
+  };
+
   Model.prototype = new Base();
   Model.prototype.model = Model;
   Model.prototype.client = client;

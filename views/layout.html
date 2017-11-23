@@ -37,6 +37,7 @@
   <body id="page-top" class="{{ settings.env }} {% if bodyClass %}{{ bodyClass }}{% endif %}" data-commit="{{ settings.sha|d('') }}" data-logged-in="{{ 'true' if user else 'false' }}">
     {% include "includes/nav.html" %}
     {% include "includes/header.html" %}
+    {% include "includes/verify-primary-email.html" %}
     <div class="body">
       {% block body %}{% endblock %}
     </div>

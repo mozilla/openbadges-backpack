@@ -96,18 +96,8 @@ app.use(middleware.findPassportUser());
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash());
-// app.use(middleware.csrf({
-//   whitelist: [
-//     '/backpack/authenticate',
-//     '/displayer/convert/.+',
-//     '/issuer/frameless.*',
-//     '/api/.+'
-//   ]
-// }));
 app.use(middleware.cors({ whitelist: ['/_badges.*', '/issuer.*', '/baker', '/displayer/.+/group.*'] }));
 app.use(middleware.statsdRequests());
-// app.use(app.router);
-// app.use(middleware.notFound());
 app.use(errorHandler());
 
 // development-specific app properties
@@ -120,7 +110,6 @@ if (process.env['NODE_ENV'] === 'development') {
   catch (ex) {
     logger.warn(ex);
   }
-  // browserid.configure({testUser: process.env['BROWSERID_TEST_USER']});
 };
 
 var year = new Date().getFullYear();

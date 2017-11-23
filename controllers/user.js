@@ -7,10 +7,16 @@ const url = require('url');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const smtpTransport = require("nodemailer-smtp-transport");
-const User = require('../models/user');
 const flash = require('connect-flash');
 const owasp = require('owasp-password-strength-test');
 const shortid = require('shortid');
+
+const User = require('../models/user');
+const BadgeImage = require('../models/badge-image');
+const Badge = require('../models/badge');
+const Session = require('../models/backpack-connect').Session;
+const Group = require('../models/group');
+const Portfolio = require('../models/portfolio');
 
 var configuration = require('../lib/configuration'),
     mailerConfig = configuration.get('mailer'),
@@ -41,6 +47,8 @@ exports.migrate = function migrate(request, response) {
   }
   return response.render('migration-step-1.html', {
     error: request.flash('error'),
+    success: request.flash('success'),
+    info: request.flash('info'),
     hideNav: true,
     csrfToken: request.csrfToken()
   });
@@ -111,6 +119,8 @@ exports.migrateVerify = function migrateVerify(request, response) {
       response.render('migration-step-3.html', {
         user: request.user,
         error: request.flash('error'),
+        success: request.flash('success'),
+        info: request.flash('info'),
         csrfToken: request.csrfToken(),
         token: request.params.token
       });
@@ -185,8 +195,32 @@ exports.profile = function profile(request, response) {
   // decide there if we want to display all of them or just the first one.
   response.render('user-profile.html', {
     error: request.flash('error'),
+    success: request.flash('success'),
+    info: request.flash('info'),
     csrfToken: request.csrfToken(),
     user: request.user,
+  });
+};
+
+
+/**
+ * Change user's name from the the user profile page.
+ */
+
+exports.profileUpdateNamePost = function profileUpdateNamePost(request, response) {
+  if (!request.user) {
+    return response.redirect(303, '/');
+  }
+
+  var user = request.user;
+
+  user.attributes.first_name = request.body.first_name;
+  user.attributes.last_name = request.body.last_name;
+  user.attributes.updated_at = new Date().getTime();
+
+  user.save(function(err) {
+    request.flash('success', 'User name has been updated successfully');
+    return response.redirect('/user/profile');
   });
 };
 
@@ -246,76 +280,97 @@ exports.profileAddAdditionalEmailPost = function profileAddAdditionalEmailPost(r
 
   // check to see that we don't already have this email in the system
   User.findOne({ email : additionalEmailAddress }, function(err, user) {
-      if (err) return done(err);
+    if (err) return done(err);
 
-      // if a user has been found, then someone already has this email address, let's bail
-      if (user) {
-        request.flash('error', 'Email already exists in the system');
-        return response.redirect('/user/profile');
-      }
+    // if a user has been found, then someone already has this email address as their primary 
+    // account, to proceed that user must delete the account where this email is primary, so let's bail
+    if (user) {
+      request.flash('error', 'An account already has this email address as it\'s primary email.  That other account needs deleting before the address can be added to this account.');
+      return response.redirect('/user/profile');
+    }
 
-      User.findOne({ additional_email_1 : additionalEmailAddress, additional_email_1_is_verified: true }, function(err, user) {
-          if (err) return done(err);
+    // yay!  We're good to go ahead and save this!
+    shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$@');
 
-          // if a user has been found, then someone already has this email address, let's bail
-          if (user) {
-            request.flash('error', 'Email already exists in the system');
-            return response.redirect('/user/profile');
-          }
+    var user = request.user,
+        token = shortid.generate();
 
-          User.findOne({ additional_email_2 : additionalEmailAddress, additional_email_2_is_verified: true }, function(err, user) {
-              if (err) return done(err);
+    if (request.body.additional_email_1) {
+      var additionalEmailAddress = request.body.additional_email_1;
+      user.attributes.additional_email_1 = request.body.additional_email_1;
+      user.attributes.additional_email_1_is_verified = false;
+      user.attributes.additional_email_1_verification_code = token;
+    } else if (request.body.additional_email_2) {
+      var additionalEmailAddress = request.body.additional_email_2;
+      user.attributes.additional_email_2 = request.body.additional_email_2;
+      user.attributes.additional_email_2_is_verified = false;
+      user.attributes.additional_email_2_verification_code = token;
+    }
 
-              // if a user has been found, then someone already has this email address, let's bail
-              if (user) {
-                request.flash('error', 'Email already exists in the system');
-                return response.redirect('/user/profile');
-              }
+    user.attributes.updated_at = new Date().getTime();
 
-              // yay!  We're good to go ahead and save this!
-              shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$@');
-
-              var user = request.user,
-                  token = shortid.generate();
-
-              if (request.body.additional_email_1) {
-                var additionalEmailAddress = request.body.additional_email_1;
-                user.attributes.additional_email_1 = request.body.additional_email_1;
-                user.attributes.additional_email_1_is_verified = false;
-                user.attributes.additional_email_1_verification_code = token;
-              } else if (request.body.additional_email_2) {
-                var additionalEmailAddress = request.body.additional_email_2;
-                user.attributes.additional_email_2 = request.body.additional_email_2;
-                user.attributes.additional_email_2_is_verified = false;
-                user.attributes.additional_email_2_verification_code = token;
-              }
-
-              user.attributes.updated_at = new Date().getTime();
-
-              user.save(function(err) {
-                // send email
-                var mailOptions = {
-                    to: additionalEmailAddress,
-                    from: 'no-reply@backpack.openbadges.org',
-                    subject: 'Mozilla Openbadges Backpack Email Verification',
-                    text: 'You are receiving this because you (or someone else) has added this email address to a Backpack account.\n\n' +
-                      'If you didn\'t add an additional email to your Backpack account, you can safely ignore this email.\n\n' +
-                      'If you did, then please copy the following code and paste it into the verification form on your Backpack User Profile page.  ' + 
-                      ' Once you have taken this step, you will then be able to use this email address to login to the Backpack.\n\n' +
-                      'CODE:  ' + token + '\n\n'
-                };
-                smtpTrans.sendMail(mailOptions, function(err) {
-                    response.render('user-profile.html', {
-                      success: ['Additional email has been added successfully, please complete the verification process'],
-                      csrfToken: request.csrfToken(),
-                      user: request.user,
-                    });
-                });
-              });
-
-
-          });
+    user.save(function(err) {
+      // send email
+      var mailOptions = {
+        to: additionalEmailAddress,
+        from: 'no-reply@backpack.openbadges.org',
+        subject: 'Mozilla Openbadges Backpack Email Verification',
+        text: 'You are receiving this because you (or someone else) has added this email address to a Backpack account.\n\n' +
+          'If you didn\'t add an additional email to your Backpack account, you can safely ignore this email.\n\n' +
+          'If you did, then please copy the following code and paste it into the verification form on your Backpack User Profile page.  ' + 
+          ' Once you have taken this step, you will then be able to use this email address to login to the Backpack.\n\n' +
+          'CODE:  ' + token + '\n\n'
+      };
+      smtpTrans.sendMail(mailOptions, function(err) {
+        response.render('user-profile.html', {
+          success: ['Additional email has been added successfully, please complete the verification process'],
+          csrfToken: request.csrfToken(),
+          user: request.user,
+        });
       });
+    });
+
+  });
+
+};
+
+
+exports.sendEmailAddressVerificationEmailPost = function sendEmailAddressVerificationEmailPost(request, response) {
+
+  if (!request.user) {
+    return response.redirect(303, '/');
+  }
+
+  // yay!  We're good to go ahead and save this!
+  shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$@');
+
+  var user = request.user,
+      token = shortid.generate();
+
+  user.attributes.email_is_verified = false;
+  user.attributes.email_verification_code = token;
+
+  user.attributes.updated_at = new Date().getTime();
+
+  user.save(function(err) {
+    // send email
+    var mailOptions = {
+      to: user.attributes.email,
+      from: 'no-reply@backpack.openbadges.org',
+      subject: 'Mozilla Openbadges Backpack Email Verification',
+      text: 'You are receiving this because you (or someone else) has requested to verify this email address with the associated Backpack account.\n\n' +
+        'Please login to the Backpack and copy the following code and paste it into the verification form on your Backpack User Profile page.  ' + 
+        'CODE:  ' + token + '\n\n'
+    };
+    smtpTrans.sendMail(mailOptions, function(err) {
+      response.render('user-profile.html', {
+        success: ['Verification email has been sent successfully, please check your inbox!'],
+        csrfToken: request.csrfToken(),
+        user: request.user,
+      });
+    });
+
+    return response.json(200, {'status':'ok'});
   });
 
 };
@@ -333,16 +388,20 @@ exports.profileRemoveAdditionalEmailPost = function profileRemoveAdditionalEmail
   var user = request.user;
 
   if (request.body.additional_email_1) {
+    removedEmail = request.user.additional_email_1;
     user.attributes.additional_email_1 = null;
     user.attributes.additional_email_1_is_verified = false;
     user.attributes.additional_email_1_verification_code = null;
   } else if (request.body.additional_email_2) {
+    removedEmail = request.user.additional_email_2;
     user.attributes.additional_email_2 = null;
     user.attributes.additional_email_2_is_verified = false;
     user.attributes.additional_email_2_verification_code = null;
   }
 
   user.attributes.updated_at = new Date().getTime();
+
+  // remove bpc_sessions here
 
   user.save(function(err) {
     response.render('user-profile.html', {
@@ -364,19 +423,96 @@ exports.verifyEmailPost = function verifyEmailPost(request, response) {
     return response.redirect(303, '/');
   }
 
-  var user = request.user,
-      additionalEmailToVerify = (request.body.additional_email_1 ? 1 : 2);
+  if (request.body.email) {
+    emailToVerify = 'email';
+  } else if (request.body.additional_email_1) {
+    emailToVerify = 'additional_email_1';
+  } else {
+    emailToVerify = 'additional_email_2';
+  }
 
-  if (request.body['additional_email_' + additionalEmailToVerify + '_verification_code'] == user.attributes['additional_email_' + additionalEmailToVerify + '_verification_code']) {
-    user.attributes['additional_email_' + additionalEmailToVerify + '_is_verified'] = true;
-    user.attributes.updated_at = new Date().getTime();
+  if (request.body[emailToVerify + '_verification_code'] == request.user.attributes[emailToVerify + '_verification_code']) {
+    async.waterfall([
+      function(done) {
 
-    user.save(function(err) {
-      response.render('user-profile.html', {
-        success: ['Email verification was successful'],
-        csrfToken: request.csrfToken(),
-        user: request.user,
-      });
+        // if this is a primary email we're verifying, then no other account can have the same primary account email address, so let's continue on
+        if (emailToVerify == 'email') {
+          done();
+        } else {
+          User.findOne({ email : request.body[emailToVerify] }, function(err, user) {
+            if (err) return done(err);
+            // if a user has been found, then someone already has this email address as their primary 
+              // account, to proceed that user must delete the account where this email is primary, so let's bail
+            if (user) {
+              request.flash('error', 'An account already has this email address as it\'s primary email.  That other account needs deleting before the address can be verified on this account.');
+              return response.redirect('/user/profile');
+            } else {
+              done();
+            }
+
+          });
+        }
+
+      },
+      function(done) {
+       
+        User.find({ additional_email_1 : request.body[emailToVerify] }, function(err, users) {
+          if (err) return done(err);
+          // if users have been found with this email address as their additional_email_1, then let's unverify them
+          if (users.length) {
+            for (var i = users.length - 1; i >= 0; i--) {
+              if (request.user.attributes.id != users[i].attributes.id) {
+                users[i].attributes.additional_email_1_is_verified = false;
+                users[i].attributes.additional_email_1_verification_code = null;
+                users[i].attributes.updated_at = new Date().getTime();
+                users[i].save();
+              }
+              if (i == 0) {
+                done();
+              }
+            }
+          } else {
+            done();
+          }
+        });
+
+      },
+      function(done) {
+        
+        User.find({ additional_email_2 : request.body[emailToVerify] }, function(err, users) {
+          if (err) return done(err);
+          // if users have been found with this email address as their additional_email_2, then let's unverify them
+          if (users.length) {
+            for (var i = users.length - 1; i >= 0; i--) {
+              if (request.user.attributes.id != users[i].attributes.id) {
+                users[i].attributes.additional_email_2_is_verified = false;
+                users[i].attributes.additional_email_2_verification_code = null;
+                users[i].attributes.updated_at = new Date().getTime();
+                users[i].save();
+              }
+              if (i == 0) {
+                done();
+              }
+            }
+          } else {
+            done();
+          }
+        });
+
+      },
+      function(done) {
+
+        var user = request.user;
+        user.attributes[emailToVerify + '_is_verified'] = true;
+        user.attributes.updated_at = new Date().getTime();
+        user.save(function(err) {
+          request.flash('success', 'Email verification was successful');
+          return response.redirect('/user/profile');
+        });
+
+      }
+    ], function(err) {
+      response.redirect('/user/profile');
     });
   } else {
     request.flash('error', 'Email verification failed.  Incorrect code provided.');
@@ -397,6 +533,8 @@ exports.requestReset = function reset(request, response) {
   // decide there if we want to display all of them or just the first one.
   response.render('request-reset-password.html', {
     error: request.flash('error'),
+    success: request.flash('success'),
+    info: request.flash('info'),
     csrfToken: request.csrfToken()
   });
 };
@@ -472,6 +610,8 @@ exports.reset = function change(request, response) {
     response.render('reset-password.html', {
       user: request.user,
       error: request.flash('error'),
+      success: request.flash('success'),
+      info: request.flash('info'),
       csrfToken: request.csrfToken(),
       token: request.params.token
     });
@@ -530,3 +670,169 @@ exports.resetPost = function changePost(request, response) {
     response.redirect('/backpack/login');
   });
 };
+
+
+/**
+ * Request account deletion code.
+ */
+
+exports.requestAccountDeletionCodePost = function requestAccountDeletionCodePost(request, response) {
+  if (!request.user) {
+    return response.redirect(303, '/');
+  }
+
+  // yay!  We're good to go ahead and save this!
+  shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$@');
+
+  var user = request.user,
+      token = shortid.generate();
+
+  user.attributes.delete_account_code_requested = true;
+  user.attributes.delete_account_code = token;
+  user.attributes.updated_at = new Date().getTime();
+
+  user.save(function(err) {
+    // send email
+    var mailOptions = {
+      to: user.attributes.email,
+      from: 'no-reply@backpack.openbadges.org',
+      subject: 'Mozilla Openbadges Backpack Account Deletion Code',
+      text: 'You are receiving this because you (or someone else) has requested a deletion code for the Backpack account associated to this email address.\n\n' +
+        'If you didn\'t request this code, you can safely ignore this email.\n\n' +
+        'If you did, then please copy the following code and paste it into the deletion form on your Backpack User Profile page.  ' + 
+        ' Once you have taken this step, you will then be able to delete your Backpack account.\n\n' +
+        'CODE:  ' + token + '\n\n'
+    };
+    smtpTrans.sendMail(mailOptions, function(err) {
+      request.flash('success', 'Account deletion code has been sent successfully, please check your inbox!');
+      return response.redirect('/user/profile');
+    });
+  });
+}
+
+
+/**
+ * YIKES!... DELETE ACCOUNT!
+ */
+
+exports.deleteAccountPost = function deleteAccountPost(request, response) {
+  if (!request.user) {
+    return response.redirect(303, '/');
+  }
+
+  var user = request.user;
+
+  if (!user.attributes.delete_account_code_requested) {
+    request.flash('error', 'No account deletion code has been requested for this account.');
+    return response.redirect('/user/profile');
+  }
+
+  if (user.attributes.delete_account_code != request.body.delete_account_code) {
+    request.flash('error', 'Incorrect account deletion code provided.');
+    return response.redirect('/user/profile');
+  }
+
+  async.series([
+    function destroyBadgeImages(done) {
+      user.getAllBadges(function(err, badges) {
+        if (err) {
+          request.flash('error', 'There was a problem getting badge images to delete for this account.');
+          return response.redirect('/user/profile');
+        }
+
+        var criteria = {
+          key: 'badge_hash',
+          values: []
+        };
+
+        if (badges.length) {
+          for (var i = badges.length - 1; i >= 0; i--) {
+
+            criteria.values.push("'" + badges[i].get('body_hash') + "'");
+           
+            if (i == 0) {
+              BadgeImage.findAndDestroyIn(criteria, done);
+            }
+          }
+        } else {
+          done(null);
+        }
+      });
+    },
+    function destroyBadges(done) {
+      user.getAllBadges(function(err, badges) {
+        if (err) {
+          request.flash('error', 'There was a problem getting badges to delete for this account.');
+          return response.redirect('/user/profile');
+        }
+
+        var criteria = {
+          key: 'id',
+          values: []
+        };
+
+        if (badges.length) {
+          for (var i = badges.length - 1; i >= 0; i--) {
+
+            criteria.values.push("'" + badges[i].get('id') + "'");
+           
+            if (i == 0) {
+              Badge.findAndDestroyIn(criteria, done);
+            }
+          }
+        } else {
+          done(null);
+        }
+      });
+    },
+    function destroyConnectSessions(done) {
+      Session.findAndDestroy({ user_id: user.attributes.id }, done);
+    },
+    function destroyPortfolios(done) {
+      Group.find({ user_id: user.attributes.id }, function(err, groups) {
+        if (err) {
+          request.flash('error', 'There was a problem getting groups to delete for this account.');
+          return response.redirect('/user/profile');
+        }
+
+        var criteria = {
+          key: 'group_id',
+          values: []
+        };
+
+        if (groups.length) {
+          for (var i = groups.length - 1; i >= 0; i--) {
+
+            criteria.values.push("'" + groups[i].get('id') + "'");
+           
+            if (i == 0) {
+              Portfolio.findAndDestroyIn(criteria, function(err) {
+                done(err);
+              });
+            }
+          }
+        } else {
+          done(null);
+        }
+
+      });
+    },
+    function destroyGroups(done) {
+      Group.findAndDestroy({ user_id: user.attributes.id }, done);
+    },
+    function destroyUser(done) {
+      user.destroy(function(err) {
+        done(err);
+      });
+    }
+  ], function (err) {
+    if (err) {
+      request.flash('error', 'There was a problem deleting this account.');
+      return response.redirect('/user/profile');
+    }
+
+    request.session = null;
+    return response.redirect(303, '/backpack/login#solongandthanksforallthefish');
+  });
+
+}

@@ -14,6 +14,29 @@ var Session = require('../models/backpack-connect').Session;
 // load up our trusty password strength checker, courtesy of the sec experts over at owasp
 var owasp = require('owasp-password-strength-test');
 
+const nodemailer = require('nodemailer');
+const smtpTransport = require("nodemailer-smtp-transport");
+
+var configuration = require('../lib/configuration'),
+    mailerConfig = configuration.get('mailer'),
+    siteUrl = configuration.get('protocol') + '://' + configuration.get('hostname'),
+    port = configuration.get('port');
+
+if ((process.env.NODE_ENV !== 'heroku') && (port !== 80) && (port !== 443)) {
+  siteUrl = siteUrl + ':' + port;
+}
+
+// prepare mailer
+const smtpTrans = nodemailer.createTransport(smtpTransport({
+  service: mailerConfig.service,
+  auth: {
+    user: mailerConfig.user,
+    pass: mailerConfig.pass
+  }
+}));
+
+const shortid = require('shortid');
+
 
 module.exports = function(passport, configuration) {
 
@@ -241,23 +264,68 @@ module.exports = function(passport, configuration) {
                         return done(null, false, req.flash('error', 'That email is already taken.'));
                     } else {
 
-                        var createdAt = new Date().getTime();
-
-                        // create the user
-                        var newUser = new User({
-                            email: email,
-                            active: 1,
-                            created_at: createdAt,
-                            updated_at: createdAt,
-                        });
-
-                        newUser.attributes.password = newUser.generateHash(password);
-
-                        newUser.save(function(err) {
+                        // check additional email 1
+                        User.findOne({ additional_email_1: email, additional_email_1_is_verified: true }, function(err, user) {
+                            // if there are any errors, return the error
                             if (err)
                                 return done(err);
 
-                            return done(null, newUser.attributes);
+                            if (user) {
+                                return done(null, false, req.flash('error', 'That email is already taken.'));
+                            } else {
+
+                                // check additional email 2
+                                User.findOne({ additional_email_2: email, additional_email_2_is_verified: true }, function(err, user) {
+                                    // if there are any errors, return the error
+                                    if (err)
+                                        return done(err);
+
+                                    if (user) {
+                                        return done(null, false, req.flash('error', 'That email is already taken.'));
+                                    } else {
+
+                                        shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$@');
+
+                                        var createdAt = new Date().getTime(),
+                                            token = shortid.generate();
+
+                                        // create the user
+                                        var newUser = new User({
+                                            first_name: req.body.first_name,
+                                            last_name: req.body.last_name,
+                                            email: email,
+                                            active: 1,
+                                            created_at: createdAt,
+                                            updated_at: createdAt,
+                                            email_is_verified: false,
+                                            email_verification_code: token,
+                                        });
+
+                                        newUser.attributes.password = newUser.generateHash(password);
+
+                                        newUser.save(function(err) {
+                                            if (err)
+                                                return done(err);
+
+                                            // send email
+                                            var mailOptions = {
+                                                to: email,
+                                                from: 'no-reply@backpack.openbadges.org',
+                                                subject: 'Welcome to the Mozilla Openbadges Backpack',
+                                                text: 'You are receiving this because you (or someone else) has created a Backpack account with this email address.\n\n' +
+                                                    'If you actioned this, then please login to the Backpack, copy the following code and paste it into the verification form on your Backpack User Profile page.  ' + 
+                                                    'CODE:  ' + token + '\n\n'
+                                            };
+
+                                            smtpTrans.sendMail(mailOptions, function(err) {
+                                                return done(null, newUser.attributes);
+                                            });
+                                            
+                                        });
+                                    }
+                                });
+
+                            }
                         });
                     }
 

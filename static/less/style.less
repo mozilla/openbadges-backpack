@@ -1985,8 +1985,49 @@ p.info {
     color: #bbbbbb;
 }
 
-.change-password {
-    input[type=submit].password-check {
-        margin-bottom: 40px;
+#verification-bar {
+    top: 180px;
+    position: relative;
+    background: #f38021;
+    padding: 20px;
+    color: black;
+    font-weight: bold;
+    text-align: center;
+
+    a {
+        color: white;
+    }
+}
+
+.push {
+    margin-top: 60px;
+}
+
+section.page {
+    .delete-account {
+        padding: 30px;
+        border: solid 3px #f53e36;
+        border-radius: 10px;
+        legend {
+            color: #f53e36;
+            border-bottom: 1px solid #f53e36;
+        }
+        input[type="submit"] {
+            color: #f53e36;
+            border: 3px solid #f53e36;
+            &:hover,
+            &:focus,
+            &:active,
+            &.active {
+                background-color: #f53e36;
+                color: white;
+            }
+        }
+        p {
+            font-size: 12px;
+        }
+        input[name="delete_account_code"] {
+            margin: 45px 0 15px;
+        }
     }
 }
