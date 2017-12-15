@@ -26,7 +26,7 @@ User.prototype.generateHash = function(password) {
 };
 
 User.prototype.getAllBadges = function(callback) {
-  Badge.find({email: this.get('email')}, function(err, badges) {
+  Badge.find({user_id: this.get('id')}, function(err, badges) {
     if (!err && badges) {
       // There doesn't appear to be a way to do this at the SQL level :(
       badges.sort(function(a, b) {

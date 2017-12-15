@@ -20,18 +20,31 @@
           <input name="_csrf" type="hidden" value="{{ csrfToken }}"></input>
           <div class="group at">
             <input type="text" name="email" required>
-            <span class="highlight"></span>
             <span class="bar"></span>
             <label>Email</label>
           </div>
+          <div class="group">
+            <input type="text" name="first_name" required>
+            <span class="bar"></span>
+            <label>First Name</label>
+          </div>
+          <div class="group">
+            <input type="text" name="last_name" required>
+            <span class="bar"></span>
+            <label>Last Name</label>
+          </div>
           <div class="group lock">
             <input type="password" name="password" required>
-            <span class="highlight"></span>
             <span class="bar"></span>
             <label>Password</label>
           </div>
+          <div class="group lock">
+            <input type="password" name="confirm" required>
+            <span class="bar"></span>
+            <label>Confirm</label>
+          </div>
           {% include "includes/password-requirements.html" %}
-          <input type="submit" value="signup" class="btn" disabled="true">
+          <input type="submit" value="signup" class="btn password-check" disabled="true">
           <div class="links">
             <a href="/backpack/login" class="go-to-link">Go to login page</a>
           </div>

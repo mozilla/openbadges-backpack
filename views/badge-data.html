@@ -47,6 +47,14 @@
         <span>{{badge.attributes.body.badge.description|e}}</span>
       </li>
       <li>
+        <label>Awardee</label>
+        <span>{{badge.attributes.awarded_to_email_address|e}}</span>
+      </li>
+      <li>
+        <label>Assertion</label>
+        <span><a href='{{badge.attributes.endpoint|e}}'>{{badge.attributes.endpoint|e}}</a></span>
+      </li>
+      <li>
         <label>Criteria</label>
         <span><a href='{{badge.attributes.body.badge.criteria|e}}'>{{badge.attributes.body.badge.criteria|e}}</a></span>
       </li>

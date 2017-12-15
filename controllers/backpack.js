@@ -52,43 +52,6 @@ exports.login = function login(request, response) {
  */
 
 exports.authenticate = function authenticate(req, res) {
-  // function formatResponse(to, apiError, humanReadableError) {
-  //   const preferJsonOverHtml = req.accepts('html, json') === 'json';
-  //   if (preferJsonOverHtml) {
-  //     if (apiError) {
-  //       return res.send(400, {status: 'error', reason: apiError});
-  //     }
-  //     return res.send(200, {status: 'ok', email: req.session.emails[0]});
-  //   }
-  //   if (humanReadableError)
-  //     req.flash('error', humanReadableError);
-  //   return res.redirect(303, to);
-  // }
-
-  // const assertion = req.body && req.body.assertion;
-  // const verifierUrl = browserid.getVerifierUrl(configuration);
-  // const audience = browserid.getAudience(req);
-
-  // if (!assertion) {
-  //   return formatResponse('/backpack/login', "assertion expected");
-  // }
-
-  // browserid.verify({
-  //   url: verifierUrl,
-  //   assertion: assertion,
-  //   audience: audience,
-  // }, function (err, email) {
-  //   if (err) {
-  //     logger.error('Failed browserID verification: ');
-  //     logger.debug('Code: ' + err.code + "; Extra: " + err.extra);
-  //     return formatResponse('back', "browserID verification failed: " + err.message,
-  //                           "Could not verify with browserID!");
-  //   }
-
-  //   req.session.emails = [email];
-  //   return formatResponse('/');
-  // });
-
   return res.send(400, {status: 'error', reason: 'Persona has been decommissioned'});
 };
 
@@ -181,7 +144,7 @@ function badgePage (request, response, badges, template) {
     error: error,
     success: success,
     badges: badges,
-    csrfToken: request.session._csrf
+    csrfToken: request.csrfToken()
   });
 }
 
@@ -303,7 +266,7 @@ exports.manage = function manage(request, response, next) {
       error: error,
       success: success,
       badges: badges,
-      csrfToken: request.session._csrf,
+      csrfToken: request.csrfToken(),
       groups: groups
     });
   }
@@ -359,7 +322,7 @@ exports.settings = function(options) {
       response.render('settings.html', {
         error: error,
         success: success,
-        csrfToken: request.session._csrf,
+        csrfToken: request.csrfToken(),
         services: getServices(),
         issuers: issuers
       });
@@ -412,6 +375,16 @@ exports.userBadgeUpload = function userBadgeUpload(req, res) {
   const user = req.user;
   const tmpfile = req.files.userBadge;
   const awardOptions = {recipient: user.get('email')};
+
+  var potentialRecipients = [user.get('email')];
+
+  if (user.attributes.additional_email_1 && user.attributes.additional_email_1_is_verified) {
+    potentialRecipients.push(user.attributes.additional_email_1);
+  }
+
+  if (user.attributes.additional_email_2 && user.attributes.additional_email_2_is_verified) {
+    potentialRecipients.push(user.attributes.additional_email_2);
+  }
 
   // While the openbadges assertion specification doesn't specify a size
   // limit, our backpack does. We don't want to store lots of huge images,
@@ -467,9 +440,8 @@ exports.userBadgeUpload = function userBadgeUpload(req, res) {
       analyzeAssertion(data.value, callback);
     },
     function confirmAndAward(data, callback) {
-      const recipient = awardOptions.recipient;
       const assertion = normalizeAssertion(data.info);
-      const userOwnsBadge = Badge.confirmRecipient(assertion, recipient);
+      const userOwnsBadge = Badge.confirmRecipient(assertion, potentialRecipients);
       if (!userOwnsBadge) {
         const err = new Error('This badge was not issued to you! Contact your issuer.');
         err.name = 'InvalidRecipient';
@@ -477,6 +449,7 @@ exports.userBadgeUpload = function userBadgeUpload(req, res) {
         return callback(err);
       }
       awardOptions.assertion = assertion;
+      awardOptions.awardedTo = userOwnsBadge;
       awardBadge(awardOptions, callback);
     }
   ], redirect);

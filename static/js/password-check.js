@@ -36,9 +36,9 @@ $(function() {
       }
       if (i == (requirements.length - 1)) {
         if (results.errors.length == 0) {
-          $('input[type="submit"]').prop('disabled', false);
+          $('input[type="submit"].password-check').prop('disabled', false);
         } else {
-          $('input[type="submit"]').prop('disabled', true);
+          $('input[type="submit"].password-check').prop('disabled', true);
         }
       }
     }

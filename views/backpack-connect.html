@@ -28,13 +28,11 @@
 							<input name="_csrf" type="hidden" value="{{ csrfToken }}"></input>
 							<div class="group at">
 								<input type="text" name="email" required>
-								<span class="highlight"></span>
 								<span class="bar"></span>
 								<label>Email</label>
 							</div>
 							<div class="group lock">
 								<input type="password" name="password" required>
-								<span class="highlight"></span>
 								<span class="bar"></span>
 								<label>Password</label>
 							</div>
@@ -48,6 +46,7 @@
 						<input name="_csrf" type="hidden" value="{{ csrfToken }}">
 						<input name="callback" type="hidden" value="{{ callback|e }}">
 						<input name="scope" type="hidden" value="{{ joinedScope|e }}">
+						<input name="email" type="hidden" value="{{ email|e }}">
 						<button class="btn btn-primary" type="submit">Grant permission</button>
 						<a class="btn" href="{{ denyCallback|e }}">Deny permission</a>
 						<a href="/backpack/signout" class="logout access">

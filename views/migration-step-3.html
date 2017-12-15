@@ -21,18 +21,16 @@
           <input name="token" type="hidden" value="{{ token }}"></input>
           <div class="group lock">
             <input type="password" name="password" required>
-            <span class="highlight"></span>
             <span class="bar"></span>
             <label>Password</label>
           </div>
           <div class="group lock">
             <input type="password" name="confirm" required>
-            <span class="highlight"></span>
             <span class="bar"></span>
             <label>Confirm</label>
           </div>
           {% include "includes/password-requirements.html" %}
-          <input type="submit" value="set new password" class="btn" disabled="true">
+          <input type="submit" value="set new password" class="btn password-check" disabled="true">
         </form>
       </div>
     </div>
