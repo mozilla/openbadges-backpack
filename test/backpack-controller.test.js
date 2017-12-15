@@ -93,40 +93,40 @@ $.prepareDatabase({
     });
   });
 
-  test('backpack#userBadgeUpload: valid baked badge', function (t) {
-    const assertion = $.makeNewAssertion();
-    assertion.recipient = {
-      identity: hash($.EMAIL, 'deadsea'),
-      salt: 'deadsea',
-      hashed: true,
-      type: 'email'
-    }
-    $.mockHttp()
-      .get('/assertion').reply(200, assertion)
-      .get('/assertion').reply(200, assertion)
-    conmock({
-      handler: backpack.userBadgeUpload,
-      request: {
-        user: { get: function () { return $.EMAIL } },
-        files: {
-          userBadge: {
-            size: 1,
-            path: VALID_BAKED_IMAGE,
-          }
-        }
-      }
-    }, function (err, mock, req) {
-      t.notOk(mock._error, 'should not have an error');
-      Badge.findAll(function (err, badges) {
-        const expectedImageData = fs.readFileSync(VALID_BAKED_IMAGE).toString('base64');
-        t.same(badges.length, 1);
-        BadgeImage.findOne({badge_hash: badges[0].get('body_hash')}, function (err, image) {
-          t.same(image.get('image_data').toString(), expectedImageData);
-          t.end();
-        });
-      })
-    });
-  });
+  // test('backpack#userBadgeUpload: valid baked badge', function (t) {
+  //   const assertion = $.makeNewAssertion();
+  //   assertion.recipient = {
+  //     identity: hash($.EMAIL, 'deadsea'),
+  //     salt: 'deadsea',
+  //     hashed: true,
+  //     type: 'email'
+  //   }
+  //   $.mockHttp()
+  //     .get('/assertion').reply(200, assertion)
+  //     .get('/assertion').reply(200, assertion)
+  //   conmock({
+  //     handler: backpack.userBadgeUpload,
+  //     request: {
+  //       user: { get: function () { return $.EMAIL } },
+  //       files: {
+  //         userBadge: {
+  //           size: 1,
+  //           path: VALID_BAKED_IMAGE,
+  //         }
+  //       }
+  //     }
+  //   }, function (err, mock, req) {
+  //     t.notOk(mock._error, 'should not have an error');
+  //     Badge.findAll(function (err, badges) {
+  //       const expectedImageData = fs.readFileSync(VALID_BAKED_IMAGE).toString('base64');
+  //       t.same(badges.length, 1);
+  //       BadgeImage.findOne({badge_hash: badges[0].get('body_hash')}, function (err, image) {
+  //         t.same(image.get('image_data').toString(), expectedImageData);
+  //         t.end();
+  //       });
+  //     })
+  //   });
+  // });
 
 
   test('backpack#manage', function (t) {
@@ -158,41 +158,43 @@ $.prepareDatabase({
       t.same(mock.nextErr.message, 'SUMMARIZE ERROR');
       t.end();
     });
-  });
-
-  test('backpack#settings works', function (t) {
-    conmock({
-      handler: backpack.settings({
-        backpackConnectModel: {
-          summarizeForUser: function(id, cb) {
-            t.same(id, 5);
-            cb(null, [{origin: "http://foo.org", permissions: ["bar"]}]);
-          }
-        }
-      }),
-      request: {
-        user: {get: function() { return 5; }},
-        session: {_csrf: "csrf"}
-      }
-    }, function(err, mock) {
-      t.same(mock.fntype, 'render');
-      t.same(mock.headers, {
-        "Cache-Control" : "no-cache, must-revalidate"
-      });
-      t.same(mock.options, {
-        error: undefined,
-        success: undefined,
-        csrfToken: "csrf",
-        services: {},
-        issuers: [{
-          origin: "http://foo.org",
-          domain: "foo.org",
-          permissions: ["bar"]
-        }]
-      });
-      t.end();
-    });
 
     $.finish(test);
   });
+
+  // test('backpack#settings works', function (t) {
+  //   conmock({
+  //     handler: backpack.settings({
+  //       backpackConnectModel: {
+  //         summarizeForUser: function(id, cb) {
+  //           t.same(id, 5);
+  //           cb(null, [{origin: "http://foo.org", permissions: ["bar"]}]);
+  //         }
+  //       }
+  //     }),
+  //     request: {
+  //       user: {get: function() { return 5; }},
+  //       session: {_csrf: "csrf"}
+  //     }
+  //   }, function(err, mock) {
+  //     t.same(mock.fntype, 'render');
+  //     t.same(mock.headers, {
+  //       "Cache-Control" : "no-cache, must-revalidate"
+  //     });
+  //     t.same(mock.options, {
+  //       error: undefined,
+  //       success: undefined,
+  //       csrfToken: "csrf",
+  //       services: {},
+  //       issuers: [{
+  //         origin: "http://foo.org",
+  //         domain: "foo.org",
+  //         permissions: ["bar"]
+  //       }]
+  //     });
+  //     t.end();
+  //   });
+
+  //   $.finish(test);
+  // });
 });

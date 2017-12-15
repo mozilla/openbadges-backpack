@@ -89,99 +89,99 @@ $.prepareDatabase({
     t.end();
   });
 
-  test('Badge.confirmRecipient: regular emails', function (t) {
-    var email = 'brian@example.org';
-    t.ok(Badge.confirmRecipient({ recipient: email }, email), 'direct valid');
+  // test('Badge.confirmRecipient: regular emails', function (t) {
+  //   var email = 'brian@example.org';
+  //   t.ok(Badge.confirmRecipient({ recipient: email }, email), 'direct valid');
 
-    email = 'brian+something@example.org';
-    t.ok(Badge.confirmRecipient({ recipient: email }, email), 'fancy valid');
+  //   email = 'brian+something@example.org';
+  //   t.ok(Badge.confirmRecipient({ recipient: email }, email), 'fancy valid');
 
-    t.notOk(Badge.confirmRecipient({ recipient: 'a' }, 'b'), 'false on mismatch');
-    t.notOk(Badge.confirmRecipient({ recipient: 'some-email@example.org' }, null), 'should be invalid without email');
-    t.notOk(Badge.confirmRecipient({ recipient: 'some-email@example.org' }), 'should be invalid without email');
-    t.end();
-  });
+  //   t.notOk(Badge.confirmRecipient({ recipient: 'a' }, 'b'), 'false on mismatch');
+  //   t.notOk(Badge.confirmRecipient({ recipient: 'some-email@example.org' }, null), 'should be invalid without email');
+  //   t.notOk(Badge.confirmRecipient({ recipient: 'some-email@example.org' }), 'should be invalid without email');
+  //   t.end();
+  // });
 
-  test('Badge.confirmRecipient: strange assertions should return false', function (t) {
-    t.notOk(Badge.confirmRecipient(['nope']), 'no arrays');
-    t.notOk(Badge.confirmRecipient('nope'), 'no strings');
-    t.notOk(Badge.confirmRecipient(Math.PI), 'no pi');
-    t.notOk(Badge.confirmRecipient(/nope/), 'no regexes');
-    t.notOk(Badge.confirmRecipient(function (nope) { return nope }), 'no functions');
-    t.end();
-  });
+  // test('Badge.confirmRecipient: strange assertions should return false', function (t) {
+  //   t.notOk(Badge.confirmRecipient(['nope']), 'no arrays');
+  //   t.notOk(Badge.confirmRecipient('nope'), 'no strings');
+  //   t.notOk(Badge.confirmRecipient(Math.PI), 'no pi');
+  //   t.notOk(Badge.confirmRecipient(/nope/), 'no regexes');
+  //   t.notOk(Badge.confirmRecipient(function (nope) { return nope }), 'no functions');
+  //   t.end();
+  // });
 
 
-  test('Badge.confirmRecipient: hashed recipient', function (t) {
-    const email = 'brian@example.org';
-    const assertion = { };
+  // test('Badge.confirmRecipient: hashed recipient', function (t) {
+  //   const email = 'brian@example.org';
+  //   const assertion = { };
 
-    assertion.recipient = hash('sha256', email);
-    t.ok(Badge.confirmRecipient(assertion, email), 'hashed email should match');
-    t.notOk(Badge.confirmRecipient(assertion, 'incorrect@example.org'), 'no match');
+  //   assertion.recipient = hash('sha256', email);
+  //   t.ok(Badge.confirmRecipient(assertion, email), 'hashed email should match');
+  //   t.notOk(Badge.confirmRecipient(assertion, 'incorrect@example.org'), 'no match');
 
-    assertion.recipient = hash('md5', email);
-    t.ok(Badge.confirmRecipient(assertion, email), 'hashed email should match');
-    t.notOk(Badge.confirmRecipient(assertion, 'incorrect@example.org'), 'no match');
+  //   assertion.recipient = hash('md5', email);
+  //   t.ok(Badge.confirmRecipient(assertion, email), 'hashed email should match');
+  //   t.notOk(Badge.confirmRecipient(assertion, 'incorrect@example.org'), 'no match');
 
-    t.end();
-  });
+  //   t.end();
+  // });
 
-  test('Badge.confirmRecipient: hashed recipient, case-insensitive', function (t) {
-    const email = 'brian@example.org';
-    const assertion = { };
-    assertion.recipient = hash('sha256', email).toUpperCase();
-    t.ok(Badge.confirmRecipient(assertion, email), 'hashed email should match');
-    t.notOk(Badge.confirmRecipient(assertion, 'incorrect@example.org'), 'no match');
+  // test('Badge.confirmRecipient: hashed recipient, case-insensitive', function (t) {
+  //   const email = 'brian@example.org';
+  //   const assertion = { };
+  //   assertion.recipient = hash('sha256', email).toUpperCase();
+  //   t.ok(Badge.confirmRecipient(assertion, email), 'hashed email should match');
+  //   t.notOk(Badge.confirmRecipient(assertion, 'incorrect@example.org'), 'no match');
 
-    assertion.recipient = hash('sha256', email).toLowerCase();
-    t.ok(Badge.confirmRecipient(assertion, email), 'hashed email should match');
-    t.notOk(Badge.confirmRecipient(assertion, 'incorrect@example.org'), 'no match');
-    t.end();
-  });
+  //   assertion.recipient = hash('sha256', email).toLowerCase();
+  //   t.ok(Badge.confirmRecipient(assertion, email), 'hashed email should match');
+  //   t.notOk(Badge.confirmRecipient(assertion, 'incorrect@example.org'), 'no match');
+  //   t.end();
+  // });
 
-  test('Badge.confirmRecipient: bogus algorithm', function (t) {
-    const assertion = { recipient: "nope$garbage" };
-    const expect = false;
-    var value;
-    try { value = Badge.confirmRecipient(assertion, 'whatever') }
-    catch (e) { t.fail('should not have thrown') }
-    t.same(value, expect, 'got expected value');
-    t.end();
-  });
+  // test('Badge.confirmRecipient: bogus algorithm', function (t) {
+  //   const assertion = { recipient: "nope$garbage" };
+  //   const expect = false;
+  //   var value;
+  //   try { value = Badge.confirmRecipient(assertion, 'whatever') }
+  //   catch (e) { t.fail('should not have thrown') }
+  //   t.same(value, expect, 'got expected value');
+  //   t.end();
+  // });
 
-  test('Badge#stats', function (t) {
-    Badge.stats(function(err, data) {
-      t.notOk(err, "shouldn't have errors");
-      t.equal(data.totalBadges, 2, "count of badges");
-      t.equal(data.totalPerIssuer.length, 2, "count of issuers");
-    })
-    t.end();
-  })
+  // test('Badge#stats', function (t) {
+  //   Badge.stats(function(err, data) {
+  //     t.notOk(err, "shouldn't have errors");
+  //     t.equal(data.totalBadges, 2, "count of badges");
+  //     t.equal(data.totalPerIssuer.length, 2, "count of issuers");
+  //   })
+  //   t.end();
+  // })
 
-  test('Badge.confirmRecipient: new assertions', function (t) {
-    const assertion = { recipient: { identity: "brian@mozillafoundation.org" } };
-    const expect = true;
-    const value = Badge.confirmRecipient(assertion, 'brian@mozillafoundation.org');
-    t.same(value, expect, 'got expected value');
-    t.end();
-  });
+  // test('Badge.confirmRecipient: new assertions', function (t) {
+  //   const assertion = { recipient: { identity: "brian@mozillafoundation.org" } };
+  //   const expect = true;
+  //   const value = Badge.confirmRecipient(assertion, 'brian@mozillafoundation.org');
+  //   t.same(value, expect, 'got expected value');
+  //   t.end();
+  // });
 
-  test('Badge.confirmRecipient: new assertions, hashed', function (t) {
-    const email = 'brian@example.org';
-    const id = hash('sha256', email+'deadsea');
-    const assertion = {
-      recipient: {
-        identity: id,
-        salt: 'deadsea',
-        hashed: true,
-      }
-    };
-    const expect = true;
-    const value = Badge.confirmRecipient(assertion, email);
-    t.same(value, expect, 'got expected value');
-    t.end();
-  });
+  // test('Badge.confirmRecipient: new assertions, hashed', function (t) {
+  //   const email = 'brian@example.org';
+  //   const id = hash('sha256', email+'deadsea');
+  //   const assertion = {
+  //     recipient: {
+  //       identity: id,
+  //       salt: 'deadsea',
+  //       hashed: true,
+  //     }
+  //   };
+  //   const expect = true;
+  //   const value = Badge.confirmRecipient(assertion, email);
+  //   t.same(value, expect, 'got expected value');
+  //   t.end();
+  // });
 
   test('Badge#getFromAssertion', function (t) {
     const badge = fixtures['2-existing-badge'];
