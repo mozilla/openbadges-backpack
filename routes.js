@@ -25,31 +25,31 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
   app.param('badgeHash', badge.findByHash);
 
   // Badge baking and issuer
-  app.get('/baker', baker.baker);
-  app.get('/issuer.js', issuer.generateScript);
+  app.get('/baker', csrfProtection, baker.baker);
+  app.get('/issuer.js', csrfProtection, issuer.generateScript);
   app.get('/issuer/frame', csrfProtection, issuer.frame);
   app.post('/issuer/frameless', parseForm, csrfProtection, issuer.frameless);
-  app.get('/issuer/assertion', issuer.issuerBadgeAddFromAssertion);
+  app.get('/issuer/assertion', csrfProtection, issuer.issuerBadgeAddFromAssertion);
   app.post('/issuer/assertion', parseForm, issuer.issuerBadgeAddFromAssertion);
-  app.get('/issuer/welcome', issuer.welcome);
+  app.get('/issuer/welcome', csrfProtection, issuer.welcome);
 
   // Displayer
-  app.get('/displayer/convert/email', displayer.emailToUserIdView);
+  app.get('/displayer/convert/email', csrfProtection, displayer.emailToUserIdView);
   app.post('/displayer/convert/email', parseForm, displayer.emailToUserId);
-  app.get('/displayer/:apiUserId/groups.:format?', displayer.userGroups);
-  app.get('/displayer/:apiUserId/group/:apiGroupId.:format?', displayer.userGroupBadges);
+  app.get('/displayer/:apiUserId/groups.:format?', csrfProtection, displayer.userGroups);
+  app.get('/displayer/:apiUserId/group/:apiGroupId.:format?', csrfProtection, displayer.userGroupBadges);
 
   // Demo pages/functions
-  app.get('/demo', demo.issuer);
-  app.get('/demo/ballertime', demo.massAward);
-  app.get('/demo/badge.json', demo.demoBadge);
-  app.get('/demo/invalid.json', demo.badBadge);
+  app.get('/demo', csrfProtection, demo.issuer);
+  app.get('/demo/ballertime', csrfProtection, demo.massAward);
+  app.get('/demo/badge.json', csrfProtection, demo.demoBadge);
+  app.get('/demo/invalid.json', csrfProtection, demo.badBadge);
   app.post('/demo/award', parseForm, demo.award);
 
   // Backpack
   app.get('/', csrfProtection, backpack.recentBadges);
-  app.get('/backpack', backpack.manage);
-  app.get('/backpack/badges', backpack.allBadges);
+  app.get('/backpack', csrfProtection, backpack.manage);
+  app.get('/backpack/badges', csrfProtection, backpack.allBadges);
   app.get('/backpack/add', csrfProtection, backpack.addBadge);
   app.get('/backpack/welcome', csrfProtection, backpack.welcome);
   app.get('/backpack/login', csrfProtection, backpack.login); // normal login
@@ -81,7 +81,7 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
     failureRedirect : '/backpack/signup', // redirect back to the signup page if there is an error
     failureFlash : true // allow flash messages
   }));
-  app.get('/backpack/signout', backpack.signout);
+  app.get('/backpack/signout', csrfProtection, backpack.signout);
   app.post('/backpack/badge', parseForm, csrfProtection, backpack.userBadgeUpload);
 
   // User profile and password functionality
@@ -120,10 +120,10 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
   app.post('/backpack/settings/revoke-origin', parseForm, csrfProtection, backpackConnect.revokeOrigin());
 
   // Statistics
-  app.get('/stats', backpack.stats);
+  app.get('/stats', csrfProtection, backpack.stats);
 
   // Badge deletion
-  app.get('/backpack/badge/:badgeId', backpack.details);
+  app.get('/backpack/badge/:badgeId', csrfProtection, backpack.details);
   app.delete('/backpack/badge/:badgeId', backpack.deleteBadge);
   app.delete('/badge/:badgeId', badge.destroy);
 
@@ -132,11 +132,11 @@ module.exports = function(app, passport, parseForm, csrfProtection) {
   app.put('/group/:groupId', group.update);
   app.delete('/group/:groupId', group.destroy);
 
-  app.get('/images/badge/:badgeHash.:badgeFileType', badge.image);
+  app.get('/images/badge/:badgeHash.:badgeFileType', csrfProtection, badge.image);
 
   // Badge and group sharing
   app.post('/share/badge/:badgeId', parseForm, badge.share);
-  app.get('/share/badge/:badgeUrl', badge.show);
+  app.get('/share/badge/:badgeUrl', csrfProtection, badge.show);
   app.get('/share/:groupUrl/edit', csrfProtection, share.editor);
   app.post('/share/:groupUrl', parseForm, csrfProtection, share.createOrUpdate);
   app.put('/share/:groupUrl', share.createOrUpdate);
