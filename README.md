@@ -1,3 +1,5 @@
+**We are retiring the Mozilla Backpack and transitioning to Badgr Backpack. More information at https://backpack.openbadges.org.badgr.io/**
+
 # Open Badges Backpack-ng (Next Generation)
 [![Build Status](https://travis-ci.org/mozilla/openbadges-backpack.png?branch=master)](https://travis-ci.org/mozilla/openbadges-backpack)
 [![Dependencies](https://david-dm.org/mozilla/openbadges-backpack.svg)](https://david-dm.org/mozilla/openbadges-backpack)
